@@ -1,50 +1,351 @@
-# Welcome to your Expo app 👋
+BridgeUA — Frontend (Expo / React Native)
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+BridgeUA is a community-driven mobile application that connects users with trusted Ukrainian businesses through real recommendations.
 
-## Get started
+This repository contains the frontend (mobile app), built with:
+- React Native
+- Expo
+- Expo Router
+- TypeScript
 
-1. Install dependencies
 
-   ```bash
-   npm install
-   ```
+----------------------------------------
+GETTING STARTED
+----------------------------------------
 
-2. Start the app
+1. Clone the repository
 
-   ```bash
-   npx expo start
-   ```
+git clone <your-repo-url>
+cd bridgeua-fe
 
-In the output, you'll find options to open the app in a
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+2. Install dependencies
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+npm install
 
-## Get a fresh project
 
-When you're ready, run:
+3. Start the app
 
-```bash
-npm run reset-project
+npx expo start
+
+
+Open on your phone:
+- Install Expo Go from the App Store or Google Play
+- Scan the QR code shown in the terminal
+- Make sure your phone and laptop are on the same Wi-Fi
+
+
+If it doesn’t connect:
+
+npx expo start --tunnel
+
+
+----------------------------------------
+PROJECT STRUCTURE OVERVIEW
+----------------------------------------
+```text
+bridgeua-fe/
+├── app/        → Screens and navigation (Expo Router)
+├── src/        → Logic, components, services, theme
+├── assets/     → Images, icons, fonts
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+----------------------------------------
+APP FOLDER (ROUTING & SCREENS)
+----------------------------------------
 
-## Learn more
+The app/ folder controls navigation using Expo Router.
 
-To learn more about developing your project with Expo, look at the following resources:
+Think of it as the "pages" of the app.
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+Main sections:
+```text
+app/
+- splash/           → Splash screen
+- onboarding/       → Onboarding flow
+- auth/             → Login, signup, password flows
+- (tabs)/           → Main app (bottom tabs navigation)
+- business/         → Business details and related pages
+- add-business/     → Add business flow
+- profile/          → User profile pages
+- search/           → Search screens
+- filters/          → Filters (can also be modal)
+- promotions/       → Promotions pages
+- settings/         → App settings
+- modal/            → Bottom sheets and overlays
+```
 
-## Join the community
+Routing example:
 
-Join our community of developers creating universal apps.
+File:
+app/business/[id].tsx
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Route:
+business/123
+
+
+----------------------------------------
+COMPONENTS (REUSABLE UI)
+----------------------------------------
+
+Location:
+src/components/
+
+This is the most important folder for UI consistency.
+
+Never duplicate UI — reuse components from here.
+
+
+Global UI components:
+
+src/components/ui/
+
+Includes:
+- AppButton
+- AppInput
+- AppScreen
+- AppChip
+- AppRating
+- GradientHeader
+- AppBottomSheet
+- AppCard
+
+If you want to change the design globally, modify components here.
+
+
+Feature-based components:
+
+src/components/home/
+src/components/business/
+src/components/profile/
+src/components/add-business/
+src/components/auth/
+
+Examples:
+- BusinessCard
+- DiscoverHeader
+- ProfileHeader
+- PromoBanner
+
+
+----------------------------------------
+FEATURES (BUSINESS LOGIC)
+----------------------------------------
+
+Location:
+src/features/
+
+Each feature is isolated.
+
+Structure:
+
+features/
+- auth/
+- businesses/
+- reviews/
+- profile/
+- add-business/
+- filters/
+
+Inside each feature:
+- hooks/        → custom hooks
+- services/     → API logic
+- types/        → types
+- validation/   → form validation
+
+
+----------------------------------------
+SERVICES (EXTERNAL LOGIC)
+----------------------------------------
+
+Location:
+src/services/
+
+Handles communication with backend and external systems.
+
+Includes:
+- api/        → API client and endpoints
+- auth/       → token and session logic
+- storage/    → SecureStore and local storage
+- analytics/  → event tracking
+
+
+----------------------------------------
+STORE (GLOBAL STATE)
+----------------------------------------
+
+Location:
+src/store/
+
+Holds global state:
+
+- auth.store.ts
+- profile.store.ts
+- filter.store.ts
+- discovery.store.ts
+
+
+----------------------------------------
+DESIGN SYSTEM
+----------------------------------------
+
+Location:
+src/constants/
+
+This defines the visual identity of the app.
+
+Includes:
+- colors.ts
+- spacing.ts
+- radius.ts
+- typography.ts
+- gradients.ts
+- shadows.ts
+
+Important rule:
+Do NOT hardcode styles. Always use constants.
+
+
+----------------------------------------
+MOCK DATA
+----------------------------------------
+
+Location:
+src/mocks/
+
+Used during development before backend is ready.
+
+Examples:
+- businesses.mock.ts
+- reviews.mock.ts
+- profile.mock.ts
+
+
+----------------------------------------
+UTILS
+----------------------------------------
+
+Location:
+src/utils/
+
+Helper functions such as:
+- formatDate
+- validators
+- general helpers
+
+
+----------------------------------------
+ASSETS
+----------------------------------------
+
+Location:
+assets/
+
+Includes:
+- images/
+- icons/
+- fonts/
+- lottie/
+
+
+----------------------------------------
+NAVIGATION FLOW
+----------------------------------------
+
+App flow:
+
+Splash → Onboarding → Auth → Main App (Tabs)
+
+Tabs include:
+- Home
+- Following
+- Add
+- Notifications
+- Profile
+
+
+----------------------------------------
+DESIGN RULES
+----------------------------------------
+
+Colors:
+- Primary: Green
+- Accent: Orange
+- Background: Light neutral
+- Text: Dark + gray variants
+
+UI Principles:
+- Rounded corners
+- Clean white cards
+- Soft shadows
+- Gradient headers
+- Consistent spacing
+
+
+----------------------------------------
+DEVELOPMENT GUIDELINES
+----------------------------------------
+
+1. Do NOT duplicate UI  
+Always reuse components from src/components/ui/
+
+2. Do NOT hardcode styles  
+Use constants:
+colors.primaryGreen
+spacing.md
+radius.lg
+
+3. Keep logic out of screens  
+Screens = layout only  
+Logic → features/
+
+4. Use mock data first  
+Located in src/mocks/
+
+5. Naming conventions  
+- Components: PascalCase  
+- Files: camelCase or kebab-case  
+- Folders: kebab-case  
+
+
+----------------------------------------
+ENVIRONMENT VARIABLES
+----------------------------------------
+
+Create a .env file:
+
+EXPO_PUBLIC_API_URL=http://localhost:4000
+
+
+----------------------------------------
+BACKEND CONNECTION (FUTURE)
+----------------------------------------
+
+API will be connected through:
+
+src/services/api/client.ts
+
+
+----------------------------------------
+CURRENT STATUS
+----------------------------------------
+
+- Project structure created
+- Navigation configured
+- Core UI components added
+- Mock data in place
+- Backend integration pending
+
+
+----------------------------------------
+QUICK GUIDE
+----------------------------------------
+
+If you want to:
+
+Add a screen → go to app/  
+Create reusable UI → src/components/ui/  
+Add feature logic → src/features/  
+Call API → src/services/api/  
+Change design → src/constants/  
+Use fake data → src/mocks/
