@@ -1,7 +1,6 @@
 import React from "react";
-import { Pressable, StyleSheet, Text } from "react-native";
-import { colors } from "../../../constants/colors";
-import { radius } from "../../../constants/radius";
+import { Pressable, Text } from "react-native";
+import { styles } from "./AppButton.styles";
 
 type Props = {
   title: string;
@@ -33,34 +32,3 @@ export default function AppButton({ title, onPress, variant = "primary" }: Props
     </Pressable>
   );
 }
-
-const styles = StyleSheet.create({
-  base: {
-    height: 52,
-    borderRadius: radius.md,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  primary: {
-    backgroundColor: colors.primaryGreen,
-  },
-  secondary: {
-    backgroundColor: colors.accentOrange,
-  },
-  ghost: {
-    backgroundColor: "transparent",
-  },
-  text: {
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  primaryText: {
-    color: colors.white,
-  },
-  secondaryText: {
-    color: colors.white,
-  },
-  ghostText: {
-    color: colors.primaryGreen,
-  },
-});

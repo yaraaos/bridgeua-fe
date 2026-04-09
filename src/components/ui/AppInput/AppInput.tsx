@@ -1,32 +1,30 @@
-import React from "react";
-import { StyleSheet, TextInput, TextInputProps, View } from "react-native";
-import { colors } from "../../../constants/colors";
-import { radius } from "../../../constants/radius";
+import React, { useState } from "react";
+import { TextInput, TextInputProps, View } from "react-native";
+import { styles } from "./AppInput.styles";
 
-export default function AppInput(props: TextInputProps) {
+type Props = TextInputProps & {
+  error?: boolean;
+  disabled?: boolean;
+};
+
+export default function AppInput({ error, disabled, style, ...props }: Props) {
+  const [isFocused, setIsFocused] = useState(false);
+
   return (
     <View style={styles.wrapper}>
       <TextInput
-        placeholderTextColor={colors.textMuted}
+        editable={!disabled}
         {...props}
-        style={[styles.input, props.style]}
+        style={[
+          styles.input,
+          isFocused && styles.focused,
+          error && styles.error,
+          disabled && styles.disabled,
+          style,
+        ]}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
       />
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  wrapper: {
-    width: "100%",
-  },
-  input: {
-    height: 50,
-    backgroundColor: colors.white,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: radius.md,
-    paddingHorizontal: 14,
-    fontSize: 15,
-    color: colors.textPrimary,
-  },
-});

@@ -1,29 +1,64 @@
-import { FlatList, StyleSheet, Text, View } from "react-native";
-import AppScreen from "../../src/components/ui/AppScreen/AppScreen";
-import GradientHeader from "../../src/components/ui/GradientHeader/GradientHeader";
-import AppInput from "../../src/components/ui/AppInput/AppInput";
+import { router } from "expo-router";
+import { FlatList, StyleSheet, View } from "react-native";
 import BusinessCard from "../../src/components/business/BusinessCard/BusinessCard";
-import { colors } from "../../src/constants/colors";
+import ScreenHeader from "../../src/components/common/ScreenHeader/ScreenHeader";
+import AppScreen from "../../src/components/ui/AppScreen/AppScreen";
 import { businessesMock } from "../../src/mocks/businesses.mock";
 
 export default function HomeScreen() {
+  const handleLocationPress = () => {
+    console.log("Open location picker");
+    // later: open bottom sheet / modal
+    // first option: Use my location
+    // then: list of cities / states
+  };
+
+  const handleMapPress = () => {
+    console.log("Open map");
+  };
+
+  const handleFilterPress = () => {
+    console.log("Open filters");
+  };
+
+  const handleAddPress = () => {
+    router.push("/add-business/search");
+  };
+
   return (
-    <AppScreen style={styles.container}>
-      <GradientHeader>
-        <Text style={styles.location}>Location</Text>
-        <Text style={styles.locationValue}>California, USA</Text>
-        <Text style={styles.title}>Discover</Text>
-        <View style={styles.searchWrap}>
-          <AppInput placeholder="Find services, food or places" />
-        </View>
-      </GradientHeader>
+    <AppScreen withTopInset={false} style={styles.container}>
+      <ScreenHeader
+        title="Discover"
+        titleSubtitle="Community trusted places"
+        subtitleLabel="Location"
+        subtitleValue="California, USA"
+        onSubtitlePress={handleLocationPress}
+        showSubtitleChevron
+        showSearch
+        searchPlaceholder="Find services, food or places"
+        actions={["map", "filter", "add"]}
+        onPressMap={handleMapPress}
+        onPressFilter={handleFilterPress}
+        onPressAdd={handleAddPress}
+      />
 
       <View style={styles.listWrap}>
         <FlatList
           data={businessesMock}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => <BusinessCard business={item} />}
+          keyExtractor={(item) => String(item.id)}
+          renderItem={({ item }) => (
+            <BusinessCard
+              business={item}
+              onPress={() =>
+                router.push({
+                  pathname: "/business/[id]",
+                  params: { id: String(item.id) },
+                })
+              }
+            />
+          )}
           showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.listContent}
         />
       </View>
     </AppScreen>
@@ -34,28 +69,12 @@ const styles = StyleSheet.create({
   container: {
     padding: 0,
   },
-  location: {
-    fontSize: 12,
-    color: colors.textSecondary,
-    marginTop: 4,
-  },
-  locationValue: {
-    fontSize: 14,
-    color: colors.textPrimary,
-    marginTop: 2,
-    marginBottom: 12,
-  },
-  title: {
-    fontSize: 34,
-    fontWeight: "800",
-    color: colors.textPrimary,
-    marginBottom: 12,
-  },
-  searchWrap: {
-    marginBottom: 8,
-  },
   listWrap: {
     flex: 1,
-    padding: 16,
+    paddingHorizontal: 16,
+    paddingTop: 16,
+  },
+  listContent: {
+    paddingBottom: 24,
   },
 });
