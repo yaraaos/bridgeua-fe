@@ -11,7 +11,8 @@ export const styles = StyleSheet.create({
   },
   leftBlock: {
     flex: 1,
-    paddingTop: 4,
+    paddingTop: 18,
+    gap: 6,
   },
   subtitleLabel: {
     fontSize: 12,
