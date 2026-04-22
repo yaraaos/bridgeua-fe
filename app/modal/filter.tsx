@@ -20,6 +20,7 @@ import FilterSidebar from "../../src/components/filters/FilterSidebar/FilterSide
 import RatingSelector from "../../src/components/filters/RatingSelector/RatingSelector";
 import AppButton from "../../src/components/ui/AppButton/AppButton";
 import { colors } from "../../src/constants/colors";
+import { useFilterStore } from "../../src/store/filter.store";
 
 type FilterTab = "sort" | "cuisines" | "ratings" | "distance";
 
@@ -45,17 +46,22 @@ export default function FilterModalScreen() {
   const insets = useSafeAreaInsets();
   const SCREEN_HEIGHT = Dimensions.get("window").height;
   const [activeTab, setActiveTab] = useState<FilterTab>("sort");
-  const [selectedSort, setSelectedSort] = useState<string>("Rating");
-  const [selectedCuisines, setSelectedCuisines] = useState<string[]>([
-    "Italian",
-  ]);
-  const [selectedRating, setSelectedRating] = useState<string>("4.0+");
-  const [selectedDistance, setSelectedDistance] = useState<string>("10 km");
-  const [customDistance, setCustomDistance] = useState<string>("");
-
   const [isClosing, setIsClosing] = useState(false);
   const backdropOpacity = useRef(new Animated.Value(0)).current;
   const sheetTranslateY = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
+  const {
+    sort,
+    cuisines,
+    rating,
+    distance,
+    customDistance,
+    setSort,
+    toggleCuisine,
+    setRating,
+    setDistance,
+    setCustomDistance,
+    reset,
+  } = useFilterStore();
 
   useEffect(() => {
     //opening modal animation
@@ -109,15 +115,6 @@ export default function FilterModalScreen() {
     [],
   );
 
-  const clearFilters = () => {
-    setSelectedSort("Relevance (Default)");
-    setSelectedCuisines([]);
-    setSelectedRating("");
-    setSelectedDistance("");
-    setCustomDistance("");
-    setActiveTab("sort");
-  };
-
   const renderRightPanel = () => {
     if (activeTab === "sort") {
       return (
@@ -125,8 +122,8 @@ export default function FilterModalScreen() {
           title="SORT BY"
           type="radio"
           options={SORT_OPTIONS}
-          selectedValue={selectedSort}
-          onSelect={(value) => setSelectedSort(value)}
+          selectedValue={sort}
+          onSelect={setSort}
         />
       );
     }
@@ -137,29 +134,21 @@ export default function FilterModalScreen() {
           title="FILTER BY CUISINE"
           type="checkbox"
           options={CUISINE_OPTIONS}
-          selectedValues={selectedCuisines}
-          onToggle={(value) => {
-            setSelectedCuisines((prev) =>
-              prev.includes(value)
-                ? prev.filter((item) => item !== value)
-                : [...prev, value],
-            );
-          }}
+          selectedValues={cuisines}
+          onToggle={toggleCuisine}
         />
       );
     }
 
     if (activeTab === "ratings") {
-      return (
-        <RatingSelector value={selectedRating} onChange={setSelectedRating} />
-      );
+      return <RatingSelector value={rating} onChange={setRating} />;
     }
 
     return (
       <DistanceSelector
-        value={selectedDistance}
+        value={distance}
         customValue={customDistance}
-        onChange={setSelectedDistance}
+        onChange={setDistance}
         onChangeCustom={setCustomDistance}
       />
     );
@@ -214,7 +203,7 @@ export default function FilterModalScreen() {
             },
           ]}
         >
-          <Pressable onPress={clearFilters}>
+          <Pressable onPress={reset}>
             <Text style={styles.clearText}>Clear Filters</Text>
           </Pressable>
 
