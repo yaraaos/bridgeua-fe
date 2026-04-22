@@ -2,12 +2,15 @@ import { router } from "expo-router";
 import { FlatList, StyleSheet, View } from "react-native";
 import BusinessCard from "../../src/components/business/BusinessCard/BusinessCard";
 import ScreenHeader from "../../src/components/common/ScreenHeader/ScreenHeader";
+import CategoryScroller from "../../src/components/home/CategoryScroller/CategoryScroller";
 import AppScreen from "../../src/components/ui/AppScreen/AppScreen";
+import { HOME_CATEGORIES } from "../../src/constants/categories";
 import { businessesMock } from "../../src/mocks/businesses.mock";
 import { useFilterStore } from "../../src/store/filter.store";
 
 export default function HomeScreen() {
-  const { sort, cuisines, rating, distance, customDistance } = useFilterStore();
+  const { sort, cuisines, rating, distance, customDistance, reset } =
+    useFilterStore();
 
   const handleLocationPress = () => {
     console.log("Open location picker");
@@ -44,6 +47,26 @@ export default function HomeScreen() {
     rating && rating !== "Any rating"
       ? Number(String(rating).replace("+", ""))
       : null;
+
+  const selectedHomeCategory =
+    cuisines.length === 0
+      ? "All Categories"
+      : cuisines[0] === "Automotive"
+        ? "Auto"
+        : cuisines[0];
+
+  const handleSelectCategory = (category: string) => {
+    if (category === "All Categories") {
+      reset();
+      return;
+    }
+
+    const mappedCategory = category === "Auto" ? "Automotive" : category;
+
+    useFilterStore.setState({
+      cuisines: [mappedCategory],
+    });
+  };
 
   const filteredBusinesses = [...businessesMock]
     .filter((business) => {
@@ -101,6 +124,11 @@ export default function HomeScreen() {
         onPressAdd={handleAddPress}
       />
 
+      <CategoryScroller
+        categories={HOME_CATEGORIES}
+        selectedCategory={selectedHomeCategory}
+        onSelectCategory={handleSelectCategory}
+      />
       <View style={styles.listWrap}>
         <FlatList
           data={filteredBusinesses}

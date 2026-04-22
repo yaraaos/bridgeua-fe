@@ -1,0 +1,1 @@
+export { default as CategoryScroller } from "./CategoryScroller/CategoryScroller";
