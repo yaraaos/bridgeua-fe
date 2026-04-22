@@ -18,7 +18,7 @@ export default function HomeScreen() {
   };
 
   const handleFilterPress = () => {
-    console.log("Open filters");
+    router.push("/modal/filter");
   };
 
   const handleAddPress = () => {
