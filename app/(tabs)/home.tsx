@@ -8,9 +8,10 @@ import { HOME_CATEGORIES } from "../../src/constants/categories";
 import { businessesMock } from "../../src/mocks/businesses.mock";
 import { useFilterStore } from "../../src/store/filter.store";
 
+const CATEGORY_BAR_HEIGHT = 48;
+
 export default function HomeScreen() {
-  const { sort, cuisines, rating, distance, customDistance, reset } =
-    useFilterStore();
+  const { sort, cuisines, rating, distance, customDistance } = useFilterStore();
 
   const handleLocationPress = () => {
     console.log("Open location picker");
@@ -57,7 +58,9 @@ export default function HomeScreen() {
 
   const handleSelectCategory = (category: string) => {
     if (category === "All Categories") {
-      reset();
+      useFilterStore.setState({
+        cuisines: [],
+      });
       return;
     }
 
@@ -124,12 +127,15 @@ export default function HomeScreen() {
         onPressAdd={handleAddPress}
       />
 
-      <CategoryScroller
-        categories={HOME_CATEGORIES}
-        selectedCategory={selectedHomeCategory}
-        onSelectCategory={handleSelectCategory}
-      />
-      <View style={styles.listWrap}>
+      <View style={styles.contentArea}>
+        <View style={styles.categoryOverlay}>
+          <CategoryScroller
+            categories={HOME_CATEGORIES}
+            selectedCategory={selectedHomeCategory}
+            onSelectCategory={handleSelectCategory}
+          />
+        </View>
+
         <FlatList
           data={filteredBusinesses}
           keyExtractor={(item) => String(item.id)}
@@ -156,12 +162,20 @@ const styles = StyleSheet.create({
   container: {
     padding: 0,
   },
-  listWrap: {
+  contentArea: {
     flex: 1,
-    paddingHorizontal: 16,
-    paddingTop: 16,
+    position: "relative",
+  },
+  categoryOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 20,
   },
   listContent: {
+    paddingTop: CATEGORY_BAR_HEIGHT + 8,
+    paddingHorizontal: 16,
     paddingBottom: 24,
   },
 });

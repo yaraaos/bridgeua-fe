@@ -4,9 +4,17 @@ import { radius } from "../../../constants/radius";
 
 export const styles = StyleSheet.create({
   wrapper: {
-    marginTop: 14,
-    marginBottom: 0,
-    marginLeft: 16,
+    paddingHorizontal: 16,
+    paddingTop: 8,
+    paddingBottom: 8,
+    backgroundColor: colors.background,
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(0,0,0,0.04)",
+    shadowColor: "#000",
+    shadowOpacity: 0.04,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 3 },
+    elevation: 2,
   },
   content: {
     paddingRight: 16,
