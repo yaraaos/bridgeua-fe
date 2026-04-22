@@ -1,4 +1,4 @@
-import { Link, router } from "expo-router";
+import { router } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
 import AppButton from "../../src/components/ui/AppButton/AppButton";
 import AppInput from "../../src/components/ui/AppInput/AppInput";
@@ -16,11 +16,16 @@ export default function SignInScreen() {
         <AppInput placeholder="Email address" />
         <AppInput placeholder="Password" secureTextEntry />
         <Text style={styles.forgot}>Forgot password?</Text>
-        <AppButton title="Login" onPress={() => router.replace("/(tabs)/home")} />
+        <AppButton
+          title="Login"
+          onPress={() => router.replace("/(tabs)/home")}
+        />
       </View>
 
       <Text style={styles.footer}>
-        Not a member? <Link href="/auth/sign-up" style={styles.link}>Register now</Link>
+        <Text onPress={() => router.push("/auth/sign-up-personal")}>
+          Not a member? Register now
+        </Text>
       </Text>
     </AppScreen>
   );

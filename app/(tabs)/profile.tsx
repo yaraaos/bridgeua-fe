@@ -1,10 +1,13 @@
-import { Text } from "react-native";
-import AppScreen from "../../src/components/ui/AppScreen/AppScreen";
+import BusinessProfileScreen from "../profile/business";
+import PersonalProfileScreen from "../profile/personal";
 
-export default function NotificationsScreen() {
-  return (
-    <AppScreen>
-      <Text>Notifications screen</Text>
-    </AppScreen>
-  );
+// temporary FE-only mock
+const MOCK_ACCOUNT_TYPE = "business"; // "personal" | "business"
+
+export default function ProfileTabScreen() {
+  if (MOCK_ACCOUNT_TYPE === "business") {
+    return <BusinessProfileScreen />;
+  }
+
+  return <PersonalProfileScreen />;
 }
