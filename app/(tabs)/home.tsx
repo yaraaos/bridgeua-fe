@@ -4,13 +4,13 @@ import BusinessCard from "../../src/components/business/BusinessCard/BusinessCar
 import ScreenHeader from "../../src/components/common/ScreenHeader/ScreenHeader";
 import AppScreen from "../../src/components/ui/AppScreen/AppScreen";
 import { businessesMock } from "../../src/mocks/businesses.mock";
+import { useFilterStore } from "../../src/store/filter.store";
 
 export default function HomeScreen() {
+  const { sort, cuisines, rating, distance, customDistance } = useFilterStore();
+
   const handleLocationPress = () => {
     console.log("Open location picker");
-    // later: open bottom sheet / modal
-    // first option: Use my location
-    // then: list of cities / states
   };
 
   const handleMapPress = () => {
@@ -24,6 +24,65 @@ export default function HomeScreen() {
   const handleAddPress = () => {
     router.push("/add-business/search");
   };
+
+  const selectedDistanceKm =
+    distance === "Nearby"
+      ? 1
+      : distance === "1 km"
+        ? 1
+        : distance === "5 km"
+          ? 5
+          : distance === "10 km"
+            ? 10
+            : distance === "25 km"
+              ? 25
+              : distance === "custom"
+                ? Number(customDistance || 0)
+                : null;
+
+  const selectedRatingValue =
+    rating && rating !== "Any rating"
+      ? Number(String(rating).replace("+", ""))
+      : null;
+
+  const filteredBusinesses = [...businessesMock]
+    .filter((business) => {
+      const businessCategory = String(business.category ?? "").trim();
+      const businessRating = Number(business.rating ?? 0);
+      const businessDistance = Number(business.distanceKm ?? 0);
+
+      const cuisineMatch =
+        cuisines.length === 0 || cuisines.includes(businessCategory);
+
+      const ratingMatch =
+        selectedRatingValue === null || businessRating >= selectedRatingValue;
+
+      const distanceMatch =
+        selectedDistanceKm === null ||
+        Number.isNaN(selectedDistanceKm) ||
+        businessDistance <= selectedDistanceKm;
+
+      return cuisineMatch && ratingMatch && distanceMatch;
+    })
+    .sort((a, b) => {
+      if (sort === "Distance") {
+        return Number(a.distanceKm ?? 0) - Number(b.distanceKm ?? 0);
+      }
+
+      if (sort === "Rating") {
+        return Number(b.rating ?? 0) - Number(a.rating ?? 0);
+      }
+
+      if (sort === "Cost: Low to High") {
+        return Number(a.priceLevel ?? 0) - Number(b.priceLevel ?? 0);
+      }
+
+      if (sort === "Cost: High to Low") {
+        return Number(b.priceLevel ?? 0) - Number(a.priceLevel ?? 0);
+      }
+
+      return 0;
+    });
 
   return (
     <AppScreen withTopInset={false} style={styles.container}>
@@ -44,7 +103,7 @@ export default function HomeScreen() {
 
       <View style={styles.listWrap}>
         <FlatList
-          data={businessesMock}
+          data={filteredBusinesses}
           keyExtractor={(item) => String(item.id)}
           renderItem={({ item }) => (
             <BusinessCard

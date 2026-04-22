@@ -6,4 +6,6 @@ export type Business = {
   recommendedBy: string;
   rating: number;
   image: string;
+  distanceKm: number;
+  priceLevel: number;
 };
