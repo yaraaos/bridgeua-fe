@@ -1,3 +1,4 @@
+import { MaterialIcons } from "@expo/vector-icons";
 import React from "react";
 import { Image, Pressable, Text, View } from "react-native";
 import { Business } from "../../../types/business";
@@ -16,25 +17,42 @@ export default function BusinessCard({
 }: Props) {
   return (
     <Pressable
-      style={[
-        styles.card,
-        variant === "compact" && styles.cardCompact,
-      ]}
+      style={[styles.card, variant === "compact" && styles.cardCompact]}
       onPress={onPress}
       disabled={!onPress}
     >
       <Image
         source={{ uri: business.image }}
-        style={[
-          styles.image,
-          variant === "compact" && styles.imageCompact,
-        ]}
+        style={[styles.image, variant === "compact" && styles.imageCompact]}
       />
 
       <View style={styles.info}>
-        <Text style={styles.name} numberOfLines={1}>
-          {business.name}
-        </Text>
+        <View style={styles.topRow}>
+          <Text style={styles.name} numberOfLines={1}>
+            {business.name}
+          </Text>
+
+          <View
+            style={[
+              styles.ratingWrap,
+              variant === "compact" && styles.ratingWrapCompact,
+            ]}
+          >
+            <MaterialIcons
+              name="star"
+              size={variant === "compact" ? 12 : 14}
+              color="#F79A2E"
+            />
+            <Text
+              style={[
+                styles.ratingText,
+                variant === "compact" && styles.ratingTextCompact,
+              ]}
+            >
+              {business.rating.toFixed(1)}
+            </Text>
+          </View>
+        </View>
 
         <Text style={styles.meta} numberOfLines={1}>
           {business.category}
