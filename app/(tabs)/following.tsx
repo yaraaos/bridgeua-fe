@@ -10,6 +10,7 @@ import {
   Text,
   View,
 } from "react-native";
+import FollowButton from "../../src/components/business/FollowButton/FollowButton";
 import ScreenHeader from "../../src/components/common/ScreenHeader/ScreenHeader";
 import AppLoader from "../../src/components/ui/AppLoader/AppLoader";
 import AppScreen from "../../src/components/ui/AppScreen/AppScreen";
@@ -26,14 +27,17 @@ export default function FollowingScreen() {
     isEmpty,
     hasFollowedBusinesses,
   } = useFollowingFeed();
+
+  const handleMapPress = () => {
+    console.log("Following map is not implemented yet");
+  };
+
   const handleFilterPress = () => {
     router.push("/modal/filter");
   };
+
   const handleAddPress = () => {
     console.log("Add action pressed");
-  };
-  const handleMapPress = () => {
-    console.log("Following map is not implemented yet");
   };
 
   if (isLoading) {
@@ -200,7 +204,14 @@ export default function FollowingScreen() {
                       {item.businessName}
                     </Text>
 
-                    <RatingBadge rating={item.businessRating} compact />
+                    <View style={styles.rightActions}>
+                      <RatingBadge rating={item.businessRating} compact />
+                      <FollowButton
+                        businessId={String(item.businessId)}
+                        size="sm"
+                        variant="outline"
+                      />
+                    </View>
                   </View>
 
                   <Text style={styles.metaText} numberOfLines={1}>
@@ -326,20 +337,13 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: "700",
     color: colors.textPrimary,
+    marginRight: 8,
   },
-  ratingWrap: {
+  rightActions: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 2,
-  },
-  ratingStar: {
-    fontSize: 12,
-    color: "#7B8F7A",
-  },
-  ratingText: {
-    fontSize: 11,
-    fontWeight: "700",
-    color: "#7B8F7A",
+    gap: 8,
+    flexShrink: 0,
   },
   metaText: {
     fontSize: 11,
