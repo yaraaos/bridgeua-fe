@@ -2,18 +2,21 @@ import { MaterialIcons } from "@expo/vector-icons";
 import React from "react";
 import { Image, Pressable, Text, View } from "react-native";
 import { Business } from "../../../types/business";
+import FollowButton from "../FollowButton/FollowButton";
 import { styles } from "./BusinessCard.styles";
 
 type Props = {
   business: Business;
   onPress?: () => void;
   variant?: "default" | "compact";
+  showFollowButton?: boolean;
 };
 
 export default function BusinessCard({
   business,
   onPress,
   variant = "default",
+  showFollowButton = true,
 }: Props) {
   return (
     <Pressable
@@ -32,25 +35,31 @@ export default function BusinessCard({
             {business.name}
           </Text>
 
-          <View
-            style={[
-              styles.ratingWrap,
-              variant === "compact" && styles.ratingWrapCompact,
-            ]}
-          >
-            <MaterialIcons
-              name="star"
-              size={variant === "compact" ? 12 : 14}
-              color="#F79A2E"
-            />
-            <Text
+          <View style={styles.rightSide}>
+            <View
               style={[
-                styles.ratingText,
-                variant === "compact" && styles.ratingTextCompact,
+                styles.ratingWrap,
+                variant === "compact" && styles.ratingWrapCompact,
               ]}
             >
-              {business.rating.toFixed(1)}
-            </Text>
+              <MaterialIcons
+                name="star"
+                size={variant === "compact" ? 12 : 14}
+                color="#F79A2E"
+              />
+              <Text
+                style={[
+                  styles.ratingText,
+                  variant === "compact" && styles.ratingTextCompact,
+                ]}
+              >
+                {business.rating.toFixed(1)}
+              </Text>
+            </View>
+
+            {showFollowButton ? (
+              <FollowButton businessId={String(business.id)} />
+            ) : null}
           </View>
         </View>
 

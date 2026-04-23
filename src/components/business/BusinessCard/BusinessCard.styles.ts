@@ -34,8 +34,6 @@ export const styles = StyleSheet.create({
   topRow: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
-    gap: 8,
     marginBottom: 4,
   },
   name: {
@@ -43,6 +41,13 @@ export const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "700",
     color: colors.textPrimary,
+    marginRight: 8,
+  },
+  rightSide: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    flexShrink: 0,
   },
   ratingWrap: {
     flexDirection: "row",
