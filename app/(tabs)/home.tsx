@@ -1,11 +1,13 @@
 import { router } from "expo-router";
+
+import { useBusinesses } from "@/src/features/businesses";
 import { FlatList, StyleSheet, View } from "react-native";
 import BusinessCard from "../../src/components/business/BusinessCard/BusinessCard";
 import ScreenHeader from "../../src/components/common/ScreenHeader/ScreenHeader";
 import CategoryScroller from "../../src/components/home/CategoryScroller/CategoryScroller";
+import AppLoader from "../../src/components/ui/AppLoader/AppLoader";
 import AppScreen from "../../src/components/ui/AppScreen/AppScreen";
 import { HOME_CATEGORIES } from "../../src/constants/categories";
-import { useBusinesses } from '@/src/features/businesses';
 import { useFilterStore } from "../../src/store/filter.store";
 
 const CATEGORY_BAR_HEIGHT = 48;
@@ -110,6 +112,39 @@ export default function HomeScreen() {
 
       return 0;
     });
+
+  if (isLoading) {
+    return (
+      <AppScreen withTopInset={false} style={styles.container}>
+        <ScreenHeader
+          title="Discover"
+          titleSubtitle="Community trusted places"
+          subtitleLabel="Location"
+          subtitleValue="California, USA"
+          onSubtitlePress={handleLocationPress}
+          showSubtitleChevron
+          showSearch
+          searchPlaceholder="Find services, food or places"
+          actions={["map", "filter", "add"]}
+          onPressMap={handleMapPress}
+          onPressFilter={handleFilterPress}
+          onPressAdd={handleAddPress}
+        />
+
+        <View style={styles.contentArea}>
+          <View style={styles.categoryOverlay}>
+            <CategoryScroller
+              categories={HOME_CATEGORIES}
+              selectedCategory={selectedHomeCategory}
+              onSelectCategory={handleSelectCategory}
+            />
+          </View>
+
+          <AppLoader />
+        </View>
+      </AppScreen>
+    );
+  }
 
   return (
     <AppScreen withTopInset={false} style={styles.container}>
