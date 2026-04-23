@@ -5,13 +5,14 @@ import ScreenHeader from "../../src/components/common/ScreenHeader/ScreenHeader"
 import CategoryScroller from "../../src/components/home/CategoryScroller/CategoryScroller";
 import AppScreen from "../../src/components/ui/AppScreen/AppScreen";
 import { HOME_CATEGORIES } from "../../src/constants/categories";
-import { businessesMock } from "../../src/mocks/businesses.mock";
+import { useBusinesses } from '@/src/features/businesses';
 import { useFilterStore } from "../../src/store/filter.store";
 
 const CATEGORY_BAR_HEIGHT = 48;
 
 export default function HomeScreen() {
   const { sort, cuisines, rating, distance, customDistance } = useFilterStore();
+  const { businesses, isLoading } = useBusinesses();
 
   const handleLocationPress = () => {
     console.log("Open location picker");
@@ -71,7 +72,7 @@ export default function HomeScreen() {
     });
   };
 
-  const filteredBusinesses = [...businessesMock]
+  const filteredBusinesses = [...businesses]
     .filter((business) => {
       const businessCategory = String(business.category ?? "").trim();
       const businessRating = Number(business.rating ?? 0);
