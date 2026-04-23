@@ -4,6 +4,7 @@ import { Feather } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
+import { AccountTypeSwitch } from "../../src/components/auth";
 import AppButton from "../../src/components/ui/AppButton/AppButton";
 import AppInput from "../../src/components/ui/AppInput/AppInput";
 import AppScreen from "../../src/components/ui/AppScreen/AppScreen";
@@ -22,19 +23,19 @@ export default function SignUpPersonalScreen() {
           </Text>
         </View>
 
-        <View style={styles.switchRow}>
-          <Pressable style={[styles.switchTab, styles.switchTabActive]}>
-            <Text style={[styles.switchText, styles.switchTextActive]}>
-              Personal
-            </Text>
-          </Pressable>
-
-          <Pressable
-            style={styles.switchTab}
-            onPress={() => router.replace("/auth/sign-up-business")}
-          >
-            <Text style={styles.switchText}>Business</Text>
-          </Pressable>
+        <View style={{ marginBottom: 16 }}>
+          <AccountTypeSwitch
+            options={[
+              { label: "Personal", value: "personal" },
+              { label: "Business", value: "business" },
+            ]}
+            value="personal"
+            onChange={(value) => {
+              if (value === "business") {
+                router.replace("/auth/sign-up-business");
+              }
+            }}
+          />
         </View>
 
         <View style={styles.form}>
@@ -125,31 +126,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: colors.textSecondary,
     textAlign: "center",
-  },
-  switchRow: {
-    flexDirection: "row",
-    backgroundColor: "#D4DED7",
-    borderRadius: 999,
-    padding: 4,
-    marginBottom: 16,
-  },
-  switchTab: {
-    flex: 1,
-    minHeight: 32,
-    borderRadius: 999,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  switchTabActive: {
-    backgroundColor: colors.primaryGreen,
-  },
-  switchText: {
-    fontSize: 12,
-    fontWeight: "700",
-    color: colors.textPrimary,
-  },
-  switchTextActive: {
-    color: colors.white,
   },
   form: {
     gap: 12,

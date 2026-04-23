@@ -1,12 +1,13 @@
 //app/auth/sign-up-business.tsx
 
+import { Feather } from "@expo/vector-icons";
+import { router } from "expo-router";
 import React, { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import { router } from "expo-router";
-import { Feather } from "@expo/vector-icons";
-import AppScreen from "../../src/components/ui/AppScreen/AppScreen";
+import { AccountTypeSwitch } from "../../src/components/auth";
 import AppButton from "../../src/components/ui/AppButton/AppButton";
 import AppInput from "../../src/components/ui/AppInput/AppInput";
+import AppScreen from "../../src/components/ui/AppScreen/AppScreen";
 import { colors } from "../../src/constants/colors";
 
 const CATEGORIES = [
@@ -33,17 +34,19 @@ export default function SignUpBusinessScreen() {
           </Text>
         </View>
 
-        <View style={styles.switchRow}>
-          <Pressable
-            style={styles.switchTab}
-            onPress={() => router.replace("/auth/sign-up-personal")}
-          >
-            <Text style={styles.switchText}>Personal</Text>
-          </Pressable>
-
-          <Pressable style={[styles.switchTab, styles.switchTabActive]}>
-            <Text style={[styles.switchText, styles.switchTextActive]}>Business</Text>
-          </Pressable>
+        <View style={{ marginBottom: 16 }}>
+          <AccountTypeSwitch
+            options={[
+              { label: "Personal", value: "personal" },
+              { label: "Business", value: "business" },
+            ]}
+            value="business"
+            onChange={(value) => {
+              if (value === "personal") {
+                router.replace("/auth/sign-up-personal");
+              }
+            }}
+          />
         </View>
 
         <View style={styles.form}>
@@ -83,7 +86,10 @@ export default function SignUpBusinessScreen() {
                   <Pressable
                     key={category}
                     onPress={() => setSelectedCategory(category)}
-                    style={[styles.categoryChip, active && styles.categoryChipActive]}
+                    style={[
+                      styles.categoryChip,
+                      active && styles.categoryChipActive,
+                    ]}
                   >
                     <Text
                       style={[
@@ -107,17 +113,32 @@ export default function SignUpBusinessScreen() {
 
           <View>
             <AppInput placeholder="Password" secureTextEntry />
-            <Feather name="eye-off" size={16} color={colors.textMuted} style={styles.eyeIcon} />
+            <Feather
+              name="eye-off"
+              size={16}
+              color={colors.textMuted}
+              style={styles.eyeIcon}
+            />
           </View>
 
           <View>
             <AppInput placeholder="Confirm password" secureTextEntry />
-            <Feather name="eye-off" size={16} color={colors.textMuted} style={styles.eyeIcon} />
+            <Feather
+              name="eye-off"
+              size={16}
+              color={colors.textMuted}
+              style={styles.eyeIcon}
+            />
           </View>
 
-          <Pressable style={styles.checkboxRow} onPress={() => setAgree((prev) => !prev)}>
+          <Pressable
+            style={styles.checkboxRow}
+            onPress={() => setAgree((prev) => !prev)}
+          >
             <View style={[styles.checkbox, agree && styles.checkboxChecked]}>
-              {agree ? <Feather name="check" size={12} color={colors.white} /> : null}
+              {agree ? (
+                <Feather name="check" size={12} color={colors.white} />
+              ) : null}
             </View>
 
             <Text style={styles.checkboxText}>
@@ -136,7 +157,10 @@ export default function SignUpBusinessScreen() {
         <View style={styles.footer}>
           <Text style={styles.footerText}>
             Already have an account?{" "}
-            <Text style={styles.footerLink} onPress={() => router.replace("/auth/sign-in")}>
+            <Text
+              style={styles.footerLink}
+              onPress={() => router.replace("/auth/sign-in")}
+            >
               Sign in
             </Text>
           </Text>
@@ -169,31 +193,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: colors.textSecondary,
     textAlign: "center",
-  },
-  switchRow: {
-    flexDirection: "row",
-    backgroundColor: "#D4DED7",
-    borderRadius: 999,
-    padding: 4,
-    marginBottom: 16,
-  },
-  switchTab: {
-    flex: 1,
-    minHeight: 32,
-    borderRadius: 999,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  switchTabActive: {
-    backgroundColor: colors.primaryGreen,
-  },
-  switchText: {
-    fontSize: 12,
-    fontWeight: "700",
-    color: colors.textPrimary,
-  },
-  switchTextActive: {
-    color: colors.white,
   },
   form: {
     gap: 12,
