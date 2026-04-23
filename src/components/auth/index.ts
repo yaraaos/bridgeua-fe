@@ -1,0 +1,1 @@
+export { default as AccountTypeSwitch } from "./AccountTypeSwitch/AccountTypeSwitch";

@@ -1,3 +1,4 @@
+import { AccountTypeSwitch } from "@/src/components/auth";
 import { RatingBadge } from "@/src/components/common";
 import { useFollowingFeed } from "@/src/features/following";
 import { router } from "expo-router";
@@ -60,40 +61,15 @@ export default function FollowingScreen() {
           gradientColors={["#F7D0A7", "#F2B277"]}
         />
 
-        <View style={styles.tabsRow}>
-          <Pressable
-            style={[
-              styles.tabButton,
-              activeTab === "promotion" && styles.tabButtonActive,
+        <View style={styles.switchWrap}>
+          <AccountTypeSwitch
+            options={[
+              { label: "Promotions", value: "promotion" },
+              { label: "News", value: "news" },
             ]}
-            onPress={() => setActiveTab("promotion")}
-          >
-            <Text
-              style={[
-                styles.tabButtonText,
-                activeTab === "promotion" && styles.tabButtonTextActive,
-              ]}
-            >
-              Promotions
-            </Text>
-          </Pressable>
-
-          <Pressable
-            style={[
-              styles.tabButton,
-              activeTab === "news" && styles.tabButtonActive,
-            ]}
-            onPress={() => setActiveTab("news")}
-          >
-            <Text
-              style={[
-                styles.tabButtonText,
-                activeTab === "news" && styles.tabButtonTextActive,
-              ]}
-            >
-              News
-            </Text>
-          </Pressable>
+            value={activeTab}
+            onChange={setActiveTab}
+          />
         </View>
 
         <View style={styles.loaderWrap}>
@@ -122,40 +98,15 @@ export default function FollowingScreen() {
         gradientColors={["#F7D0A7", "#F2B277"]}
       />
 
-      <View style={styles.tabsRow}>
-        <Pressable
-          style={[
-            styles.tabButton,
-            activeTab === "promotion" && styles.tabButtonActive,
+      <View style={styles.switchWrap}>
+        <AccountTypeSwitch
+          options={[
+            { label: "Promotions", value: "promotion" },
+            { label: "News", value: "news" },
           ]}
-          onPress={() => setActiveTab("promotion")}
-        >
-          <Text
-            style={[
-              styles.tabButtonText,
-              activeTab === "promotion" && styles.tabButtonTextActive,
-            ]}
-          >
-            Promotions
-          </Text>
-        </Pressable>
-
-        <Pressable
-          style={[
-            styles.tabButton,
-            activeTab === "news" && styles.tabButtonActive,
-          ]}
-          onPress={() => setActiveTab("news")}
-        >
-          <Text
-            style={[
-              styles.tabButtonText,
-              activeTab === "news" && styles.tabButtonTextActive,
-            ]}
-          >
-            News
-          </Text>
-        </Pressable>
+          value={activeTab}
+          onChange={setActiveTab}
+        />
       </View>
 
       {!hasFollowedBusinesses ? (
@@ -249,37 +200,16 @@ export default function FollowingScreen() {
 const styles = StyleSheet.create({
   container: {
     padding: 0,
-    backgroundColor: colors.background || "#F5F4F1",
+    backgroundColor: colors.background,
   },
-  loaderWrap: {
-    flex: 1,
-    justifyContent: "center",
-  },
-  tabsRow: {
-    flexDirection: "row",
-    gap: 8,
+  switchWrap: {
     paddingHorizontal: 16,
     paddingTop: 12,
     paddingBottom: 8,
   },
-  tabButton: {
+  loaderWrap: {
     flex: 1,
-    height: 36,
-    borderRadius: 8,
-    backgroundColor: "#D1D5DB",
-    alignItems: "center",
     justifyContent: "center",
-  },
-  tabButtonActive: {
-    backgroundColor: "#25684A",
-  },
-  tabButtonText: {
-    fontSize: 13,
-    fontWeight: "600",
-    color: colors.white,
-  },
-  tabButtonTextActive: {
-    color: colors.white,
   },
   listContent: {
     paddingHorizontal: 12,
