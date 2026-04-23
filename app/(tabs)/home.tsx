@@ -1,7 +1,7 @@
 import { router } from "expo-router";
+import { FlatList, StyleSheet, View } from "react-native";
 
 import { useBusinesses } from "@/src/features/businesses";
-import { FlatList, StyleSheet, View } from "react-native";
 import BusinessCard from "../../src/components/business/BusinessCard/BusinessCard";
 import ScreenHeader from "../../src/components/common/ScreenHeader/ScreenHeader";
 import CategoryScroller from "../../src/components/home/CategoryScroller/CategoryScroller";
@@ -11,6 +11,14 @@ import { HOME_CATEGORIES } from "../../src/constants/categories";
 import { useFilterStore } from "../../src/store/filter.store";
 
 const CATEGORY_BAR_HEIGHT = 48;
+
+const distanceMap: Record<string, number> = {
+  Nearby: 1,
+  "1 km": 1,
+  "5 km": 5,
+  "10 km": 10,
+  "25 km": 25,
+};
 
 export default function HomeScreen() {
   const { sort, cuisines, rating, distance, customDistance } = useFilterStore();
@@ -33,19 +41,9 @@ export default function HomeScreen() {
   };
 
   const selectedDistanceKm =
-    distance === "Nearby"
-      ? 1
-      : distance === "1 km"
-        ? 1
-        : distance === "5 km"
-          ? 5
-          : distance === "10 km"
-            ? 10
-            : distance === "25 km"
-              ? 25
-              : distance === "custom"
-                ? Number(customDistance || 0)
-                : null;
+    distance === "custom"
+      ? Number(customDistance || 0)
+      : (distanceMap[distance] ?? null);
 
   const selectedRatingValue =
     rating && rating !== "Any rating"
@@ -61,9 +59,7 @@ export default function HomeScreen() {
 
   const handleSelectCategory = (category: string) => {
     if (category === "All Categories") {
-      useFilterStore.setState({
-        cuisines: [],
-      });
+      useFilterStore.setState({ cuisines: [] });
       return;
     }
 
@@ -72,6 +68,26 @@ export default function HomeScreen() {
     useFilterStore.setState({
       cuisines: [mappedCategory],
     });
+  };
+
+  const sortBusinesses = (a: any, b: any) => {
+    if (sort === "Distance") {
+      return Number(a.distanceKm ?? 0) - Number(b.distanceKm ?? 0);
+    }
+
+    if (sort === "Rating") {
+      return Number(b.rating ?? 0) - Number(a.rating ?? 0);
+    }
+
+    if (sort === "Cost: Low to High") {
+      return Number(a.priceLevel ?? 0) - Number(b.priceLevel ?? 0);
+    }
+
+    if (sort === "Cost: High to Low") {
+      return Number(b.priceLevel ?? 0) - Number(a.priceLevel ?? 0);
+    }
+
+    return 0;
   };
 
   const filteredBusinesses = [...businesses]
@@ -93,53 +109,42 @@ export default function HomeScreen() {
 
       return cuisineMatch && ratingMatch && distanceMatch;
     })
-    .sort((a, b) => {
-      if (sort === "Distance") {
-        return Number(a.distanceKm ?? 0) - Number(b.distanceKm ?? 0);
-      }
+    .sort(sortBusinesses);
 
-      if (sort === "Rating") {
-        return Number(b.rating ?? 0) - Number(a.rating ?? 0);
-      }
+  const header = (
+    <ScreenHeader
+      title="Discover"
+      titleSubtitle="Community trusted places"
+      subtitleLabel="Location"
+      subtitleValue="California, USA"
+      onSubtitlePress={handleLocationPress}
+      showSubtitleChevron
+      showSearch
+      searchPlaceholder="Find services, food or places"
+      actions={["map", "filter", "add"]}
+      onPressMap={handleMapPress}
+      onPressFilter={handleFilterPress}
+      onPressAdd={handleAddPress}
+    />
+  );
 
-      if (sort === "Cost: Low to High") {
-        return Number(a.priceLevel ?? 0) - Number(b.priceLevel ?? 0);
-      }
-
-      if (sort === "Cost: High to Low") {
-        return Number(b.priceLevel ?? 0) - Number(a.priceLevel ?? 0);
-      }
-
-      return 0;
-    });
+  const categoryBar = (
+    <View style={styles.categoryOverlay}>
+      <CategoryScroller
+        categories={HOME_CATEGORIES}
+        selectedCategory={selectedHomeCategory}
+        onSelectCategory={handleSelectCategory}
+      />
+    </View>
+  );
 
   if (isLoading) {
     return (
       <AppScreen withTopInset={false} style={styles.container}>
-        <ScreenHeader
-          title="Discover"
-          titleSubtitle="Community trusted places"
-          subtitleLabel="Location"
-          subtitleValue="California, USA"
-          onSubtitlePress={handleLocationPress}
-          showSubtitleChevron
-          showSearch
-          searchPlaceholder="Find services, food or places"
-          actions={["map", "filter", "add"]}
-          onPressMap={handleMapPress}
-          onPressFilter={handleFilterPress}
-          onPressAdd={handleAddPress}
-        />
+        {header}
 
         <View style={styles.contentArea}>
-          <View style={styles.categoryOverlay}>
-            <CategoryScroller
-              categories={HOME_CATEGORIES}
-              selectedCategory={selectedHomeCategory}
-              onSelectCategory={handleSelectCategory}
-            />
-          </View>
-
+          {categoryBar}
           <AppLoader />
         </View>
       </AppScreen>
@@ -148,29 +153,10 @@ export default function HomeScreen() {
 
   return (
     <AppScreen withTopInset={false} style={styles.container}>
-      <ScreenHeader
-        title="Discover"
-        titleSubtitle="Community trusted places"
-        subtitleLabel="Location"
-        subtitleValue="California, USA"
-        onSubtitlePress={handleLocationPress}
-        showSubtitleChevron
-        showSearch
-        searchPlaceholder="Find services, food or places"
-        actions={["map", "filter", "add"]}
-        onPressMap={handleMapPress}
-        onPressFilter={handleFilterPress}
-        onPressAdd={handleAddPress}
-      />
+      {header}
 
       <View style={styles.contentArea}>
-        <View style={styles.categoryOverlay}>
-          <CategoryScroller
-            categories={HOME_CATEGORIES}
-            selectedCategory={selectedHomeCategory}
-            onSelectCategory={handleSelectCategory}
-          />
-        </View>
+        {categoryBar}
 
         <FlatList
           data={filteredBusinesses}
