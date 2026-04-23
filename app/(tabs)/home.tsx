@@ -1,14 +1,18 @@
-import { router } from "expo-router";
-import { FlatList, StyleSheet, View } from "react-native";
-
 import { useBusinesses } from "@/src/features/businesses";
+import { router } from "expo-router";
+import { Alert, FlatList, StyleSheet, View } from "react-native";
 import BusinessCard from "../../src/components/business/BusinessCard/BusinessCard";
 import ScreenHeader from "../../src/components/common/ScreenHeader/ScreenHeader";
 import CategoryScroller from "../../src/components/home/CategoryScroller/CategoryScroller";
 import AppLoader from "../../src/components/ui/AppLoader/AppLoader";
 import AppScreen from "../../src/components/ui/AppScreen/AppScreen";
 import { HOME_CATEGORIES } from "../../src/constants/categories";
+import {
+  DEFAULT_LOCATION_OPTIONS,
+  LocationOption,
+} from "../../src/constants/locations";
 import { useFilterStore } from "../../src/store/filter.store";
+import { useLocationStore } from "../../src/store/location.store";
 
 const CATEGORY_BAR_HEIGHT = 48;
 
@@ -21,11 +25,50 @@ const distanceMap: Record<string, number> = {
 };
 
 export default function HomeScreen() {
+  const {
+    label: selectedLocationLabel,
+    value: selectedLocationValue,
+    setManualLocation,
+    setNearbyLocation,
+    setPermissionStatus,
+  } = useLocationStore();
   const { sort, cuisines, rating, distance, customDistance } = useFilterStore();
   const { businesses, isLoading } = useBusinesses();
 
   const handleLocationPress = () => {
-    console.log("Open location picker");
+    console.log("Location selector is handled inside ScreenHeader");
+  };
+  const handleSelectLocationOption = (option: LocationOption) => {
+    setManualLocation({
+      label: option.label,
+      value: option.value,
+    });
+  };
+
+  const handleRequestNearby = () => {
+    Alert.alert(
+      "Use your location?",
+      "Allow location access to find businesses near you.",
+      [
+        {
+          text: "Not now",
+          style: "cancel",
+          onPress: () => setPermissionStatus("denied"),
+        },
+        {
+          text: "Allow",
+          onPress: () => {
+            setPermissionStatus("granted");
+            setNearbyLocation({
+              label: "Near you",
+              value: "nearby",
+              latitude: 34.0549,
+              longitude: -118.2426,
+            });
+          },
+        },
+      ],
+    );
   };
 
   const handleMapPress = () => {
@@ -115,10 +158,12 @@ export default function HomeScreen() {
     <ScreenHeader
       title="Discover"
       titleSubtitle="Community trusted places"
-      subtitleLabel="Location"
-      subtitleValue="California, USA"
+      subtitleValue={selectedLocationLabel}
       onSubtitlePress={handleLocationPress}
       showSubtitleChevron
+      locationOptions={DEFAULT_LOCATION_OPTIONS}
+      onSelectLocationOption={handleSelectLocationOption}
+      onRequestNearby={handleRequestNearby}
       showSearch
       searchPlaceholder="Find services, food or places"
       actions={["map", "filter", "add"]}

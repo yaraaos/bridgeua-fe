@@ -4,7 +4,7 @@ export const styles = StyleSheet.create({
   container: {
     borderBottomLeftRadius: 24,
     borderBottomRightRadius: 24,
-    overflow: "hidden",
+    overflow: "visible",
   },
   inner: {
     paddingHorizontal: 16,

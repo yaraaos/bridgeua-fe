@@ -4,6 +4,7 @@ import { useFollowingFeed } from "@/src/features/following";
 import { router } from "expo-router";
 import React from "react";
 import {
+  Alert,
   FlatList,
   Image,
   Pressable,
@@ -16,8 +17,53 @@ import ScreenHeader from "../../src/components/common/ScreenHeader/ScreenHeader"
 import AppLoader from "../../src/components/ui/AppLoader/AppLoader";
 import AppScreen from "../../src/components/ui/AppScreen/AppScreen";
 import { colors } from "../../src/constants/colors";
+import {
+  DEFAULT_LOCATION_OPTIONS,
+  LocationOption,
+} from "../../src/constants/locations";
+import { useLocationStore } from "../../src/store/location.store";
 
 export default function FollowingScreen() {
+  const {
+    label: selectedLocationLabel,
+    setManualLocation,
+    setNearbyLocation,
+    setPermissionStatus,
+  } = useLocationStore();
+
+  const handleSelectLocationOption = (option: LocationOption) => {
+    setManualLocation({
+      label: option.label,
+      value: option.value,
+    });
+  };
+
+  const handleRequestNearby = () => {
+    Alert.alert(
+      "Use your location?",
+      "Allow location access to see followed businesses near you.",
+      [
+        {
+          text: "Not now",
+          style: "cancel",
+          onPress: () => setPermissionStatus("denied"),
+        },
+        {
+          text: "Allow",
+          onPress: () => {
+            setPermissionStatus("granted");
+            setNearbyLocation({
+              label: "Near you",
+              value: "nearby",
+              latitude: 34.0549,
+              longitude: -118.2426,
+            });
+          },
+        },
+      ],
+    );
+  };
+
   const {
     activeTab,
     setActiveTab,
@@ -48,9 +94,11 @@ export default function FollowingScreen() {
           title="Following"
           titleSubtitle="Businesses you follow"
           subtitleLabel="Location"
-          subtitleValue="California, USA"
+          subtitleValue={selectedLocationLabel}
           showSubtitleChevron
-          showSearch
+          locationOptions={DEFAULT_LOCATION_OPTIONS}
+          onSelectLocationOption={handleSelectLocationOption}
+          onRequestNearby={handleRequestNearby}
           searchPlaceholder="Search here..."
           searchValue={searchQuery}
           onSearchChangeText={setSearchQuery}
@@ -85,8 +133,11 @@ export default function FollowingScreen() {
         title="Following"
         titleSubtitle="Businesses you follow"
         subtitleLabel="Location"
-        subtitleValue="California, USA"
+        subtitleValue={selectedLocationLabel}
         showSubtitleChevron
+        locationOptions={DEFAULT_LOCATION_OPTIONS}
+        onSelectLocationOption={handleSelectLocationOption}
+        onRequestNearby={handleRequestNearby}
         showSearch
         searchPlaceholder="Search here..."
         searchValue={searchQuery}

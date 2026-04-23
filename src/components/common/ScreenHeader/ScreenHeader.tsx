@@ -2,8 +2,10 @@ import { AntDesign, Feather, Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Pressable, Text, View } from "react-native";
 import { colors } from "../../../constants/colors";
+import { LocationOption } from "../../../constants/locations";
 import AppInput from "../../ui/AppInput/AppInput";
 import GradientHeader from "../../ui/GradientHeader/GradientHeader";
+import { LocationSelector } from "../index";
 import { styles } from "./ScreenHeader.styles";
 
 type ActionType = "map" | "filter" | "add";
@@ -28,6 +30,10 @@ type Props = {
   onPressAdd?: () => void;
 
   gradientColors?: readonly [string, string, ...string[]];
+
+  locationOptions?: LocationOption[];
+  onSelectLocationOption?: (option: LocationOption) => void;
+  onRequestNearby?: () => void;
 };
 
 export default function ScreenHeader({
@@ -46,8 +52,13 @@ export default function ScreenHeader({
   onPressFilter,
   onPressAdd,
   gradientColors,
+  locationOptions,
+  onSelectLocationOption,
+  onRequestNearby,
 }: Props) {
   const hasSubtitle = !!subtitleLabel || !!subtitleValue;
+  const showLocationSelector =
+    !!locationOptions && !!onSelectLocationOption && !!onRequestNearby;
 
   const renderActionIcon = (action: ActionType) => {
     if (action === "map") {
@@ -78,7 +89,22 @@ export default function ScreenHeader({
   return (
     <GradientHeader colors={gradientColors}>
       <View style={styles.topRow}>
-        {hasSubtitle ? (
+        {showLocationSelector ? (
+          <View style={styles.leftBlock}>
+            <LocationSelector
+              subtitleLabel={subtitleLabel}
+              label={subtitleValue}
+              value={
+                locationOptions.find((item) => item.label === subtitleValue)
+                  ?.value
+              }
+              options={locationOptions}
+              onSelectManual={onSelectLocationOption}
+              onRequestNearby={onRequestNearby}
+              showChevron={showSubtitleChevron}
+            />
+          </View>
+        ) : hasSubtitle ? (
           onSubtitlePress ? (
             <Pressable style={styles.leftBlock} onPress={onSubtitlePress}>
               {!!subtitleLabel && (
