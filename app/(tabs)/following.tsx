@@ -1,3 +1,4 @@
+import { RatingBadge } from "@/src/components/common";
 import { useFollowingFeed } from "@/src/features/following";
 import { router } from "expo-router";
 import React from "react";
@@ -199,12 +200,7 @@ export default function FollowingScreen() {
                       {item.businessName}
                     </Text>
 
-                    <View style={styles.ratingWrap}>
-                      <Text style={styles.ratingStar}>★</Text>
-                      <Text style={styles.ratingText}>
-                        {item.businessRating.toFixed(1)}
-                      </Text>
-                    </View>
+                    <RatingBadge rating={item.businessRating} compact />
                   </View>
 
                   <Text style={styles.metaText} numberOfLines={1}>

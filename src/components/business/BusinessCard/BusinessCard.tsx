@@ -1,4 +1,4 @@
-import { MaterialIcons } from "@expo/vector-icons";
+import { RatingBadge } from "@/src/components/common";
 import React from "react";
 import { Image, Pressable, Text, View } from "react-native";
 import { Business } from "../../../types/business";
@@ -36,26 +36,10 @@ export default function BusinessCard({
           </Text>
 
           <View style={styles.rightSide}>
-            <View
-              style={[
-                styles.ratingWrap,
-                variant === "compact" && styles.ratingWrapCompact,
-              ]}
-            >
-              <MaterialIcons
-                name="star"
-                size={variant === "compact" ? 12 : 14}
-                color="#F79A2E"
-              />
-              <Text
-                style={[
-                  styles.ratingText,
-                  variant === "compact" && styles.ratingTextCompact,
-                ]}
-              >
-                {business.rating.toFixed(1)}
-              </Text>
-            </View>
+            <RatingBadge
+              rating={business.rating}
+              compact={variant === "compact"}
+            />
 
             {showFollowButton ? (
               <FollowButton businessId={String(business.id)} />
