@@ -1,30 +1,46 @@
 import { StyleSheet } from "react-native";
+import { colors } from "../../../constants/colors";
 
 export const styles = StyleSheet.create({
   button: {
-    minHeight: 32,
-    paddingHorizontal: 12,
     borderRadius: 999,
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 1,
   },
-  buttonInactive: {
-    backgroundColor: "#FFFFFF",
-    borderColor: "#2DBE7F",
+
+  buttonSm: {
+    minHeight: 28,
+    paddingHorizontal: 10,
   },
-  buttonActive: {
-    backgroundColor: "#2DBE7F",
-    borderColor: "#2DBE7F",
+  buttonMd: {
+    minHeight: 36,
+    paddingHorizontal: 14,
   },
+
+  buttonOutline: {
+    backgroundColor: colors.white,
+    borderColor: colors.primaryGreen,
+  },
+  buttonFilled: {
+    backgroundColor: colors.primaryGreen,
+    borderColor: colors.primaryGreen,
+  },
+
   buttonText: {
-    fontSize: 13,
     fontWeight: "600",
   },
-  buttonTextInactive: {
-    color: "#2DBE7F",
+  buttonTextSm: {
+    fontSize: 12,
   },
-  buttonTextActive: {
-    color: "#FFFFFF",
+  buttonTextMd: {
+    fontSize: 14,
+  },
+
+  buttonTextOutline: {
+    color: colors.primaryGreen,
+  },
+  buttonTextFilled: {
+    color: colors.white,
   },
 });

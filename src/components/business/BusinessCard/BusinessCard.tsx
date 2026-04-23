@@ -42,7 +42,11 @@ export default function BusinessCard({
             />
 
             {showFollowButton ? (
-              <FollowButton businessId={String(business.id)} />
+              <FollowButton
+                businessId={String(business.id)}
+                size={variant === "compact" ? "sm" : "sm"}
+                variant="outline"
+              />
             ) : null}
           </View>
         </View>
