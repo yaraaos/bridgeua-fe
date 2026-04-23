@@ -198,6 +198,6 @@ const styles = StyleSheet.create({
   listContent: {
     paddingTop: CATEGORY_BAR_HEIGHT + 8,
     paddingHorizontal: 16,
-    paddingBottom: 24,
+    paddingBottom: 4,
   },
 });
