@@ -21,7 +21,7 @@ import {
   DEFAULT_LOCATION_OPTIONS,
   LocationOption,
 } from "../../src/constants/locations";
-import { useLocationStore } from "../../src/store/location.store";
+import { useFollowingLocationStore } from "../../src/store/following-location.store";
 
 export default function FollowingScreen() {
   const {
@@ -29,7 +29,7 @@ export default function FollowingScreen() {
     setManualLocation,
     setNearbyLocation,
     setPermissionStatus,
-  } = useLocationStore();
+  } = useFollowingLocationStore();
 
   const handleSelectLocationOption = (option: LocationOption) => {
     setManualLocation({

@@ -11,8 +11,8 @@ import {
   DEFAULT_LOCATION_OPTIONS,
   LocationOption,
 } from "../../src/constants/locations";
+import { useDiscoveryLocationStore } from "../../src/store/discovery-location";
 import { useFilterStore } from "../../src/store/filter.store";
-import { useLocationStore } from "../../src/store/location.store";
 
 const CATEGORY_BAR_HEIGHT = 48;
 
@@ -31,7 +31,7 @@ export default function HomeScreen() {
     setManualLocation,
     setNearbyLocation,
     setPermissionStatus,
-  } = useLocationStore();
+  } = useDiscoveryLocationStore();
   const { sort, cuisines, rating, distance, customDistance } = useFilterStore();
   const { businesses, isLoading } = useBusinesses();
 
