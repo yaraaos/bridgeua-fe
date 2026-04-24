@@ -5,6 +5,7 @@ import AppEmptyState from "@/src/components/ui/AppEmptyState";
 import AppLoader from "@/src/components/ui/AppLoader/AppLoader";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
 import { colors } from "@/src/constants/colors";
+import { DISCOVERY_GRADIENT } from "@/src/constants/gradients";
 import {
   DEFAULT_LOCATION_OPTIONS,
   LocationOption,
@@ -101,7 +102,7 @@ export default function FollowingScreen() {
           onPressMap={handleMapPress}
           onPressFilter={handleFilterPress}
           onPressAdd={handleAddPress}
-          gradientColors={["#F7D0A7", "#F2B277"]}
+          gradientColors={DISCOVERY_GRADIENT}
         />
 
         <View style={styles.switchWrap}>
@@ -141,7 +142,7 @@ export default function FollowingScreen() {
         onPressMap={handleMapPress}
         onPressFilter={handleFilterPress}
         onPressAdd={handleAddPress}
-        gradientColors={["#F7D0A7", "#F2B277"]}
+        gradientColors={DISCOVERY_GRADIENT}
       />
 
       <View style={styles.switchWrap}>
@@ -165,7 +166,11 @@ export default function FollowingScreen() {
           title={`No ${
             activeTab === "promotion" ? "promotions" : "news"
           } found`}
-          description="Try another search or switch tabs."
+          description={
+            activeTab === "promotion"
+              ? "There are no promotions at this time. Check the News!"
+              : "There is no news at this time. Check the Promotions!"
+          }
         />
       ) : (
         <FlatList

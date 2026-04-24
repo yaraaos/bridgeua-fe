@@ -44,7 +44,7 @@ export default function BusinessCard({
             {showFollowButton ? (
               <FollowButton
                 businessId={String(business.id)}
-                size={variant === "compact" ? "sm" : "sm"}
+                size="sm"
                 variant="outline"
               />
             ) : null}

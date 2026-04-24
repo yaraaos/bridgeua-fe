@@ -57,7 +57,7 @@ export const styles = StyleSheet.create({
     marginTop: 10,
     paddingTop: 10,
     borderTopWidth: 1,
-    borderTopColor: "#F1F1F1",
+    borderTopColor: colors.border,
   },
   feedTitle: {
     fontSize: 13,
