@@ -1,3 +1,5 @@
+import type { Business } from "@/src/features/businesses";
+
 const distanceMap: Record<string, number> = {
   Nearby: 1,
   "1 km": 1,
@@ -7,7 +9,7 @@ const distanceMap: Record<string, number> = {
 };
 
 type UseDiscoveryFeedParams = {
-  businesses: any[];
+  businesses: Business[];
   sort: string;
   cuisines: string[];
   rating: string | null;
@@ -35,7 +37,7 @@ export function useDiscoveryFeed({
       ? Number(String(rating).replace("+", ""))
       : null;
 
-  const sortBusinesses = (a: any, b: any) => {
+  const sortBusinesses = (a: Business, b: Business) => {
     if (sort === "Distance") {
       return Number(a.distanceKm ?? 0) - Number(b.distanceKm ?? 0);
     }
