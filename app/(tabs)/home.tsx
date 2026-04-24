@@ -1,6 +1,7 @@
 import BusinessCard from "@/src/components/business/BusinessCard/BusinessCard";
 import ScreenHeader from "@/src/components/common/ScreenHeader/ScreenHeader";
 import CategoryScroller from "@/src/components/home/CategoryScroller/CategoryScroller";
+import HomePromotionModal from "@/src/components/home/HomePromotionModal/HomePromotionModal";
 import AppLoader from "@/src/components/ui/AppLoader/AppLoader";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
 import { HOME_CATEGORIES } from "@/src/constants/categories";
@@ -10,6 +11,7 @@ import {
 } from "@/src/constants/locations";
 import { useBusinesses } from "@/src/features/businesses";
 import { useDiscoveryFeed } from "@/src/features/discovery/hooks/useDiscoveryFeed";
+import { useHomePromotion } from "@/src/features/promotions/hooks/useHomePromotion";
 import { useDiscoveryLocationStore } from "@/src/store/discovery-location";
 import { useFilterStore } from "@/src/store/filter.store";
 import { router } from "expo-router";
@@ -38,6 +40,25 @@ export default function HomeScreen() {
     distance,
     customDistance,
   });
+
+  const {
+    promotion,
+    isVisible: isPromotionVisible,
+    closePromotion,
+  } = useHomePromotion();
+
+  const handlePromotionPress = () => {
+    if (!promotion) {
+      return;
+    }
+
+    closePromotion();
+
+    router.push({
+      pathname: "/business/[id]",
+      params: { id: String(promotion.businessId) },
+    });
+  };
 
   const handleLocationPress = () => {
     console.log("Location selector is handled inside ScreenHeader");
@@ -186,6 +207,13 @@ export default function HomeScreen() {
           contentContainerStyle={styles.listContent}
         />
       </View>
+
+      <HomePromotionModal
+        visible={isPromotionVisible}
+        promotion={promotion}
+        onClose={closePromotion}
+        onPressCta={handlePromotionPress}
+      />
     </AppScreen>
   );
 }
