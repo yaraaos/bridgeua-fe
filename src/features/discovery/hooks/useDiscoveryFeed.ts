@@ -1,19 +1,26 @@
 import type { Business } from "@/src/features/businesses";
+import type {
+    DistanceOption,
+    RatingOption,
+    SortOption,
+} from "@/src/store/filter.store";
 
-const distanceMap: Record<string, number> = {
-  Nearby: 1,
-  "1 km": 1,
-  "5 km": 5,
-  "10 km": 10,
-  "25 km": 25,
+const distanceMap: Record<DistanceOption, number | null> = {
+  "": null,
+  nearby: 1,
+  "1": 1,
+  "5": 5,
+  "10": 10,
+  "25": 25,
+  custom: null,
 };
 
 type UseDiscoveryFeedParams = {
   businesses: Business[];
-  sort: string;
+  sort: SortOption;
   cuisines: string[];
-  rating: string | null;
-  distance: string | null;
+  rating: RatingOption;
+  distance: DistanceOption;
   customDistance: string;
 };
 
@@ -26,31 +33,25 @@ export function useDiscoveryFeed({
   customDistance,
 }: UseDiscoveryFeedParams) {
   const selectedDistanceKm =
-    distance === "custom"
-      ? Number(customDistance || 0)
-      : distance
-        ? (distanceMap[distance] ?? null)
-        : null;
+    distance === "custom" ? Number(customDistance || 0) : distanceMap[distance];
 
   const selectedRatingValue =
-    rating && rating !== "Any rating"
-      ? Number(String(rating).replace("+", ""))
-      : null;
+    rating && rating !== "custom" ? Number(rating) : null;
 
   const sortBusinesses = (a: Business, b: Business) => {
-    if (sort === "Distance") {
+    if (sort === "distance") {
       return Number(a.distanceKm ?? 0) - Number(b.distanceKm ?? 0);
     }
 
-    if (sort === "Rating") {
+    if (sort === "rating") {
       return Number(b.rating ?? 0) - Number(a.rating ?? 0);
     }
 
-    if (sort === "Cost: Low to High") {
+    if (sort === "price_low") {
       return Number(a.priceLevel ?? 0) - Number(b.priceLevel ?? 0);
     }
 
-    if (sort === "Cost: High to Low") {
+    if (sort === "price_high") {
       return Number(b.priceLevel ?? 0) - Number(a.priceLevel ?? 0);
     }
 

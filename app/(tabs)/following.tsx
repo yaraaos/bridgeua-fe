@@ -72,7 +72,10 @@ export default function FollowingScreen() {
   };
 
   const handleFilterPress = () => {
-    router.push("/modal/filter");
+    router.push({
+      pathname: "/modal/filter",
+      params: { scope: "following" },
+    });
   };
 
   const handleAddPress = () => {

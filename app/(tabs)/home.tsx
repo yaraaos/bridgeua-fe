@@ -25,7 +25,9 @@ export default function HomeScreen() {
     setPermissionStatus,
   } = useDiscoveryLocationStore();
 
-  const { sort, cuisines, rating, distance, customDistance } = useFilterStore();
+  const { sort, cuisines, rating, distance, customDistance } = useFilterStore(
+    (state) => state.discoveryFilters,
+  );
   const { businesses, isLoading } = useBusinesses();
 
   const { filteredBusinesses } = useDiscoveryFeed({
@@ -79,7 +81,10 @@ export default function HomeScreen() {
   };
 
   const handleFilterPress = () => {
-    router.push("/modal/filter");
+    router.push({
+      pathname: "/modal/filter",
+      params: { scope: "discovery" },
+    });
   };
 
   const handleAddPress = () => {
@@ -95,15 +100,22 @@ export default function HomeScreen() {
 
   const handleSelectCategory = (category: string) => {
     if (category === "All Categories") {
-      useFilterStore.setState({ cuisines: [] });
-      return;
+      useFilterStore.setState((state) => ({
+        discoveryFilters: {
+          ...state.discoveryFilters,
+          cuisines: [],
+        },
+      }));
     }
 
     const mappedCategory = category === "Auto" ? "Automotive" : category;
 
-    useFilterStore.setState({
-      cuisines: [mappedCategory],
-    });
+    useFilterStore.setState((state) => ({
+      discoveryFilters: {
+        ...state.discoveryFilters,
+        cuisines: [mappedCategory],
+      },
+    }));
   };
 
   const header = (
