@@ -34,7 +34,7 @@ export const styles = StyleSheet.create({
     padding: 14,
   },
   imageRadius: {
-    borderRadius: 18,
+    borderRadius: 0,
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
@@ -79,5 +79,20 @@ export const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: "800",
     color: colors.white,
+  },
+  dots: {
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: 5,
+    marginTop: 8,
+  },
+  dot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: colors.border,
+  },
+  dotActive: {
+    backgroundColor: colors.textPrimary,
   },
 });
