@@ -1,8 +1,8 @@
+import { FollowButton } from "@/src/components/business";
 import { RatingBadge } from "@/src/components/common";
 import React from "react";
 import { Image, Pressable, Text, View } from "react-native";
 import { Business } from "../../../types/business";
-import FollowButton from "../FollowButton/FollowButton";
 import { styles } from "./BusinessCard.styles";
 
 type Props = {

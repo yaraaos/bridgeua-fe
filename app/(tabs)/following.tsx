@@ -1,5 +1,7 @@
 import { AccountTypeSwitch } from "@/src/components/auth";
+import ScreenHeader from "@/src/components/common/ScreenHeader/ScreenHeader";
 import FollowingFeedCard from "@/src/components/following/FollowingFeedCard";
+import AppEmptyState from "@/src/components/ui/AppEmptyState";
 import AppLoader from "@/src/components/ui/AppLoader/AppLoader";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
 import { colors } from "@/src/constants/colors";
@@ -11,8 +13,7 @@ import { useFollowingFeed } from "@/src/features/following";
 import { useFollowingLocationStore } from "@/src/store/following-location.store";
 import { router } from "expo-router";
 import React from "react";
-import { Alert, FlatList, StyleSheet, Text, View } from "react-native";
-import ScreenHeader from "../../src/components/common/ScreenHeader/ScreenHeader";
+import { Alert, FlatList, StyleSheet, View } from "react-native";
 
 export default function FollowingScreen() {
   const {
@@ -152,23 +153,17 @@ export default function FollowingScreen() {
       </View>
 
       {!hasFollowedBusinesses ? (
-        <View style={styles.emptyState}>
-          <Text style={styles.emptyTitle}>
-            You are not following anyone yet
-          </Text>
-          <Text style={styles.emptyText}>
-            Follow businesses from Home to see their promotions and news here.
-          </Text>
-        </View>
+        <AppEmptyState
+          title="You are not following anyone yet"
+          description="Follow businesses to see their promotions and news here."
+        />
       ) : isEmpty ? (
-        <View style={styles.emptyState}>
-          <Text style={styles.emptyTitle}>
-            No {activeTab === "promotion" ? "promotions" : "news"} found
-          </Text>
-          <Text style={styles.emptyText}>
-            Try another search or switch tabs.
-          </Text>
-        </View>
+        <AppEmptyState
+          title={`No ${
+            activeTab === "promotion" ? "promotions" : "news"
+          } found`}
+          description="Try another search or switch tabs."
+        />
       ) : (
         <FlatList
           data={items}
@@ -200,24 +195,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 8,
     paddingBottom: 24,
-  },
-  emptyState: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: 24,
-  },
-  emptyTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: colors.textPrimary,
-    marginBottom: 8,
-    textAlign: "center",
-  },
-  emptyText: {
-    fontSize: 14,
-    lineHeight: 20,
-    color: colors.textSecondary,
-    textAlign: "center",
   },
 });
