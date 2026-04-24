@@ -1,43 +1,46 @@
-import { useBusinesses } from "@/src/features/businesses";
-import { router } from "expo-router";
-import { Alert, FlatList, StyleSheet, View } from "react-native";
-import BusinessCard from "../../src/components/business/BusinessCard/BusinessCard";
-import ScreenHeader from "../../src/components/common/ScreenHeader/ScreenHeader";
-import CategoryScroller from "../../src/components/home/CategoryScroller/CategoryScroller";
-import AppLoader from "../../src/components/ui/AppLoader/AppLoader";
-import AppScreen from "../../src/components/ui/AppScreen/AppScreen";
-import { HOME_CATEGORIES } from "../../src/constants/categories";
+import BusinessCard from "@/src/components/business/BusinessCard/BusinessCard";
+import ScreenHeader from "@/src/components/common/ScreenHeader/ScreenHeader";
+import CategoryScroller from "@/src/components/home/CategoryScroller/CategoryScroller";
+import AppLoader from "@/src/components/ui/AppLoader/AppLoader";
+import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
+import { HOME_CATEGORIES } from "@/src/constants/categories";
 import {
   DEFAULT_LOCATION_OPTIONS,
   LocationOption,
-} from "../../src/constants/locations";
-import { useDiscoveryLocationStore } from "../../src/store/discovery-location";
-import { useFilterStore } from "../../src/store/filter.store";
+} from "@/src/constants/locations";
+import { useBusinesses } from "@/src/features/businesses";
+import { useDiscoveryFeed } from "@/src/features/discovery/hooks/useDiscoveryFeed";
+import { useDiscoveryLocationStore } from "@/src/store/discovery-location";
+import { useFilterStore } from "@/src/store/filter.store";
+import { router } from "expo-router";
+import { Alert, FlatList, StyleSheet, View } from "react-native";
 
 const CATEGORY_BAR_HEIGHT = 48;
-
-const distanceMap: Record<string, number> = {
-  Nearby: 1,
-  "1 km": 1,
-  "5 km": 5,
-  "10 km": 10,
-  "25 km": 25,
-};
 
 export default function HomeScreen() {
   const {
     label: selectedLocationLabel,
-    value: selectedLocationValue,
     setManualLocation,
     setNearbyLocation,
     setPermissionStatus,
   } = useDiscoveryLocationStore();
+
   const { sort, cuisines, rating, distance, customDistance } = useFilterStore();
   const { businesses, isLoading } = useBusinesses();
+
+  const { filteredBusinesses } = useDiscoveryFeed({
+    businesses,
+    sort,
+    cuisines,
+    rating,
+    distance,
+    customDistance,
+  });
 
   const handleLocationPress = () => {
     console.log("Location selector is handled inside ScreenHeader");
   };
+
   const handleSelectLocationOption = (option: LocationOption) => {
     setManualLocation({
       label: option.label,
@@ -83,16 +86,6 @@ export default function HomeScreen() {
     router.push("/add-business/search");
   };
 
-  const selectedDistanceKm =
-    distance === "custom"
-      ? Number(customDistance || 0)
-      : (distanceMap[distance] ?? null);
-
-  const selectedRatingValue =
-    rating && rating !== "Any rating"
-      ? Number(String(rating).replace("+", ""))
-      : null;
-
   const selectedHomeCategory =
     cuisines.length === 0
       ? "All Categories"
@@ -112,47 +105,6 @@ export default function HomeScreen() {
       cuisines: [mappedCategory],
     });
   };
-
-  const sortBusinesses = (a: any, b: any) => {
-    if (sort === "Distance") {
-      return Number(a.distanceKm ?? 0) - Number(b.distanceKm ?? 0);
-    }
-
-    if (sort === "Rating") {
-      return Number(b.rating ?? 0) - Number(a.rating ?? 0);
-    }
-
-    if (sort === "Cost: Low to High") {
-      return Number(a.priceLevel ?? 0) - Number(b.priceLevel ?? 0);
-    }
-
-    if (sort === "Cost: High to Low") {
-      return Number(b.priceLevel ?? 0) - Number(a.priceLevel ?? 0);
-    }
-
-    return 0;
-  };
-
-  const filteredBusinesses = [...businesses]
-    .filter((business) => {
-      const businessCategory = String(business.category ?? "").trim();
-      const businessRating = Number(business.rating ?? 0);
-      const businessDistance = Number(business.distanceKm ?? 0);
-
-      const cuisineMatch =
-        cuisines.length === 0 || cuisines.includes(businessCategory);
-
-      const ratingMatch =
-        selectedRatingValue === null || businessRating >= selectedRatingValue;
-
-      const distanceMatch =
-        selectedDistanceKm === null ||
-        Number.isNaN(selectedDistanceKm) ||
-        businessDistance <= selectedDistanceKm;
-
-      return cuisineMatch && ratingMatch && distanceMatch;
-    })
-    .sort(sortBusinesses);
 
   const header = (
     <ScreenHeader
