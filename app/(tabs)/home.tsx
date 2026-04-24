@@ -106,6 +106,7 @@ export default function HomeScreen() {
           cuisines: [],
         },
       }));
+      return;
     }
 
     const mappedCategory = category === "Auto" ? "Automotive" : category;

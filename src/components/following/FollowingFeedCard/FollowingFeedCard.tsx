@@ -1,11 +1,12 @@
 import FollowButton from "@/src/components/business/FollowButton/FollowButton";
 import { RatingBadge } from "@/src/components/common";
+import type { FollowingFeedCardItem } from "@/src/features/following/types/following.types";
 import { router } from "expo-router";
 import { Image, Pressable, Text, View } from "react-native";
 import { styles } from "./FollowingFeedCard.styles";
 
 type FollowingFeedCardProps = {
-  item: any;
+  item: FollowingFeedCardItem;
 };
 
 export default function FollowingFeedCard({ item }: FollowingFeedCardProps) {
@@ -20,7 +21,10 @@ export default function FollowingFeedCard({ item }: FollowingFeedCardProps) {
       }
     >
       <View style={styles.feedCardTop}>
-        <Image source={{ uri: item.businessImage }} style={styles.businessImage} />
+        <Image
+          source={{ uri: item.businessImage }}
+          style={styles.businessImage}
+        />
 
         <View style={styles.feedCardInfo}>
           <View style={styles.nameRow}>
