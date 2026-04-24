@@ -1,27 +1,18 @@
 import { AccountTypeSwitch } from "@/src/components/auth";
-import { RatingBadge } from "@/src/components/common";
-import { useFollowingFeed } from "@/src/features/following";
-import { router } from "expo-router";
-import React from "react";
-import {
-  Alert,
-  FlatList,
-  Image,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
-import FollowButton from "../../src/components/business/FollowButton/FollowButton";
-import ScreenHeader from "../../src/components/common/ScreenHeader/ScreenHeader";
-import AppLoader from "../../src/components/ui/AppLoader/AppLoader";
-import AppScreen from "../../src/components/ui/AppScreen/AppScreen";
-import { colors } from "../../src/constants/colors";
+import FollowingFeedCard from "@/src/components/following/FollowingFeedCard";
+import AppLoader from "@/src/components/ui/AppLoader/AppLoader";
+import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
+import { colors } from "@/src/constants/colors";
 import {
   DEFAULT_LOCATION_OPTIONS,
   LocationOption,
-} from "../../src/constants/locations";
-import { useFollowingLocationStore } from "../../src/store/following-location.store";
+} from "@/src/constants/locations";
+import { useFollowingFeed } from "@/src/features/following";
+import { useFollowingLocationStore } from "@/src/store/following-location.store";
+import { router } from "expo-router";
+import React from "react";
+import { Alert, FlatList, StyleSheet, Text, View } from "react-native";
+import ScreenHeader from "../../src/components/common/ScreenHeader/ScreenHeader";
 
 export default function FollowingScreen() {
   const {
@@ -184,64 +175,7 @@ export default function FollowingScreen() {
           keyExtractor={(item) => item.id}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.listContent}
-          renderItem={({ item }) => (
-            <Pressable
-              style={styles.feedCard}
-              onPress={() =>
-                router.push({
-                  pathname: "/business/[id]",
-                  params: { id: String(item.businessId) },
-                })
-              }
-            >
-              <View style={styles.feedCardTop}>
-                <Image
-                  source={{ uri: item.businessImage }}
-                  style={styles.businessImage}
-                />
-
-                <View style={styles.feedCardInfo}>
-                  <View style={styles.nameRow}>
-                    <Text style={styles.businessName} numberOfLines={1}>
-                      {item.businessName}
-                    </Text>
-
-                    <View style={styles.rightActions}>
-                      <RatingBadge rating={item.businessRating} compact />
-                      <FollowButton
-                        businessId={String(item.businessId)}
-                        size="sm"
-                        variant="outline"
-                      />
-                    </View>
-                  </View>
-
-                  <Text style={styles.metaText} numberOfLines={1}>
-                    {item.businessCategory}
-                  </Text>
-
-                  <Text style={styles.metaText} numberOfLines={1}>
-                    {item.businessLocation}
-                  </Text>
-
-                  {!!item.recommendedBy && (
-                    <Text style={styles.recommendedText} numberOfLines={1}>
-                      {item.recommendedBy}
-                    </Text>
-                  )}
-                </View>
-              </View>
-
-              <View style={styles.feedBody}>
-                <Text style={styles.feedTitle} numberOfLines={1}>
-                  {item.title}
-                </Text>
-                <Text style={styles.feedDescription} numberOfLines={2}>
-                  {item.description}
-                </Text>
-              </View>
-            </Pressable>
-          )}
+          renderItem={({ item }) => <FollowingFeedCard item={item} />}
         />
       )}
     </AppScreen>
@@ -263,7 +197,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   listContent: {
-    paddingHorizontal: 12,
+    paddingHorizontal: 16,
     paddingTop: 8,
     paddingBottom: 24,
   },
@@ -285,72 +219,5 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     color: colors.textSecondary,
     textAlign: "center",
-  },
-  feedCard: {
-    backgroundColor: colors.white,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: colors.border,
-    padding: 10,
-    marginBottom: 10,
-  },
-  feedCardTop: {
-    flexDirection: "row",
-    gap: 10,
-  },
-  businessImage: {
-    width: 56,
-    height: 56,
-    borderRadius: 12,
-  },
-  feedCardInfo: {
-    flex: 1,
-    justifyContent: "center",
-  },
-  nameRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-    marginBottom: 2,
-  },
-  businessName: {
-    flex: 1,
-    fontSize: 15,
-    fontWeight: "700",
-    color: colors.textPrimary,
-    marginRight: 8,
-  },
-  rightActions: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-    flexShrink: 0,
-  },
-  metaText: {
-    fontSize: 11,
-    color: colors.textSecondary,
-    marginBottom: 1,
-  },
-  recommendedText: {
-    fontSize: 10,
-    color: colors.textMuted,
-    marginTop: 2,
-  },
-  feedBody: {
-    marginTop: 10,
-    paddingTop: 10,
-    borderTopWidth: 1,
-    borderTopColor: "#F1F1F1",
-  },
-  feedTitle: {
-    fontSize: 13,
-    fontWeight: "700",
-    color: colors.textPrimary,
-    marginBottom: 4,
-  },
-  feedDescription: {
-    fontSize: 12,
-    lineHeight: 18,
-    color: colors.textSecondary,
   },
 });
