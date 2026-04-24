@@ -1,7 +1,7 @@
 import { colors } from "@/src/constants/colors";
 import type { HomePromotion } from "@/src/features/promotions/types/promotion.types";
 import { Feather } from "@expo/vector-icons";
-import React, { useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import {
     FlatList,
     ImageBackground,
@@ -11,7 +11,6 @@ import {
     Text,
     View,
 } from "react-native";
-
 import {
     HOME_PROMOTION_BANNER_WIDTH,
     styles,
@@ -35,50 +34,43 @@ export default function HomePromotionBanner({
   const listRef = useRef<FlatList<HomePromotion>>(null);
   const activeIndexRef = useRef(1);
   const isUserTouchingRef = useRef(false);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const loopedPromotions = useMemo(() => {
-    if (promotions.length <= 1) {
-      return promotions;
-    }
-
+    if (promotions.length <= 1) return promotions;
     return [promotions[promotions.length - 1], ...promotions, promotions[0]];
   }, [promotions]);
+
+  const startAutoScroll = useCallback(() => {
+    if (intervalRef.current) clearInterval(intervalRef.current);
+
+    intervalRef.current = setInterval(() => {
+      if (isUserTouchingRef.current) return;
+
+      const nextIndex = activeIndexRef.current + 1;
+      listRef.current?.scrollToIndex({ index: nextIndex, animated: true });
+      activeIndexRef.current = nextIndex;
+    }, AUTO_SWIPE_INTERVAL_MS);
+  }, []);
 
   useEffect(() => {
     if (visible && promotions.length > 1) {
       requestAnimationFrame(() => {
         activeIndexRef.current = 1;
-
-        listRef.current?.scrollToIndex({
-          index: 1,
-          animated: false,
-        });
+        listRef.current?.scrollToIndex({ index: 1, animated: false });
       });
     }
   }, [visible, promotions.length]);
 
   useEffect(() => {
-    if (!visible || promotions.length <= 1) {
-      return;
-    }
+    if (!visible || promotions.length <= 1) return;
 
-    const interval = setInterval(() => {
-      if (isUserTouchingRef.current) {
-        return;
-      }
+    startAutoScroll();
 
-      const nextIndex = activeIndexRef.current + 1;
-
-      listRef.current?.scrollToIndex({
-        index: nextIndex,
-        animated: true,
-      });
-
-      activeIndexRef.current = nextIndex;
-    }, AUTO_SWIPE_INTERVAL_MS);
-
-    return () => clearInterval(interval);
-  }, [visible, promotions.length]);
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, [visible, promotions.length, startAutoScroll]);
 
   if (!visible || promotions.length === 0) {
     return null;
@@ -87,9 +79,7 @@ export default function HomePromotionBanner({
   const handleMomentumScrollEnd = (
     event: NativeSyntheticEvent<NativeScrollEvent>,
   ) => {
-    if (promotions.length <= 1) {
-      return;
-    }
+    if (promotions.length <= 1) return;
 
     const offsetX = event.nativeEvent.contentOffset.x;
     const index = Math.round(offsetX / HOME_PROMOTION_BANNER_WIDTH);
@@ -98,22 +88,22 @@ export default function HomePromotionBanner({
 
     if (index === 0) {
       activeIndexRef.current = promotions.length;
-
       listRef.current?.scrollToIndex({
         index: promotions.length,
         animated: false,
       });
+      startAutoScroll();
       return;
     }
 
     if (index === loopedPromotions.length - 1) {
       activeIndexRef.current = 1;
-
-      listRef.current?.scrollToIndex({
-        index: 1,
-        animated: false,
-      });
+      listRef.current?.scrollToIndex({ index: 1, animated: false });
+      startAutoScroll();
+      return;
     }
+
+    startAutoScroll();
   };
 
   return (
@@ -164,7 +154,6 @@ export default function HomePromotionBanner({
                   <Text style={styles.title} numberOfLines={2}>
                     {item.title}
                   </Text>
-
                   <Text style={styles.ctaText} numberOfLines={1}>
                     {item.ctaLabel ?? `View ${item.businessName}`}
                   </Text>
