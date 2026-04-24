@@ -1,14 +1,15 @@
 import React from "react";
-import { Text, TextInput, View, Pressable } from "react-native";
-import styles from "./DistanceSelector.styles";
-import { colors } from "../../../constants/colors";
+import { Pressable, Text, TextInput, View } from "react-native";
 
-const OPTIONS = ["Nearby", "1 km", "5 km", "10 km", "25 km"];
+import { colors } from "@/src/constants/colors";
+import { DISTANCE_OPTIONS } from "@/src/constants/filters";
+import type { DistanceOption } from "@/src/store/filter.store";
+import styles from "./DistanceSelector.styles";
 
 type Props = {
-  value: string;
+  value: DistanceOption;
   customValue: string;
-  onChange: (value: string) => void;
+  onChange: (value: DistanceOption) => void;
   onChangeCustom: (value: string) => void;
 };
 
@@ -23,22 +24,33 @@ export default function DistanceSelector({
       <Text style={styles.title}>FILTER BY DISTANCE</Text>
 
       <View style={styles.optionsWrap}>
-        {OPTIONS.map((option) => {
-          const active = value === option;
+        {DISTANCE_OPTIONS.map((option) => {
+          const active = value === option.value;
 
           return (
-            <Pressable key={option} onPress={() => onChange(option)} style={styles.optionRow}>
-              <View style={[styles.radioOuter, active && styles.radioOuterActive]}>
+            <Pressable
+              key={option.value}
+              onPress={() => onChange(option.value)}
+              style={styles.optionRow}
+            >
+              <View
+                style={[styles.radioOuter, active && styles.radioOuterActive]}
+              >
                 {active ? <View style={styles.radioInner} /> : null}
               </View>
 
-              <Text style={styles.optionText}>{option}</Text>
+              <Text style={styles.optionText}>{option.label}</Text>
             </Pressable>
           );
         })}
 
         <View style={styles.optionRow}>
-          <View style={[styles.radioOuter, value === "custom" && styles.radioOuterActive]}>
+          <View
+            style={[
+              styles.radioOuter,
+              value === "custom" && styles.radioOuterActive,
+            ]}
+          >
             {value === "custom" ? <View style={styles.radioInner} /> : null}
           </View>
 

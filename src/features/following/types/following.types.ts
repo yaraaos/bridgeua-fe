@@ -15,5 +15,7 @@ export type FollowingFeedCardItem = FollowingFeedItem & {
   businessLocation: string;
   businessImage: string;
   businessRating: number;
+  businessDistanceKm?: number;
+  businessPriceLevel?: number;
   recommendedBy?: string;
 };

@@ -224,7 +224,7 @@ const styles = StyleSheet.create({
     minHeight: 32,
     paddingHorizontal: 12,
     borderRadius: 10,
-    backgroundColor: "#EFEFEA",
+    backgroundColor: colors.background,
     borderWidth: 1,
     borderColor: "#E3E3DD",
     alignItems: "center",

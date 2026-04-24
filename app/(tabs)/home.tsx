@@ -1,31 +1,79 @@
-import { router } from "expo-router";
-import { FlatList, StyleSheet, View } from "react-native";
-
+import BusinessCard from "@/src/components/business/BusinessCard/BusinessCard";
+import ScreenHeader from "@/src/components/common/ScreenHeader/ScreenHeader";
+import CategoryScroller from "@/src/components/home/CategoryScroller/CategoryScroller";
+import AppLoader from "@/src/components/ui/AppLoader/AppLoader";
+import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
+import { HOME_CATEGORIES } from "@/src/constants/categories";
+import {
+  DEFAULT_LOCATION_OPTIONS,
+  LocationOption,
+} from "@/src/constants/locations";
 import { useBusinesses } from "@/src/features/businesses";
-import BusinessCard from "../../src/components/business/BusinessCard/BusinessCard";
-import ScreenHeader from "../../src/components/common/ScreenHeader/ScreenHeader";
-import CategoryScroller from "../../src/components/home/CategoryScroller/CategoryScroller";
-import AppLoader from "../../src/components/ui/AppLoader/AppLoader";
-import AppScreen from "../../src/components/ui/AppScreen/AppScreen";
-import { HOME_CATEGORIES } from "../../src/constants/categories";
-import { useFilterStore } from "../../src/store/filter.store";
+import { useDiscoveryFeed } from "@/src/features/discovery/hooks/useDiscoveryFeed";
+import { useDiscoveryLocationStore } from "@/src/store/discovery-location";
+import { useFilterStore } from "@/src/store/filter.store";
+import { router } from "expo-router";
+import { Alert, FlatList, StyleSheet, View } from "react-native";
 
 const CATEGORY_BAR_HEIGHT = 48;
 
-const distanceMap: Record<string, number> = {
-  Nearby: 1,
-  "1 km": 1,
-  "5 km": 5,
-  "10 km": 10,
-  "25 km": 25,
-};
-
 export default function HomeScreen() {
-  const { sort, cuisines, rating, distance, customDistance } = useFilterStore();
+  const {
+    label: selectedLocationLabel,
+    setManualLocation,
+    setNearbyLocation,
+    setPermissionStatus,
+  } = useDiscoveryLocationStore();
+
+  const { sort, cuisines, rating, distance, customDistance } = useFilterStore(
+    (state) => state.discoveryFilters,
+  );
   const { businesses, isLoading } = useBusinesses();
 
+  const { filteredBusinesses } = useDiscoveryFeed({
+    businesses,
+    sort,
+    cuisines,
+    rating,
+    distance,
+    customDistance,
+  });
+
   const handleLocationPress = () => {
-    console.log("Open location picker");
+    console.log("Location selector is handled inside ScreenHeader");
+  };
+
+  const handleSelectLocationOption = (option: LocationOption) => {
+    setManualLocation({
+      label: option.label,
+      value: option.value,
+    });
+  };
+
+  const handleRequestNearby = () => {
+    Alert.alert(
+      "Use your location?",
+      "Allow location access to find businesses near you.",
+      [
+        {
+          text: "Not now",
+          style: "cancel",
+          onPress: () => setPermissionStatus("denied"),
+        },
+        {
+          text: "Allow",
+          onPress: () => {
+            setPermissionStatus("granted");
+            setNearbyLocation({
+              label: "Near you",
+              value: "nearby",
+              latitude: 34.0549,
+              longitude: -118.2426,
+            });
+          },
+        },
+      ],
+    );
   };
 
   const handleMapPress = () => {
@@ -33,22 +81,15 @@ export default function HomeScreen() {
   };
 
   const handleFilterPress = () => {
-    router.push("/modal/filter");
+    router.push({
+      pathname: "/modal/filter",
+      params: { scope: "discovery" },
+    });
   };
 
   const handleAddPress = () => {
     router.push("/add-business/search");
   };
-
-  const selectedDistanceKm =
-    distance === "custom"
-      ? Number(customDistance || 0)
-      : (distanceMap[distance] ?? null);
-
-  const selectedRatingValue =
-    rating && rating !== "Any rating"
-      ? Number(String(rating).replace("+", ""))
-      : null;
 
   const selectedHomeCategory =
     cuisines.length === 0
@@ -59,66 +100,35 @@ export default function HomeScreen() {
 
   const handleSelectCategory = (category: string) => {
     if (category === "All Categories") {
-      useFilterStore.setState({ cuisines: [] });
+      useFilterStore.setState((state) => ({
+        discoveryFilters: {
+          ...state.discoveryFilters,
+          cuisines: [],
+        },
+      }));
       return;
     }
 
     const mappedCategory = category === "Auto" ? "Automotive" : category;
 
-    useFilterStore.setState({
-      cuisines: [mappedCategory],
-    });
+    useFilterStore.setState((state) => ({
+      discoveryFilters: {
+        ...state.discoveryFilters,
+        cuisines: [mappedCategory],
+      },
+    }));
   };
-
-  const sortBusinesses = (a: any, b: any) => {
-    if (sort === "Distance") {
-      return Number(a.distanceKm ?? 0) - Number(b.distanceKm ?? 0);
-    }
-
-    if (sort === "Rating") {
-      return Number(b.rating ?? 0) - Number(a.rating ?? 0);
-    }
-
-    if (sort === "Cost: Low to High") {
-      return Number(a.priceLevel ?? 0) - Number(b.priceLevel ?? 0);
-    }
-
-    if (sort === "Cost: High to Low") {
-      return Number(b.priceLevel ?? 0) - Number(a.priceLevel ?? 0);
-    }
-
-    return 0;
-  };
-
-  const filteredBusinesses = [...businesses]
-    .filter((business) => {
-      const businessCategory = String(business.category ?? "").trim();
-      const businessRating = Number(business.rating ?? 0);
-      const businessDistance = Number(business.distanceKm ?? 0);
-
-      const cuisineMatch =
-        cuisines.length === 0 || cuisines.includes(businessCategory);
-
-      const ratingMatch =
-        selectedRatingValue === null || businessRating >= selectedRatingValue;
-
-      const distanceMatch =
-        selectedDistanceKm === null ||
-        Number.isNaN(selectedDistanceKm) ||
-        businessDistance <= selectedDistanceKm;
-
-      return cuisineMatch && ratingMatch && distanceMatch;
-    })
-    .sort(sortBusinesses);
 
   const header = (
     <ScreenHeader
       title="Discover"
       titleSubtitle="Community trusted places"
-      subtitleLabel="Location"
-      subtitleValue="California, USA"
+      subtitleValue={selectedLocationLabel}
       onSubtitlePress={handleLocationPress}
       showSubtitleChevron
+      locationOptions={DEFAULT_LOCATION_OPTIONS}
+      onSelectLocationOption={handleSelectLocationOption}
+      onRequestNearby={handleRequestNearby}
       showSearch
       searchPlaceholder="Find services, food or places"
       actions={["map", "filter", "add"]}
@@ -198,6 +208,6 @@ const styles = StyleSheet.create({
   listContent: {
     paddingTop: CATEGORY_BAR_HEIGHT + 8,
     paddingHorizontal: 16,
-    paddingBottom: 24,
+    paddingBottom: 4,
   },
 });

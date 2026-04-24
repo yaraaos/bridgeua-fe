@@ -49,27 +49,6 @@ export const styles = StyleSheet.create({
     gap: 8,
     flexShrink: 0,
   },
-  ratingWrap: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 2,
-    backgroundColor: "#FFF5E8",
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 999,
-  },
-  ratingWrapCompact: {
-    paddingHorizontal: 6,
-    paddingVertical: 3,
-  },
-  ratingText: {
-    fontSize: 12,
-    fontWeight: "700",
-    color: colors.textPrimary,
-  },
-  ratingTextCompact: {
-    fontSize: 11,
-  },
   meta: {
     fontSize: 12,
     color: colors.textSecondary,

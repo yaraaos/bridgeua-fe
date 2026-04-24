@@ -1,7 +1,12 @@
 //app/modal/filter.tsx
 
+import type {
+    DistanceOption,
+    RatingOption,
+    SortOption,
+} from "@/src/store/filter.store";
 import { Feather } from "@expo/vector-icons";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
     Animated,
@@ -24,12 +29,29 @@ import { useFilterStore } from "../../src/store/filter.store";
 
 type FilterTab = "sort" | "cuisines" | "ratings" | "distance";
 
-const SORT_OPTIONS = [
-  "Relevance (Default)",
-  "Distance",
-  "Rating",
-  "Cost: Low to High",
-  "Cost: High to Low",
+export const SORT_OPTIONS: { label: string; value: SortOption }[] = [
+  { label: "Relevance (Default)", value: "relevance" },
+  { label: "Distance", value: "distance" },
+  { label: "Rating", value: "rating" },
+  { label: "Cost: Low to High", value: "price_low" },
+  { label: "Cost: High to Low", value: "price_high" },
+];
+
+export const RATING_OPTIONS: { label: string; value: RatingOption }[] = [
+  { label: "Any rating", value: "" },
+  { label: "4+ stars", value: "4" },
+  { label: "3+ stars", value: "3" },
+  { label: "2+ stars", value: "2" },
+  { label: "1+ stars", value: "1" },
+];
+
+export const DISTANCE_OPTIONS: { label: string; value: DistanceOption }[] = [
+  { label: "Any distance", value: "" },
+  { label: "1 km", value: "1" },
+  { label: "5 km", value: "5" },
+  { label: "10 km", value: "10" },
+  { label: "25 km", value: "25" },
+  { label: "Custom", value: "custom" },
 ];
 
 const CUISINE_OPTIONS = [
@@ -49,12 +71,16 @@ export default function FilterModalScreen() {
   const [isClosing, setIsClosing] = useState(false);
   const backdropOpacity = useRef(new Animated.Value(0)).current;
   const sheetTranslateY = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
+  const params = useLocalSearchParams<{ scope?: string }>();
+
+  const scope = params.scope === "following" ? "following" : "discovery";
+  const filters = useFilterStore((state) =>
+    scope === "following" ? state.followingFilters : state.discoveryFilters,
+  );
+
+  const { sort, cuisines, rating, distance, customDistance } = filters;
+
   const {
-    sort,
-    cuisines,
-    rating,
-    distance,
-    customDistance,
     setSort,
     toggleCuisine,
     setRating,
@@ -123,7 +149,7 @@ export default function FilterModalScreen() {
           type="radio"
           options={SORT_OPTIONS}
           selectedValue={sort}
-          onSelect={setSort}
+          onSelect={(value) => setSort(scope, value)}
         />
       );
     }
@@ -135,21 +161,26 @@ export default function FilterModalScreen() {
           type="checkbox"
           options={CUISINE_OPTIONS}
           selectedValues={cuisines}
-          onToggle={toggleCuisine}
+          onToggle={(value) => toggleCuisine(scope, value)}
         />
       );
     }
 
     if (activeTab === "ratings") {
-      return <RatingSelector value={rating} onChange={setRating} />;
+      return (
+        <RatingSelector
+          value={rating}
+          onChange={(value) => setRating(scope, value)}
+        />
+      );
     }
 
     return (
       <DistanceSelector
         value={distance}
         customValue={customDistance}
-        onChange={setDistance}
-        onChangeCustom={setCustomDistance}
+        onChange={(value) => setDistance(scope, value)}
+        onChangeCustom={(value) => setCustomDistance(scope, value)}
       />
     );
   };
@@ -203,7 +234,7 @@ export default function FilterModalScreen() {
             },
           ]}
         >
-          <Pressable onPress={reset}>
+          <Pressable onPress={() => reset(scope)}>
             <Text style={styles.clearText}>Clear Filters</Text>
           </Pressable>
 
@@ -265,7 +296,7 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 999,
-    backgroundColor: "#EFEFEA",
+    backgroundColor: colors.background,
     alignItems: "center",
     justifyContent: "center",
   },
