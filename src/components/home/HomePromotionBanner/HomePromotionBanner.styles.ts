@@ -8,7 +8,7 @@ export const HOME_PROMOTION_BANNER_HORIZONTAL_MARGIN = 16;
 export const HOME_PROMOTION_BANNER_WIDTH =
   SCREEN_WIDTH - HOME_PROMOTION_BANNER_HORIZONTAL_MARGIN * 2;
 
-export const HOME_PROMOTION_BANNER_HEIGHT = 120;
+export const HOME_PROMOTION_BANNER_HEIGHT = 130;
 
 export const styles = StyleSheet.create({
   wrapper: {
@@ -79,20 +79,5 @@ export const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: "800",
     color: colors.white,
-  },
-  dots: {
-    flexDirection: "row",
-    justifyContent: "center",
-    gap: 5,
-    marginTop: 8,
-  },
-  dot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: colors.border,
-  },
-  dotActive: {
-    backgroundColor: colors.textPrimary,
   },
 });
