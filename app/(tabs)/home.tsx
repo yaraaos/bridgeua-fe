@@ -18,9 +18,10 @@ import type { HomePromotion } from "@/src/features/promotions/types/promotion.ty
 import { useDiscoveryLocationStore } from "@/src/store/discovery-location";
 import { useFilterStore } from "@/src/store/filter.store";
 import { router } from "expo-router";
-import { Alert, FlatList, StyleSheet, View } from "react-native";
+import { useRef } from "react";
+import { Alert, Animated, StyleSheet, View } from "react-native";
 
-const CATEGORY_BAR_HEIGHT = 48;
+const PROMO_BANNER_COLLAPSE_HEIGHT = 144;
 
 export default function HomeScreen() {
   const {
@@ -29,6 +30,20 @@ export default function HomeScreen() {
     setNearbyLocation,
     setPermissionStatus,
   } = useDiscoveryLocationStore();
+
+  const scrollY = useRef(new Animated.Value(0)).current;
+
+  const bannerMaxHeight = scrollY.interpolate({
+    inputRange: [0, PROMO_BANNER_COLLAPSE_HEIGHT],
+    outputRange: [PROMO_BANNER_COLLAPSE_HEIGHT, 0],
+    extrapolate: "clamp",
+  });
+
+  const bannerOpacity = scrollY.interpolate({
+    inputRange: [0, PROMO_BANNER_COLLAPSE_HEIGHT * 0.7],
+    outputRange: [1, 0],
+    extrapolate: "clamp",
+  });
 
   const { sort, cuisines, rating, distance, customDistance } = useFilterStore(
     (state) => state.discoveryFilters,
@@ -201,18 +216,33 @@ export default function HomeScreen() {
       {header}
 
       <View style={styles.contentArea}>
-        <HomePromotionBanner
-          promotions={bannerPromotions}
-          visible={isBannerVisible}
-          onClose={closeBanner}
-          onPressPromotion={handlePromotionBannerPress}
-        />
+        {isBannerVisible && (
+          <Animated.View
+            style={{
+              height: bannerMaxHeight,
+              opacity: bannerOpacity,
+              overflow: "hidden",
+            }}
+          >
+            <HomePromotionBanner
+              promotions={bannerPromotions}
+              visible={isBannerVisible}
+              onClose={closeBanner}
+              onPressPromotion={handlePromotionBannerPress}
+            />
+          </Animated.View>
+        )}
 
         {categoryBar}
 
-        <FlatList
+        <Animated.FlatList
           data={filteredBusinesses}
           keyExtractor={(item) => String(item.id)}
+          onScroll={Animated.event(
+            [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+            { useNativeDriver: false },
+          )}
+          scrollEventThrottle={16}
           renderItem={({ item }) => (
             <BusinessCard
               business={item}
