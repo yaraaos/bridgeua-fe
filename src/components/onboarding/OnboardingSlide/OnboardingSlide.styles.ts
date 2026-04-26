@@ -9,13 +9,13 @@ export const styles = StyleSheet.create({
 
   brandWrap: {
     alignItems: "center",
-    marginBottom: 44,
+    marginBottom: 24,
   },
 
   logo: {
     fontSize: 30,
     fontWeight: "800",
-    color: colors.textPrimary,
+    color: colors.primaryGreenDark,
   },
 
   tagline: {
@@ -31,7 +31,7 @@ export const styles = StyleSheet.create({
 
   card: {
     width: "100%",
-    height: 208,
+    height: 238,
     borderRadius: 16,
     overflow: "hidden",
     justifyContent: "center",
@@ -54,11 +54,14 @@ export const styles = StyleSheet.create({
   },
 
   cardEyebrow: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: "800",
     color: "#FFFFFF",
     textAlign: "center",
     marginBottom: 4,
+    textShadowColor: "rgba(0,0,0,0.4)",
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 3,
   },
 
   cardTitle: {
@@ -69,13 +72,15 @@ export const styles = StyleSheet.create({
   },
 
   cardSubtitle: {
-    marginTop: 2,
-    fontSize: 13,
-    lineHeight: 17,
-    color: "#FFFFFF",
+    marginTop: 6,
+    fontSize: 14,
+    lineHeight: 18,
+    color: "rgba(255,255,255,0.9)",
     textAlign: "center",
-    fontStyle: "italic",
-    opacity: 0.95,
+    fontStyle: "normal",
+    textShadowColor: "rgba(0,0,0,0.3)",
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
   },
   dotsWrap: {
     marginTop: 18,

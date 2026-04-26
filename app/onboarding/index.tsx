@@ -1,3 +1,4 @@
+import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import React, { useRef, useState } from "react";
 import { FlatList, StyleSheet, View, useWindowDimensions } from "react-native";
@@ -29,38 +30,40 @@ export default function OnboardingScreen() {
   };
 
   return (
-    <AppScreen style={styles.container}>
-      <FlatList
-        ref={listRef}
-        data={ONBOARDING_SLIDES}
-        keyExtractor={(item) => item.id}
-        horizontal
-        pagingEnabled
-        showsHorizontalScrollIndicator={false}
-        renderItem={({ item }) => (
-          <View style={{ width, overflow: "hidden" }}>
-            <OnboardingSlide
-              slide={item}
-              totalSlides={ONBOARDING_SLIDES.length}
-              activeIndex={activeIndex}
-            />
+    <LinearGradient colors={["#2b803a32", "#FFFFFF"]} style={{ flex: 1 }}>
+      <AppScreen style={styles.container}>
+        <FlatList
+          ref={listRef}
+          data={ONBOARDING_SLIDES}
+          keyExtractor={(item) => item.id}
+          horizontal
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+          renderItem={({ item }) => (
+            <View style={{ width, overflow: "hidden" }}>
+              <OnboardingSlide
+                slide={item}
+                totalSlides={ONBOARDING_SLIDES.length}
+                activeIndex={activeIndex}
+              />
+            </View>
+          )}
+          onMomentumScrollEnd={(event) => {
+            const index = Math.round(event.nativeEvent.contentOffset.x / width);
+            setActiveIndex(index);
+          }}
+        />
+
+        <View style={styles.footer}>
+          <View style={styles.textWrap}>
+            <AppText style={styles.title}>{activeSlide.title}</AppText>
+            <AppText style={styles.subtitle}>{activeSlide.subtitle}</AppText>
           </View>
-        )}
-        onMomentumScrollEnd={(event) => {
-          const index = Math.round(event.nativeEvent.contentOffset.x / width);
-          setActiveIndex(index);
-        }}
-      />
 
-      <View style={styles.footer}>
-        <View style={styles.textWrap}>
-          <AppText style={styles.title}>{activeSlide.title}</AppText>
-          <AppText style={styles.subtitle}>{activeSlide.subtitle}</AppText>
+          <AppButton title={activeSlide.buttonLabel} onPress={handleNext} />
         </View>
-
-        <AppButton title={activeSlide.buttonLabel} onPress={handleNext} />
-      </View>
-    </AppScreen>
+      </AppScreen>
+    </LinearGradient>
   );
 }
 
@@ -69,11 +72,12 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 0,
     paddingBottom: 32,
+    backgroundColor: "transparent",
   },
   footer: {
     paddingHorizontal: 18,
     paddingBottom: 24,
-    gap: 46,
+    gap: 50,
   },
 
   textWrap: {

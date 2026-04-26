@@ -1,4 +1,5 @@
 import AppText from "@/src/components/ui/AppText/AppText";
+import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { ImageBackground, View } from "react-native";
 import type { OnboardingSlideItem } from "../../../mocks/onboarding.mock";
@@ -36,12 +37,17 @@ export default function OnboardingSlide({
                   imageStyle={styles.imageRadius}
                   style={styles.imageBackground}
                 >
-                  <View style={styles.imageOverlay}>
+                  <LinearGradient
+                    colors={["rgba(0,0,0,0.55)", "rgba(0,0,0,0.2)"]}
+                    start={{ x: 0.5, y: 1 }}
+                    end={{ x: 0.5, y: 0 }}
+                    style={styles.imageOverlay}
+                  >
                     <AppText style={styles.cardEyebrow}>{card.eyebrow}</AppText>
                     <AppText style={styles.cardSubtitle}>
                       {card.subtitle}
                     </AppText>
-                  </View>
+                  </LinearGradient>
                 </ImageBackground>
               </View>
             );
