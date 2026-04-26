@@ -1,6 +1,7 @@
 import BusinessCard from "@/src/components/business/BusinessCard/BusinessCard";
 import ScreenHeader from "@/src/components/common/ScreenHeader/ScreenHeader";
 import CategoryScroller from "@/src/components/home/CategoryScroller/CategoryScroller";
+import HomePromotionBanner from "@/src/components/home/HomePromotionBanner";
 import HomePromotionModal from "@/src/components/home/HomePromotionModal/HomePromotionModal";
 import AppLoader from "@/src/components/ui/AppLoader/AppLoader";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
@@ -12,12 +13,15 @@ import {
 import { useBusinesses } from "@/src/features/businesses";
 import { useDiscoveryFeed } from "@/src/features/discovery/hooks/useDiscoveryFeed";
 import { useHomePromotion } from "@/src/features/promotions/hooks/useHomePromotion";
+import { useHomePromotionBanner } from "@/src/features/promotions/hooks/useHomePromotionBanner";
+import type { HomePromotion } from "@/src/features/promotions/types/promotion.types";
 import { useDiscoveryLocationStore } from "@/src/store/discovery-location";
 import { useFilterStore } from "@/src/store/filter.store";
 import { router } from "expo-router";
-import { Alert, FlatList, StyleSheet, View } from "react-native";
+import { useRef } from "react";
+import { Alert, Animated, StyleSheet, View } from "react-native";
 
-const CATEGORY_BAR_HEIGHT = 48;
+const PROMO_BANNER_COLLAPSE_HEIGHT = 144;
 
 export default function HomeScreen() {
   const {
@@ -26,6 +30,20 @@ export default function HomeScreen() {
     setNearbyLocation,
     setPermissionStatus,
   } = useDiscoveryLocationStore();
+
+  const scrollY = useRef(new Animated.Value(0)).current;
+
+  const bannerMaxHeight = scrollY.interpolate({
+    inputRange: [0, PROMO_BANNER_COLLAPSE_HEIGHT],
+    outputRange: [PROMO_BANNER_COLLAPSE_HEIGHT, 0],
+    extrapolate: "clamp",
+  });
+
+  const bannerOpacity = scrollY.interpolate({
+    inputRange: [0, PROMO_BANNER_COLLAPSE_HEIGHT * 0.7],
+    outputRange: [1, 0],
+    extrapolate: "clamp",
+  });
 
   const { sort, cuisines, rating, distance, customDistance } = useFilterStore(
     (state) => state.discoveryFilters,
@@ -46,6 +64,19 @@ export default function HomeScreen() {
     isVisible: isPromotionVisible,
     closePromotion,
   } = useHomePromotion();
+
+  const {
+    promotions: bannerPromotions,
+    isVisible: isBannerVisible,
+    closeBanner,
+  } = useHomePromotionBanner();
+
+  const handlePromotionBannerPress = (promotion: HomePromotion) => {
+    router.push({
+      pathname: "/business/[id]",
+      params: { id: String(promotion.businessId) },
+    });
+  };
 
   const handlePromotionPress = () => {
     if (!promotion) {
@@ -160,13 +191,11 @@ export default function HomeScreen() {
   );
 
   const categoryBar = (
-    <View style={styles.categoryOverlay}>
-      <CategoryScroller
-        categories={HOME_CATEGORIES}
-        selectedCategory={selectedHomeCategory}
-        onSelectCategory={handleSelectCategory}
-      />
-    </View>
+    <CategoryScroller
+      categories={HOME_CATEGORIES}
+      selectedCategory={selectedHomeCategory}
+      onSelectCategory={handleSelectCategory}
+    />
   );
 
   if (isLoading) {
@@ -187,11 +216,33 @@ export default function HomeScreen() {
       {header}
 
       <View style={styles.contentArea}>
+        {isBannerVisible && (
+          <Animated.View
+            style={{
+              height: bannerMaxHeight,
+              opacity: bannerOpacity,
+              overflow: "hidden",
+            }}
+          >
+            <HomePromotionBanner
+              promotions={bannerPromotions}
+              visible={isBannerVisible}
+              onClose={closeBanner}
+              onPressPromotion={handlePromotionBannerPress}
+            />
+          </Animated.View>
+        )}
+
         {categoryBar}
 
-        <FlatList
+        <Animated.FlatList
           data={filteredBusinesses}
           keyExtractor={(item) => String(item.id)}
+          onScroll={Animated.event(
+            [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+            { useNativeDriver: false },
+          )}
+          scrollEventThrottle={16}
           renderItem={({ item }) => (
             <BusinessCard
               business={item}
@@ -224,18 +275,10 @@ const styles = StyleSheet.create({
   },
   contentArea: {
     flex: 1,
-    position: "relative",
-  },
-  categoryOverlay: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    zIndex: 20,
   },
   listContent: {
-    paddingTop: CATEGORY_BAR_HEIGHT + 8,
     paddingHorizontal: 16,
+    paddingTop: 8,
     paddingBottom: 4,
   },
 });
