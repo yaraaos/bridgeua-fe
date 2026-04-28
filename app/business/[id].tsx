@@ -1,4 +1,7 @@
+import { BusinessHeader, BusinessHeroGallery } from "@/src/components/business";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
+import { colors } from "@/src/constants/colors";
+import { spacing } from "@/src/constants/spacing";
 import { useBusinessDetails } from "@/src/features/businesses/hooks/useBusiness";
 import { useLocalSearchParams } from "expo-router";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
@@ -25,35 +28,16 @@ export default function BusinessDetailsScreen() {
   }
 
   return (
-    <AppScreen style={styles.container}>
-      <View>
-        <Text style={styles.name}>{business.name}</Text>
-        <Text style={styles.meta}>{business.category}</Text>
-        <Text style={styles.meta}>{business.location}</Text>
+    <AppScreen scroll withTopInset style={styles.container}>
+      <BusinessHeader business={business} />
+      <BusinessHeroGallery
+        images={business.images}
+        onPressImage={(imageId) => console.log("Open image", imageId)}
+        onPressViewAll={() => console.log("Open all photos")}
+      />
 
-        <View style={styles.section}>
-          <Text style={styles.label}>Rating</Text>
-          <Text>{business.rating} / 5</Text>
-          <Text>{business.reviewCount} reviews</Text>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.label}>Address</Text>
-          <Text>{business.address}</Text>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.label}>Website</Text>
-          <Text>{business.website}</Text>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.label}>Opening hours</Text>
-          <Text>
-            {business.isOpen ? "Open" : "Closed"} · Closes at{" "}
-            {business.closesAt}
-          </Text>
-        </View>
+      <View style={styles.placeholderSection}>
+        <Text style={styles.sectionTitle}>Business details content next</Text>
       </View>
     </AppScreen>
   );
@@ -61,26 +45,22 @@ export default function BusinessDetailsScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 16,
+    padding: 0,
+    backgroundColor: colors.background,
   },
   center: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+    backgroundColor: colors.background,
   },
-  name: {
-    fontSize: 26,
+  placeholderSection: {
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.lg,
+  },
+  sectionTitle: {
+    fontSize: 16,
     fontWeight: "700",
-  },
-  meta: {
-    marginTop: 4,
-    color: "#6B7280",
-  },
-  section: {
-    marginTop: 24,
-  },
-  label: {
-    marginBottom: 6,
-    fontWeight: "700",
+    color: colors.textPrimary,
   },
 });
