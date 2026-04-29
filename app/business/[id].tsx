@@ -41,7 +41,7 @@ export default function BusinessDetailsScreen() {
   }
 
   return (
-    <AppScreen scroll withTopInset style={styles.container}>
+    <AppScreen scroll withTopInset={false} style={styles.container}>
       <BusinessHeader business={business} />
       <BusinessHeroGallery
         images={business.images}

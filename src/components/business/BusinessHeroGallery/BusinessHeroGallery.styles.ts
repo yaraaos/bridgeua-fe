@@ -5,6 +5,7 @@ import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
   container: {
+    marginTop: -spacing.md,
     paddingHorizontal: spacing.lg,
     flexDirection: "row",
     gap: spacing.sm,

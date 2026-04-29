@@ -7,30 +7,9 @@ export const styles = StyleSheet.create({
   container: {
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.md,
-    paddingBottom: spacing.lg,
-    backgroundColor: colors.background,
+    paddingBottom: spacing.xl,
   },
-  actionsRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  rightActions: {
-    flexDirection: "row",
-    gap: spacing.sm,
-  },
-  iconButton: {
-    width: 40,
-    height: 40,
-    borderRadius: radius.pill,
-    backgroundColor: colors.surface,
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  mainRow: {
-    marginTop: spacing.lg,
+  contentRow: {
     flexDirection: "row",
     alignItems: "center",
     gap: spacing.md,
@@ -39,37 +18,47 @@ export const styles = StyleSheet.create({
     width: 72,
     height: 72,
     borderRadius: radius.lg,
-    backgroundColor: colors.primaryGreenSoft,
+    backgroundColor: colors.surface,
   },
   info: {
     flex: 1,
+    minWidth: 0,
   },
-  titleRow: {
+  name: {
+    fontSize: 17,
+    lineHeight: 22,
+    fontWeight: "800",
+    color: colors.textPrimary,
+  },
+  ratingRow: {
+    marginTop: 2,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 2,
+  },
+  ratingText: {
+    marginLeft: spacing.xs,
+    fontSize: 12,
+    fontWeight: "600",
+    color: colors.textSecondary,
+  },
+  meta: {
+    marginTop: 2,
+    fontSize: 12,
+    lineHeight: 16,
+    color: colors.textSecondary,
+  },
+  rightActions: {
     flexDirection: "row",
     alignItems: "center",
     gap: spacing.sm,
   },
-  name: {
-    flex: 1,
-    fontSize: 24,
-    lineHeight: 30,
-    fontWeight: "700",
-    color: colors.textPrimary,
-  },
-  meta: {
-    marginTop: spacing.xs,
-    fontSize: 14,
-    lineHeight: 20,
-    color: colors.textSecondary,
-  },
-  bottomRow: {
-    marginTop: spacing.lg,
-    flexDirection: "row",
+  shareButton: {
+    width: 32,
+    height: 32,
+    borderRadius: radius.md,
+    backgroundColor: colors.primaryGreenSoft,
     alignItems: "center",
-    justifyContent: "space-between",
-  },
-  reviewText: {
-    fontSize: 14,
-    color: colors.textSecondary,
+    justifyContent: "center",
   },
 });
