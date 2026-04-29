@@ -37,6 +37,8 @@ export type BusinessDetails = {
   isFollowing?: boolean;
   services: BusinessDetailsService[];
   topReviews: BusinessDetailsReview[];
+  ratingBreakdown: BusinessRatingBreakdownItem[];
+  reviewPhotos: BusinessReviewPhoto[];
 };
 
 export type BusinessRatingBreakdownItem = {

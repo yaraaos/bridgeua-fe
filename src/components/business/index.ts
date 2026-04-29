@@ -5,6 +5,7 @@ export { default as BusinessHeader } from "./BusinessHeader";
 export { default as BusinessHeroGallery } from "./BusinessHeroGallery";
 export { default as BusinessInfoRow } from "./BusinessInfoRow";
 export { default as BusinessOverviewCard } from "./BusinessOverviewCard";
+export { default as BusinessRatingSummary } from "./BusinessRatingsSummary";
 export { default as BusinessReviewsList } from "./BusinessReviewsList";
 export { default as BusinessServicesList } from "./BusinessServicesList";
 export { default as BusinessTopReviews } from "./BusinessTopReviews";

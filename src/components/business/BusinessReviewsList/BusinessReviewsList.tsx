@@ -1,31 +1,98 @@
 import ReviewCard from "@/src/components/business/ReviewCard";
-import type { BusinessDetailsReview } from "@/src/features/businesses/types/business.types";
+import AppButton from "@/src/components/ui/AppButton/AppButton";
+import type {
+  BusinessDetailsReview,
+  BusinessReviewPhoto,
+} from "@/src/features/businesses/types/business.types";
+import { Ionicons } from "@expo/vector-icons";
 import React from "react";
-import { Text, View } from "react-native";
+import { Image, Pressable, Text, View } from "react-native";
 import { styles } from "./BusinessReviewsList.styles";
 
 type Props = {
   reviews: BusinessDetailsReview[];
   reviewCount: number;
+  reviewPhotos: BusinessReviewPhoto[];
+  onPressWriteReview?: () => void;
 };
 
-export default function BusinessReviewsList({ reviews, reviewCount }: Props) {
-  if (reviews.length === 0) {
-    return (
-      <View style={styles.emptyContainer}>
-        <Text style={styles.emptyTitle}>No reviews yet</Text>
-        <Text style={styles.emptyText}>
-          Be the first to review this business.
-        </Text>
-      </View>
-    );
-  }
+const FILTERS = ["Most relevant", "Newest", "Highest", "Lowest"];
 
+export default function BusinessReviewsList({
+  reviews,
+  reviewCount,
+  reviewPhotos,
+  onPressWriteReview,
+}: Props) {
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Reviews</Text>
-        <Text style={styles.subtitle}>{reviewCount} reviews</Text>
+      <View style={styles.writeCard}>
+        <Text style={styles.writeTitle}>Write a review</Text>
+
+        <View style={styles.writeStars}>
+          {Array.from({ length: 5 }).map((_, index) => (
+            <Ionicons
+              key={index}
+              name="star-outline"
+              size={30}
+              style={styles.writeStar}
+            />
+          ))}
+        </View>
+
+        <Text style={styles.writeHint}>
+          Share your experience and help the community.
+        </Text>
+
+        <AppButton title="Write a review" onPress={onPressWriteReview} />
+      </View>
+
+      {reviewPhotos.length > 0 ? (
+        <View style={styles.photosSection}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Add photos</Text>
+            <Pressable style={styles.uploadButton}>
+              <Ionicons name="image-outline" size={16} style={styles.uploadIcon} />
+              <Text style={styles.uploadText}>Upload</Text>
+            </Pressable>
+          </View>
+
+          <View style={styles.photosRow}>
+            {reviewPhotos.slice(0, 3).map((photo) => (
+              <Image
+                key={photo.id}
+                source={{ uri: photo.url }}
+                style={styles.reviewPhoto}
+              />
+            ))}
+          </View>
+        </View>
+      ) : null}
+
+      <View style={styles.filtersRow}>
+        {FILTERS.map((filter, index) => (
+          <Pressable
+            key={filter}
+            style={[
+              styles.filterChip,
+              index === 0 && styles.filterChipActive,
+            ]}
+          >
+            <Text
+              style={[
+                styles.filterText,
+                index === 0 && styles.filterTextActive,
+              ]}
+            >
+              {filter}
+            </Text>
+          </Pressable>
+        ))}
+      </View>
+
+      <View style={styles.listHeader}>
+        <Text style={styles.sectionTitle}>All reviews</Text>
+        <Text style={styles.reviewCount}>{reviewCount} total</Text>
       </View>
 
       <View style={styles.list}>

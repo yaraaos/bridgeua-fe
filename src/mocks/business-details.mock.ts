@@ -74,5 +74,26 @@ export const businessDetailsMock: BusinessDetails[] = [
         text: "Beautiful salon, clean space, and very professional service. Highly recommended.",
       },
     ],
+    ratingBreakdown: [
+      { rating: 5, count: 18 },
+      { rating: 4, count: 7 },
+      { rating: 3, count: 2 },
+      { rating: 2, count: 1 },
+      { rating: 1, count: 0 },
+    ],
+    reviewPhotos: [
+      {
+        id: "review-photo-1",
+        url: "https://images.unsplash.com/photo-1604654894610-df63bc536371?w=500",
+      },
+      {
+        id: "review-photo-2",
+        url: "https://images.unsplash.com/photo-1610992015732-2449b76344bc?w=500",
+      },
+      {
+        id: "review-photo-3",
+        url: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=500",
+      },
+    ],
   },
 ];
