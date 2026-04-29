@@ -1,15 +1,23 @@
-import { BusinessHeader, BusinessHeroGallery } from "@/src/components/business";
+import {
+    BusinessDetailsTabs,
+    BusinessHeader,
+    BusinessHeroGallery,
+    type BusinessDetailsTab,
+} from "@/src/components/business";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
 import { colors } from "@/src/constants/colors";
 import { spacing } from "@/src/constants/spacing";
 import { useBusinessDetails } from "@/src/features/businesses/hooks/useBusiness";
 import { useLocalSearchParams } from "expo-router";
+import { useState } from "react";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 
 export default function BusinessDetailsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
 
   const { business, isLoading } = useBusinessDetails(id);
+
+  const [activeTab, setActiveTab] = useState<BusinessDetailsTab>("overview");
 
   if (isLoading) {
     return (
@@ -35,6 +43,7 @@ export default function BusinessDetailsScreen() {
         onPressImage={(imageId) => console.log("Open image", imageId)}
         onPressViewAll={() => console.log("Open all photos")}
       />
+      <BusinessDetailsTabs activeTab={activeTab} onChange={setActiveTab} />
 
       <View style={styles.placeholderSection}>
         <Text style={styles.sectionTitle}>Business details content next</Text>
