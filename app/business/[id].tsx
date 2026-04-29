@@ -2,6 +2,7 @@ import {
     BusinessDetailsTabs,
     BusinessHeader,
     BusinessHeroGallery,
+    BusinessOverviewCard,
     type BusinessDetailsTab,
 } from "@/src/components/business";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
@@ -44,6 +45,9 @@ export default function BusinessDetailsScreen() {
         onPressViewAll={() => console.log("Open all photos")}
       />
       <BusinessDetailsTabs activeTab={activeTab} onChange={setActiveTab} />
+      {activeTab === "overview" ? (
+        <BusinessOverviewCard business={business} />
+      ) : null}
 
       <View style={styles.placeholderSection}>
         <Text style={styles.sectionTitle}>Business details content next</Text>
