@@ -4,6 +4,7 @@ import {
     BusinessHeader,
     BusinessHeroGallery,
     BusinessOverviewCard,
+    BusinessReviewsList,
     BusinessServicesList,
     BusinessTopReviews,
     type BusinessDetailsTab,
@@ -72,6 +73,13 @@ export default function BusinessDetailsScreen() {
               },
             })
           }
+        />
+      ) : null}
+
+      {activeTab === "reviews" ? (
+        <BusinessReviewsList
+          reviews={business.topReviews}
+          reviewCount={business.reviewCount}
         />
       ) : null}
 

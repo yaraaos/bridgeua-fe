@@ -38,3 +38,13 @@ export type BusinessDetails = {
   services: BusinessDetailsService[];
   topReviews: BusinessDetailsReview[];
 };
+
+export type BusinessRatingBreakdownItem = {
+  rating: 5 | 4 | 3 | 2 | 1;
+  count: number;
+};
+
+export type BusinessReviewPhoto = {
+  id: string;
+  url: string;
+};
