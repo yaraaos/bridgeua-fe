@@ -1,4 +1,5 @@
 import {
+    BusinessBookingCard,
     BusinessDetailsTabs,
     BusinessHeader,
     BusinessHeroGallery,
@@ -46,7 +47,10 @@ export default function BusinessDetailsScreen() {
       />
       <BusinessDetailsTabs activeTab={activeTab} onChange={setActiveTab} />
       {activeTab === "overview" ? (
-        <BusinessOverviewCard business={business} />
+        <>
+          <BusinessOverviewCard business={business} />
+          <BusinessBookingCard businessId={business.id} />
+        </>
       ) : null}
 
       <View style={styles.placeholderSection}>
