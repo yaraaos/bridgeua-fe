@@ -4,6 +4,7 @@ import {
     BusinessHeader,
     BusinessHeroGallery,
     BusinessOverviewCard,
+    BusinessTopReviews,
     type BusinessDetailsTab,
 } from "@/src/components/business";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
@@ -50,6 +51,11 @@ export default function BusinessDetailsScreen() {
         <>
           <BusinessOverviewCard business={business} />
           <BusinessBookingCard businessId={business.id} />
+          <BusinessTopReviews
+            reviews={business.topReviews}
+            reviewCount={business.reviewCount}
+            onPressViewAll={() => setActiveTab("reviews")}
+          />
         </>
       ) : null}
 
