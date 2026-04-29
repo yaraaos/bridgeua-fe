@@ -1,16 +1,18 @@
 import {
     BusinessBookingCard,
     BusinessDetailsTabs,
-    BusinessHeader,
     BusinessHeroGallery,
     BusinessOverviewCard,
     BusinessReviewsList,
     BusinessServicesList,
     BusinessTopReviews,
+    FollowButton,
     type BusinessDetailsTab,
 } from "@/src/components/business";
+import ScreenHeader from "@/src/components/common/ScreenHeader/ScreenHeader";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
 import { colors } from "@/src/constants/colors";
+import { DISCOVERY_GRADIENT } from "@/src/constants/gradients";
 import { spacing } from "@/src/constants/spacing";
 import { useBusinessDetails } from "@/src/features/businesses/hooks/useBusiness";
 import { router, useLocalSearchParams } from "expo-router";
@@ -42,13 +44,31 @@ export default function BusinessDetailsScreen() {
 
   return (
     <AppScreen scroll withTopInset={false} style={styles.container}>
-      <BusinessHeader business={business} />
+      <ScreenHeader
+        variant="business"
+        title={business.name}
+        imageUrl={business.images[0]?.url}
+        rating={business.rating}
+        reviewCount={business.reviewCount}
+        category={business.category}
+        location={business.location}
+        isOpen={business.isOpen}
+        closesAt={business.closesAt}
+        gradientColors={DISCOVERY_GRADIENT}
+        onPressShare={() => console.log("Share business", business.id)}
+        rightSlot={
+          <FollowButton businessId={business.id} size="sm" variant="filled" />
+        }
+      />
+
       <BusinessHeroGallery
         images={business.images}
         onPressImage={(imageId) => console.log("Open image", imageId)}
         onPressViewAll={() => console.log("Open all photos")}
       />
+
       <BusinessDetailsTabs activeTab={activeTab} onChange={setActiveTab} />
+
       {activeTab === "overview" ? (
         <>
           <BusinessOverviewCard business={business} />
