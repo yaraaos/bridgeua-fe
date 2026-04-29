@@ -4,6 +4,7 @@ import {
     BusinessHeader,
     BusinessHeroGallery,
     BusinessOverviewCard,
+    BusinessServicesList,
     BusinessTopReviews,
     type BusinessDetailsTab,
 } from "@/src/components/business";
@@ -11,7 +12,7 @@ import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
 import { colors } from "@/src/constants/colors";
 import { spacing } from "@/src/constants/spacing";
 import { useBusinessDetails } from "@/src/features/businesses/hooks/useBusiness";
-import { useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 
@@ -57,6 +58,21 @@ export default function BusinessDetailsScreen() {
             onPressViewAll={() => setActiveTab("reviews")}
           />
         </>
+      ) : null}
+
+      {activeTab === "services" ? (
+        <BusinessServicesList
+          services={business.services}
+          onPressService={(serviceId) =>
+            router.push({
+              pathname: "/bookings/choose-service",
+              params: {
+                businessId: business.id,
+                serviceId,
+              },
+            })
+          }
+        />
       ) : null}
 
       <View style={styles.placeholderSection}>
