@@ -78,8 +78,8 @@ export const styles = StyleSheet.create({
     paddingBottom: spacing.sm,
   },
   businessLogo: {
-    width: 82,
-    height: 82,
+    width: 98,
+    height: 98,
     borderRadius: radius.lg,
     backgroundColor: colors.surface,
   },

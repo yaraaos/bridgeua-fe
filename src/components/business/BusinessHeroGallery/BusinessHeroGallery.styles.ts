@@ -5,14 +5,14 @@ import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
   container: {
-    marginTop: -spacing.md,
     paddingHorizontal: spacing.lg,
+    paddingTop: spacing.md,
     flexDirection: "row",
     gap: spacing.sm,
   },
   mainImageWrap: {
     flex: 1.4,
-    height: 210,
+    height: 200,
     borderRadius: radius.xl,
     overflow: "hidden",
     backgroundColor: colors.primaryGreenSoft,
@@ -26,7 +26,7 @@ export const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   sideImageWrap: {
-    height: 101,
+    height: 96,
     borderRadius: radius.lg,
     overflow: "hidden",
     backgroundColor: colors.primaryGreenSoft,
