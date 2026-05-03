@@ -1,5 +1,7 @@
 import { StyleSheet } from "react-native";
 import { colors } from "../../../constants/colors";
+import { radius } from "../../../constants/radius";
+import { spacing } from "../../../constants/spacing";
 
 export const styles = StyleSheet.create({
   topRow: {
@@ -59,4 +61,80 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+
+  // BUSINESS PAGE
+  businessIconButton: {
+    width: 34,
+    height: 34,
+    borderRadius: radius.md,
+    backgroundColor: colors.primaryGreenSoft,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  businessHeaderRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: spacing.lg,
+    transform: [{ translateY: 10 }],
+    paddingBottom: spacing.sm,
+  },
+  businessLogo: {
+    width: 98,
+    height: 98,
+    borderRadius: radius.lg,
+    backgroundColor: colors.surface,
+  },
+  businessInfo: {
+    flex: 1,
+    minWidth: 0,
+  },
+  businessTitle: {
+    fontSize: 22,
+    lineHeight: 26,
+    fontWeight: "800",
+    color: colors.textPrimary,
+  },
+  businessRatingRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 3,
+    marginTop: 6,
+  },
+  businessRatingValue: {
+    fontSize: 13,
+    fontWeight: "700",
+    color: colors.textPrimary,
+    marginLeft: 4,
+  },
+  businessReviewText: {
+    fontSize: 12,
+    color: colors.textSecondary,
+  },
+  businessMeta: {
+    marginTop: 2,
+    fontSize: 14,
+    lineHeight: 18,
+    color: colors.textSecondary,
+  },
+  businessStatus: {
+    marginTop: 4,
+    fontSize: 14,
+    lineHeight: 18,
+    fontWeight: "700",
+    color: colors.primaryGreen,
+  },
+  businessTitleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: spacing.sm,
+  },
+
+  businessInlineActions: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.sm,
+  },
 });
+
+//
