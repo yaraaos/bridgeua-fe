@@ -1,26 +1,16 @@
+import ImageGalleryModal from "@/src/components/common/ImageGalleryModal/ImageGalleryModal";
 import AppAvatar from "@/src/components/ui/AppAvatar";
 import { colors } from "@/src/constants/colors";
 import type { BusinessDetailsReview } from "@/src/features/businesses/types/business.types";
-import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { MaterialIcons } from "@expo/vector-icons";
 import React, { useState } from "react";
-import {
-    Dimensions,
-    FlatList,
-    Image,
-    Modal,
-    Pressable,
-    ScrollView,
-    Text,
-    View,
-} from "react-native";
+import { Image, Pressable, ScrollView, Text, View } from "react-native";
 import { styles } from "./ReviewCard.styles";
 
 type Props = {
   review: BusinessDetailsReview;
   variant?: "default" | "preview";
 };
-
-const SCREEN_WIDTH = Dimensions.get("window").width;
 
 export default function ReviewCard({ review, variant = "default" }: Props) {
   const isPreview = variant === "preview";
@@ -29,10 +19,6 @@ export default function ReviewCard({ review, variant = "default" }: Props) {
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(
     null,
   );
-
-  const closePhotoModal = () => {
-    setSelectedPhotoIndex(null);
-  };
 
   return (
     <View style={[styles.container, isPreview && styles.containerPreview]}>
@@ -95,44 +81,12 @@ export default function ReviewCard({ review, variant = "default" }: Props) {
 
       {isPreview ? <Text style={styles.moreText}>More</Text> : null}
 
-      <Modal
+      <ImageGalleryModal
+        images={review.photos ?? []}
         visible={selectedPhotoIndex !== null}
-        transparent
-        animationType="fade"
-        onRequestClose={closePhotoModal}
-      >
-        <View style={styles.photoModal}>
-          <Pressable style={styles.photoModalClose} onPress={closePhotoModal}>
-            <Ionicons name="close" size={24} color={colors.white} />
-          </Pressable>
-
-          <FlatList
-            data={review.photos ?? []}
-            horizontal
-            pagingEnabled
-            showsHorizontalScrollIndicator={false}
-            keyExtractor={(photo) => photo.id}
-            initialScrollIndex={selectedPhotoIndex ?? 0}
-            getItemLayout={(_, index) => ({
-              length: SCREEN_WIDTH,
-              offset: SCREEN_WIDTH * index,
-              index,
-            })}
-            renderItem={({ item }) => (
-              <Pressable
-                style={styles.photoModalPage}
-                onPress={closePhotoModal}
-              >
-                <Image
-                  source={{ uri: item.url }}
-                  style={styles.photoModalImage}
-                  resizeMode="contain"
-                />
-              </Pressable>
-            )}
-          />
-        </View>
-      </Modal>
+        initialIndex={selectedPhotoIndex ?? 0}
+        onClose={() => setSelectedPhotoIndex(null)}
+      />
     </View>
   );
 }

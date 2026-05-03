@@ -1,4 +1,5 @@
 import ReviewCard from "@/src/components/business/ReviewCard";
+import ImageGalleryModal from "@/src/components/common/ImageGalleryModal/ImageGalleryModal";
 import AppButton from "@/src/components/ui/AppButton/AppButton";
 import AppEmptyState from "@/src/components/ui/AppEmptyState";
 import type {
@@ -7,7 +8,7 @@ import type {
 } from "@/src/features/businesses/types/business.types";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
-import { Image, Pressable, Text, View } from "react-native";
+import { Image, Pressable, ScrollView, Text, View } from "react-native";
 import { styles } from "./BusinessReviewsList.styles";
 
 type Props = {
@@ -26,6 +27,7 @@ export default function BusinessReviewsList({
   onPressWriteReview,
 }: Props) {
   const [activeFilter, setActiveFilter] = useState("Most relevant");
+  const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(null);
 
   return (
     <View style={styles.container}>
@@ -53,18 +55,27 @@ export default function BusinessReviewsList({
       {reviewPhotos.length > 0 ? (
         <View style={styles.photosSection}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Photos from reviews</Text>
+            <Text style={styles.sectionTitle}>Review photos</Text>
           </View>
 
-          <View style={styles.photosRow}>
-            {reviewPhotos.slice(0, 3).map((photo) => (
-              <Image
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.photosRow}
+          >
+            {reviewPhotos.map((photo, index) => (
+              <Pressable
                 key={photo.id}
-                source={{ uri: photo.url }}
-                style={styles.reviewPhoto}
-              />
+                onPress={() => setSelectedPhotoIndex(index)}
+                style={styles.photoItem}
+              >
+                <Image
+                  source={{ uri: photo.url }}
+                  style={styles.reviewPhoto}
+                />
+              </Pressable>
             ))}
-          </View>
+          </ScrollView>
         </View>
       ) : null}
 
@@ -111,6 +122,13 @@ export default function BusinessReviewsList({
           ))}
         </View>
       )}
+
+      <ImageGalleryModal
+        images={reviewPhotos}
+        visible={selectedPhotoIndex !== null}
+        initialIndex={selectedPhotoIndex ?? 0}
+        onClose={() => setSelectedPhotoIndex(null)}
+      />
     </View>
   );
 }

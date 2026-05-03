@@ -52,11 +52,13 @@ export const styles = StyleSheet.create({
   },
   photosRow: {
     marginTop: spacing.md,
-    flexDirection: "row",
-    gap: spacing.sm,
+    paddingRight: spacing.lg,
+  },
+  photoItem: {
+    marginRight: spacing.sm,
   },
   reviewPhoto: {
-    flex: 1,
+    width: 120,
     height: 92,
     borderRadius: radius.lg,
     backgroundColor: colors.primaryGreenSoft,
