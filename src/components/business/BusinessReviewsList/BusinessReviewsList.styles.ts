@@ -5,7 +5,6 @@ import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
   container: {
-    marginHorizontal: spacing.lg,
     marginTop: spacing.md,
     marginBottom: spacing.xxl,
   },
@@ -50,19 +49,6 @@ export const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "700",
     color: colors.textPrimary,
-  },
-  uploadButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.xs,
-  },
-  uploadIcon: {
-    color: colors.primaryGreen,
-  },
-  uploadText: {
-    fontSize: 13,
-    fontWeight: "700",
-    color: colors.primaryGreen,
   },
   photosRow: {
     marginTop: spacing.md,

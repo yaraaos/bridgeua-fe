@@ -6,6 +6,7 @@ export type BusinessDetailsReview = {
   authorAvatar: string;
   rating: number;
   text: string;
+  photos?: BusinessReviewPhoto[];
 };
 
 export type BusinessDetailsService = {

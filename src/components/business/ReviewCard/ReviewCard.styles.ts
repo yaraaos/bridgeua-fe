@@ -58,4 +58,15 @@ export const styles = StyleSheet.create({
     fontWeight: "700",
     color: colors.primaryGreen,
   },
+  photosRow: {
+    marginTop: spacing.md,
+    flexDirection: "row",
+    gap: spacing.sm,
+  },
+  reviewPhoto: {
+    width: 76,
+    height: 76,
+    borderRadius: radius.md,
+    backgroundColor: colors.primaryGreenSoft,
+  },
 });

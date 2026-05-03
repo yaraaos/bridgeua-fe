@@ -3,7 +3,7 @@ import { colors } from "@/src/constants/colors";
 import type { BusinessDetailsReview } from "@/src/features/businesses/types/business.types";
 import { MaterialIcons } from "@expo/vector-icons";
 import React from "react";
-import { Text, View } from "react-native";
+import { Image, Text, View } from "react-native";
 import { styles } from "./ReviewCard.styles";
 
 type Props = {
@@ -13,6 +13,7 @@ type Props = {
 
 export default function ReviewCard({ review, variant = "default" }: Props) {
   const isPreview = variant === "preview";
+  const showPhotos = !isPreview && !!review.photos?.length;
 
   return (
     <View style={[styles.container, isPreview && styles.containerPreview]}>
@@ -54,6 +55,18 @@ export default function ReviewCard({ review, variant = "default" }: Props) {
       >
         {review.text}
       </Text>
+
+      {showPhotos ? (
+        <View style={styles.photosRow}>
+          {review.photos?.slice(0, 3).map((photo) => (
+            <Image
+              key={photo.id}
+              source={{ uri: photo.url }}
+              style={styles.reviewPhoto}
+            />
+          ))}
+        </View>
+      ) : null}
 
       {isPreview ? <Text style={styles.moreText}>More</Text> : null}
     </View>

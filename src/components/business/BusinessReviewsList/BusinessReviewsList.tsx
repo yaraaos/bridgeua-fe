@@ -1,8 +1,8 @@
 import ReviewCard from "@/src/components/business/ReviewCard";
 import AppButton from "@/src/components/ui/AppButton/AppButton";
 import type {
-  BusinessDetailsReview,
-  BusinessReviewPhoto,
+    BusinessDetailsReview,
+    BusinessReviewPhoto,
 } from "@/src/features/businesses/types/business.types";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
@@ -50,11 +50,7 @@ export default function BusinessReviewsList({
       {reviewPhotos.length > 0 ? (
         <View style={styles.photosSection}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Add photos</Text>
-            <Pressable style={styles.uploadButton}>
-              <Ionicons name="image-outline" size={16} style={styles.uploadIcon} />
-              <Text style={styles.uploadText}>Upload</Text>
-            </Pressable>
+            <Text style={styles.sectionTitle}>Photos from reviews</Text>
           </View>
 
           <View style={styles.photosRow}>
@@ -73,10 +69,7 @@ export default function BusinessReviewsList({
         {FILTERS.map((filter, index) => (
           <Pressable
             key={filter}
-            style={[
-              styles.filterChip,
-              index === 0 && styles.filterChipActive,
-            ]}
+            style={[styles.filterChip, index === 0 && styles.filterChipActive]}
           >
             <Text
               style={[

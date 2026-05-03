@@ -56,6 +56,12 @@ export const businessDetailsMock: BusinessDetails[] = [
           "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300",
         rating: 4,
         text: "Amazing experience from start to finish. Very professional approach, attention to details, high-quality materials...",
+        photos: [
+          {
+            id: "photo-1",
+            url: "https://images.unsplash.com/photo-1551782450-a2132b4ba21d",
+          },
+        ],
       },
       {
         id: "review-2",
