@@ -138,7 +138,7 @@ export default function BusinessDetailsScreen() {
             />
 
             <BusinessReviewsList
-              reviews={business.topReviews}
+              reviews={business.reviews}
               reviewCount={business.reviewCount}
               reviewPhotos={business.reviewPhotos}
               onPressWriteReview={() =>

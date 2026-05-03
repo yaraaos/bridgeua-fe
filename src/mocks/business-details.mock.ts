@@ -6,7 +6,8 @@ export const businessDetailsMock: BusinessDetails[] = [
     name: "Zelenska Beauty",
     category: "Beauty",
     location: "Beverly Hills / California",
-    address: "9455 S Santa Monica Blvd, Beverly Hills, CA 90210, United States",
+    address:
+      "9455 S Santa Monica Blvd, Beverly Hills, CA 90210, United States",
     website: "zelenskabeauty.com",
     rating: 4.5,
     reviewCount: 28,
@@ -14,6 +15,7 @@ export const businessDetailsMock: BusinessDetails[] = [
     recommendedByPreview: ["ToryProNails", "Best deal"],
     isOpen: true,
     closesAt: "21:00",
+
     images: [
       {
         id: "zelenska-main",
@@ -28,6 +30,7 @@ export const businessDetailsMock: BusinessDetails[] = [
         url: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=900",
       },
     ],
+
     services: [
       {
         id: "service-1",
@@ -48,7 +51,37 @@ export const businessDetailsMock: BusinessDetails[] = [
         duration: "1h",
       },
     ],
+
+    // 👇 Preview (no photos here)
     topReviews: [
+      {
+        id: "review-1",
+        authorName: "Kateryna",
+        authorAvatar:
+          "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300",
+        rating: 4,
+        text: "Amazing experience from start to finish. Very professional approach, attention to details, high-quality materials...",
+      },
+      {
+        id: "review-2",
+        authorName: "Kristina",
+        authorAvatar:
+          "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300",
+        rating: 5,
+        text: "The team was friendly and the service felt very personal. I would definitely come back again.",
+      },
+      {
+        id: "review-3",
+        authorName: "Anna",
+        authorAvatar:
+          "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=300",
+        rating: 5,
+        text: "Beautiful salon, clean space, and very professional service. Highly recommended.",
+      },
+    ],
+
+    // 👇 Full list (used in "All reviews")
+    reviews: [
       {
         id: "review-1",
         authorName: "Kateryna",
@@ -59,7 +92,7 @@ export const businessDetailsMock: BusinessDetails[] = [
         photos: [
           {
             id: "photo-1",
-            url: "https://images.unsplash.com/photo-1551782450-a2132b4ba21d",
+            url: "https://images.unsplash.com/photo-1551782450-a2132b4ba21d?w=500",
           },
         ],
       },
@@ -80,6 +113,7 @@ export const businessDetailsMock: BusinessDetails[] = [
         text: "Beautiful salon, clean space, and very professional service. Highly recommended.",
       },
     ],
+
     ratingBreakdown: [
       { rating: 5, count: 18 },
       { rating: 4, count: 7 },
@@ -87,6 +121,8 @@ export const businessDetailsMock: BusinessDetails[] = [
       { rating: 2, count: 1 },
       { rating: 1, count: 0 },
     ],
+
+    // 👇 Aggregated gallery (top photos from reviews)
     reviewPhotos: [
       {
         id: "review-photo-1",
