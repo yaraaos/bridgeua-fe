@@ -89,8 +89,14 @@ export default function BusinessReviewsList({
       </View>
 
       <View style={styles.list}>
-        {reviews.map((review) => (
-          <ReviewCard key={review.id} review={review} />
+        {reviews.map((review, index) => (
+          <View key={review.id}>
+            <ReviewCard review={review} />
+
+            {index < reviews.length - 1 ? (
+              <View style={styles.separator} />
+            ) : null}
+          </View>
         ))}
       </View>
     </View>

@@ -6,8 +6,6 @@ import { StyleSheet } from "react-native";
 export const styles = StyleSheet.create({
   container: {
     paddingVertical: spacing.md,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
   },
   containerPreview: {
     width: 200,

@@ -102,7 +102,8 @@ export const styles = StyleSheet.create({
   list: {
     marginHorizontal: spacing.lg,
     marginTop: spacing.md,
-    padding: spacing.lg,
+    paddingTop: spacing.xs,
+    paddingHorizontal: spacing.lg,
     borderRadius: radius.xl,
     backgroundColor: colors.surface,
     borderWidth: 1,
@@ -117,5 +118,9 @@ export const styles = StyleSheet.create({
     marginTop: spacing.xs,
     fontSize: 14,
     color: colors.textSecondary,
+  },
+  separator: {
+    height: 1,
+    backgroundColor: colors.border,
   },
 });
