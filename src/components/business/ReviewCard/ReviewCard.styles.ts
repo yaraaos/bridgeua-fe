@@ -1,7 +1,7 @@
 import { colors } from "@/src/constants/colors";
 import { radius } from "@/src/constants/radius";
 import { spacing } from "@/src/constants/spacing";
-import { StyleSheet } from "react-native";
+import { Dimensions, StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
   container: {
@@ -70,8 +70,12 @@ export const styles = StyleSheet.create({
   photoModal: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.92)",
-    alignItems: "center",
-    justifyContent: "center",
+  },
+  photosScroll: {
+    marginTop: spacing.md,
+  },
+  photoItem: {
+    marginRight: spacing.sm,
   },
   photoModalClose: {
     position: "absolute",
@@ -85,15 +89,14 @@ export const styles = StyleSheet.create({
     justifyContent: "center",
     zIndex: 10,
   },
+  photoModalPage: {
+    width: Dimensions.get("window").width,
+    height: "100%",
+    alignItems: "center",
+    justifyContent: "center",
+  },
   photoModalImage: {
-    width: "100%",
-    height: "80%",
-  },
-  photosScroll: {
-    marginTop: spacing.md,
-  },
-
-  photoItem: {
-    marginRight: spacing.sm,
+    width: "92%",
+    height: "75%",
   },
 });

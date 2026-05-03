@@ -6,8 +6,7 @@ export const businessDetailsMock: BusinessDetails[] = [
     name: "Zelenska Beauty",
     category: "Beauty",
     location: "Beverly Hills / California",
-    address:
-      "9455 S Santa Monica Blvd, Beverly Hills, CA 90210, United States",
+    address: "9455 S Santa Monica Blvd, Beverly Hills, CA 90210, United States",
     website: "zelenskabeauty.com",
     rating: 4.5,
     reviewCount: 28,
@@ -93,6 +92,10 @@ export const businessDetailsMock: BusinessDetails[] = [
           {
             id: "photo-1",
             url: "https://images.unsplash.com/photo-1551782450-a2132b4ba21d?w=500",
+          },
+          {
+            id: "photo-2",
+            url: "https://plus.unsplash.com/premium_photo-1670348051093-a3f94b408bcb?q=80&w=1172&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
           },
         ],
       },
