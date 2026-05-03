@@ -1,14 +1,12 @@
 import { useFollowingStore } from "@/src/store/following.store";
-import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Pressable, StyleProp, Text, ViewStyle } from "react-native";
-import { colors } from "../../../constants/colors";
 import { styles } from "./FollowButton.styles";
 
 type FollowButtonProps = {
   businessId: string | number;
-  size?: "sm" | "md" | "icon";
-  variant?: "filled" | "outline" | "soft";
+  size?: "sm" | "md";
+  variant?: "filled" | "outline";
   style?: StyleProp<ViewStyle>;
 };
 
@@ -29,21 +27,6 @@ export default function FollowButton({
   const isFollowing = followedBusinessIds.includes(normalizedId);
 
   const useFilledStyle = variant === "filled" || isFollowing;
-
-  if (size === "icon") {
-    return (
-      <Pressable
-        onPress={() => toggleFollowBusiness(normalizedId)}
-        style={[styles.iconButton, style]}
-      >
-        <Ionicons
-          name={isFollowing ? "person" : "person-add-outline"}
-          size={18}
-          color={colors.primaryGreen}
-        />
-      </Pressable>
-    );
-  }
 
   return (
     <Pressable
