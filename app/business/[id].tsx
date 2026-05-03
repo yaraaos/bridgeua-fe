@@ -1,29 +1,45 @@
 import {
     BusinessBookingCard,
     BusinessDetailsTabs,
-    BusinessHeader,
     BusinessHeroGallery,
     BusinessOverviewCard,
     BusinessRatingSummary,
     BusinessReviewsList,
     BusinessServicesList,
     BusinessTopReviews,
+    FollowButton,
     type BusinessDetailsTab,
 } from "@/src/components/business";
+import ScreenHeader from "@/src/components/common/ScreenHeader/ScreenHeader";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
 import { colors } from "@/src/constants/colors";
+import { DISCOVERY_GRADIENT } from "@/src/constants/gradients";
 import { spacing } from "@/src/constants/spacing";
 import { useBusinessDetails } from "@/src/features/businesses/hooks/useBusiness";
 import { router, useLocalSearchParams } from "expo-router";
-import { useState } from "react";
-import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
+import { useRef, useState } from "react";
+import {
+    ActivityIndicator,
+    Animated,
+    ScrollView,
+    StyleSheet,
+    Text,
+    View,
+} from "react-native";
 
 export default function BusinessDetailsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
-
   const { business, isLoading } = useBusinessDetails(id);
-
   const [activeTab, setActiveTab] = useState<BusinessDetailsTab>("overview");
+
+  const scrollY = useRef(new Animated.Value(0)).current;
+  const scrollViewRef = useRef<ScrollView>(null);
+
+  const handleChangeTab = (tab: BusinessDetailsTab) => {
+    scrollViewRef.current?.scrollTo({ y: 0, animated: false });
+    scrollY.setValue(0);
+    setActiveTab(tab);
+  };
 
   if (isLoading) {
     return (
@@ -42,72 +58,106 @@ export default function BusinessDetailsScreen() {
   }
 
   return (
-    <AppScreen scroll withTopInset style={styles.container}>
-      <BusinessHeader business={business} />
-      <BusinessHeroGallery
-        images={business.images}
-        onPressImage={(imageId) => console.log("Open image", imageId)}
-        onPressViewAll={() => console.log("Open all photos")}
+    <AppScreen withTopInset={false} style={styles.container}>
+      <ScreenHeader
+        variant="business"
+        title={business.name}
+        imageUrl={business.images[0]?.url}
+        rating={business.rating}
+        reviewCount={business.reviewCount}
+        category={business.category}
+        location={business.location}
+        isOpen={business.isOpen}
+        closesAt={business.closesAt}
+        gradientColors={DISCOVERY_GRADIENT}
+        onPressShare={() => console.log("Share business", business.id)}
+        rightSlot={
+          <FollowButton businessId={business.id} size="icon" variant="soft" />
+        }
       />
-      <BusinessDetailsTabs activeTab={activeTab} onChange={setActiveTab} />
-      {activeTab === "overview" ? (
-        <>
-          <BusinessOverviewCard business={business} />
-          <BusinessBookingCard businessId={business.id} />
-          <BusinessTopReviews
-            reviews={business.topReviews}
-            reviewCount={business.reviewCount}
-            onPressViewAll={() => setActiveTab("reviews")}
+
+      <Animated.ScrollView
+        ref={scrollViewRef}
+        stickyHeaderIndices={[1]}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+          { useNativeDriver: false },
+        )}
+        scrollEventThrottle={16}
+      >
+        <View style={styles.galleryCollapseWrap}>
+          <BusinessHeroGallery
+            images={business.images}
+            onPressImage={(imageId) => console.log("Open image", imageId)}
+            onPressViewAll={() => console.log("Open all photos")}
           />
-        </>
-      ) : null}
+        </View>
 
-      {activeTab === "services" ? (
-        <BusinessServicesList
-          services={business.services}
-          onPressService={(serviceId) =>
-            router.push({
-              pathname: "/bookings/choose-service",
-              params: {
-                businessId: business.id,
-                serviceId,
-              },
-            })
-          }
-        />
-      ) : null}
-
-      {activeTab === "reviews" ? (
-        <>
-          <BusinessRatingSummary
-            rating={business.rating}
-            reviewCount={business.reviewCount}
-            breakdown={business.ratingBreakdown}
+        <View style={styles.stickyTabsWrap}>
+          <BusinessDetailsTabs
+            activeTab={activeTab}
+            onChange={handleChangeTab}
           />
+        </View>
 
-          <BusinessReviewsList
-            reviews={business.topReviews}
-            reviewCount={business.reviewCount}
-            reviewPhotos={business.reviewPhotos}
-            onPressWriteReview={() =>
+        {activeTab === "overview" ? (
+          <>
+            <BusinessOverviewCard business={business} />
+            <BusinessBookingCard businessId={business.id} />
+            <BusinessTopReviews
+              reviews={business.topReviews}
+              reviewCount={business.reviewCount}
+              onPressViewAll={() => handleChangeTab("reviews")}
+            />
+          </>
+        ) : null}
+
+        {activeTab === "services" ? (
+          <BusinessServicesList
+            services={business.services}
+            onPressService={(serviceId) =>
               router.push({
-                pathname: "/business/write-review",
-                params: { businessId: business.id },
+                pathname: "/bookings/choose-service",
+                params: {
+                  businessId: business.id,
+                  serviceId,
+                },
               })
             }
           />
-        </>
-      ) : null}
+        ) : null}
 
-      <View style={styles.placeholderSection}>
-        <Text style={styles.sectionTitle}>Business details content next</Text>
-      </View>
+        {activeTab === "reviews" ? (
+          <>
+            <BusinessRatingSummary
+              rating={business.rating}
+              reviewCount={business.reviewCount}
+              breakdown={business.ratingBreakdown}
+            />
+
+            <BusinessReviewsList
+              reviews={business.topReviews}
+              reviewCount={business.reviewCount}
+              reviewPhotos={business.reviewPhotos}
+              onPressWriteReview={() =>
+                router.push({
+                  pathname: "/business/write-review",
+                  params: { businessId: business.id },
+                })
+              }
+            />
+          </>
+        ) : null}
+      </Animated.ScrollView>
     </AppScreen>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     padding: 0,
     backgroundColor: colors.background,
   },
@@ -117,13 +167,15 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: colors.background,
   },
-  placeholderSection: {
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.lg,
+  galleryCollapseWrap: {
+    overflow: "hidden",
+    backgroundColor: colors.background,
   },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: colors.textPrimary,
+  stickyTabsWrap: {
+    backgroundColor: colors.background,
+    zIndex: 10,
+  },
+  scrollContent: {
+    paddingBottom: spacing.xl,
   },
 });

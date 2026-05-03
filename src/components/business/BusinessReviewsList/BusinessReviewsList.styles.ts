@@ -5,7 +5,8 @@ import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
   container: {
-    marginTop: spacing.lg,
+    marginHorizontal: spacing.lg,
+    marginTop: spacing.md,
     marginBottom: spacing.xxl,
   },
   writeCard: {
@@ -120,5 +121,15 @@ export const styles = StyleSheet.create({
     backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.border,
+  },
+  emptyTitle: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: colors.textPrimary,
+  },
+  emptyText: {
+    marginTop: spacing.xs,
+    fontSize: 14,
+    color: colors.textSecondary,
   },
 });
