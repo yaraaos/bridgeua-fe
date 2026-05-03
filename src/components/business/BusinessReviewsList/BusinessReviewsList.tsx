@@ -2,11 +2,11 @@ import ReviewCard from "@/src/components/business/ReviewCard";
 import AppButton from "@/src/components/ui/AppButton/AppButton";
 import AppEmptyState from "@/src/components/ui/AppEmptyState";
 import type {
-    BusinessDetailsReview,
-    BusinessReviewPhoto,
+  BusinessDetailsReview,
+  BusinessReviewPhoto,
 } from "@/src/features/businesses/types/business.types";
 import { Ionicons } from "@expo/vector-icons";
-import React from "react";
+import React, { useState } from "react";
 import { Image, Pressable, Text, View } from "react-native";
 import { styles } from "./BusinessReviewsList.styles";
 
@@ -25,6 +25,8 @@ export default function BusinessReviewsList({
   reviewPhotos,
   onPressWriteReview,
 }: Props) {
+  const [activeFilter, setActiveFilter] = useState("Most relevant");
+
   return (
     <View style={styles.container}>
       <View style={styles.writeCard}>
@@ -48,25 +50,6 @@ export default function BusinessReviewsList({
         <AppButton title="Write a review" onPress={onPressWriteReview} />
       </View>
 
-      {reviews.length === 0 ? (
-        <AppEmptyState
-          title="No reviews yet"
-          description="Be the first to share your experience."
-        />
-      ) : (
-        <View style={styles.list}>
-          {reviews.map((review, index) => (
-            <View key={review.id}>
-              <ReviewCard review={review} />
-
-              {index < reviews.length - 1 ? (
-                <View style={styles.separator} />
-              ) : null}
-            </View>
-          ))}
-        </View>
-      )}
-
       {reviewPhotos.length > 0 ? (
         <View style={styles.photosSection}>
           <View style={styles.sectionHeader}>
@@ -86,21 +69,23 @@ export default function BusinessReviewsList({
       ) : null}
 
       <View style={styles.filtersRow}>
-        {FILTERS.map((filter, index) => (
-          <Pressable
-            key={filter}
-            style={[styles.filterChip, index === 0 && styles.filterChipActive]}
-          >
-            <Text
-              style={[
-                styles.filterText,
-                index === 0 && styles.filterTextActive,
-              ]}
+        {FILTERS.map((filter) => {
+          const isActive = activeFilter === filter;
+
+          return (
+            <Pressable
+              key={filter}
+              onPress={() => setActiveFilter(filter)}
+              style={[styles.filterChip, isActive && styles.filterChipActive]}
             >
-              {filter}
-            </Text>
-          </Pressable>
-        ))}
+              <Text
+                style={[styles.filterText, isActive && styles.filterTextActive]}
+              >
+                {filter}
+              </Text>
+            </Pressable>
+          );
+        })}
       </View>
 
       <View style={styles.listHeader}>
@@ -108,17 +93,24 @@ export default function BusinessReviewsList({
         <Text style={styles.reviewCount}>{reviewCount} total</Text>
       </View>
 
-      <View style={styles.list}>
-        {reviews.map((review, index) => (
-          <View key={review.id}>
-            <ReviewCard review={review} />
+      {reviews.length === 0 ? (
+        <AppEmptyState
+          title="No reviews yet"
+          description="Be the first to share your experience."
+        />
+      ) : (
+        <View style={styles.list}>
+          {reviews.map((review, index) => (
+            <View key={review.id}>
+              <ReviewCard review={review} />
 
-            {index < reviews.length - 1 ? (
-              <View style={styles.separator} />
-            ) : null}
-          </View>
-        ))}
-      </View>
+              {index < reviews.length - 1 ? (
+                <View style={styles.separator} />
+              ) : null}
+            </View>
+          ))}
+        </View>
+      )}
     </View>
   );
 }
