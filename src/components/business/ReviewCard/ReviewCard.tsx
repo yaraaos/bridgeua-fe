@@ -1,9 +1,9 @@
 import AppAvatar from "@/src/components/ui/AppAvatar";
 import { colors } from "@/src/constants/colors";
 import type { BusinessDetailsReview } from "@/src/features/businesses/types/business.types";
-import { MaterialIcons } from "@expo/vector-icons";
-import React from "react";
-import { Image, Text, View } from "react-native";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import React, { useState } from "react";
+import { Image, Modal, Pressable, ScrollView, Text, View } from "react-native";
 import { styles } from "./ReviewCard.styles";
 
 type Props = {
@@ -14,6 +14,8 @@ type Props = {
 export default function ReviewCard({ review, variant = "default" }: Props) {
   const isPreview = variant === "preview";
   const showPhotos = !isPreview && !!review.photos?.length;
+
+  const [selectedPhotoUrl, setSelectedPhotoUrl] = useState<string | null>(null);
 
   return (
     <View style={[styles.container, isPreview && styles.containerPreview]}>
@@ -57,18 +59,48 @@ export default function ReviewCard({ review, variant = "default" }: Props) {
       </Text>
 
       {showPhotos ? (
-        <View style={styles.photosRow}>
-          {review.photos?.slice(0, 3).map((photo) => (
-            <Image
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.photosScroll}
+        >
+          {review.photos?.map((photo) => (
+            <Pressable
               key={photo.id}
-              source={{ uri: photo.url }}
-              style={styles.reviewPhoto}
-            />
+              onPress={() => setSelectedPhotoUrl(photo.url)}
+              style={styles.photoItem}
+            >
+              <Image source={{ uri: photo.url }} style={styles.reviewPhoto} />
+            </Pressable>
           ))}
-        </View>
+        </ScrollView>
       ) : null}
 
       {isPreview ? <Text style={styles.moreText}>More</Text> : null}
+
+      <Modal
+        visible={!!selectedPhotoUrl}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setSelectedPhotoUrl(null)}
+      >
+        <View style={styles.photoModal}>
+          <Pressable
+            style={styles.photoModalClose}
+            onPress={() => setSelectedPhotoUrl(null)}
+          >
+            <Ionicons name="close" size={24} color={colors.white} />
+          </Pressable>
+
+          {selectedPhotoUrl ? (
+            <Image
+              source={{ uri: selectedPhotoUrl }}
+              style={styles.photoModalImage}
+              resizeMode="contain"
+            />
+          ) : null}
+        </View>
+      </Modal>
     </View>
   );
 }

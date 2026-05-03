@@ -67,4 +67,33 @@ export const styles = StyleSheet.create({
     borderRadius: radius.md,
     backgroundColor: colors.primaryGreenSoft,
   },
+  photoModal: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.92)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  photoModalClose: {
+    position: "absolute",
+    top: 56,
+    right: 20,
+    width: 40,
+    height: 40,
+    borderRadius: radius.pill,
+    backgroundColor: "rgba(255,255,255,0.16)",
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 10,
+  },
+  photoModalImage: {
+    width: "100%",
+    height: "80%",
+  },
+  photosScroll: {
+    marginTop: spacing.md,
+  },
+
+  photoItem: {
+    marginRight: spacing.sm,
+  },
 });
