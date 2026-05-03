@@ -33,20 +33,44 @@ export default function BusinessDetailsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { business, isLoading } = useBusinessDetails(id);
   const [activeTab, setActiveTab] = useState<BusinessDetailsTab>("overview");
+  const [scrollViewHeight, setScrollViewHeight] = useState(0);
+  const [canFullyCollapseGallery, setCanFullyCollapseGallery] = useState(false);
 
   const scrollY = useRef(new Animated.Value(0)).current;
 
-  const galleryHeight = scrollY.interpolate({
-    inputRange: [0, GALLERY_COLLAPSE_DISTANCE],
-    outputRange: [GALLERY_FULL_HEIGHT, GALLERY_COLLAPSED_HEIGHT],
-    extrapolate: "clamp",
-  });
+  const canCollapseGallery = canFullyCollapseGallery;
 
-  const galleryOpacity = scrollY.interpolate({
-    inputRange: [0, GALLERY_COLLAPSE_DISTANCE],
-    outputRange: [1, 0],
-    extrapolate: "clamp",
-  });
+  const galleryHeight = canCollapseGallery
+    ? scrollY.interpolate({
+        inputRange: [0, GALLERY_COLLAPSE_DISTANCE],
+        outputRange: [GALLERY_FULL_HEIGHT, GALLERY_COLLAPSED_HEIGHT],
+        extrapolate: "clamp",
+      })
+    : GALLERY_FULL_HEIGHT;
+
+  const galleryOpacity = canCollapseGallery
+    ? scrollY.interpolate({
+        inputRange: [0, GALLERY_COLLAPSE_DISTANCE],
+        outputRange: [1, 0],
+        extrapolate: "clamp",
+      })
+    : 1;
+
+  const handleContentSizeChange = (_: number, contentHeight: number) => {
+    if (!scrollViewHeight) {
+      return;
+    }
+
+    const maxScrollDistance = contentHeight - scrollViewHeight;
+
+    setCanFullyCollapseGallery(maxScrollDistance >= GALLERY_COLLAPSE_DISTANCE);
+  };
+
+  const handleChangeTab = (tab: BusinessDetailsTab) => {
+    setActiveTab(tab);
+    setCanFullyCollapseGallery(false);
+    scrollY.setValue(0);
+  };
 
   if (isLoading) {
     return (
@@ -87,6 +111,10 @@ export default function BusinessDetailsScreen() {
         stickyHeaderIndices={[1]}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
+        onLayout={(event) =>
+          setScrollViewHeight(event.nativeEvent.layout.height)
+        }
+        onContentSizeChange={handleContentSizeChange}
         onScroll={Animated.event(
           [{ nativeEvent: { contentOffset: { y: scrollY } } }],
           { useNativeDriver: false },
@@ -110,7 +138,10 @@ export default function BusinessDetailsScreen() {
         </Animated.View>
 
         <View style={styles.stickyTabsWrap}>
-          <BusinessDetailsTabs activeTab={activeTab} onChange={setActiveTab} />
+          <BusinessDetailsTabs
+            activeTab={activeTab}
+            onChange={handleChangeTab}
+          />
         </View>
 
         {activeTab === "overview" ? (
