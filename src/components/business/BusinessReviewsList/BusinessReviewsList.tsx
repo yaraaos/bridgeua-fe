@@ -1,5 +1,6 @@
 import ReviewCard from "@/src/components/business/ReviewCard";
 import AppButton from "@/src/components/ui/AppButton/AppButton";
+import AppEmptyState from "@/src/components/ui/AppEmptyState";
 import type {
     BusinessDetailsReview,
     BusinessReviewPhoto,
@@ -46,6 +47,25 @@ export default function BusinessReviewsList({
 
         <AppButton title="Write a review" onPress={onPressWriteReview} />
       </View>
+
+      {reviews.length === 0 ? (
+        <AppEmptyState
+          title="No reviews yet"
+          description="Be the first to share your experience."
+        />
+      ) : (
+        <View style={styles.list}>
+          {reviews.map((review, index) => (
+            <View key={review.id}>
+              <ReviewCard review={review} />
+
+              {index < reviews.length - 1 ? (
+                <View style={styles.separator} />
+              ) : null}
+            </View>
+          ))}
+        </View>
+      )}
 
       {reviewPhotos.length > 0 ? (
         <View style={styles.photosSection}>
