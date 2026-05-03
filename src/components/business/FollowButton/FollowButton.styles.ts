@@ -43,4 +43,13 @@ export const styles = StyleSheet.create({
   buttonTextFilled: {
     color: colors.white,
   },
+
+  iconButton: {
+    width: 34,
+    height: 34,
+    borderRadius: 10,
+    backgroundColor: colors.primaryGreenSoft,
+    alignItems: "center",
+    justifyContent: "center",
+  },
 });
