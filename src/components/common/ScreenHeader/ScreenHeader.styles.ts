@@ -75,6 +75,7 @@ export const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "flex-start",
     gap: spacing.lg,
+    transform: [{ translateY: 10 }],
     paddingBottom: spacing.sm,
   },
   businessLogo: {

@@ -71,7 +71,7 @@ export default function BusinessDetailsScreen() {
         gradientColors={DISCOVERY_GRADIENT}
         onPressShare={() => console.log("Share business", business.id)}
         rightSlot={
-          <FollowButton businessId={business.id} size="sm" variant="filled" />
+          <FollowButton businessId={business.id} size="icon" variant="soft" />
         }
       />
 
