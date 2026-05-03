@@ -16,6 +16,7 @@ type Props = {
   reviewCount: number;
   reviewPhotos: BusinessReviewPhoto[];
   onPressWriteReview?: () => void;
+  focusedReviewId?: string | null;
 };
 
 const FILTERS = ["Most relevant", "Newest", "Highest", "Lowest"];
@@ -24,10 +25,19 @@ export default function BusinessReviewsList({
   reviews,
   reviewCount,
   reviewPhotos,
+  focusedReviewId,
   onPressWriteReview,
 }: Props) {
   const [activeFilter, setActiveFilter] = useState("Most relevant");
-  const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(null);
+  const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(
+    null,
+  );
+  const displayedReviews = focusedReviewId
+    ? [
+        ...reviews.filter((review) => review.id === focusedReviewId),
+        ...reviews.filter((review) => review.id !== focusedReviewId),
+      ]
+    : reviews;
 
   return (
     <View style={styles.container}>
@@ -69,10 +79,7 @@ export default function BusinessReviewsList({
                 onPress={() => setSelectedPhotoIndex(index)}
                 style={styles.photoItem}
               >
-                <Image
-                  source={{ uri: photo.url }}
-                  style={styles.reviewPhoto}
-                />
+                <Image source={{ uri: photo.url }} style={styles.reviewPhoto} />
               </Pressable>
             ))}
           </ScrollView>
@@ -104,18 +111,18 @@ export default function BusinessReviewsList({
         <Text style={styles.reviewCount}>{reviewCount} total</Text>
       </View>
 
-      {reviews.length === 0 ? (
+      {displayedReviews.length === 0 ? (
         <AppEmptyState
           title="No reviews yet"
           description="Be the first to share your experience."
         />
       ) : (
         <View style={styles.list}>
-          {reviews.map((review, index) => (
+          {displayedReviews.map((review, index) => (
             <View key={review.id}>
               <ReviewCard review={review} />
 
-              {index < reviews.length - 1 ? (
+              {index < displayedReviews.length - 1 ? (
                 <View style={styles.separator} />
               ) : null}
             </View>

@@ -10,9 +10,14 @@ import { styles } from "./ReviewCard.styles";
 type Props = {
   review: BusinessDetailsReview;
   variant?: "default" | "preview";
+  onPressMore?: (reviewId: string) => void;
 };
 
-export default function ReviewCard({ review, variant = "default" }: Props) {
+export default function ReviewCard({
+  review,
+  variant = "default",
+  onPressMore,
+}: Props) {
   const isPreview = variant === "preview";
   const showPhotos = !isPreview && !!review.photos?.length;
 
@@ -79,7 +84,11 @@ export default function ReviewCard({ review, variant = "default" }: Props) {
         </ScrollView>
       ) : null}
 
-      {isPreview ? <Text style={styles.moreText}>More</Text> : null}
+      {isPreview ? (
+        <Pressable onPress={() => onPressMore?.(review.id)}>
+          <Text style={styles.moreText}>More</Text>
+        </Pressable>
+      ) : null}
 
       <ImageGalleryModal
         images={review.photos ?? []}
