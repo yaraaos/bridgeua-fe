@@ -6,8 +6,6 @@ import { StyleSheet } from "react-native";
 export const styles = StyleSheet.create({
   container: {
     paddingVertical: spacing.md,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
   },
   containerPreview: {
     width: 200,
@@ -57,5 +55,16 @@ export const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: "700",
     color: colors.primaryGreen,
+  },
+  photosRow: {
+    marginTop: spacing.md,
+    flexDirection: "row",
+    gap: spacing.sm,
+  },
+  reviewPhoto: {
+    width: 76,
+    height: 76,
+    borderRadius: radius.md,
+    backgroundColor: colors.primaryGreenSoft,
   },
 });

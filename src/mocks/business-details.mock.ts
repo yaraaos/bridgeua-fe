@@ -56,6 +56,12 @@ export const businessDetailsMock: BusinessDetails[] = [
           "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300",
         rating: 4,
         text: "Amazing experience from start to finish. Very professional approach, attention to details, high-quality materials...",
+        photos: [
+          {
+            id: "photo-1",
+            url: "https://images.unsplash.com/photo-1551782450-a2132b4ba21d",
+          },
+        ],
       },
       {
         id: "review-2",
@@ -72,6 +78,27 @@ export const businessDetailsMock: BusinessDetails[] = [
           "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=300",
         rating: 5,
         text: "Beautiful salon, clean space, and very professional service. Highly recommended.",
+      },
+    ],
+    ratingBreakdown: [
+      { rating: 5, count: 18 },
+      { rating: 4, count: 7 },
+      { rating: 3, count: 2 },
+      { rating: 2, count: 1 },
+      { rating: 1, count: 0 },
+    ],
+    reviewPhotos: [
+      {
+        id: "review-photo-1",
+        url: "https://images.unsplash.com/photo-1604654894610-df63bc536371?w=500",
+      },
+      {
+        id: "review-photo-2",
+        url: "https://images.unsplash.com/photo-1610992015732-2449b76344bc?w=500",
+      },
+      {
+        id: "review-photo-3",
+        url: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=500",
       },
     ],
   },

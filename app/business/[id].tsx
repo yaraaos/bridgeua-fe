@@ -3,6 +3,7 @@ import {
     BusinessDetailsTabs,
     BusinessHeroGallery,
     BusinessOverviewCard,
+    BusinessRatingSummary,
     BusinessReviewsList,
     BusinessServicesList,
     BusinessTopReviews,
@@ -108,7 +109,7 @@ export default function BusinessDetailsScreen() {
             <BusinessTopReviews
               reviews={business.topReviews}
               reviewCount={business.reviewCount}
-              onPressViewAll={() => setActiveTab("reviews")}
+              onPressViewAll={() => handleChangeTab("reviews")}
             />
           </>
         ) : null}
@@ -129,10 +130,25 @@ export default function BusinessDetailsScreen() {
         ) : null}
 
         {activeTab === "reviews" ? (
-          <BusinessReviewsList
-            reviews={business.topReviews}
-            reviewCount={business.reviewCount}
-          />
+          <>
+            <BusinessRatingSummary
+              rating={business.rating}
+              reviewCount={business.reviewCount}
+              breakdown={business.ratingBreakdown}
+            />
+
+            <BusinessReviewsList
+              reviews={business.topReviews}
+              reviewCount={business.reviewCount}
+              reviewPhotos={business.reviewPhotos}
+              onPressWriteReview={() =>
+                router.push({
+                  pathname: "/business/write-review",
+                  params: { businessId: business.id },
+                })
+              }
+            />
+          </>
         ) : null}
       </Animated.ScrollView>
     </AppScreen>

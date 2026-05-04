@@ -6,6 +6,7 @@ export type BusinessDetailsReview = {
   authorAvatar: string;
   rating: number;
   text: string;
+  photos?: BusinessReviewPhoto[];
 };
 
 export type BusinessDetailsService = {
@@ -37,6 +38,8 @@ export type BusinessDetails = {
   isFollowing?: boolean;
   services: BusinessDetailsService[];
   topReviews: BusinessDetailsReview[];
+  ratingBreakdown: BusinessRatingBreakdownItem[];
+  reviewPhotos: BusinessReviewPhoto[];
 };
 
 export type BusinessRatingBreakdownItem = {
