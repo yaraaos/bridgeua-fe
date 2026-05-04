@@ -15,24 +15,22 @@ export const styles = StyleSheet.create({
     marginBottom: spacing.md,
   },
   tab: {
+    minHeight: 34,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
     borderRadius: radius.pill,
-    borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.surface,
+    backgroundColor: "transparent",
   },
   tabActive: {
-    backgroundColor: colors.primaryGreen,
-    borderColor: colors.primaryGreen,
+    backgroundColor: colors.primaryGreenSoft,
   },
   tabText: {
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: "700",
     color: colors.textSecondary,
   },
   tabTextActive: {
-    color: colors.white,
+    color: colors.primaryGreen,
   },
   grid: {
     flexDirection: "row",
