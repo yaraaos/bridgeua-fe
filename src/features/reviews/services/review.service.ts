@@ -1,11 +1,10 @@
+import { businessDetailsMock } from "@/src/mocks/business-details.mock";
 import type {
   GetReviewsParams,
   GetReviewsResponse,
-  SubmitReviewPayload,
   Review,
+  SubmitReviewPayload,
 } from "../types/review.types";
-
-import { businessDetailsMock } from "@/src/mocks/business-details.mock";
 
 export const getReviews = async ({
   businessId,
@@ -13,41 +12,42 @@ export const getReviews = async ({
   limit = 10,
   rating,
 }: GetReviewsParams): Promise<GetReviewsResponse> => {
-  const business = businessDetailsMock.find((b) => b.id === businessId);
+  const business = businessDetailsMock.find((item) => item.id === businessId);
 
   if (!business) {
     return {
       data: [],
       page: 1,
       totalPages: 1,
+      total: 0,
     };
   }
 
-  let reviews: Review[] = business.reviews.map((r) => ({
-    ...r,
+  let reviews: Review[] = business.reviews.map((review) => ({
+    ...review,
     businessId,
     createdAt: new Date().toISOString(),
-    photos: r.photos?.map((p) => p.url),
   }));
 
   if (rating) {
-    reviews = reviews.filter((r) => r.rating === rating);
+    reviews = reviews.filter((review) => review.rating === rating);
   }
 
   const start = (page - 1) * limit;
   const paginated = reviews.slice(start, start + limit);
+  const totalPages = Math.max(1, Math.ceil(reviews.length / limit));
 
   return {
     data: paginated,
     page,
-    totalPages: Math.ceil(reviews.length / limit),
+    totalPages,
+    total: reviews.length,
   };
 };
 
 export const submitReview = async (
   payload: SubmitReviewPayload,
 ): Promise<Review> => {
-  // 🔥 mock create
   const newReview: Review = {
     id: `review-${Date.now()}`,
     businessId: payload.businessId,
@@ -56,7 +56,10 @@ export const submitReview = async (
     rating: payload.rating,
     text: payload.text,
     tags: payload.tags,
-    photos: payload.photos,
+    photos: payload.photos?.map((uri, index) => ({
+      id: `submitted-photo-${Date.now()}-${index}`,
+      url: uri,
+    })),
     createdAt: new Date().toISOString(),
   };
 

@@ -16,6 +16,7 @@ import { colors } from "@/src/constants/colors";
 import { DISCOVERY_GRADIENT } from "@/src/constants/gradients";
 import { spacing } from "@/src/constants/spacing";
 import { useBusinessDetails } from "@/src/features/businesses/hooks/useBusiness";
+import { useReviews } from "@/src/features/reviews/hooks/useReviews";
 import { router, useLocalSearchParams } from "expo-router";
 import { useRef, useState } from "react";
 import {
@@ -30,6 +31,13 @@ import {
 export default function BusinessDetailsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { business, isLoading } = useBusinessDetails(id);
+  const {
+    reviews,
+    reviewCount,
+    isLoading: areReviewsLoading,
+  } = useReviews({
+    businessId: id,
+  });
   const [activeTab, setActiveTab] = useState<BusinessDetailsTab>("overview");
 
   const scrollY = useRef(new Animated.Value(0)).current;
@@ -147,8 +155,10 @@ export default function BusinessDetailsScreen() {
             />
 
             <BusinessReviewsList
-              reviews={business.reviews}
-              reviewCount={business.reviewCount}
+              reviews={reviews}
+              reviewCount={
+                areReviewsLoading ? business.reviewCount : reviewCount
+              }
               reviewPhotos={business.reviewPhotos}
               focusedReviewId={focusedReviewId}
               onPressWriteReview={(rating) =>
