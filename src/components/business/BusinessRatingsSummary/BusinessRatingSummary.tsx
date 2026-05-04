@@ -16,6 +16,9 @@ export default function BusinessRatingSummary({
   reviewCount,
   breakdown,
 }: Props) {
+  if (reviewCount === 0) {
+    return null;
+  }
   const maxCount = Math.max(...breakdown.map((item) => item.count), 1);
 
   return (
