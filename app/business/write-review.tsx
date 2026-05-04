@@ -269,12 +269,11 @@ export default function WriteReviewScreen() {
           </View>
         </View>
         <View style={{ marginTop: spacing.lg }}>
-          <View style={{ opacity: canSubmit ? 1 : 0.5 }}>
-            <AppButton
-              title="Submit Review"
-              onPress={canSubmit ? handleSubmit : undefined}
-            />
-          </View>
+          <AppButton
+            title="Submit Review"
+            onPress={handleSubmit}
+            disabled={!canSubmit}
+          />
         </View>
       </ScrollView>
     </AppScreen>

@@ -18,6 +18,9 @@ export const styles = StyleSheet.create({
   ghost: {
     backgroundColor: "transparent",
   },
+  disabled: {
+    opacity: 0.5,
+  },
   text: {
     fontSize: 16,
     fontWeight: "600",
