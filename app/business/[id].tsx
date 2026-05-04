@@ -10,6 +10,7 @@ import {
   FollowButton,
   type BusinessDetailsTab,
 } from "@/src/components/business";
+import BusinessGalleryGrid from "@/src/components/business/BusinessGalleryGrid";
 import ScreenHeader from "@/src/components/common/ScreenHeader/ScreenHeader";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
 import { colors } from "@/src/constants/colors";
@@ -101,7 +102,7 @@ export default function BusinessDetailsScreen() {
           <BusinessHeroGallery
             images={business.images}
             onPressImage={(imageId) => console.log("Open image", imageId)}
-            onPressViewAll={() => console.log("Open all photos")}
+            onPressViewAll={() => handleChangeTab("photos")}
           />
         </View>
 
@@ -172,6 +173,12 @@ export default function BusinessDetailsScreen() {
               }
             />
           </>
+        ) : null}
+        {activeTab === "photos" ? (
+          <BusinessGalleryGrid
+            businessPhotos={business.images}
+            reviewPhotos={business.reviewPhotos}
+          />
         ) : null}
       </Animated.ScrollView>
     </AppScreen>
