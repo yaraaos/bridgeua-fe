@@ -99,4 +99,21 @@ export const styles = StyleSheet.create({
     width: "92%",
     height: "75%",
   },
+  tagsWrap: {
+    marginTop: spacing.md,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: spacing.xs,
+  },
+  tag: {
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 5,
+    borderRadius: radius.pill,
+    backgroundColor: colors.primaryGreenSoft,
+  },
+  tagText: {
+    fontSize: 11,
+    fontWeight: "700",
+    color: colors.primaryGreen,
+  },
 });

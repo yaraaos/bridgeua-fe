@@ -6,6 +6,7 @@ export type BusinessDetailsReview = {
   authorAvatar: string;
   rating: number;
   text: string;
+  tags?: string[];
   photos?: BusinessReviewPhoto[];
 };
 
