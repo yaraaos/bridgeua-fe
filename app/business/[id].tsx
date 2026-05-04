@@ -151,10 +151,13 @@ export default function BusinessDetailsScreen() {
               reviewCount={business.reviewCount}
               reviewPhotos={business.reviewPhotos}
               focusedReviewId={focusedReviewId}
-              onPressWriteReview={() =>
+              onPressWriteReview={(rating) =>
                 router.push({
                   pathname: "/business/write-review",
-                  params: { businessId: business.id },
+                  params: {
+                    businessId: business.id,
+                    rating: rating ? String(rating) : undefined,
+                  },
                 })
               }
             />

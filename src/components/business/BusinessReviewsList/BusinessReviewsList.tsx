@@ -1,4 +1,7 @@
 import ReviewCard from "@/src/components/business/ReviewCard";
+import ReviewFilters, {
+  type ReviewFilterOption,
+} from "@/src/components/business/ReviewFilters/ReviewFilters";
 import ImageGalleryModal from "@/src/components/common/ImageGalleryModal/ImageGalleryModal";
 import AppButton from "@/src/components/ui/AppButton/AppButton";
 import AppEmptyState from "@/src/components/ui/AppEmptyState";
@@ -10,15 +13,12 @@ import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import { Image, Pressable, ScrollView, Text, View } from "react-native";
 import { styles } from "./BusinessReviewsList.styles";
-import ReviewFilters, {
-  type ReviewFilterOption,
-} from "@/src/components/business/ReviewFilters/ReviewFilters";
 
 type Props = {
   reviews: BusinessDetailsReview[];
   reviewCount: number;
   reviewPhotos: BusinessReviewPhoto[];
-  onPressWriteReview?: () => void;
+  onPressWriteReview?: (rating?: number) => void;
   focusedReviewId?: string | null;
 };
 
@@ -29,11 +29,12 @@ export default function BusinessReviewsList({
   focusedReviewId,
   onPressWriteReview,
 }: Props) {
-const [activeFilter, setActiveFilter] =
-  useState<ReviewFilterOption>("Most relevant");
+  const [activeFilter, setActiveFilter] =
+    useState<ReviewFilterOption>("Most relevant");
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(
     null,
   );
+
   const displayedReviews = focusedReviewId
     ? [
         ...reviews.filter((review) => review.id === focusedReviewId),
@@ -47,21 +48,33 @@ const [activeFilter, setActiveFilter] =
         <Text style={styles.writeTitle}>Write a review</Text>
 
         <View style={styles.writeStars}>
-          {Array.from({ length: 5 }).map((_, index) => (
-            <Ionicons
-              key={index}
-              name="star-outline"
-              size={30}
-              style={styles.writeStar}
-            />
-          ))}
+          {Array.from({ length: 5 }).map((_, index) => {
+            const rating = index + 1;
+
+            return (
+              <Pressable
+                key={rating}
+                hitSlop={10}
+                onPress={() => onPressWriteReview?.(rating)}
+              >
+                <Ionicons
+                  name="star-outline"
+                  size={34}
+                  style={styles.writeStar}
+                />
+              </Pressable>
+            );
+          })}
         </View>
 
         <Text style={styles.writeHint}>
           Share your experience and help the community.
         </Text>
 
-        <AppButton title="Write a review" onPress={onPressWriteReview} />
+        <AppButton
+          title="Write a review"
+          onPress={() => onPressWriteReview?.()}
+        />
       </View>
 
       {reviewPhotos.length > 0 ? (
