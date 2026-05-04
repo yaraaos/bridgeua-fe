@@ -1,4 +1,5 @@
 import ImageGalleryModal from "@/src/components/common/ImageGalleryModal/ImageGalleryModal";
+import AppEmptyState from "@/src/components/ui/AppEmptyState";
 import type {
     BusinessDetailsImage,
     BusinessReviewPhoto,
@@ -61,44 +62,66 @@ export default function BusinessGalleryGrid({
     return allPhotos;
   }, [activeTab, allPhotos]);
 
+  const emptyTitle =
+    activeTab === "business"
+      ? "No business photos yet"
+      : activeTab === "reviews"
+        ? "No review photos yet"
+        : "No photos yet";
+
+  const hasAnyPhotos = allPhotos.length > 0;
+
   return (
     <View style={styles.container}>
-      <View style={styles.tabsRow}>
-        {PHOTO_TABS.map((tab) => {
-          const isActive = activeTab === tab.value;
+      {hasAnyPhotos ? (
+        <View style={styles.tabsRow}>
+          {PHOTO_TABS.map((tab) => {
+            const isActive = activeTab === tab.value;
 
-          return (
-            <Pressable
-              key={tab.value}
-              onPress={() => setActiveTab(tab.value)}
-              style={[styles.tab, isActive && styles.tabActive]}
-            >
-              <Text style={[styles.tabText, isActive && styles.tabTextActive]}>
-                {tab.label}
-              </Text>
-            </Pressable>
-          );
-        })}
-      </View>
+            return (
+              <Pressable
+                key={tab.value}
+                onPress={() => setActiveTab(tab.value)}
+                style={[styles.tab, isActive && styles.tabActive]}
+              >
+                <Text
+                  style={[styles.tabText, isActive && styles.tabTextActive]}
+                >
+                  {tab.label}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </View>
+      ) : null}
 
-      <View style={styles.grid}>
-        {visiblePhotos.map((photo, index) => {
-          const patternIndex = index % 5;
+      {visiblePhotos.length === 0 ? (
+        <View style={styles.emptyWrap}>
+          <AppEmptyState
+            title={emptyTitle}
+            description="Photos will appear here once they are added."
+          />
+        </View>
+      ) : (
+        <View style={styles.grid}>
+          {visiblePhotos.map((photo, index) => {
+            const patternIndex = index % 5;
 
-          const photoStyle =
-            patternIndex === 0 ? styles.photoWide : styles.photoHalf;
+            const photoStyle =
+              patternIndex === 0 ? styles.photoWide : styles.photoHalf;
 
-          return (
-            <Pressable
-              key={photo.id}
-              style={[styles.photoWrap, photoStyle]}
-              onPress={() => setSelectedPhotoIndex(index)}
-            >
-              <Image source={{ uri: photo.url }} style={styles.photo} />
-            </Pressable>
-          );
-        })}
-      </View>
+            return (
+              <Pressable
+                key={photo.id}
+                style={[styles.photoWrap, photoStyle]}
+                onPress={() => setSelectedPhotoIndex(index)}
+              >
+                <Image source={{ uri: photo.url }} style={styles.photo} />
+              </Pressable>
+            );
+          })}
+        </View>
+      )}
 
       <ImageGalleryModal
         images={visiblePhotos}

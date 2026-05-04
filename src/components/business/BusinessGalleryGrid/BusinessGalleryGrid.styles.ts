@@ -1,7 +1,9 @@
 import { colors } from "@/src/constants/colors";
 import { radius } from "@/src/constants/radius";
 import { spacing } from "@/src/constants/spacing";
-import { StyleSheet } from "react-native";
+import { Dimensions, StyleSheet } from "react-native";
+
+const SCREEN_HEIGHT = Dimensions.get("window").height;
 
 export const styles = StyleSheet.create({
   container: {
@@ -53,5 +55,10 @@ export const styles = StyleSheet.create({
   photo: {
     width: "100%",
     height: "100%",
+  },
+  emptyWrap: {
+    height: SCREEN_HEIGHT * 0.6,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
