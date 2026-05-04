@@ -5,21 +5,22 @@ import { DISCOVERY_GRADIENT } from "@/src/constants/gradients";
 import { radius } from "@/src/constants/radius";
 import { spacing } from "@/src/constants/spacing";
 import { useBusinessDetails } from "@/src/features/businesses/hooks/useBusiness";
+import { useSubmitReview } from "@/src/features/reviews/hooks/useSubmitReview";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { LinearGradient } from "expo-linear-gradient";
 import { router, useLocalSearchParams } from "expo-router";
 import { useMemo, useState } from "react";
 import {
-    ActivityIndicator,
-    Alert,
-    Image,
-    Pressable,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    View,
+  ActivityIndicator,
+  Alert,
+  Image,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
 } from "react-native";
 
 const REVIEW_TAGS = [
@@ -56,6 +57,7 @@ export default function WriteReviewScreen() {
   }, [rating]);
 
   const canSubmit = rating > 0 && review.trim().length >= 10;
+  const { submit, isSubmitting } = useSubmitReview();
 
   const toggleTag = (tag: string) => {
     setSelectedTags((current) =>
@@ -94,22 +96,21 @@ export default function WriteReviewScreen() {
     setPhotos((current) => current.filter((photo) => photo !== uri));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!canSubmit || !business) return;
 
-    console.log("Submit review", {
+    const submittedReview = await submit({
       businessId: business.id,
       rating,
-      review: review.trim(),
+      text: review.trim(),
       tags: selectedTags,
       photos,
     });
 
-    Alert.alert("Review submitted", "Thank you for helping the community.", [
-      {
-        text: "Done",
-        onPress: () => router.back(),
-      },
+    if (!submittedReview) return;
+
+    Alert.alert("Review submitted", "Thank you!", [
+      { text: "Done", onPress: () => router.back() },
     ]);
   };
 
@@ -282,9 +283,9 @@ export default function WriteReviewScreen() {
           </View>
           <View style={styles.submitWrap}>
             <AppButton
-              title="Submit Review"
+              title={isSubmitting ? "Submitting..." : "Submit Review"}
               onPress={handleSubmit}
-              disabled={!canSubmit}
+              disabled={!canSubmit || isSubmitting}
             />
           </View>
         </View>
@@ -367,17 +368,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: "700",
     color: colors.textPrimary,
-  },
-  visitRow: {
-    marginTop: spacing.sm,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.xs,
-  },
-  visitText: {
-    fontSize: 13,
-    fontWeight: "600",
-    color: colors.primaryGreen,
   },
   card: {
     marginTop: spacing.md,
@@ -513,25 +503,6 @@ const styles = StyleSheet.create({
   },
   tagTextSelected: {
     color: colors.primaryGreen,
-  },
-  recommendRow: {
-    marginTop: spacing.sm,
-    flexDirection: "row",
-    alignItems: "flex-start",
-    gap: spacing.sm,
-  },
-  recommendTextWrap: {
-    flex: 1,
-  },
-  recommendTitle: {
-    fontSize: 14,
-    fontWeight: "700",
-    color: colors.textPrimary,
-  },
-  recommendSubtitle: {
-    marginTop: 2,
-    fontSize: 12,
-    color: colors.textMuted,
   },
   submitWrap: {
     marginTop: spacing.xl,
