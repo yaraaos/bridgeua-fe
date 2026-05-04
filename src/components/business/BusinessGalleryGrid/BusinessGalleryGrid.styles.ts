@@ -40,11 +40,17 @@ export const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   photoWrap: {
-    width: "31.8%",
-    aspectRatio: 1,
-    borderRadius: radius.md,
     overflow: "hidden",
+    borderRadius: radius.md,
     backgroundColor: colors.primaryGreenSoft,
+  },
+  photoWide: {
+    width: "100%",
+    height: 220,
+  },
+  photoHalf: {
+    width: "48.8%",
+    height: 150,
   },
   photo: {
     width: "100%",

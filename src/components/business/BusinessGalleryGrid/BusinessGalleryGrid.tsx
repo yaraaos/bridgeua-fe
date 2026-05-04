@@ -82,15 +82,22 @@ export default function BusinessGalleryGrid({
       </View>
 
       <View style={styles.grid}>
-        {visiblePhotos.map((photo, index) => (
-          <Pressable
-            key={photo.id}
-            style={styles.photoWrap}
-            onPress={() => setSelectedPhotoIndex(index)}
-          >
-            <Image source={{ uri: photo.url }} style={styles.photo} />
-          </Pressable>
-        ))}
+        {visiblePhotos.map((photo, index) => {
+          const patternIndex = index % 5;
+
+          const photoStyle =
+            patternIndex === 0 ? styles.photoWide : styles.photoHalf;
+
+          return (
+            <Pressable
+              key={photo.id}
+              style={[styles.photoWrap, photoStyle]}
+              onPress={() => setSelectedPhotoIndex(index)}
+            >
+              <Image source={{ uri: photo.url }} style={styles.photo} />
+            </Pressable>
+          );
+        })}
       </View>
 
       <ImageGalleryModal

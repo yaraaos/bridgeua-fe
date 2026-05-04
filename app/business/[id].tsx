@@ -44,6 +44,8 @@ export default function BusinessDetailsScreen() {
   const scrollY = useRef(new Animated.Value(0)).current;
   const scrollViewRef = useRef<ScrollView>(null);
 
+  const stickyIndex = activeTab === "photos" ? 0 : 1;
+
   const handleChangeTab = (tab: BusinessDetailsTab) => {
     scrollViewRef.current?.scrollTo({ y: 0, animated: false });
     scrollY.setValue(0);
@@ -89,7 +91,7 @@ export default function BusinessDetailsScreen() {
 
       <Animated.ScrollView
         ref={scrollViewRef}
-        stickyHeaderIndices={[1]}
+        stickyHeaderIndices={[stickyIndex]}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
         onScroll={Animated.event(
