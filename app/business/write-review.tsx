@@ -1,11 +1,13 @@
 import AppButton from "@/src/components/ui/AppButton/AppButton";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
 import { colors } from "@/src/constants/colors";
+import { DISCOVERY_GRADIENT } from "@/src/constants/gradients";
 import { radius } from "@/src/constants/radius";
 import { spacing } from "@/src/constants/spacing";
 import { useBusinessDetails } from "@/src/features/businesses/hooks/useBusiness";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
+import { LinearGradient } from "expo-linear-gradient";
 import { router, useLocalSearchParams } from "expo-router";
 import { useMemo, useState } from "react";
 import {
@@ -143,7 +145,7 @@ export default function WriteReviewScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        <View style={styles.businessCard}>
+        <LinearGradient colors={DISCOVERY_GRADIENT} style={styles.businessCard}>
           <Image
             source={{ uri: business.images[0]?.url }}
             style={styles.businessImage}
@@ -166,7 +168,7 @@ export default function WriteReviewScreen() {
             <Text style={styles.businessMeta}>{business.category}</Text>
             <Text style={styles.businessMeta}>{business.location}</Text>
           </View>
-        </View>
+        </LinearGradient>
 
         <View style={styles.card}>
           <Text style={styles.label}>Your rating</Text>
@@ -332,7 +334,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: spacing.md,
     borderRadius: radius.xl,
-    backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.border,
   },
