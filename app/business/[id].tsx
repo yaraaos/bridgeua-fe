@@ -20,7 +20,7 @@ import { spacing } from "@/src/constants/spacing";
 import { useBusinessDetails } from "@/src/features/businesses/hooks/useBusiness";
 import { useReviews } from "@/src/features/reviews/hooks/useReviews";
 import { router, useLocalSearchParams } from "expo-router";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Animated,
@@ -44,6 +44,17 @@ export default function BusinessDetailsScreen() {
 
   const scrollY = useRef(new Animated.Value(0)).current;
   const scrollViewRef = useRef<ScrollView>(null);
+  const contentOpacity = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    contentOpacity.setValue(0);
+
+    Animated.timing(contentOpacity, {
+      toValue: 1,
+      duration: 180,
+      useNativeDriver: true,
+    }).start();
+  }, [activeTab, contentOpacity]);
 
   const stickyIndex = activeTab === "photos" ? 0 : 1;
 
@@ -126,74 +137,75 @@ export default function BusinessDetailsScreen() {
             onChange={handleChangeTab}
           />
         </View>
+        <Animated.View style={{ opacity: contentOpacity }}>
+          {activeTab === "overview" ? (
+            <>
+              <BusinessOverviewCard business={business} />
+              <BusinessBookingCard businessId={business.id} />
+              <BusinessTopReviews
+                reviews={business.topReviews}
+                reviewCount={business.reviewCount}
+                onPressViewAll={() => {
+                  setFocusedReviewId(null);
+                  handleChangeTab("reviews");
+                }}
+                onPressReviewMore={(reviewId) => {
+                  setFocusedReviewId(reviewId);
+                  handleChangeTab("reviews");
+                }}
+              />
+            </>
+          ) : null}
 
-        {activeTab === "overview" ? (
-          <>
-            <BusinessOverviewCard business={business} />
-            <BusinessBookingCard businessId={business.id} />
-            <BusinessTopReviews
-              reviews={business.topReviews}
-              reviewCount={business.reviewCount}
-              onPressViewAll={() => {
-                setFocusedReviewId(null);
-                handleChangeTab("reviews");
-              }}
-              onPressReviewMore={(reviewId) => {
-                setFocusedReviewId(reviewId);
-                handleChangeTab("reviews");
-              }}
-            />
-          </>
-        ) : null}
-
-        {activeTab === "services" ? (
-          <BusinessServicesList
-            services={business.services}
-            onPressService={(serviceId) =>
-              router.push({
-                pathname: "/bookings/choose-service",
-                params: {
-                  businessId: business.id,
-                  serviceId,
-                },
-              })
-            }
-          />
-        ) : null}
-
-        {activeTab === "reviews" ? (
-          <>
-            <BusinessRatingSummary
-              rating={business.rating}
-              reviewCount={business.reviewCount}
-              breakdown={business.ratingBreakdown}
-            />
-
-            <BusinessReviewsList
-              reviews={reviews}
-              reviewCount={
-                areReviewsLoading ? business.reviewCount : reviewCount
-              }
-              reviewPhotos={business.reviewPhotos}
-              focusedReviewId={focusedReviewId}
-              onPressWriteReview={(rating) =>
+          {activeTab === "services" ? (
+            <BusinessServicesList
+              services={business.services}
+              onPressService={(serviceId) =>
                 router.push({
-                  pathname: "/business/write-review",
+                  pathname: "/bookings/choose-service",
                   params: {
                     businessId: business.id,
-                    rating: rating ? String(rating) : undefined,
+                    serviceId,
                   },
                 })
               }
             />
-          </>
-        ) : null}
-        {activeTab === "photos" ? (
-          <BusinessGalleryGrid
-            businessPhotos={business.images}
-            reviewPhotos={business.reviewPhotos}
-          />
-        ) : null}
+          ) : null}
+
+          {activeTab === "reviews" ? (
+            <>
+              <BusinessRatingSummary
+                rating={business.rating}
+                reviewCount={business.reviewCount}
+                breakdown={business.ratingBreakdown}
+              />
+
+              <BusinessReviewsList
+                reviews={reviews}
+                reviewCount={
+                  areReviewsLoading ? business.reviewCount : reviewCount
+                }
+                reviewPhotos={business.reviewPhotos}
+                focusedReviewId={focusedReviewId}
+                onPressWriteReview={(rating) =>
+                  router.push({
+                    pathname: "/business/write-review",
+                    params: {
+                      businessId: business.id,
+                      rating: rating ? String(rating) : undefined,
+                    },
+                  })
+                }
+              />
+            </>
+          ) : null}
+          {activeTab === "photos" ? (
+            <BusinessGalleryGrid
+              businessPhotos={business.images}
+              reviewPhotos={business.reviewPhotos}
+            />
+          ) : null}
+        </Animated.View>
       </Animated.ScrollView>
       <ImageGalleryModal
         images={business.images}
