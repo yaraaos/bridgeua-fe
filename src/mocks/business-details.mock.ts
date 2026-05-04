@@ -98,6 +98,7 @@ export const businessDetailsMock: BusinessDetails[] = [
             url: "https://plus.unsplash.com/premium_photo-1670348051093-a3f94b408bcb?q=80&w=1172&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
           },
         ],
+        tags: ["Great service", "Professional staff", "Clean & comfortable"],
       },
       {
         id: "review-2",
@@ -114,6 +115,7 @@ export const businessDetailsMock: BusinessDetails[] = [
           "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=300",
         rating: 5,
         text: "Beautiful salon, clean space, and very professional service. Highly recommended.",
+        tags: ["Good value", "Easy booking"],
       },
     ],
 

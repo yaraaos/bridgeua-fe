@@ -84,6 +84,16 @@ export default function ReviewCard({
         </ScrollView>
       ) : null}
 
+      {!isPreview && review.tags?.length ? (
+        <View style={styles.tagsWrap}>
+          {review.tags.map((tag) => (
+            <View key={tag} style={styles.tag}>
+              <Text style={styles.tagText}>{tag}</Text>
+            </View>
+          ))}
+        </View>
+      ) : null}
+
       {isPreview ? (
         <Pressable onPress={() => onPressMore?.(review.id)}>
           <Text style={styles.moreText}>More</Text>
