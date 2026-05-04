@@ -26,8 +26,49 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  image: {
+  fullArea: {
+    ...StyleSheet.absoluteFillObject,
+    zIndex: 1,
+  },
+  topCloseArea: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    height: "12.5%",
+    zIndex: 1,
+  },
+  bottomCloseArea: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: "12.5%",
+    zIndex: 1,
+  },
+  imageWrap: {
     width: "92%",
     height: "75%",
+    alignSelf: "center",
+    position: "relative",
+    zIndex: 2,
+  },
+
+  image: {
+    width: "100%",
+    height: "100%",
+  },
+
+  viewAllOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0,0,0,0.42)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  viewAllText: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontWeight: "800",
   },
 });

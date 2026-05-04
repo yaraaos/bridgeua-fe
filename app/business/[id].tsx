@@ -11,6 +11,7 @@ import {
   type BusinessDetailsTab,
 } from "@/src/components/business";
 import BusinessGalleryGrid from "@/src/components/business/BusinessGalleryGrid";
+import ImageGalleryModal from "@/src/components/common/ImageGalleryModal/ImageGalleryModal";
 import ScreenHeader from "@/src/components/common/ScreenHeader/ScreenHeader";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
 import { colors } from "@/src/constants/colors";
@@ -51,6 +52,10 @@ export default function BusinessDetailsScreen() {
     scrollY.setValue(0);
     setActiveTab(tab);
   };
+
+  const [selectedHeroImageIndex, setSelectedHeroImageIndex] = useState<
+    number | null
+  >(null);
 
   const [focusedReviewId, setFocusedReviewId] = useState<string | null>(null);
 
@@ -104,7 +109,12 @@ export default function BusinessDetailsScreen() {
           <View style={styles.galleryCollapseWrap}>
             <BusinessHeroGallery
               images={business.images}
-              onPressImage={(imageId) => console.log("Open image", imageId)}
+              onPressImage={(imageId) => {
+                const imageIndex = business.images.findIndex(
+                  (image) => image.id === imageId,
+                );
+                setSelectedHeroImageIndex(imageIndex >= 0 ? imageIndex : 0);
+              }}
               onPressViewAll={() => handleChangeTab("photos")}
             />
           </View>
@@ -185,6 +195,18 @@ export default function BusinessDetailsScreen() {
           />
         ) : null}
       </Animated.ScrollView>
+      <ImageGalleryModal
+        images={business.images}
+        visible={selectedHeroImageIndex !== null}
+        initialIndex={selectedHeroImageIndex ?? 0}
+        overlayIndex={2}
+        overlayText="View all"
+        onPressOverlay={() => {
+          setSelectedHeroImageIndex(null);
+          handleChangeTab("photos");
+        }}
+        onClose={() => setSelectedHeroImageIndex(null)}
+      />
     </AppScreen>
   );
 }
