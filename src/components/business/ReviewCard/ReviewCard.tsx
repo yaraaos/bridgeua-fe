@@ -1,19 +1,29 @@
+import ImageGalleryModal from "@/src/components/common/ImageGalleryModal/ImageGalleryModal";
 import AppAvatar from "@/src/components/ui/AppAvatar";
 import { colors } from "@/src/constants/colors";
 import type { BusinessDetailsReview } from "@/src/features/businesses/types/business.types";
 import { MaterialIcons } from "@expo/vector-icons";
-import React from "react";
-import { Image, Text, View } from "react-native";
+import React, { useState } from "react";
+import { Image, Pressable, ScrollView, Text, View } from "react-native";
 import { styles } from "./ReviewCard.styles";
 
 type Props = {
   review: BusinessDetailsReview;
   variant?: "default" | "preview";
+  onPressMore?: (reviewId: string) => void;
 };
 
-export default function ReviewCard({ review, variant = "default" }: Props) {
+export default function ReviewCard({
+  review,
+  variant = "default",
+  onPressMore,
+}: Props) {
   const isPreview = variant === "preview";
   const showPhotos = !isPreview && !!review.photos?.length;
+
+  const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(
+    null,
+  );
 
   return (
     <View style={[styles.container, isPreview && styles.containerPreview]}>
@@ -57,18 +67,35 @@ export default function ReviewCard({ review, variant = "default" }: Props) {
       </Text>
 
       {showPhotos ? (
-        <View style={styles.photosRow}>
-          {review.photos?.slice(0, 3).map((photo) => (
-            <Image
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.photosScroll}
+        >
+          {review.photos?.map((photo, index) => (
+            <Pressable
               key={photo.id}
-              source={{ uri: photo.url }}
-              style={styles.reviewPhoto}
-            />
+              onPress={() => setSelectedPhotoIndex(index)}
+              style={styles.photoItem}
+            >
+              <Image source={{ uri: photo.url }} style={styles.reviewPhoto} />
+            </Pressable>
           ))}
-        </View>
+        </ScrollView>
       ) : null}
 
-      {isPreview ? <Text style={styles.moreText}>More</Text> : null}
+      {isPreview ? (
+        <Pressable onPress={() => onPressMore?.(review.id)}>
+          <Text style={styles.moreText}>More</Text>
+        </Pressable>
+      ) : null}
+
+      <ImageGalleryModal
+        images={review.photos ?? []}
+        visible={selectedPhotoIndex !== null}
+        initialIndex={selectedPhotoIndex ?? 0}
+        onClose={() => setSelectedPhotoIndex(null)}
+      />
     </View>
   );
 }

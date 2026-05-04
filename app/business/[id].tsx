@@ -1,14 +1,14 @@
 import {
-    BusinessBookingCard,
-    BusinessDetailsTabs,
-    BusinessHeroGallery,
-    BusinessOverviewCard,
-    BusinessRatingSummary,
-    BusinessReviewsList,
-    BusinessServicesList,
-    BusinessTopReviews,
-    FollowButton,
-    type BusinessDetailsTab,
+  BusinessBookingCard,
+  BusinessDetailsTabs,
+  BusinessHeroGallery,
+  BusinessOverviewCard,
+  BusinessRatingSummary,
+  BusinessReviewsList,
+  BusinessServicesList,
+  BusinessTopReviews,
+  FollowButton,
+  type BusinessDetailsTab,
 } from "@/src/components/business";
 import ScreenHeader from "@/src/components/common/ScreenHeader/ScreenHeader";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
@@ -19,12 +19,12 @@ import { useBusinessDetails } from "@/src/features/businesses/hooks/useBusiness"
 import { router, useLocalSearchParams } from "expo-router";
 import { useRef, useState } from "react";
 import {
-    ActivityIndicator,
-    Animated,
-    ScrollView,
-    StyleSheet,
-    Text,
-    View,
+  ActivityIndicator,
+  Animated,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
 } from "react-native";
 
 export default function BusinessDetailsScreen() {
@@ -40,6 +40,8 @@ export default function BusinessDetailsScreen() {
     scrollY.setValue(0);
     setActiveTab(tab);
   };
+
+  const [focusedReviewId, setFocusedReviewId] = useState<string | null>(null);
 
   if (isLoading) {
     return (
@@ -109,7 +111,14 @@ export default function BusinessDetailsScreen() {
             <BusinessTopReviews
               reviews={business.topReviews}
               reviewCount={business.reviewCount}
-              onPressViewAll={() => handleChangeTab("reviews")}
+              onPressViewAll={() => {
+                setFocusedReviewId(null);
+                handleChangeTab("reviews");
+              }}
+              onPressReviewMore={(reviewId) => {
+                setFocusedReviewId(reviewId);
+                handleChangeTab("reviews");
+              }}
             />
           </>
         ) : null}
@@ -138,9 +147,10 @@ export default function BusinessDetailsScreen() {
             />
 
             <BusinessReviewsList
-              reviews={business.topReviews}
+              reviews={business.reviews}
               reviewCount={business.reviewCount}
               reviewPhotos={business.reviewPhotos}
+              focusedReviewId={focusedReviewId}
               onPressWriteReview={() =>
                 router.push({
                   pathname: "/business/write-review",

@@ -1,29 +1,46 @@
 import ReviewCard from "@/src/components/business/ReviewCard";
+import ImageGalleryModal from "@/src/components/common/ImageGalleryModal/ImageGalleryModal";
 import AppButton from "@/src/components/ui/AppButton/AppButton";
+import AppEmptyState from "@/src/components/ui/AppEmptyState";
 import type {
-    BusinessDetailsReview,
-    BusinessReviewPhoto,
+  BusinessDetailsReview,
+  BusinessReviewPhoto,
 } from "@/src/features/businesses/types/business.types";
 import { Ionicons } from "@expo/vector-icons";
-import React from "react";
-import { Image, Pressable, Text, View } from "react-native";
+import React, { useState } from "react";
+import { Image, Pressable, ScrollView, Text, View } from "react-native";
 import { styles } from "./BusinessReviewsList.styles";
+import ReviewFilters, {
+  type ReviewFilterOption,
+} from "@/src/components/business/ReviewFilters/ReviewFilters";
 
 type Props = {
   reviews: BusinessDetailsReview[];
   reviewCount: number;
   reviewPhotos: BusinessReviewPhoto[];
   onPressWriteReview?: () => void;
+  focusedReviewId?: string | null;
 };
-
-const FILTERS = ["Most relevant", "Newest", "Highest", "Lowest"];
 
 export default function BusinessReviewsList({
   reviews,
   reviewCount,
   reviewPhotos,
+  focusedReviewId,
   onPressWriteReview,
 }: Props) {
+const [activeFilter, setActiveFilter] =
+  useState<ReviewFilterOption>("Most relevant");
+  const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(
+    null,
+  );
+  const displayedReviews = focusedReviewId
+    ? [
+        ...reviews.filter((review) => review.id === focusedReviewId),
+        ...reviews.filter((review) => review.id !== focusedReviewId),
+      ]
+    : reviews;
+
   return (
     <View style={styles.container}>
       <View style={styles.writeCard}>
@@ -50,55 +67,59 @@ export default function BusinessReviewsList({
       {reviewPhotos.length > 0 ? (
         <View style={styles.photosSection}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Photos from reviews</Text>
+            <Text style={styles.sectionTitle}>Review photos</Text>
           </View>
 
-          <View style={styles.photosRow}>
-            {reviewPhotos.slice(0, 3).map((photo) => (
-              <Image
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.photosRow}
+          >
+            {reviewPhotos.map((photo, index) => (
+              <Pressable
                 key={photo.id}
-                source={{ uri: photo.url }}
-                style={styles.reviewPhoto}
-              />
+                onPress={() => setSelectedPhotoIndex(index)}
+                style={styles.photoItem}
+              >
+                <Image source={{ uri: photo.url }} style={styles.reviewPhoto} />
+              </Pressable>
             ))}
-          </View>
+          </ScrollView>
         </View>
       ) : null}
 
-      <View style={styles.filtersRow}>
-        {FILTERS.map((filter, index) => (
-          <Pressable
-            key={filter}
-            style={[styles.filterChip, index === 0 && styles.filterChipActive]}
-          >
-            <Text
-              style={[
-                styles.filterText,
-                index === 0 && styles.filterTextActive,
-              ]}
-            >
-              {filter}
-            </Text>
-          </Pressable>
-        ))}
-      </View>
+      <ReviewFilters value={activeFilter} onChange={setActiveFilter} />
 
       <View style={styles.listHeader}>
         <Text style={styles.sectionTitle}>All reviews</Text>
         <Text style={styles.reviewCount}>{reviewCount} total</Text>
       </View>
 
-      <View style={styles.list}>
-        {reviews.map((review, index) => (
-          <View key={review.id}>
-            <ReviewCard review={review} />
+      {displayedReviews.length === 0 ? (
+        <AppEmptyState
+          title="No reviews yet"
+          description="Be the first to share your experience."
+        />
+      ) : (
+        <View style={styles.list}>
+          {displayedReviews.map((review, index) => (
+            <View key={review.id}>
+              <ReviewCard review={review} />
 
-            {index < reviews.length - 1 ? (
-              <View style={styles.separator} />
-            ) : null}
-          </View>
-        ))}
-      </View>
+              {index < displayedReviews.length - 1 ? (
+                <View style={styles.separator} />
+              ) : null}
+            </View>
+          ))}
+        </View>
+      )}
+
+      <ImageGalleryModal
+        images={reviewPhotos}
+        visible={selectedPhotoIndex !== null}
+        initialIndex={selectedPhotoIndex ?? 0}
+        onClose={() => setSelectedPhotoIndex(null)}
+      />
     </View>
   );
 }

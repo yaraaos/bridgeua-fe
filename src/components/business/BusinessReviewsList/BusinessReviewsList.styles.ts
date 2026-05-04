@@ -52,42 +52,18 @@ export const styles = StyleSheet.create({
   },
   photosRow: {
     marginTop: spacing.md,
-    flexDirection: "row",
-    gap: spacing.sm,
+    paddingRight: spacing.lg,
+  },
+  photoItem: {
+    marginRight: spacing.sm,
   },
   reviewPhoto: {
-    flex: 1,
+    width: 120,
     height: 92,
     borderRadius: radius.lg,
     backgroundColor: colors.primaryGreenSoft,
   },
-  filtersRow: {
-    marginTop: spacing.lg,
-    paddingHorizontal: spacing.lg,
-    flexDirection: "row",
-    gap: spacing.sm,
-    flexWrap: "wrap",
-  },
-  filterChip: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    borderRadius: radius.pill,
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  filterChipActive: {
-    backgroundColor: colors.primaryGreen,
-    borderColor: colors.primaryGreen,
-  },
-  filterText: {
-    fontSize: 13,
-    fontWeight: "600",
-    color: colors.textSecondary,
-  },
-  filterTextActive: {
-    color: colors.white,
-  },
+
   listHeader: {
     marginTop: spacing.lg,
     paddingHorizontal: spacing.lg,

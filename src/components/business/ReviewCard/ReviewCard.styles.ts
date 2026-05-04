@@ -1,7 +1,7 @@
 import { colors } from "@/src/constants/colors";
 import { radius } from "@/src/constants/radius";
 import { spacing } from "@/src/constants/spacing";
-import { StyleSheet } from "react-native";
+import { Dimensions, StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
   container: {
@@ -66,5 +66,37 @@ export const styles = StyleSheet.create({
     height: 76,
     borderRadius: radius.md,
     backgroundColor: colors.primaryGreenSoft,
+  },
+  photoModal: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.92)",
+  },
+  photosScroll: {
+    marginTop: spacing.md,
+  },
+  photoItem: {
+    marginRight: spacing.sm,
+  },
+  photoModalClose: {
+    position: "absolute",
+    top: 56,
+    right: 20,
+    width: 40,
+    height: 40,
+    borderRadius: radius.pill,
+    backgroundColor: "rgba(255,255,255,0.16)",
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 10,
+  },
+  photoModalPage: {
+    width: Dimensions.get("window").width,
+    height: "100%",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  photoModalImage: {
+    width: "92%",
+    height: "75%",
   },
 });

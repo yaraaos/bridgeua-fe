@@ -9,11 +9,13 @@ type Props = {
   reviews: BusinessDetailsReview[];
   reviewCount: number;
   onPressViewAll?: () => void;
+  onPressReviewMore?: (reviewId: string) => void;
 };
 
 export default function BusinessTopReviews({
   reviews,
   onPressViewAll,
+  onPressReviewMore,
 }: Props) {
   const previewReviews = reviews.slice(0, 6);
 
@@ -28,7 +30,11 @@ export default function BusinessTopReviews({
 
         <Pressable style={styles.viewAllButton} onPress={onPressViewAll}>
           <Text style={styles.viewAllText}>View all</Text>
-          <Ionicons name="chevron-forward" size={14} style={styles.viewAllIcon} />
+          <Ionicons
+            name="chevron-forward"
+            size={14}
+            style={styles.viewAllIcon}
+          />
         </Pressable>
       </View>
 
@@ -36,7 +42,13 @@ export default function BusinessTopReviews({
         horizontal
         data={previewReviews}
         keyExtractor={(item) => item.id}
-        renderItem={({ item }) => <ReviewCard review={item} variant="preview" />}
+        renderItem={({ item }) => (
+          <ReviewCard
+            review={item}
+            variant="preview"
+            onPressMore={onPressReviewMore}
+          />
+        )}
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.listContent}
       />
