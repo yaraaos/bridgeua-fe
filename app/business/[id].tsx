@@ -86,6 +86,9 @@ export default function BusinessDetailsScreen() {
     );
   }
 
+  const heroPhotos =
+    business.images.length > 0 ? business.images : business.reviewPhotos;
+
   return (
     <AppScreen withTopInset={false} style={styles.container}>
       <ScreenHeader
@@ -119,7 +122,7 @@ export default function BusinessDetailsScreen() {
         {activeTab !== "photos" ? (
           <View style={styles.galleryCollapseWrap}>
             <BusinessHeroGallery
-              images={business.images}
+              images={heroPhotos}
               onPressImage={(imageId) => {
                 const imageIndex = business.images.findIndex(
                   (image) => image.id === imageId,
@@ -208,7 +211,7 @@ export default function BusinessDetailsScreen() {
         </Animated.View>
       </Animated.ScrollView>
       <ImageGalleryModal
-        images={business.images}
+        images={heroPhotos}
         visible={selectedHeroImageIndex !== null}
         initialIndex={selectedHeroImageIndex ?? 0}
         overlayIndex={2}
