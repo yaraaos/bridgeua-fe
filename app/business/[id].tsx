@@ -98,13 +98,15 @@ export default function BusinessDetailsScreen() {
         )}
         scrollEventThrottle={16}
       >
-        <View style={styles.galleryCollapseWrap}>
-          <BusinessHeroGallery
-            images={business.images}
-            onPressImage={(imageId) => console.log("Open image", imageId)}
-            onPressViewAll={() => handleChangeTab("photos")}
-          />
-        </View>
+        {activeTab !== "photos" ? (
+          <View style={styles.galleryCollapseWrap}>
+            <BusinessHeroGallery
+              images={business.images}
+              onPressImage={(imageId) => console.log("Open image", imageId)}
+              onPressViewAll={() => handleChangeTab("photos")}
+            />
+          </View>
+        ) : null}
 
         <View style={styles.stickyTabsWrap}>
           <BusinessDetailsTabs
