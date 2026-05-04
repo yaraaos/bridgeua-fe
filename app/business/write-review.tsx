@@ -30,7 +30,7 @@ const REVIEW_TAGS = [
 ];
 
 const MAX_REVIEW_LENGTH = 500;
-const MAX_PHOTOS = 4;
+const MAX_PHOTOS = 8;
 
 export default function WriteReviewScreen() {
   const { businessId, rating: initialRating } = useLocalSearchParams<{
@@ -193,7 +193,7 @@ export default function WriteReviewScreen() {
               }
               multiline
               textAlignVertical="top"
-              placeholder="Share details about your experience..."
+              placeholder="Share about your experience (min 10 characters)..."
               placeholderTextColor={colors.textMuted}
               style={styles.textArea}
             />
@@ -267,13 +267,13 @@ export default function WriteReviewScreen() {
               );
             })}
           </View>
-        </View>
-        <View style={{ marginTop: spacing.lg }}>
-          <AppButton
-            title="Submit Review"
-            onPress={handleSubmit}
-            disabled={!canSubmit}
-          />
+          <View style={styles.submitWrap}>
+            <AppButton
+              title="Submit Review"
+              onPress={handleSubmit}
+              disabled={!canSubmit}
+            />
+          </View>
         </View>
       </ScrollView>
     </AppScreen>
@@ -509,5 +509,8 @@ const styles = StyleSheet.create({
     marginTop: 2,
     fontSize: 12,
     color: colors.textMuted,
+  },
+  submitWrap: {
+    marginTop: spacing.xl,
   },
 });
