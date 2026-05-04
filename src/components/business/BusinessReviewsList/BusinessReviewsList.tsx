@@ -10,6 +10,9 @@ import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import { Image, Pressable, ScrollView, Text, View } from "react-native";
 import { styles } from "./BusinessReviewsList.styles";
+import ReviewFilters, {
+  type ReviewFilterOption,
+} from "@/src/components/business/ReviewFilters/ReviewFilters";
 
 type Props = {
   reviews: BusinessDetailsReview[];
@@ -19,8 +22,6 @@ type Props = {
   focusedReviewId?: string | null;
 };
 
-const FILTERS = ["Most relevant", "Newest", "Highest", "Lowest"];
-
 export default function BusinessReviewsList({
   reviews,
   reviewCount,
@@ -28,7 +29,8 @@ export default function BusinessReviewsList({
   focusedReviewId,
   onPressWriteReview,
 }: Props) {
-  const [activeFilter, setActiveFilter] = useState("Most relevant");
+const [activeFilter, setActiveFilter] =
+  useState<ReviewFilterOption>("Most relevant");
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(
     null,
   );
@@ -86,25 +88,7 @@ export default function BusinessReviewsList({
         </View>
       ) : null}
 
-      <View style={styles.filtersRow}>
-        {FILTERS.map((filter) => {
-          const isActive = activeFilter === filter;
-
-          return (
-            <Pressable
-              key={filter}
-              onPress={() => setActiveFilter(filter)}
-              style={[styles.filterChip, isActive && styles.filterChipActive]}
-            >
-              <Text
-                style={[styles.filterText, isActive && styles.filterTextActive]}
-              >
-                {filter}
-              </Text>
-            </Pressable>
-          );
-        })}
-      </View>
+      <ReviewFilters value={activeFilter} onChange={setActiveFilter} />
 
       <View style={styles.listHeader}>
         <Text style={styles.sectionTitle}>All reviews</Text>
