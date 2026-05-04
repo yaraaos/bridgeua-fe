@@ -18,7 +18,7 @@ export const styles = StyleSheet.create({
     backgroundColor: "rgba(255,255,255,0.16)",
     alignItems: "center",
     justifyContent: "center",
-    zIndex: 10,
+    zIndex: 20,
   },
   page: {
     width: SCREEN_WIDTH,
@@ -26,8 +26,22 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  imageWrap: {
+    position: "relative",
+  },
   image: {
-    width: "92%",
-    height: "75%",
+    width: "100%",
+    height: "100%",
+  },
+  viewAllOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0,0,0,0.42)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  viewAllText: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontWeight: "800",
   },
 });
