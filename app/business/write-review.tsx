@@ -151,9 +151,20 @@ export default function WriteReviewScreen() {
 
           <View style={styles.businessInfo}>
             <Text style={styles.businessName}>{business.name}</Text>
-            <Text style={styles.businessMeta}>
-              {business.category} · {business.location}
-            </Text>
+
+            <View style={styles.businessRatingRow}>
+              <MaterialIcons
+                name="star"
+                size={14}
+                color={colors.accentOrange}
+              />
+              <Text style={styles.businessRatingText}>
+                {business.rating.toFixed(1)} ({business.reviewCount})
+              </Text>
+            </View>
+
+            <Text style={styles.businessMeta}>{business.category}</Text>
+            <Text style={styles.businessMeta}>{business.location}</Text>
           </View>
         </View>
 
@@ -344,6 +355,17 @@ const styles = StyleSheet.create({
     marginTop: spacing.xs,
     fontSize: 13,
     color: colors.textSecondary,
+  },
+  businessRatingRow: {
+    marginTop: spacing.xs,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 3,
+  },
+  businessRatingText: {
+    fontSize: 13,
+    fontWeight: "700",
+    color: colors.textPrimary,
   },
   visitRow: {
     marginTop: spacing.sm,
