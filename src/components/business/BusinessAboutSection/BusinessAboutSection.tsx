@@ -4,7 +4,7 @@ import type {
     BusinessContactItem,
     BusinessContactType,
 } from "@/src/features/businesses/types/business.types";
-import { MaterialIcons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
 import { Linking, Pressable, Text, View } from "react-native";
 import { styles } from "./BusinessAboutSection.styles";
@@ -16,23 +16,23 @@ type Props = {
 
 const contactIcons: Record<
   BusinessContactType,
-  keyof typeof MaterialIcons.glyphMap
+  keyof typeof Ionicons.glyphMap
 > = {
-  address: "location-on",
-  hours: "access-time",
-  phone: "phone",
-  website: "language",
-  instagram: "photo-camera",
+  address: "location-outline",
+  hours: "time-outline",
+  phone: "call-outline",
+  website: "globe-outline",
+  instagram: "logo-instagram",
 };
 
 const featureIcons: Record<
   BusinessAboutFeature["icon"],
-  keyof typeof MaterialIcons.glyphMap
+  keyof typeof Ionicons.glyphMap
 > = {
-  shield: "verified-user",
-  leaf: "eco",
-  heart: "favorite-border",
-  sparkle: "auto-awesome",
+  shield: "shield-checkmark-outline",
+  leaf: "leaf-outline",
+  heart: "heart-outline",
+  sparkle: "sparkles-outline",
 };
 
 export default function BusinessAboutSection({ businessName, about }: Props) {
@@ -81,11 +81,9 @@ export default function BusinessAboutSection({ businessName, about }: Props) {
                   {isExpanded ? "Read less" : "Read more"}
                 </Text>
 
-                <MaterialIcons
-                  name={
-                    isExpanded ? "keyboard-arrow-up" : "keyboard-arrow-down"
-                  }
-                  size={22}
+                <Ionicons
+                  name={isExpanded ? "chevron-up" : "chevron-down"}
+                  size={18}
                   style={styles.readMoreIcon}
                 />
               </Pressable>
@@ -108,22 +106,28 @@ export default function BusinessAboutSection({ businessName, about }: Props) {
                 disabled={!item.actionUrl}
               >
                 <View style={styles.contactIconWrap}>
-                  <MaterialIcons
+                  <Ionicons
                     name={contactIcons[item.type]}
-                    size={24}
+                    size={18}
                     style={styles.contactIcon}
                   />
                 </View>
 
                 <View style={styles.contactTextWrap}>
                   <Text style={styles.contactLabel}>{item.label}</Text>
-                  <Text style={styles.contactValue}>{item.value}</Text>
+                  <Text
+                    style={styles.contactValue}
+                    numberOfLines={item.type === "address" ? 1 : undefined}
+                    ellipsizeMode="tail"
+                  >
+                    {item.value}
+                  </Text>
                 </View>
 
                 {item.actionUrl ? (
-                  <MaterialIcons
-                    name="chevron-right"
-                    size={26}
+                  <Ionicons
+                    name="chevron-forward"
+                    size={18}
                     style={styles.chevron}
                   />
                 ) : null}
@@ -141,9 +145,9 @@ export default function BusinessAboutSection({ businessName, about }: Props) {
             {about.features.map((feature) => (
               <View key={feature.id} style={styles.featureItem}>
                 <View style={styles.featureIconWrap}>
-                  <MaterialIcons
+                  <Ionicons
                     name={featureIcons[feature.icon]}
-                    size={27}
+                    size={18}
                     style={styles.featureIcon}
                   />
                 </View>

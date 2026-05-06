@@ -6,7 +6,7 @@ import { StyleSheet } from "react-native";
 export const styles = StyleSheet.create({
   card: {
     marginHorizontal: spacing.lg,
-    marginTop: spacing.lg,
+    marginTop: spacing.md,
     padding: spacing.lg,
     borderRadius: radius.xl,
     backgroundColor: colors.surface,
@@ -20,16 +20,16 @@ export const styles = StyleSheet.create({
     flex: 1,
   },
   title: {
-    fontSize: 22,
-    lineHeight: 28,
-    fontWeight: "800",
-    color: colors.textPrimary,
     marginBottom: spacing.md,
+    fontSize: 18,
+    fontWeight: "700",
+    color: colors.textPrimary,
   },
   description: {
     fontSize: 15,
-    lineHeight: 23,
-    color: colors.textSecondary,
+    lineHeight: 21,
+    fontWeight: "500",
+    color: colors.textPrimary,
   },
   readMoreButton: {
     marginTop: spacing.sm,
@@ -38,7 +38,7 @@ export const styles = StyleSheet.create({
     alignSelf: "flex-start",
   },
   readMoreText: {
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: "700",
     color: colors.primaryGreen,
   },
@@ -47,14 +47,15 @@ export const styles = StyleSheet.create({
     marginLeft: 2,
   },
   contactList: {
-    marginTop: spacing.lg,
+    marginTop: spacing.md,
     borderTopWidth: 1,
     borderTopColor: colors.border,
   },
   contactRow: {
-    minHeight: 66,
     flexDirection: "row",
     alignItems: "center",
+    gap: spacing.md,
+    paddingVertical: spacing.md,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
   },
@@ -62,13 +63,12 @@ export const styles = StyleSheet.create({
     borderBottomWidth: 0,
   },
   contactIconWrap: {
-    width: 42,
-    height: 42,
+    width: 36,
+    height: 36,
     borderRadius: radius.md,
     backgroundColor: colors.primaryGreenSoft,
     alignItems: "center",
     justifyContent: "center",
-    marginRight: spacing.md,
   },
   contactIcon: {
     color: colors.primaryGreen,
@@ -77,30 +77,28 @@ export const styles = StyleSheet.create({
     flex: 1,
   },
   contactLabel: {
-    fontSize: 15,
-    fontWeight: "800",
-    color: colors.textPrimary,
-  },
-  contactValue: {
-    marginTop: 2,
-    fontSize: 14,
-    lineHeight: 19,
+    fontSize: 13,
+    fontWeight: "600",
     color: colors.textSecondary,
   },
+  contactValue: {
+    marginTop: spacing.xs,
+    fontSize: 15,
+    lineHeight: 21,
+    fontWeight: "600",
+    color: colors.textPrimary,
+  },
   chevron: {
-    color: colors.primaryGreen,
-    marginLeft: spacing.sm,
+    color: colors.textMuted,
   },
   featuresTitle: {
-    fontSize: 20,
-    lineHeight: 26,
-    fontWeight: "800",
+    fontSize: 18,
+    fontWeight: "700",
     color: colors.textPrimary,
-    marginBottom: spacing.lg,
+    marginBottom: spacing.md,
   },
   featuresGrid: {
     flexDirection: "row",
-    justifyContent: "space-between",
     gap: spacing.sm,
   },
   featureItem: {
@@ -108,8 +106,8 @@ export const styles = StyleSheet.create({
     alignItems: "center",
   },
   featureIconWrap: {
-    width: 48,
-    height: 48,
+    width: 36,
+    height: 36,
     borderRadius: radius.md,
     backgroundColor: colors.primaryGreenSoft,
     alignItems: "center",
@@ -122,6 +120,7 @@ export const styles = StyleSheet.create({
   featureLabel: {
     fontSize: 13,
     lineHeight: 18,
+    fontWeight: "500",
     color: colors.textPrimary,
     textAlign: "center",
   },
