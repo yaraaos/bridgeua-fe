@@ -23,15 +23,16 @@ export const businessDetailsMock: BusinessDetails[] = [
           id: "contact-address",
           type: "address",
           label: "Address",
-          value: "123 Rodeo Dr, Beverly Hills, CA 90210, USA",
+          value:
+            "9455 S Santa Monica Blvd, Beverly Hills, CA 90210, United States",
           actionUrl:
-            "https://maps.google.com/?q=123 Rodeo Dr, Beverly Hills, CA 90210, USA",
+            "https://maps.google.com/?q=9455 S Santa Monica Blvd, Beverly Hills, CA 90210, United States",
         },
         {
           id: "contact-hours",
           type: "hours",
-          label: "Hours",
-          value: "Mon – Sun 10:00 – 21:00",
+          label: "Opening hours",
+          value: "Open now · Closes at 21:00",
         },
         {
           id: "contact-phone",
@@ -44,8 +45,8 @@ export const businessDetailsMock: BusinessDetails[] = [
           id: "contact-website",
           type: "website",
           label: "Website",
-          value: "www.zelenskabeauty.com",
-          actionUrl: "https://www.zelenskabeauty.com",
+          value: "zelenskabeauty.com",
+          actionUrl: "https://zelenskabeauty.com",
         },
         {
           id: "contact-instagram",
