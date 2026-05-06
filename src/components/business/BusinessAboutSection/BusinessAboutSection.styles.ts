@@ -92,6 +92,7 @@ export const styles = StyleSheet.create({
     color: colors.textPrimary,
   },
   hoursPanel: {
+    overflow: "hidden",
     paddingLeft: 36 + spacing.md,
     paddingBottom: spacing.md,
     borderBottomWidth: 1,

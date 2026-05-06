@@ -6,8 +6,19 @@ import type {
 } from "@/src/features/businesses/types/business.types";
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
-import { Linking, Pressable, Text, View } from "react-native";
+import {
+    LayoutAnimation,
+    Linking,
+    Platform,
+    Pressable,
+    Text,
+    UIManager,
+    View,
+} from "react-native";
 import { styles } from "./BusinessAboutSection.styles";
+if (Platform.OS === "android") {
+  UIManager.setLayoutAnimationEnabledExperimental?.(true);
+}
 
 type Props = {
   businessName: string;
@@ -112,6 +123,20 @@ export default function BusinessAboutSection({ businessName, about }: Props) {
                   ]}
                   onPress={() => {
                     if (isHoursRow) {
+                      LayoutAnimation.configureNext({
+                        duration: 180,
+                        update: {
+                          type: LayoutAnimation.Types.easeInEaseOut,
+                        },
+                        delete: {
+                          type: LayoutAnimation.Types.easeInEaseOut,
+                          property: LayoutAnimation.Properties.opacity,
+                        },
+                        create: {
+                          type: LayoutAnimation.Types.easeInEaseOut,
+                          property: LayoutAnimation.Properties.opacity,
+                        },
+                      });
                       setAreHoursExpanded((value) => !value);
                       return;
                     }
