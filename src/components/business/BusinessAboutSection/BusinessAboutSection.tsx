@@ -47,6 +47,7 @@ const featureIcons: Record<
 };
 
 export default function BusinessAboutSection({ businessName, about }: Props) {
+  const [isAddressExpanded, setIsAddressExpanded] = useState(false);
   const [areHoursExpanded, setAreHoursExpanded] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isTextTruncated, setIsTextTruncated] = useState(false);
@@ -108,16 +109,18 @@ export default function BusinessAboutSection({ businessName, about }: Props) {
             const isLastItem = index === about.contacts.length - 1;
             const isHoursRow =
               item.type === "hours" && Boolean(about.openingHours?.length);
+            const isAddressRow = item.type === "address";
 
             return (
               <View key={item.id}>
                 <Pressable
                   style={[
                     styles.contactRow,
-                    isHoursRow && areHoursExpanded
+                    (isHoursRow && areHoursExpanded) ||
+                    (isAddressRow && isAddressExpanded)
                       ? styles.contactRowExpanded
                       : null,
-                    isLastItem && !areHoursExpanded
+                    isLastItem && !areHoursExpanded && !isAddressExpanded
                       ? styles.contactRowLast
                       : null,
                   ]}
@@ -137,13 +140,34 @@ export default function BusinessAboutSection({ businessName, about }: Props) {
                           property: LayoutAnimation.Properties.opacity,
                         },
                       });
+
                       setAreHoursExpanded((value) => !value);
+                      return;
+                    }
+
+                    if (isAddressRow) {
+                      LayoutAnimation.configureNext({
+                        duration: 180,
+                        update: {
+                          type: LayoutAnimation.Types.easeInEaseOut,
+                        },
+                        delete: {
+                          type: LayoutAnimation.Types.easeInEaseOut,
+                          property: LayoutAnimation.Properties.opacity,
+                        },
+                        create: {
+                          type: LayoutAnimation.Types.easeInEaseOut,
+                          property: LayoutAnimation.Properties.opacity,
+                        },
+                      });
+
+                      setIsAddressExpanded((value) => !value);
                       return;
                     }
 
                     handlePressContact(item);
                   }}
-                  disabled={!item.actionUrl && !isHoursRow}
+                  disabled={!item.actionUrl && !isHoursRow && !isAddressRow}
                 >
                   <View style={styles.contactIconWrap}>
                     <Ionicons
@@ -158,7 +182,9 @@ export default function BusinessAboutSection({ businessName, about }: Props) {
 
                     <Text
                       style={styles.contactValue}
-                      numberOfLines={item.type === "address" ? 1 : undefined}
+                      numberOfLines={
+                        isAddressRow && !isAddressExpanded ? 1 : undefined
+                      }
                       ellipsizeMode="tail"
                     >
                       {item.value}
@@ -171,9 +197,9 @@ export default function BusinessAboutSection({ businessName, about }: Props) {
                       size={18}
                       style={styles.chevron}
                     />
-                  ) : item.actionUrl ? (
+                  ) : isAddressRow ? (
                     <Ionicons
-                      name="chevron-forward"
+                      name={isAddressExpanded ? "chevron-up" : "chevron-down"}
                       size={18}
                       style={styles.chevron}
                     />
