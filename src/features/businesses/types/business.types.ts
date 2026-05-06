@@ -1,5 +1,33 @@
 export type { Business } from "@/src/types/business";
 
+export type BusinessContactType =
+  | "address"
+  | "hours"
+  | "phone"
+  | "website"
+  | "instagram";
+
+export type BusinessContactItem = {
+  id: string;
+  type: BusinessContactType;
+  label: string;
+  value: string;
+  actionUrl?: string;
+};
+
+export type BusinessAboutFeature = {
+  id: string;
+  label: string;
+  icon: "shield" | "leaf" | "heart" | "sparkle";
+};
+
+export type BusinessAbout = {
+  title?: string;
+  description: string;
+  contacts: BusinessContactItem[];
+  features: BusinessAboutFeature[];
+};
+
 export type BusinessDetailsReview = {
   id: string;
   authorName: string;
@@ -37,6 +65,7 @@ export type BusinessDetails = {
   isOpen: boolean;
   closesAt: string;
   isFollowing?: boolean;
+  about: BusinessAbout;
   services: BusinessDetailsService[];
   topReviews: BusinessDetailsReview[];
   reviews: BusinessDetailsReview[];

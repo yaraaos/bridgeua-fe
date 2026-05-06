@@ -1,3 +1,4 @@
+export { default as BusinessAboutSection } from "./BusinessAboutSection/BusinessAboutSection";
 export { default as BusinessBookingCard } from "./BusinessBookingCard";
 export { default as BusinessDetailsTabs } from "./BusinessDetailsTabs";
 export type { BusinessDetailsTab } from "./BusinessDetailsTabs";

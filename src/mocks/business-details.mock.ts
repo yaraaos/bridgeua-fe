@@ -14,6 +14,70 @@ export const businessDetailsMock: BusinessDetails[] = [
     recommendedByPreview: ["ToryProNails", "Best deal"],
     isOpen: true,
     closesAt: "21:00",
+    about: {
+      title: "About Zelenska Beauty",
+      description:
+        "At Zelenska Beauty, we believe beauty is personal. Our team of expert stylists and beauty specialists is dedicated to helping you look and feel your absolute best.",
+      contacts: [
+        {
+          id: "contact-address",
+          type: "address",
+          label: "Address",
+          value: "123 Rodeo Dr, Beverly Hills, CA 90210, USA",
+          actionUrl:
+            "https://maps.google.com/?q=123 Rodeo Dr, Beverly Hills, CA 90210, USA",
+        },
+        {
+          id: "contact-hours",
+          type: "hours",
+          label: "Hours",
+          value: "Mon – Sun 10:00 – 21:00",
+        },
+        {
+          id: "contact-phone",
+          type: "phone",
+          label: "Phone",
+          value: "+1 (310) 555-0198",
+          actionUrl: "tel:+13105550198",
+        },
+        {
+          id: "contact-website",
+          type: "website",
+          label: "Website",
+          value: "www.zelenskabeauty.com",
+          actionUrl: "https://www.zelenskabeauty.com",
+        },
+        {
+          id: "contact-instagram",
+          type: "instagram",
+          label: "Instagram",
+          value: "@zelenska.beauty",
+          actionUrl: "https://instagram.com/zelenska.beauty",
+        },
+      ],
+      features: [
+        {
+          id: "feature-experienced",
+          label: "Experienced Professionals",
+          icon: "shield",
+        },
+        {
+          id: "feature-premium",
+          label: "Premium Products",
+          icon: "leaf",
+        },
+        {
+          id: "feature-personalized",
+          label: "Personalized Service",
+          icon: "heart",
+        },
+        {
+          id: "feature-results",
+          label: "Beautiful Results",
+          icon: "sparkle",
+        },
+      ],
+    },
 
     images: [
       {
