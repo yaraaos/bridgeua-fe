@@ -37,8 +37,9 @@ const featureIcons: Record<
 
 export default function BusinessAboutSection({ businessName, about }: Props) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isTextTruncated, setIsTextTruncated] = useState(false);
 
-  const shouldShowReadMore = about.description.length > 140;
+  const shouldShowReadMore = isTextTruncated || isExpanded;
 
   const handlePressContact = async (item: BusinessContactItem) => {
     if (!item.actionUrl) return;
@@ -62,6 +63,11 @@ export default function BusinessAboutSection({ businessName, about }: Props) {
             <Text
               style={styles.description}
               numberOfLines={isExpanded ? undefined : 4}
+              onTextLayout={(event) => {
+                if (!isExpanded) {
+                  setIsTextTruncated(event.nativeEvent.lines.length > 4);
+                }
+              }}
             >
               {about.description}
             </Text>
@@ -88,35 +94,42 @@ export default function BusinessAboutSection({ businessName, about }: Props) {
         </View>
 
         <View style={styles.contactList}>
-          {about.contacts.map((item) => (
-            <Pressable
-              key={item.id}
-              style={styles.contactRow}
-              onPress={() => handlePressContact(item)}
-              disabled={!item.actionUrl}
-            >
-              <View style={styles.contactIconWrap}>
-                <MaterialIcons
-                  name={contactIcons[item.type]}
-                  size={24}
-                  style={styles.contactIcon}
-                />
-              </View>
+          {about.contacts.map((item, index) => {
+            const isLastItem = index === about.contacts.length - 1;
 
-              <View style={styles.contactTextWrap}>
-                <Text style={styles.contactLabel}>{item.label}</Text>
-                <Text style={styles.contactValue}>{item.value}</Text>
-              </View>
+            return (
+              <Pressable
+                key={item.id}
+                style={[
+                  styles.contactRow,
+                  isLastItem ? styles.contactRowLast : null,
+                ]}
+                onPress={() => handlePressContact(item)}
+                disabled={!item.actionUrl}
+              >
+                <View style={styles.contactIconWrap}>
+                  <MaterialIcons
+                    name={contactIcons[item.type]}
+                    size={24}
+                    style={styles.contactIcon}
+                  />
+                </View>
 
-              {item.actionUrl ? (
-                <MaterialIcons
-                  name="chevron-right"
-                  size={26}
-                  style={styles.chevron}
-                />
-              ) : null}
-            </Pressable>
-          ))}
+                <View style={styles.contactTextWrap}>
+                  <Text style={styles.contactLabel}>{item.label}</Text>
+                  <Text style={styles.contactValue}>{item.value}</Text>
+                </View>
+
+                {item.actionUrl ? (
+                  <MaterialIcons
+                    name="chevron-right"
+                    size={26}
+                    style={styles.chevron}
+                  />
+                ) : null}
+              </Pressable>
+            );
+          })}
         </View>
       </View>
 

@@ -58,6 +58,9 @@ export const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
   },
+  contactRowLast: {
+    borderBottomWidth: 0,
+  },
   contactIconWrap: {
     width: 42,
     height: 42,
