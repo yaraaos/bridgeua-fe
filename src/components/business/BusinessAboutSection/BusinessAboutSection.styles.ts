@@ -62,6 +62,9 @@ export const styles = StyleSheet.create({
   contactRowLast: {
     borderBottomWidth: 0,
   },
+  contactRowExpanded: {
+    borderBottomWidth: 0,
+  },
   contactIconWrap: {
     width: 36,
     height: 36,
@@ -85,6 +88,27 @@ export const styles = StyleSheet.create({
     marginTop: spacing.xs,
     fontSize: 15,
     lineHeight: 21,
+    fontWeight: "600",
+    color: colors.textPrimary,
+  },
+  hoursPanel: {
+    paddingLeft: 36 + spacing.md,
+    paddingBottom: spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+  hoursRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    gap: spacing.md,
+    paddingVertical: spacing.xs,
+  },
+  hoursDay: {
+    fontSize: 14,
+    color: colors.textSecondary,
+  },
+  hoursValue: {
+    fontSize: 14,
     fontWeight: "600",
     color: colors.textPrimary,
   },

@@ -18,6 +18,15 @@ export const businessDetailsMock: BusinessDetails[] = [
       title: "About Zelenska Beauty",
       description:
         "At Zelenska Beauty, we believe beauty is personal. Our team of expert stylists and beauty specialists is dedicated to helping you look and feel your absolute best.",
+      openingHours: [
+        { id: "monday", day: "Monday", hours: "10:00 – 21:00" },
+        { id: "tuesday", day: "Tuesday", hours: "10:00 – 21:00" },
+        { id: "wednesday", day: "Wednesday", hours: "10:00 – 21:00" },
+        { id: "thursday", day: "Thursday", hours: "10:00 – 21:00" },
+        { id: "friday", day: "Friday", hours: "10:00 – 21:00" },
+        { id: "saturday", day: "Saturday", hours: "10:00 – 21:00" },
+        { id: "sunday", day: "Sunday", hours: "10:00 – 21:00" },
+      ],
       contacts: [
         {
           id: "contact-address",

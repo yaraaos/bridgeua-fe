@@ -36,6 +36,7 @@ const featureIcons: Record<
 };
 
 export default function BusinessAboutSection({ businessName, about }: Props) {
+  const [areHoursExpanded, setAreHoursExpanded] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isTextTruncated, setIsTextTruncated] = useState(false);
 
@@ -94,44 +95,77 @@ export default function BusinessAboutSection({ businessName, about }: Props) {
         <View style={styles.contactList}>
           {about.contacts.map((item, index) => {
             const isLastItem = index === about.contacts.length - 1;
+            const isHoursRow =
+              item.type === "hours" && Boolean(about.openingHours?.length);
 
             return (
-              <Pressable
-                key={item.id}
-                style={[
-                  styles.contactRow,
-                  isLastItem ? styles.contactRowLast : null,
-                ]}
-                onPress={() => handlePressContact(item)}
-                disabled={!item.actionUrl}
-              >
-                <View style={styles.contactIconWrap}>
-                  <Ionicons
-                    name={contactIcons[item.type]}
-                    size={18}
-                    style={styles.contactIcon}
-                  />
-                </View>
+              <View key={item.id}>
+                <Pressable
+                  style={[
+                    styles.contactRow,
+                    isHoursRow && areHoursExpanded
+                      ? styles.contactRowExpanded
+                      : null,
+                    isLastItem && !areHoursExpanded
+                      ? styles.contactRowLast
+                      : null,
+                  ]}
+                  onPress={() => {
+                    if (isHoursRow) {
+                      setAreHoursExpanded((value) => !value);
+                      return;
+                    }
 
-                <View style={styles.contactTextWrap}>
-                  <Text style={styles.contactLabel}>{item.label}</Text>
-                  <Text
-                    style={styles.contactValue}
-                    numberOfLines={item.type === "address" ? 1 : undefined}
-                    ellipsizeMode="tail"
-                  >
-                    {item.value}
-                  </Text>
-                </View>
+                    handlePressContact(item);
+                  }}
+                  disabled={!item.actionUrl && !isHoursRow}
+                >
+                  <View style={styles.contactIconWrap}>
+                    <Ionicons
+                      name={contactIcons[item.type]}
+                      size={18}
+                      style={styles.contactIcon}
+                    />
+                  </View>
 
-                {item.actionUrl ? (
-                  <Ionicons
-                    name="chevron-forward"
-                    size={18}
-                    style={styles.chevron}
-                  />
+                  <View style={styles.contactTextWrap}>
+                    <Text style={styles.contactLabel}>{item.label}</Text>
+
+                    <Text
+                      style={styles.contactValue}
+                      numberOfLines={item.type === "address" ? 1 : undefined}
+                      ellipsizeMode="tail"
+                    >
+                      {item.value}
+                    </Text>
+                  </View>
+
+                  {isHoursRow ? (
+                    <Ionicons
+                      name={areHoursExpanded ? "chevron-up" : "chevron-down"}
+                      size={18}
+                      style={styles.chevron}
+                    />
+                  ) : item.actionUrl ? (
+                    <Ionicons
+                      name="chevron-forward"
+                      size={18}
+                      style={styles.chevron}
+                    />
+                  ) : null}
+                </Pressable>
+
+                {isHoursRow && areHoursExpanded ? (
+                  <View style={styles.hoursPanel}>
+                    {about.openingHours?.map((hour) => (
+                      <View key={hour.id} style={styles.hoursRow}>
+                        <Text style={styles.hoursDay}>{hour.day}</Text>
+                        <Text style={styles.hoursValue}>{hour.hours}</Text>
+                      </View>
+                    ))}
+                  </View>
                 ) : null}
-              </Pressable>
+              </View>
             );
           })}
         </View>

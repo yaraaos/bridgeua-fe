@@ -7,6 +7,12 @@ export type BusinessContactType =
   | "website"
   | "instagram";
 
+export type BusinessOpeningHour = {
+  id: string;
+  day: string;
+  hours: string;
+};
+
 export type BusinessContactItem = {
   id: string;
   type: BusinessContactType;
@@ -24,6 +30,7 @@ export type BusinessAboutFeature = {
 export type BusinessAbout = {
   title?: string;
   description: string;
+  openingHours?: BusinessOpeningHour[];
   contacts: BusinessContactItem[];
   features: BusinessAboutFeature[];
 };
