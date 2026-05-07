@@ -86,13 +86,11 @@ function SettingsSection({
 // ─── Screen ───────────────────────────────────────────────────────────────────
 
 export default function SettingsScreen() {
-  const { colors } = useAppTheme();
+  const { colors, isDark } = useAppTheme();
   const styles = createStyles(colors);
 
   const router = useRouter();
-  const themeMode = useAppStore((s) => s.themeMode);
   const setThemeMode = useAppStore((s) => s.setThemeMode);
-  const darkMode = themeMode === "dark";
 
   return (
     <SafeAreaView style={styles.safeArea} edges={["top"]}>
@@ -188,7 +186,7 @@ export default function SettingsScreen() {
             subtitle="Adjust your appearance"
             rightElement={
               <Switch
-                value={darkMode}
+                value={isDark}
                 onValueChange={(val) => setThemeMode(val ? "dark" : "light")}
                 trackColor={{ false: colors.textMuted, true: colors.primaryGreen }}
                 thumbColor={colors.white}
