@@ -1,8 +1,12 @@
 import type {
+    ConfirmCodePayload,
+    ConfirmCodeResponse,
     RegisterBusinessPayload,
     RegisterBusinessResponse,
     RegisterPersonalPayload,
     RegisterResponse,
+    ResendCodePayload,
+    ResendCodeResponse,
     SignInPayload,
     SignInResponse,
 } from "../types/auth.types";
@@ -57,5 +61,31 @@ export async function registerBusiness(
     userId: "business-user-1",
     email: payload.email,
     verificationRequired: true,
+  };
+}
+
+export async function confirmCode(
+  payload: ConfirmCodePayload,
+): Promise<ConfirmCodeResponse> {
+  // TODO: Replace with real BE request when endpoint is ready.
+  await new Promise((resolve) => setTimeout(resolve, 800));
+
+  if (payload.code !== "1234") {
+    throw new Error("Incorrect confirmation code");
+  }
+
+  return {
+    verified: true,
+  };
+}
+
+export async function resendCode(
+  payload: ResendCodePayload,
+): Promise<ResendCodeResponse> {
+  // TODO: Replace with real BE request when endpoint is ready.
+  await new Promise((resolve) => setTimeout(resolve, 800));
+
+  return {
+    success: true,
   };
 }

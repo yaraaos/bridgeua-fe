@@ -37,3 +37,20 @@ export type RegisterBusinessPayload = {
 };
 
 export type RegisterBusinessResponse = RegisterResponse;
+
+export type ConfirmCodePayload = {
+  email: string;
+  code: string;
+};
+
+export type ConfirmCodeResponse = {
+  verified: boolean;
+};
+
+export type ResendCodePayload = {
+  email: string;
+};
+
+export type ResendCodeResponse = {
+  success: boolean;
+};
