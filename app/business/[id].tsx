@@ -1,4 +1,5 @@
 import {
+  BusinessAboutSection,
   BusinessBookingCard,
   BusinessDetailsTabs,
   BusinessHeroGallery,
@@ -206,6 +207,13 @@ export default function BusinessDetailsScreen() {
             <BusinessGalleryGrid
               businessPhotos={business.images}
               reviewPhotos={business.reviewPhotos}
+            />
+          ) : null}
+
+          {activeTab === "about" ? (
+            <BusinessAboutSection
+              businessName={business.name}
+              about={business.about}
             />
           ) : null}
         </Animated.View>

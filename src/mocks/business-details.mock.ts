@@ -14,6 +14,125 @@ export const businessDetailsMock: BusinessDetails[] = [
     recommendedByPreview: ["ToryProNails", "Best deal"],
     isOpen: true,
     closesAt: "21:00",
+    about: {
+      title: "About Zelenska Beauty",
+      description:
+        "At Zelenska Beauty, we believe beauty is personal. Our team of expert stylists and beauty specialists is dedicated to helping you look and feel your absolute best.",
+      isOpen: true,
+      openingHours: [
+        { id: "monday", day: "Monday", hours: "10:00 – 21:00" },
+        { id: "tuesday", day: "Tuesday", hours: "10:00 – 21:00" },
+        { id: "wednesday", day: "Wednesday", hours: "10:00 – 21:00" },
+        { id: "thursday", day: "Thursday", hours: "10:00 – 21:00" },
+        { id: "friday", day: "Friday", hours: "10:00 – 21:00" },
+        { id: "saturday", day: "Saturday", hours: "10:00 – 21:00" },
+        { id: "sunday", day: "Sunday", hours: "10:00 – 21:00" },
+      ],
+      contacts: [
+        {
+          id: "contact-address",
+          type: "address",
+          label: "Address",
+          value:
+            "9455 S Santa Monica Blvd, Beverly Hills, CA 90210, United States",
+          actionUrl:
+            "https://maps.google.com/?q=9455 S Santa Monica Blvd, Beverly Hills, CA 90210, United States",
+        },
+        {
+          id: "contact-hours",
+          type: "hours",
+          label: "Opening hours",
+          value: "Closes at 21:00",
+        },
+        {
+          id: "contact-phone",
+          type: "phone",
+          label: "Phone",
+          value: "+1 (310) 555-0198",
+          actionUrl: "tel:+13105550198",
+        },
+        {
+          id: "contact-website",
+          type: "website",
+          label: "Website",
+          value: "zelenskabeauty.com",
+          actionUrl: "https://zelenskabeauty.com",
+        },
+        {
+          id: "contact-instagram",
+          type: "instagram",
+          label: "Instagram",
+          value: "@zelenska.beauty",
+          actionUrl: "https://instagram.com/zelenska.beauty",
+        },
+      ],
+      languages: ["Ukrainian", "English", "Spanish"],
+
+      amenities: [
+        { id: "amenity-wifi", label: "Wi-Fi", icon: "wifi" },
+        { id: "amenity-parking", label: "Parking", icon: "parking" },
+        { id: "amenity-pet", label: "Pet friendly", icon: "pet" },
+        {
+          id: "amenity-accessibility",
+          label: "Wheelchair accessible",
+          icon: "accessibility",
+        },
+      ],
+
+      socialLinks: [
+        {
+          id: "social-instagram",
+          label: "Instagram",
+          icon: "instagram",
+          url: "https://instagram.com/zelenska.beauty",
+        },
+        {
+          id: "social-telegram",
+          label: "Telegram",
+          icon: "telegram",
+          url: "https://t.me/zelenskabeauty",
+        },
+        {
+          id: "social-whatsapp",
+          label: "WhatsApp",
+          icon: "whatsapp",
+          url: "https://wa.me/13105550198",
+        },
+      ],
+
+      recommendedBy: [
+        {
+          id: "recommended-by-1",
+          businessId: "2",
+          businessName: "ToryProNails",
+          businessCategory: "Nail Studio",
+          businessLocation: "Los Angeles / California",
+          businessImageUrl:
+            "https://images.unsplash.com/photo-1604654894610-df63bc536371?w=300",
+          recommendationsCount: 14,
+        },
+        {
+          id: "recommended-by-2",
+          businessId: "3",
+          businessName: "Best Deal Market",
+          businessCategory: "Grocery",
+          businessLocation: "Beverly Hills / California",
+          businessImageUrl:
+            "https://images.unsplash.com/photo-1604719312566-8912e9227c6a?w=300",
+          recommendationsCount: 9,
+        },
+        {
+          id: "recommended-by-3",
+          businessId: "4",
+          businessName: "Kyiv Hair Studio",
+          businessCategory: "Hair Salon",
+          businessLocation: "Santa Monica / California",
+          businessImageUrl:
+            "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=300",
+          recommendationsCount: 21,
+        },
+      ],
+    },
 
     images: [
       {

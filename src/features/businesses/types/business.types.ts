@@ -1,5 +1,61 @@
 export type { Business } from "@/src/types/business";
 
+export type BusinessContactType =
+  | "address"
+  | "hours"
+  | "phone"
+  | "website"
+  | "instagram";
+
+export type BusinessOpeningHour = {
+  id: string;
+  day: string;
+  hours: string;
+};
+
+export type BusinessContactItem = {
+  id: string;
+  type: BusinessContactType;
+  label: string;
+  value: string;
+  actionUrl?: string;
+};
+
+export type BusinessAmenity = {
+  id: string;
+  label: string;
+  icon: "wifi" | "parking" | "pet" | "accessibility" | "coffee";
+};
+
+export type BusinessSocialLink = {
+  id: string;
+  label: string;
+  icon: "instagram" | "telegram" | "tiktok" | "whatsapp";
+  url: string;
+};
+
+export type BusinessRecommendation = {
+  id: string;
+  businessId: string;
+  businessName: string;
+  businessCategory: string;
+  businessLocation?: string;
+  businessImageUrl?: string;
+  recommendationsCount?: number;
+};
+
+export type BusinessAbout = {
+  title?: string;
+  description: string;
+  isOpen?: boolean;
+  openingHours?: BusinessOpeningHour[];
+  contacts: BusinessContactItem[];
+  languages?: string[];
+  amenities?: BusinessAmenity[];
+  socialLinks?: BusinessSocialLink[];
+  recommendedBy?: BusinessRecommendation[];
+};
+
 export type BusinessDetailsReview = {
   id: string;
   authorName: string;
@@ -37,6 +93,7 @@ export type BusinessDetails = {
   isOpen: boolean;
   closesAt: string;
   isFollowing?: boolean;
+  about: BusinessAbout;
   services: BusinessDetailsService[];
   topReviews: BusinessDetailsReview[];
   reviews: BusinessDetailsReview[];
