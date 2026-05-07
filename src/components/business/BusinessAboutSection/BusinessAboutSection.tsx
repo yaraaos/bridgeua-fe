@@ -37,6 +37,7 @@ const featureIcons: Record<
 
 export default function BusinessAboutSection({ businessName, about }: Props) {
   const [isAddressExpanded, setIsAddressExpanded] = useState(false);
+  const [shouldShowFullAddress, setShouldShowFullAddress] = useState(false);
   const [areHoursExpanded, setAreHoursExpanded] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isTextTruncated, setIsTextTruncated] = useState(false);
@@ -109,11 +110,23 @@ export default function BusinessAboutSection({ businessName, about }: Props) {
                     isHoursRow
                       ? () => setAreHoursExpanded((value) => !value)
                       : isAddressRow
-                        ? () => setIsAddressExpanded((value) => !value)
+                        ? () => {
+                            if (isAddressExpanded) {
+                              setShouldShowFullAddress(false);
+                              setIsAddressExpanded(false);
+                              return;
+                            }
+
+                            setIsAddressExpanded(true);
+
+                            requestAnimationFrame(() => {
+                              setShouldShowFullAddress(true);
+                            });
+                          }
                         : undefined
                   }
                   numberOfLines={
-                    isAddressRow && !isAddressExpanded ? 1 : undefined
+                    isAddressRow && !shouldShowFullAddress ? 1 : undefined
                   }
                 >
                   {isHoursRow
