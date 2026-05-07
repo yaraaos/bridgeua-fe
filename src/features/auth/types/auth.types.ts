@@ -27,3 +27,13 @@ export type RegisterResponse = {
   email: string;
   verificationRequired: boolean;
 };
+
+export type RegisterBusinessPayload = {
+  businessName: string;
+  ownerName: string;
+  email: string;
+  password: string;
+  category?: string;
+};
+
+export type RegisterBusinessResponse = RegisterResponse;
