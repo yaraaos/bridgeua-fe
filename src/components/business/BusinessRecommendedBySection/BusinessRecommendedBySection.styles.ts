@@ -59,4 +59,21 @@ export const styles = StyleSheet.create({
     fontSize: 13,
     color: colors.textSecondary,
   },
+  meta: {
+    marginTop: spacing.xs,
+    fontSize: 12,
+    color: colors.textMuted,
+  },
+  headerRow: {
+    flexDirection: "row",
+    alignItems: "baseline",
+    justifyContent: "space-between",
+    marginBottom: spacing.md,
+  },
+
+  seeAllText: {
+    fontSize: 14,
+    fontWeight: "700",
+    color: colors.primaryGreen,
+  },
 });

@@ -42,9 +42,12 @@ export type BusinessSocialLink = {
 
 export type BusinessRecommendation = {
   id: string;
-  name: string;
-  subtitle?: string;
-  avatarUrl?: string;
+  businessId: string;
+  businessName: string;
+  businessCategory: string;
+  businessLocation?: string;
+  businessImageUrl?: string;
+  recommendationsCount?: number;
 };
 
 export type BusinessAbout = {

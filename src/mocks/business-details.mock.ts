@@ -124,25 +124,34 @@ export const businessDetailsMock: BusinessDetails[] = [
 
       recommendedBy: [
         {
-          id: "rec-1",
-          name: "Anna Beauty",
-          subtitle: "Hair Salon",
-          avatarUrl:
-            "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300",
+          id: "recommended-by-1",
+          businessId: "2",
+          businessName: "ToryProNails",
+          businessCategory: "Nail Studio",
+          businessLocation: "Los Angeles / California",
+          businessImageUrl:
+            "https://images.unsplash.com/photo-1604654894610-df63bc536371?w=300",
+          recommendationsCount: 14,
         },
         {
-          id: "rec-2",
-          name: "Kyiv Nails",
-          subtitle: "Nail Studio",
-          avatarUrl:
-            "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=300",
+          id: "recommended-by-2",
+          businessId: "3",
+          businessName: "Best Deal Market",
+          businessCategory: "Grocery",
+          businessLocation: "Beverly Hills / California",
+          businessImageUrl:
+            "https://images.unsplash.com/photo-1604719312566-8912e9227c6a?w=300",
+          recommendationsCount: 9,
         },
         {
-          id: "rec-3",
-          name: "Olga MUA",
-          subtitle: "Makeup Artist",
-          avatarUrl:
-            "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300",
+          id: "recommended-by-3",
+          businessId: "4",
+          businessName: "Kyiv Hair Studio",
+          businessCategory: "Hair Salon",
+          businessLocation: "Santa Monica / California",
+          businessImageUrl:
+            "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=300",
+          recommendationsCount: 21,
         },
       ],
     },

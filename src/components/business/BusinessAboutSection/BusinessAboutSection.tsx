@@ -10,7 +10,7 @@ import type {
     BusinessAbout,
     BusinessAboutFeature,
     BusinessContactItem,
-    BusinessContactType
+    BusinessContactType,
 } from "@/src/features/businesses/types/business.types";
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
@@ -193,7 +193,12 @@ export default function BusinessAboutSection({ businessName, about }: Props) {
 
       <BusinessSocialLinksSection socialLinks={about.socialLinks} />
 
-      <BusinessRecommendedBySection recommendedBy={about.recommendedBy} />
+      <BusinessRecommendedBySection
+        recommendedBy={about.recommendedBy}
+        onPressSeeAll={() => {
+          console.log("Open full recommended by screen");
+        }}
+      />
 
       {about.features.length > 0 ? (
         <View style={styles.card}>
