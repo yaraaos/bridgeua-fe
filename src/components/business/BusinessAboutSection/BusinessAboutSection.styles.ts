@@ -109,4 +109,62 @@ export const styles = StyleSheet.create({
     color: colors.textPrimary,
     textAlign: "center",
   },
+  chipGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: spacing.sm,
+  },
+  chip: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.xs,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderRadius: radius.pill,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
+  },
+  chipIcon: {
+    color: colors.primaryGreen,
+  },
+  chipText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: colors.textPrimary,
+  },
+  recommendationsList: {
+    gap: spacing.md,
+  },
+  recommendationItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.md,
+  },
+  recommendationAvatar: {
+    width: 42,
+    height: 42,
+    borderRadius: radius.pill,
+    backgroundColor: colors.primaryGreenSoft,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  recommendationAvatarText: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: colors.primaryGreen,
+  },
+  recommendationTextWrap: {
+    flex: 1,
+  },
+  recommendationName: {
+    fontSize: 15,
+    fontWeight: "700",
+    color: colors.textPrimary,
+  },
+  recommendationSubtitle: {
+    marginTop: spacing.xs,
+    fontSize: 13,
+    color: colors.textSecondary,
+  },
 });

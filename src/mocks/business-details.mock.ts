@@ -88,6 +88,63 @@ export const businessDetailsMock: BusinessDetails[] = [
           icon: "sparkle",
         },
       ],
+      languages: ["Ukrainian", "English", "Spanish"],
+
+      amenities: [
+        { id: "amenity-wifi", label: "Wi-Fi", icon: "wifi" },
+        { id: "amenity-parking", label: "Parking", icon: "parking" },
+        { id: "amenity-pet", label: "Pet friendly", icon: "pet" },
+        {
+          id: "amenity-accessibility",
+          label: "Wheelchair accessible",
+          icon: "accessibility",
+        },
+      ],
+
+      socialLinks: [
+        {
+          id: "social-instagram",
+          label: "Instagram",
+          icon: "instagram",
+          url: "https://instagram.com/zelenska.beauty",
+        },
+        {
+          id: "social-telegram",
+          label: "Telegram",
+          icon: "telegram",
+          url: "https://t.me/zelenskabeauty",
+        },
+        {
+          id: "social-whatsapp",
+          label: "WhatsApp",
+          icon: "whatsapp",
+          url: "https://wa.me/13105550198",
+        },
+      ],
+
+      recommendedBy: [
+        {
+          id: "rec-1",
+          name: "Anna Beauty",
+          subtitle: "Hair Salon",
+          avatarUrl:
+            "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300",
+        },
+        {
+          id: "rec-2",
+          name: "Kyiv Nails",
+          subtitle: "Nail Studio",
+          avatarUrl:
+            "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=300",
+        },
+        {
+          id: "rec-3",
+          name: "Olga MUA",
+          subtitle: "Makeup Artist",
+          avatarUrl:
+            "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300",
+        },
+      ],
     },
 
     images: [

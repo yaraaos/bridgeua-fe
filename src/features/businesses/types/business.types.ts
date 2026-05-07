@@ -27,6 +27,26 @@ export type BusinessAboutFeature = {
   icon: "shield" | "leaf" | "heart" | "sparkle";
 };
 
+export type BusinessAmenity = {
+  id: string;
+  label: string;
+  icon: "wifi" | "parking" | "pet" | "accessibility" | "coffee";
+};
+
+export type BusinessSocialLink = {
+  id: string;
+  label: string;
+  icon: "instagram" | "telegram" | "tiktok" | "whatsapp";
+  url: string;
+};
+
+export type BusinessRecommendation = {
+  id: string;
+  name: string;
+  subtitle?: string;
+  avatarUrl?: string;
+};
+
 export type BusinessAbout = {
   title?: string;
   description: string;
@@ -34,6 +54,10 @@ export type BusinessAbout = {
   openingHours?: BusinessOpeningHour[];
   contacts: BusinessContactItem[];
   features: BusinessAboutFeature[];
+  languages?: string[];
+  amenities?: BusinessAmenity[];
+  socialLinks?: BusinessSocialLink[];
+  recommendedBy?: BusinessRecommendation[];
 };
 
 export type BusinessDetailsReview = {

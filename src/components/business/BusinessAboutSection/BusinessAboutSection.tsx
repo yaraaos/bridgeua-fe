@@ -1,10 +1,16 @@
-import { BusinessExpandableInfoRow } from "@/src/components/business";
+import {
+    BusinessAmenitiesSection,
+    BusinessExpandableInfoRow,
+    BusinessLanguagesSection,
+    BusinessRecommendedBySection,
+    BusinessSocialLinksSection,
+} from "@/src/components/business";
 import { colors } from "@/src/constants/colors";
 import type {
     BusinessAbout,
     BusinessAboutFeature,
     BusinessContactItem,
-    BusinessContactType,
+    BusinessContactType
 } from "@/src/features/businesses/types/business.types";
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
@@ -180,6 +186,14 @@ export default function BusinessAboutSection({ businessName, about }: Props) {
           })}
         </View>
       </View>
+
+      <BusinessLanguagesSection languages={about.languages} />
+
+      <BusinessAmenitiesSection amenities={about.amenities} />
+
+      <BusinessSocialLinksSection socialLinks={about.socialLinks} />
+
+      <BusinessRecommendedBySection recommendedBy={about.recommendedBy} />
 
       {about.features.length > 0 ? (
         <View style={styles.card}>
