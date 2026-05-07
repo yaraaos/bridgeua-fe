@@ -11,7 +11,7 @@ export const styles = StyleSheet.create({
   },
   row: {
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "flex-start",
     gap: spacing.md,
     paddingVertical: spacing.md,
   },
@@ -21,6 +21,7 @@ export const styles = StyleSheet.create({
   iconBox: {
     width: 36,
     height: 36,
+    marginTop: 2,
     borderRadius: radius.md,
     backgroundColor: colors.primaryGreenSoft,
     alignItems: "center",
