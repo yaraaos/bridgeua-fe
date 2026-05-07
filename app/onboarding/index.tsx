@@ -1,3 +1,4 @@
+import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import React, { useRef, useState } from "react";
 import { FlatList, StyleSheet, View, useWindowDimensions } from "react-native";
@@ -36,11 +37,7 @@ export default function OnboardingScreen() {
   };
 
   return (
-<<<<<<< HEAD
-    <View style={styles.screen}>
-=======
     <LinearGradient colors={gradientColors} style={{ flex: 1 }}>
->>>>>>> 473abfa (Fix dark-mode for splash and onboarding)
       <AppScreen style={styles.container}>
         <FlatList
           ref={listRef}
@@ -73,41 +70,36 @@ export default function OnboardingScreen() {
           <AppButton title={activeSlide.buttonLabel} onPress={handleNext} />
         </View>
       </AppScreen>
-    </View>
+    </LinearGradient>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingHorizontal: 0,
-    paddingBottom: 32,
-    backgroundColor: "transparent",
-  },
-  screen: {
-    flex: 1,
-    backgroundColor: "#dde9e2",
-  },
-  footer: {
-    paddingHorizontal: 18,
-    paddingBottom: 24,
-    gap: 50,
-  },
-
-  textWrap: {
-    gap: 8,
-  },
-
-  title: {
-    fontSize: 28,
-    lineHeight: 38,
-    fontWeight: "800",
-    color: colors.textPrimary,
-  },
-
-  subtitle: {
-    fontSize: 16,
-    lineHeight: 24,
-    color: colors.textSecondary,
-  },
-});
+function createStyles(colors: AppColors) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      paddingHorizontal: 0,
+      paddingBottom: 32,
+      backgroundColor: "transparent",
+    },
+    footer: {
+      paddingHorizontal: 18,
+      paddingBottom: 24,
+      gap: 50,
+    },
+    textWrap: {
+      gap: 8,
+    },
+    title: {
+      fontSize: 28,
+      lineHeight: 38,
+      fontWeight: "800",
+      color: colors.textPrimary,
+    },
+    subtitle: {
+      fontSize: 16,
+      lineHeight: 24,
+      color: colors.textSecondary,
+    },
+  });
+}
