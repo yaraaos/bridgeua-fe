@@ -12,7 +12,10 @@ const LEFT_PATH =
 const EASING = Easing.bezier(0.4, 0, 0.2, 1);
 
 export default function SplashScreen() {
-  const { colors } = useAppTheme();
+  const { colors, isDark } = useAppTheme();
+  const gradientColors = isDark
+    ? ([`${colors.primaryGreen}40`, colors.background] as const)
+    : (["#2b803a32", colors.background] as const);
 
   const leftX = useRef(new Animated.Value(-SCREEN_WIDTH)).current;
   const rightX = useRef(new Animated.Value(SCREEN_WIDTH)).current;
@@ -60,7 +63,16 @@ export default function SplashScreen() {
   }, );
 
   return (
+<<<<<<< HEAD
     <Animated.View style={[styles.container, { opacity: screenOpacity }]}>
+=======
+    <AnimatedLinearGradient
+      colors={gradientColors}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 0, y: 1 }}
+      style={[styles.container, { opacity: screenOpacity }]}
+    >
+>>>>>>> 473abfa (Fix dark-mode for splash and onboarding)
       <View style={styles.logoWrap}>
         <Animated.View
           style={[

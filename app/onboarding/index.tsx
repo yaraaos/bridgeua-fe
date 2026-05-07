@@ -10,8 +10,11 @@ import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { ONBOARDING_SLIDES } from "@/src/mocks/onboarding.mock";
 
 export default function OnboardingScreen() {
-  const { colors } = useAppTheme();
+  const { colors, isDark } = useAppTheme();
   const styles = createStyles(colors);
+  const gradientColors = isDark
+    ? ([`${colors.primaryGreen}40`, colors.background] as const)
+    : (["#2b803a32", colors.background] as const);
 
   const { width } = useWindowDimensions();
   const listRef = useRef<FlatList>(null);
@@ -33,7 +36,11 @@ export default function OnboardingScreen() {
   };
 
   return (
+<<<<<<< HEAD
     <View style={styles.screen}>
+=======
+    <LinearGradient colors={gradientColors} style={{ flex: 1 }}>
+>>>>>>> 473abfa (Fix dark-mode for splash and onboarding)
       <AppScreen style={styles.container}>
         <FlatList
           ref={listRef}
