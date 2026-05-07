@@ -1,4 +1,5 @@
 import { BusinessExpandableInfoRow } from "@/src/components/business";
+import { colors } from "@/src/constants/colors";
 import type {
     BusinessAbout,
     BusinessAboutFeature,
@@ -128,7 +129,7 @@ export default function BusinessAboutSection({ businessName, about }: Props) {
                   statusColor={
                     isHoursRow
                       ? about.isOpen
-                        ? "#2E9E5B"
+                        ? colors.primaryGreen
                         : "#D9534F"
                       : undefined
                   }
