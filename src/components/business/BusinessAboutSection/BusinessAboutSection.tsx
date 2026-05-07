@@ -2,11 +2,12 @@ import { BusinessExpandableInfoRow } from "@/src/components/business";
 import type {
     BusinessAbout,
     BusinessAboutFeature,
+    BusinessContactItem,
     BusinessContactType,
 } from "@/src/features/businesses/types/business.types";
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Linking, Pressable, Text, View } from "react-native";
 import { styles } from "./BusinessAboutSection.styles";
 
 type Props = {
@@ -33,6 +34,16 @@ const featureIcons: Record<
   leaf: "leaf-outline",
   heart: "heart-outline",
   sparkle: "sparkles-outline",
+};
+
+const handlePressContact = async (item: BusinessContactItem) => {
+  if (!item.actionUrl) return;
+
+  const canOpen = await Linking.canOpenURL(item.actionUrl);
+
+  if (canOpen) {
+    await Linking.openURL(item.actionUrl);
+  }
 };
 
 export default function BusinessAboutSection({ businessName, about }: Props) {
@@ -98,6 +109,15 @@ export default function BusinessAboutSection({ businessName, about }: Props) {
                   icon={contactIcons[item.type]}
                   title={item.label}
                   value={item.value}
+                  isLinkValue={isAddressRow && isAddressExpanded}
+                  numberOfLines={
+                    isAddressRow && !shouldShowFullAddress ? 1 : undefined
+                  }
+                  onPress={
+                    !isHoursRow && !isAddressRow && item.actionUrl
+                      ? () => handlePressContact(item)
+                      : undefined
+                  }
                   statusText={
                     isHoursRow
                       ? about.isOpen
@@ -139,8 +159,10 @@ export default function BusinessAboutSection({ businessName, about }: Props) {
                           }
                         : undefined
                   }
-                  numberOfLines={
-                    isAddressRow && !shouldShowFullAddress ? 1 : undefined
+                  onPressValue={
+                    isAddressRow && isAddressExpanded
+                      ? () => handlePressContact(item)
+                      : undefined
                   }
                 >
                   {isHoursRow

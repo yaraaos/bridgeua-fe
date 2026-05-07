@@ -44,6 +44,10 @@ export const styles = StyleSheet.create({
     fontWeight: "600",
     color: colors.textPrimary,
   },
+  linkValue: {
+    color: colors.primaryGreen,
+    textDecorationLine: "underline",
+  },
   chevron: {
     color: colors.textMuted,
   },

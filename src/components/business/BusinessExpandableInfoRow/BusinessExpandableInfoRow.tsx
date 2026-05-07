@@ -20,11 +20,14 @@ type Props = {
   value: string;
   isExpanded?: boolean;
   onToggle?: () => void;
+  onPress?: () => void;
   numberOfLines?: number;
   children?: ReactNode;
   isLast?: boolean;
   statusText?: string;
   statusColor?: string;
+  isLinkValue?: boolean;
+  onPressValue?: () => void;
 };
 
 export default function BusinessExpandableInfoRow({
@@ -33,33 +36,40 @@ export default function BusinessExpandableInfoRow({
   value,
   isExpanded = false,
   onToggle,
+  onPress,
   numberOfLines,
   children,
   isLast = false,
+  onPressValue,
+  isLinkValue = false,
   statusText,
   statusColor,
 }: Props) {
   const isExpandable = Boolean(onToggle);
+  const isPressable = Boolean(onToggle || onPress);
 
   const handlePress = () => {
-    if (!onToggle) return;
+    if (onToggle) {
+      LayoutAnimation.configureNext({
+        duration: 180,
+        update: {
+          type: LayoutAnimation.Types.easeInEaseOut,
+        },
+        delete: {
+          type: LayoutAnimation.Types.easeInEaseOut,
+          property: LayoutAnimation.Properties.opacity,
+        },
+        create: {
+          type: LayoutAnimation.Types.easeInEaseOut,
+          property: LayoutAnimation.Properties.opacity,
+        },
+      });
 
-    LayoutAnimation.configureNext({
-      duration: 180,
-      update: {
-        type: LayoutAnimation.Types.easeInEaseOut,
-      },
-      delete: {
-        type: LayoutAnimation.Types.easeInEaseOut,
-        property: LayoutAnimation.Properties.opacity,
-      },
-      create: {
-        type: LayoutAnimation.Types.easeInEaseOut,
-        property: LayoutAnimation.Properties.opacity,
-      },
-    });
+      onToggle();
+      return;
+    }
 
-    onToggle();
+    onPress?.();
   };
 
   return (
@@ -67,7 +77,7 @@ export default function BusinessExpandableInfoRow({
       <Pressable
         style={[styles.row, isExpanded && children ? styles.rowExpanded : null]}
         onPress={handlePress}
-        disabled={!isExpandable}
+        disabled={!isPressable}
       >
         <View style={styles.iconBox}>
           <Ionicons name={icon} size={18} style={styles.icon} />
@@ -77,9 +87,10 @@ export default function BusinessExpandableInfoRow({
           <Text style={styles.title}>{title}</Text>
 
           <Text
-            style={styles.value}
+            style={[styles.value, isLinkValue ? styles.linkValue : null]}
             numberOfLines={numberOfLines}
             ellipsizeMode="tail"
+            onPress={isLinkValue ? onPressValue : undefined}
           >
             {statusText ? (
               <>
