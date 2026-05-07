@@ -11,4 +11,5 @@ export { default as BusinessServicesList } from "./BusinessServicesList";
 export { default as BusinessTopReviews } from "./BusinessTopReviews";
 export { default as FollowButton } from "./FollowButton/FollowButton";
 export { default as ReviewCard } from "./ReviewCard";
+export { default as BusinessExpandableInfoRow } from "./BusinessExpandableInfoRow";
 

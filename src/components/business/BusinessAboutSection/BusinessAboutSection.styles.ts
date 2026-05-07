@@ -51,46 +51,6 @@ export const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: colors.border,
   },
-  contactRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.md,
-    paddingVertical: spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  contactRowLast: {
-    borderBottomWidth: 0,
-  },
-  contactRowExpanded: {
-    borderBottomWidth: 0,
-  },
-  contactIconWrap: {
-    width: 36,
-    height: 36,
-    borderRadius: radius.md,
-    backgroundColor: colors.primaryGreenSoft,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  contactIcon: {
-    color: colors.primaryGreen,
-  },
-  contactTextWrap: {
-    flex: 1,
-  },
-  contactLabel: {
-    fontSize: 13,
-    fontWeight: "600",
-    color: colors.textSecondary,
-  },
-  contactValue: {
-    marginTop: spacing.xs,
-    fontSize: 15,
-    lineHeight: 21,
-    fontWeight: "600",
-    color: colors.textPrimary,
-  },
   hoursPanel: {
     overflow: "hidden",
     paddingLeft: 36 + spacing.md,
@@ -113,8 +73,8 @@ export const styles = StyleSheet.create({
     fontWeight: "600",
     color: colors.textPrimary,
   },
-  chevron: {
-    color: colors.textMuted,
+  lastExpandableRow: {
+    borderBottomWidth: 0,
   },
   featuresTitle: {
     fontSize: 18,

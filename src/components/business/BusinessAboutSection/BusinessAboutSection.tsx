@@ -1,24 +1,13 @@
+import { BusinessExpandableInfoRow } from "@/src/components/business";
 import type {
     BusinessAbout,
     BusinessAboutFeature,
-    BusinessContactItem,
     BusinessContactType,
 } from "@/src/features/businesses/types/business.types";
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
-import {
-    LayoutAnimation,
-    Linking,
-    Platform,
-    Pressable,
-    Text,
-    UIManager,
-    View,
-} from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { styles } from "./BusinessAboutSection.styles";
-if (Platform.OS === "android") {
-  UIManager.setLayoutAnimationEnabledExperimental?.(true);
-}
 
 type Props = {
   businessName: string;
@@ -53,16 +42,6 @@ export default function BusinessAboutSection({ businessName, about }: Props) {
   const [isTextTruncated, setIsTextTruncated] = useState(false);
 
   const shouldShowReadMore = isTextTruncated || isExpanded;
-
-  const handlePressContact = async (item: BusinessContactItem) => {
-    if (!item.actionUrl) return;
-
-    const canOpen = await Linking.canOpenURL(item.actionUrl);
-
-    if (canOpen) {
-      await Linking.openURL(item.actionUrl);
-    }
-  };
 
   return (
     <>
@@ -109,113 +88,43 @@ export default function BusinessAboutSection({ businessName, about }: Props) {
             const isLastItem = index === about.contacts.length - 1;
             const isHoursRow =
               item.type === "hours" && Boolean(about.openingHours?.length);
+
             const isAddressRow = item.type === "address";
 
             return (
               <View key={item.id}>
-                <Pressable
-                  style={[
-                    styles.contactRow,
-                    (isHoursRow && areHoursExpanded) ||
-                    (isAddressRow && isAddressExpanded)
-                      ? styles.contactRowExpanded
-                      : null,
-                    isLastItem && !areHoursExpanded && !isAddressExpanded
-                      ? styles.contactRowLast
-                      : null,
-                  ]}
-                  onPress={() => {
-                    if (isHoursRow) {
-                      LayoutAnimation.configureNext({
-                        duration: 180,
-                        update: {
-                          type: LayoutAnimation.Types.easeInEaseOut,
-                        },
-                        delete: {
-                          type: LayoutAnimation.Types.easeInEaseOut,
-                          property: LayoutAnimation.Properties.opacity,
-                        },
-                        create: {
-                          type: LayoutAnimation.Types.easeInEaseOut,
-                          property: LayoutAnimation.Properties.opacity,
-                        },
-                      });
-
-                      setAreHoursExpanded((value) => !value);
-                      return;
-                    }
-
-                    if (isAddressRow) {
-                      LayoutAnimation.configureNext({
-                        duration: 180,
-                        update: {
-                          type: LayoutAnimation.Types.easeInEaseOut,
-                        },
-                        delete: {
-                          type: LayoutAnimation.Types.easeInEaseOut,
-                          property: LayoutAnimation.Properties.opacity,
-                        },
-                        create: {
-                          type: LayoutAnimation.Types.easeInEaseOut,
-                          property: LayoutAnimation.Properties.opacity,
-                        },
-                      });
-
-                      setIsAddressExpanded((value) => !value);
-                      return;
-                    }
-
-                    handlePressContact(item);
-                  }}
-                  disabled={!item.actionUrl && !isHoursRow && !isAddressRow}
+                <BusinessExpandableInfoRow
+                  icon={contactIcons[item.type]}
+                  title={item.label}
+                  value={item.value}
+                  isLast={isLastItem}
+                  isExpanded={
+                    isHoursRow
+                      ? areHoursExpanded
+                      : isAddressRow
+                        ? isAddressExpanded
+                        : false
+                  }
+                  onToggle={
+                    isHoursRow
+                      ? () => setAreHoursExpanded((value) => !value)
+                      : isAddressRow
+                        ? () => setIsAddressExpanded((value) => !value)
+                        : undefined
+                  }
+                  numberOfLines={
+                    isAddressRow && !isAddressExpanded ? 1 : undefined
+                  }
                 >
-                  <View style={styles.contactIconWrap}>
-                    <Ionicons
-                      name={contactIcons[item.type]}
-                      size={18}
-                      style={styles.contactIcon}
-                    />
-                  </View>
-
-                  <View style={styles.contactTextWrap}>
-                    <Text style={styles.contactLabel}>{item.label}</Text>
-
-                    <Text
-                      style={styles.contactValue}
-                      numberOfLines={
-                        isAddressRow && !isAddressExpanded ? 1 : undefined
-                      }
-                      ellipsizeMode="tail"
-                    >
-                      {item.value}
-                    </Text>
-                  </View>
-
-                  {isHoursRow ? (
-                    <Ionicons
-                      name={areHoursExpanded ? "chevron-up" : "chevron-down"}
-                      size={18}
-                      style={styles.chevron}
-                    />
-                  ) : isAddressRow ? (
-                    <Ionicons
-                      name={isAddressExpanded ? "chevron-up" : "chevron-down"}
-                      size={18}
-                      style={styles.chevron}
-                    />
-                  ) : null}
-                </Pressable>
-
-                {isHoursRow && areHoursExpanded ? (
-                  <View style={styles.hoursPanel}>
-                    {about.openingHours?.map((hour) => (
-                      <View key={hour.id} style={styles.hoursRow}>
-                        <Text style={styles.hoursDay}>{hour.day}</Text>
-                        <Text style={styles.hoursValue}>{hour.hours}</Text>
-                      </View>
-                    ))}
-                  </View>
-                ) : null}
+                  {isHoursRow
+                    ? about.openingHours?.map((hour) => (
+                        <View key={hour.id} style={styles.hoursRow}>
+                          <Text style={styles.hoursDay}>{hour.day}</Text>
+                          <Text style={styles.hoursValue}>{hour.hours}</Text>
+                        </View>
+                      ))
+                    : null}
+                </BusinessExpandableInfoRow>
               </View>
             );
           })}
