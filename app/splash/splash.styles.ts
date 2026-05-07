@@ -7,6 +7,7 @@ export const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
+    backgroundColor: "#dde9e2",
     justifyContent: "center",
     overflow: "hidden",
   },
