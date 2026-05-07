@@ -1,6 +1,7 @@
 import React from "react";
-import { Pressable, Text, View } from "react-native";
-import { styles } from "./AppDatePickerCard.styles";
+import { Pressable, Text } from "react-native";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { createStyles } from "./AppDatePickerCard.styles";
 
 type Props = {
   day: string; // e.g. "Mon"
@@ -19,6 +20,9 @@ export default function AppDatePickerCard({
   disabled,
   onPress,
 }: Props) {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
   return (
     <Pressable
       onPress={onPress}

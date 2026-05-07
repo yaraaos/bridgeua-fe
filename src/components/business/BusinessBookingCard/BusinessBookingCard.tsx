@@ -1,9 +1,9 @@
-import { colors } from "@/src/constants/colors";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React from "react";
 import { Pressable, Text, View } from "react-native";
-import { styles } from "./BusinessBookingCard.styles";
+import { createStyles } from "./BusinessBookingCard.styles";
 
 type Props = {
   businessId: string;
@@ -41,6 +41,9 @@ const BOOKING_ACTIONS: BookingAction[] = [
 ];
 
 export default function BusinessBookingCard({ businessId }: Props) {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
   const handlePress = (pathname: BookingAction["pathname"]) => {
     router.push({
       pathname,

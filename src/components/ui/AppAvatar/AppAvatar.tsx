@@ -1,6 +1,7 @@
 import React from "react";
 import { Image, Text, View } from "react-native";
-import { styles } from "./AppAvatar.styles";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { createStyles } from "./AppAvatar.styles";
 
 type Props = {
   imageUrl?: string;
@@ -9,6 +10,9 @@ type Props = {
 };
 
 export default function AppAvatar({ imageUrl, name, size = "md" }: Props) {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
   const initial = name.trim().charAt(0).toUpperCase();
 
   return (

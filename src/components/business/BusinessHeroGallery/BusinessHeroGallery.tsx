@@ -1,7 +1,8 @@
+import { useAppTheme } from "@/src/hooks/useAppTheme";
 import type { BusinessDetailsImage } from "@/src/features/businesses/types/business.types";
 import React from "react";
 import { Image, Pressable, Text, View } from "react-native";
-import { styles } from "./BusinessHeroGallery.styles";
+import { createStyles } from "./BusinessHeroGallery.styles";
 
 type Props = {
   images: BusinessDetailsImage[];
@@ -14,6 +15,9 @@ export default function BusinessHeroGallery({
   onPressImage,
   onPressViewAll,
 }: Props) {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
   const mainImage = images[0];
   const sideImages = images.slice(1, 3);
 

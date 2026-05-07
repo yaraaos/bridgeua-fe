@@ -1,6 +1,7 @@
 import React from "react";
 import { Pressable, Text, View } from "react-native";
-import { styles } from "./ReviewFilters.styles";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { createStyles } from "./ReviewFilters.styles";
 
 export type ReviewFilterOption =
   | "Most relevant"
@@ -21,6 +22,9 @@ const FILTERS: ReviewFilterOption[] = [
 ];
 
 export default function ReviewFilters({ value, onChange }: Props) {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
   return (
     <View style={styles.filtersRow}>
       {FILTERS.map((filter) => {

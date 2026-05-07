@@ -5,6 +5,7 @@ import ReviewFilters, {
 import ImageGalleryModal from "@/src/components/common/ImageGalleryModal/ImageGalleryModal";
 import AppButton from "@/src/components/ui/AppButton/AppButton";
 import AppEmptyState from "@/src/components/ui/AppEmptyState";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
 import type {
   BusinessDetailsReview,
   BusinessReviewPhoto,
@@ -12,7 +13,7 @@ import type {
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import { Image, Pressable, ScrollView, Text, View } from "react-native";
-import { styles } from "./BusinessReviewsList.styles";
+import { createStyles } from "./BusinessReviewsList.styles";
 
 type Props = {
   reviews: BusinessDetailsReview[];
@@ -29,6 +30,9 @@ export default function BusinessReviewsList({
   focusedReviewId,
   onPressWriteReview,
 }: Props) {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
   const [activeFilter, setActiveFilter] =
     useState<ReviewFilterOption>("Most relevant");
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(

@@ -3,7 +3,8 @@
 import React from "react";
 import { Image, Pressable, Text, View } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
-import styles from "./ServiceSelectionCard.styles";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { createStyles } from "./ServiceSelectionCard.styles";
 
 export type ServiceSelectionCardProps = {
   title: string;
@@ -24,6 +25,9 @@ export default function ServiceSelectionCard({
   subtitle,
   onPress,
 }: ServiceSelectionCardProps) {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
   return (
     <Pressable
       onPress={onPress}
@@ -34,7 +38,7 @@ export default function ServiceSelectionCard({
           <Image source={{ uri: imageUrl }} style={styles.image} />
         ) : (
           <View style={styles.imagePlaceholder}>
-            <MaterialIcons name="spa" size={20} color="#1F5E46" />
+            <MaterialIcons name="spa" size={20} color={colors.primaryGreen} />
           </View>
         )}
 
@@ -51,7 +55,7 @@ export default function ServiceSelectionCard({
       </View>
 
       <View style={[styles.checkCircle, isSelected && styles.checkCircleSelected]}>
-        {isSelected && <MaterialIcons name="check" size={14} color="#FFFFFF" />}
+        {isSelected && <MaterialIcons name="check" size={14} color={colors.white} />}
       </View>
     </Pressable>
   );

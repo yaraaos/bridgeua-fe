@@ -1,12 +1,13 @@
 import ImageGalleryModal from "@/src/components/common/ImageGalleryModal/ImageGalleryModal";
 import AppEmptyState from "@/src/components/ui/AppEmptyState";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
 import type {
     BusinessDetailsImage,
     BusinessReviewPhoto,
 } from "@/src/features/businesses/types/business.types";
 import React, { useMemo, useState } from "react";
 import { Image, Pressable, Text, View } from "react-native";
-import { styles } from "./BusinessGalleryGrid.styles";
+import { createStyles } from "./BusinessGalleryGrid.styles";
 
 type PhotoTab = "all" | "business" | "reviews";
 
@@ -31,6 +32,9 @@ export default function BusinessGalleryGrid({
   businessPhotos,
   reviewPhotos,
 }: Props) {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
   const [activeTab, setActiveTab] = useState<PhotoTab>("all");
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(
     null,

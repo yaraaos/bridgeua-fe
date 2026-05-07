@@ -1,11 +1,11 @@
 import ImageGalleryModal from "@/src/components/common/ImageGalleryModal/ImageGalleryModal";
 import AppAvatar from "@/src/components/ui/AppAvatar";
-import { colors } from "@/src/constants/colors";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
 import type { BusinessDetailsReview } from "@/src/features/businesses/types/business.types";
 import { MaterialIcons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import { Image, Pressable, ScrollView, Text, View } from "react-native";
-import { styles } from "./ReviewCard.styles";
+import { createStyles } from "./ReviewCard.styles";
 
 type Props = {
   review: BusinessDetailsReview;
@@ -18,6 +18,9 @@ export default function ReviewCard({
   variant = "default",
   onPressMore,
 }: Props) {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
   const isPreview = variant === "preview";
   const showPhotos = !isPreview && !!review.photos?.length;
 

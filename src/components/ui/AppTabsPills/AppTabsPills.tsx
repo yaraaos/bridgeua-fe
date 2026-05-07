@@ -1,6 +1,7 @@
 import React from "react";
 import { Pressable, Text, View } from "react-native";
-import { styles } from "./AppTabsPills.styles";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { createStyles } from "./AppTabsPills.styles";
 
 export type AppTabPillItem<T extends string> = {
   label: string;
@@ -18,6 +19,9 @@ export default function AppTabsPills<T extends string>({
   activeTab,
   onChange,
 }: Props<T>) {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
   return (
     <View style={styles.container}>
       {tabs.map((tab) => {

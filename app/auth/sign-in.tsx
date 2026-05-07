@@ -1,3 +1,5 @@
+import { AppColors } from "@/src/constants/colors";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { router } from "expo-router";
 import { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
@@ -7,7 +9,6 @@ import AppInput from "../../src/components/ui/AppInput/AppInput";
 import AppLoader from "../../src/components/ui/AppLoader/AppLoader";
 import AppPasswordInput from "../../src/components/ui/AppPasswordInput/AppPasswordInput";
 import AppScreen from "../../src/components/ui/AppScreen/AppScreen";
-import { colors } from "../../src/constants/colors";
 import { useSignIn } from "../../src/features/auth/hooks/useSignIn";
 import {
   SignInFormErrors,
@@ -15,6 +16,9 @@ import {
 } from "../../src/features/auth/validation/signIn.validation";
 
 export default function SignInScreen() {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
   const { submitSignIn, isLoading, apiError, setApiError } = useSignIn();
 
   const [email, setEmail] = useState("");
@@ -22,19 +26,13 @@ export default function SignInScreen() {
   const [errors, setErrors] = useState<SignInFormErrors>({});
 
   const handleSubmit = async () => {
-    const values = {
-      email,
-      password,
-    };
-
+    const values = { email, password };
     const validationErrors = validateSignInForm(values);
 
     setErrors(validationErrors);
     setApiError(null);
 
-    if (Object.keys(validationErrors).length > 0) {
-      return;
-    }
+    if (Object.keys(validationErrors).length > 0) return;
 
     const response = await submitSignIn(values);
 
@@ -115,50 +113,52 @@ export default function SignInScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    justifyContent: "center",
-    gap: 24,
-  },
+function createStyles(colors: AppColors) {
+  return StyleSheet.create({
+    container: {
+      justifyContent: "center",
+      gap: 24,
+    },
 
-  header: {
-    alignItems: "center",
-  },
+    header: {
+      alignItems: "center",
+    },
 
-  title: {
-    fontSize: 34,
-    fontWeight: "800",
-    color: colors.primaryGreen,
-  },
+    title: {
+      fontSize: 34,
+      fontWeight: "800",
+      color: colors.primaryGreen,
+    },
 
-  form: {
-    gap: 12,
-  },
+    form: {
+      gap: 12,
+    },
 
-  forgot: {
-    color: colors.primaryGreen,
-    fontSize: 13,
-  },
+    forgot: {
+      color: colors.primaryGreen,
+      fontSize: 13,
+    },
 
-  errorText: {
-    marginTop: 4,
-    fontSize: 12,
-    color: "#D92D20",
-  },
+    errorText: {
+      marginTop: 4,
+      fontSize: 12,
+      color: colors.error,
+    },
 
-  apiError: {
-    fontSize: 13,
-    color: "#D92D20",
-    textAlign: "center",
-  },
+    apiError: {
+      fontSize: 13,
+      color: colors.error,
+      textAlign: "center",
+    },
 
-  footer: {
-    textAlign: "center",
-    color: colors.textSecondary,
-  },
+    footer: {
+      textAlign: "center",
+      color: colors.textSecondary,
+    },
 
-  link: {
-    color: colors.primaryGreen,
-    fontWeight: "700",
-  },
-});
+    link: {
+      color: colors.primaryGreen,
+      fontWeight: "700",
+    },
+  });
+}

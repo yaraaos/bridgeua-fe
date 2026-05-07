@@ -1,9 +1,10 @@
 import ReviewCard from "@/src/components/business/ReviewCard";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
 import type { BusinessDetailsReview } from "@/src/features/businesses/types/business.types";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { FlatList, Pressable, Text, View } from "react-native";
-import { styles } from "./BusinessTopReviews.styles";
+import { createStyles } from "./BusinessTopReviews.styles";
 
 type Props = {
   reviews: BusinessDetailsReview[];
@@ -17,6 +18,9 @@ export default function BusinessTopReviews({
   onPressViewAll,
   onPressReviewMore,
 }: Props) {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
   const previewReviews = reviews.slice(0, 6);
 
   if (previewReviews.length === 0) {

@@ -3,12 +3,21 @@
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { getNavigationTheme } from "@/src/theme/navigationTheme";
 
-export default function RootLayout() {
+function RootLayoutInner() {
+  const { colors, isDark } = useAppTheme();
+  const navTheme = getNavigationTheme(colors, isDark);
+
   return (
-    <SafeAreaProvider>
-      <StatusBar style="dark" />
-      <Stack screenOptions={{ headerShown: false }}>
+    <>
+      <StatusBar style={isDark ? "light" : "dark"} />
+      <Stack
+        screenOptions={{ headerShown: false }}
+        // @ts-ignore — theme prop is valid for NavigationContainer used internally
+        theme={navTheme}
+      >
         <Stack.Screen name="index" />
         <Stack.Screen name="(tabs)" />
         <Stack.Screen
@@ -20,6 +29,14 @@ export default function RootLayout() {
           }}
         />
       </Stack>
+    </>
+  );
+}
+
+export default function RootLayout() {
+  return (
+    <SafeAreaProvider>
+      <RootLayoutInner />
     </SafeAreaProvider>
   );
 }

@@ -1,8 +1,8 @@
-import { colors } from "@/src/constants/colors";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Pressable, View } from "react-native";
-import { styles } from "./AppCheckBox.styles";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { createStyles } from "./AppCheckBox.styles";
 
 type Props = {
   value: boolean;
@@ -11,6 +11,9 @@ type Props = {
 };
 
 export default function AppCheckBox({ value, onChange, disabled }: Props) {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
   const handlePress = () => {
     if (disabled) return;
     onChange?.(!value);

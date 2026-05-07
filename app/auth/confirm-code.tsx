@@ -1,3 +1,5 @@
+import { AppColors } from "@/src/constants/colors";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
@@ -6,7 +8,6 @@ import AppButton from "../../src/components/ui/AppButton/AppButton";
 import AppLoader from "../../src/components/ui/AppLoader/AppLoader";
 import AppOtpInput from "../../src/components/ui/AppOtpInput/AppOtpInput";
 import AppScreen from "../../src/components/ui/AppScreen/AppScreen";
-import { colors } from "../../src/constants/colors";
 import { useConfirmCode } from "../../src/features/auth/hooks/useConfirmCode";
 import { useResendCode } from "../../src/features/auth/hooks/useResendCode";
 
@@ -25,6 +26,9 @@ function maskEmail(email: string) {
 }
 
 export default function ConfirmCodeScreen() {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
   const params = useLocalSearchParams<{ email?: string }>();
   const email = params.email ?? "";
 
@@ -40,9 +44,7 @@ export default function ConfirmCodeScreen() {
   const canResend = timer === 0 && !isResending;
 
   useEffect(() => {
-    if (timer === 0) {
-      return;
-    }
+    if (timer === 0) return;
 
     const intervalId = setInterval(() => {
       setTimer((current) => Math.max(current - 1, 0));
@@ -63,10 +65,7 @@ export default function ConfirmCodeScreen() {
       return;
     }
 
-    const response = await submitConfirmCode({
-      email,
-      code,
-    });
+    const response = await submitConfirmCode({ email, code });
 
     if (response?.verified) {
       router.replace("/auth/success");
@@ -74,9 +73,7 @@ export default function ConfirmCodeScreen() {
   };
 
   const handleResend = async () => {
-    if (!canResend) {
-      return;
-    }
+    if (!canResend) return;
 
     const response = await submitResendCode({ email });
 
@@ -134,56 +131,58 @@ export default function ConfirmCodeScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    justifyContent: "space-between",
-    paddingVertical: 40,
-  },
+function createStyles(colors: AppColors) {
+  return StyleSheet.create({
+    container: {
+      justifyContent: "space-between",
+      paddingVertical: 40,
+    },
 
-  center: {
-    alignItems: "center",
-    marginTop: 80,
-  },
+    center: {
+      alignItems: "center",
+      marginTop: 80,
+    },
 
-  title: {
-    fontSize: 24,
-    fontWeight: "800",
-    color: colors.textPrimary,
-    textAlign: "center",
-  },
+    title: {
+      fontSize: 24,
+      fontWeight: "800",
+      color: colors.textPrimary,
+      textAlign: "center",
+    },
 
-  subtitle: {
-    marginTop: 8,
-    textAlign: "center",
-    color: colors.textSecondary,
-  },
+    subtitle: {
+      marginTop: 8,
+      textAlign: "center",
+      color: colors.textSecondary,
+    },
 
-  otpWrap: {
-    marginTop: 24,
-  },
+    otpWrap: {
+      marginTop: 24,
+    },
 
-  errorText: {
-    marginTop: 12,
-    fontSize: 13,
-    color: "#D92D20",
-    textAlign: "center",
-  },
+    errorText: {
+      marginTop: 12,
+      fontSize: 13,
+      color: colors.error,
+      textAlign: "center",
+    },
 
-  resendButton: {
-    marginTop: 20,
-  },
+    resendButton: {
+      marginTop: 20,
+    },
 
-  resendText: {
-    color: colors.primaryGreen,
-    fontSize: 13,
-    fontWeight: "700",
-  },
+    resendText: {
+      color: colors.primaryGreen,
+      fontSize: 13,
+      fontWeight: "700",
+    },
 
-  resendMuted: {
-    color: colors.textMuted,
-  },
+    resendMuted: {
+      color: colors.textMuted,
+    },
 
-  actions: {
-    gap: 12,
-  },
-});
+    actions: {
+      gap: 12,
+    },
+  });
+}

@@ -1,4 +1,4 @@
-import { colors } from "@/src/constants/colors";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useMemo, useState } from "react";
 import {
@@ -117,6 +117,8 @@ export default function ImageGalleryModal({
   overlayText = "View all",
   onPressOverlay,
 }: Props) {
+  const { colors } = useAppTheme();
+
   return (
     <Modal
       visible={visible}

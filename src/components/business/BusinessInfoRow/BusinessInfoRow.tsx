@@ -1,7 +1,8 @@
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Text, View } from "react-native";
-import { styles } from "./BusinessInfoRow.styles";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { createStyles } from "./BusinessInfoRow.styles";
 
 type Props = {
   icon: keyof typeof Ionicons.glyphMap;
@@ -10,6 +11,9 @@ type Props = {
 };
 
 export default function BusinessInfoRow({ icon, title, value }: Props) {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
   return (
     <View style={styles.container}>
       <View style={styles.iconBox}>
