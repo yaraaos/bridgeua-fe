@@ -55,4 +55,7 @@ export const styles = StyleSheet.create({
   containerLast: {
     borderBottomWidth: 0,
   },
+  statusText: {
+    fontWeight: "700",
+  },
 });

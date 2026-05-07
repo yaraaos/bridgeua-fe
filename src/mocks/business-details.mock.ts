@@ -18,6 +18,7 @@ export const businessDetailsMock: BusinessDetails[] = [
       title: "About Zelenska Beauty",
       description:
         "At Zelenska Beauty, we believe beauty is personal. Our team of expert stylists and beauty specialists is dedicated to helping you look and feel your absolute best.",
+      isOpen: true,
       openingHours: [
         { id: "monday", day: "Monday", hours: "10:00 – 21:00" },
         { id: "tuesday", day: "Tuesday", hours: "10:00 – 21:00" },
@@ -41,7 +42,7 @@ export const businessDetailsMock: BusinessDetails[] = [
           id: "contact-hours",
           type: "hours",
           label: "Opening hours",
-          value: "Open now · Closes at 21:00",
+          value: "Closes at 21:00",
         },
         {
           id: "contact-phone",

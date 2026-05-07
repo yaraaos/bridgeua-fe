@@ -23,6 +23,8 @@ type Props = {
   numberOfLines?: number;
   children?: ReactNode;
   isLast?: boolean;
+  statusText?: string;
+  statusColor?: string;
 };
 
 export default function BusinessExpandableInfoRow({
@@ -34,6 +36,8 @@ export default function BusinessExpandableInfoRow({
   numberOfLines,
   children,
   isLast = false,
+  statusText,
+  statusColor,
 }: Props) {
   const isExpandable = Boolean(onToggle);
 
@@ -77,7 +81,17 @@ export default function BusinessExpandableInfoRow({
             numberOfLines={numberOfLines}
             ellipsizeMode="tail"
           >
-            {value}
+            {statusText ? (
+              <>
+                <Text style={[styles.statusText, { color: statusColor }]}>
+                  {statusText}
+                </Text>
+
+                <Text>{value ? ` · ${value}` : ""}</Text>
+              </>
+            ) : (
+              value
+            )}
           </Text>
         </View>
 

@@ -98,6 +98,20 @@ export default function BusinessAboutSection({ businessName, about }: Props) {
                   icon={contactIcons[item.type]}
                   title={item.label}
                   value={item.value}
+                  statusText={
+                    isHoursRow
+                      ? about.isOpen
+                        ? "Open now"
+                        : "Closed"
+                      : undefined
+                  }
+                  statusColor={
+                    isHoursRow
+                      ? about.isOpen
+                        ? "#2E9E5B"
+                        : "#D9534F"
+                      : undefined
+                  }
                   isLast={isLastItem}
                   isExpanded={
                     isHoursRow

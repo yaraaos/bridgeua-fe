@@ -30,6 +30,7 @@ export type BusinessAboutFeature = {
 export type BusinessAbout = {
   title?: string;
   description: string;
+  isOpen?: boolean;
   openingHours?: BusinessOpeningHour[];
   contacts: BusinessContactItem[];
   features: BusinessAboutFeature[];
