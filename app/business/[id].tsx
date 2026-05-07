@@ -14,11 +14,12 @@ import BusinessGalleryGrid from "@/src/components/business/BusinessGalleryGrid";
 import ImageGalleryModal from "@/src/components/common/ImageGalleryModal/ImageGalleryModal";
 import ScreenHeader from "@/src/components/common/ScreenHeader/ScreenHeader";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
-import { colors } from "@/src/constants/colors";
+import { AppColors } from "@/src/constants/colors";
 import { DISCOVERY_GRADIENT } from "@/src/constants/gradients";
 import { spacing } from "@/src/constants/spacing";
 import { useBusinessDetails } from "@/src/features/businesses/hooks/useBusiness";
 import { useReviews } from "@/src/features/reviews/hooks/useReviews";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -31,6 +32,9 @@ import {
 } from "react-native";
 
 export default function BusinessDetailsScreen() {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
   const { id } = useLocalSearchParams<{ id: string }>();
   const { business, isLoading } = useBusinessDetails(id);
   const {
@@ -226,27 +230,29 @@ export default function BusinessDetailsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 0,
-    backgroundColor: colors.background,
-  },
-  center: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: colors.background,
-  },
-  galleryCollapseWrap: {
-    overflow: "hidden",
-    backgroundColor: colors.background,
-  },
-  stickyTabsWrap: {
-    backgroundColor: colors.background,
-    zIndex: 10,
-  },
-  scrollContent: {
-    paddingBottom: spacing.xl,
-  },
-});
+function createStyles(colors: AppColors) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      padding: 0,
+      backgroundColor: colors.background,
+    },
+    center: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: colors.background,
+    },
+    galleryCollapseWrap: {
+      overflow: "hidden",
+      backgroundColor: colors.background,
+    },
+    stickyTabsWrap: {
+      backgroundColor: colors.background,
+      zIndex: 10,
+    },
+    scrollContent: {
+      paddingBottom: spacing.xl,
+    },
+  });
+}

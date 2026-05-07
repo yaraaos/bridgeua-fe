@@ -1,9 +1,9 @@
-import { colors } from "@/src/constants/colors";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
 import type { BusinessRatingBreakdownItem } from "@/src/features/businesses/types/business.types";
 import { MaterialIcons } from "@expo/vector-icons";
 import React from "react";
 import { Text, View } from "react-native";
-import { styles } from "./BusinessRatingSummary.styles";
+import { createStyles } from "./BusinessRatingSummary.styles";
 
 type Props = {
   rating: number;
@@ -16,6 +16,9 @@ export default function BusinessRatingSummary({
   reviewCount,
   breakdown,
 }: Props) {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
   if (reviewCount === 0) {
     return null;
   }

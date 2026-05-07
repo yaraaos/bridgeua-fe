@@ -1,8 +1,8 @@
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Pressable, Text, View } from "react-native";
-import { colors } from "@/src/constants/colors";
-import { styles } from "./AppSelect.styles";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { createStyles } from "./AppSelect.styles";
 
 type Props = {
   label?: string;
@@ -21,6 +21,9 @@ export default function AppSelect({
   error,
   onPress,
 }: Props) {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
   const displayValue = value || placeholder;
 
   return (

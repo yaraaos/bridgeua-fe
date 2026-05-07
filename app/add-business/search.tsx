@@ -4,10 +4,14 @@ import AppButton from "../../src/components/ui/AppButton/AppButton";
 import AppInput from "../../src/components/ui/AppInput/AppInput";
 import AppScreen from "../../src/components/ui/AppScreen/AppScreen";
 import BusinessCard from "../../src/components/business/BusinessCard/BusinessCard";
-import { colors } from "../../src/constants/colors";
-import { businessesMock } from "../../src/mocks/businesses.mock";
+import { AppColors } from "@/src/constants/colors";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { businessesMock } from "@/src/mocks/businesses.mock";
 
 export default function AddBusinessSearchScreen() {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
   return (
     <AppScreen>
       <Text style={styles.title}>Add a business</Text>
@@ -27,16 +31,18 @@ export default function AddBusinessSearchScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  title: {
-    fontSize: 30,
-    fontWeight: "800",
-    color: colors.textPrimary,
-    marginBottom: 12,
-  },
-  helper: {
-    marginTop: 16,
-    color: colors.textSecondary,
-    fontWeight: "600",
-  },
-});
+function createStyles(colors: AppColors) {
+  return StyleSheet.create({
+    title: {
+      fontSize: 30,
+      fontWeight: "800",
+      color: colors.textPrimary,
+      marginBottom: 12,
+    },
+    helper: {
+      marginTop: 16,
+      color: colors.textSecondary,
+      fontWeight: "600",
+    },
+  });
+}

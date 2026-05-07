@@ -1,6 +1,7 @@
 import React from "react";
 import { View } from "react-native";
-import { styles } from "./OnboardingDots.styles";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { createStyles } from "./OnboardingDots.styles";
 
 type Props = {
   total: number;
@@ -8,6 +9,9 @@ type Props = {
 };
 
 export default function OnboardingDots({ total, activeIndex }: Props) {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
   return (
     <View style={styles.container}>
       {Array.from({ length: total }).map((_, index) => (

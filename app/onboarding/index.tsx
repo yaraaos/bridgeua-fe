@@ -6,10 +6,14 @@ import OnboardingSlide from "../../src/components/onboarding/OnboardingSlide/Onb
 import AppButton from "../../src/components/ui/AppButton/AppButton";
 import AppScreen from "../../src/components/ui/AppScreen/AppScreen";
 import AppText from "../../src/components/ui/AppText/AppText";
-import { colors } from "../../src/constants/colors";
-import { ONBOARDING_SLIDES } from "../../src/mocks/onboarding.mock";
+import { AppColors } from "@/src/constants/colors";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { ONBOARDING_SLIDES } from "@/src/mocks/onboarding.mock";
 
 export default function OnboardingScreen() {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
   const { width } = useWindowDimensions();
   const listRef = useRef<FlatList>(null);
   const [activeIndex, setActiveIndex] = useState(0);
@@ -67,33 +71,32 @@ export default function OnboardingScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingHorizontal: 0,
-    paddingBottom: 32,
-    backgroundColor: "transparent",
-  },
-  footer: {
-    paddingHorizontal: 18,
-    paddingBottom: 24,
-    gap: 50,
-  },
-
-  textWrap: {
-    gap: 8,
-  },
-
-  title: {
-    fontSize: 28,
-    lineHeight: 38,
-    fontWeight: "800",
-    color: colors.textPrimary,
-  },
-
-  subtitle: {
-    fontSize: 16,
-    lineHeight: 24,
-    color: colors.textSecondary,
-  },
-});
+function createStyles(colors: AppColors) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      paddingHorizontal: 0,
+      paddingBottom: 32,
+      backgroundColor: "transparent",
+    },
+    footer: {
+      paddingHorizontal: 18,
+      paddingBottom: 24,
+      gap: 50,
+    },
+    textWrap: {
+      gap: 8,
+    },
+    title: {
+      fontSize: 28,
+      lineHeight: 38,
+      fontWeight: "800",
+      color: colors.textPrimary,
+    },
+    subtitle: {
+      fontSize: 16,
+      lineHeight: 24,
+      color: colors.textSecondary,
+    },
+  });
+}

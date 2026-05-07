@@ -8,7 +8,8 @@ import { AccountTypeSwitch } from "../../src/components/auth";
 import AppButton from "../../src/components/ui/AppButton/AppButton";
 import AppInput from "../../src/components/ui/AppInput/AppInput";
 import AppScreen from "../../src/components/ui/AppScreen/AppScreen";
-import { colors } from "../../src/constants/colors";
+import { AppColors } from "@/src/constants/colors";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
 
 const CATEGORIES = [
   "Beauty",
@@ -21,6 +22,9 @@ const CATEGORIES = [
 ];
 
 export default function SignUpBusinessScreen() {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
   const [agree, setAgree] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>("Beauty");
 
@@ -142,7 +146,7 @@ export default function SignUpBusinessScreen() {
             </View>
 
             <Text style={styles.checkboxText}>
-              I’ve read and agree with the{" "}
+              I&apos;ve read and agree with the{" "}
               <Text style={styles.linkText}>Terms and Conditions</Text> and the{" "}
               <Text style={styles.linkText}>Privacy Policy</Text>.
             </Text>
@@ -170,123 +174,125 @@ export default function SignUpBusinessScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    paddingBottom: 24,
-  },
-  content: {
-    paddingHorizontal: 14,
-    paddingTop: 8,
-  },
-  headerBlock: {
-    alignItems: "center",
-    marginBottom: 18,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: "800",
-    color: colors.primaryGreen,
-    textAlign: "center",
-  },
-  subtitle: {
-    marginTop: 6,
-    fontSize: 13,
-    color: colors.textSecondary,
-    textAlign: "center",
-  },
-  form: {
-    gap: 12,
-  },
-  row: {
-    flexDirection: "row",
-    gap: 10,
-  },
-  half: {
-    flex: 1,
-  },
-  sectionLabel: {
-    fontSize: 13,
-    fontWeight: "700",
-    color: colors.textPrimary,
-    marginBottom: 6,
-  },
-  textarea: {
-    minHeight: 86,
-    textAlignVertical: "top",
-    paddingTop: 14,
-  },
-  categoriesWrap: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-  },
-  categoryChip: {
-    minHeight: 32,
-    paddingHorizontal: 12,
-    borderRadius: 10,
-    backgroundColor: colors.background,
-    borderWidth: 1,
-    borderColor: "#E3E3DD",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  categoryChipActive: {
-    backgroundColor: colors.primaryGreenSoft,
-    borderColor: colors.primaryGreen,
-  },
-  categoryChipText: {
-    fontSize: 12,
-    fontWeight: "600",
-    color: colors.textPrimary,
-  },
-  categoryChipTextActive: {
-    color: colors.primaryGreenDark,
-  },
-  eyeIcon: {
-    position: "absolute",
-    right: 14,
-    top: 17,
-  },
-  checkboxRow: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    gap: 8,
-  },
-  checkbox: {
-    width: 16,
-    height: 16,
-    borderRadius: 4,
-    borderWidth: 1,
-    borderColor: "#BFC7C1",
-    backgroundColor: colors.white,
-    marginTop: 2,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  checkboxChecked: {
-    backgroundColor: colors.primaryGreen,
-    borderColor: colors.primaryGreen,
-  },
-  checkboxText: {
-    flex: 1,
-    fontSize: 11,
-    lineHeight: 15,
-    color: colors.textSecondary,
-  },
-  linkText: {
-    color: colors.textPrimary,
-    fontWeight: "700",
-  },
-  footer: {
-    marginTop: 18,
-    alignItems: "center",
-  },
-  footerText: {
-    fontSize: 12,
-    color: colors.textSecondary,
-  },
-  footerLink: {
-    color: colors.textPrimary,
-    fontWeight: "700",
-  },
-});
+function createStyles(colors: AppColors) {
+  return StyleSheet.create({
+    container: {
+      paddingBottom: 24,
+    },
+    content: {
+      paddingHorizontal: 14,
+      paddingTop: 8,
+    },
+    headerBlock: {
+      alignItems: "center",
+      marginBottom: 18,
+    },
+    title: {
+      fontSize: 32,
+      fontWeight: "800",
+      color: colors.primaryGreen,
+      textAlign: "center",
+    },
+    subtitle: {
+      marginTop: 6,
+      fontSize: 13,
+      color: colors.textSecondary,
+      textAlign: "center",
+    },
+    form: {
+      gap: 12,
+    },
+    row: {
+      flexDirection: "row",
+      gap: 10,
+    },
+    half: {
+      flex: 1,
+    },
+    sectionLabel: {
+      fontSize: 13,
+      fontWeight: "700",
+      color: colors.textPrimary,
+      marginBottom: 6,
+    },
+    textarea: {
+      minHeight: 86,
+      textAlignVertical: "top",
+      paddingTop: 14,
+    },
+    categoriesWrap: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: 8,
+    },
+    categoryChip: {
+      minHeight: 32,
+      paddingHorizontal: 12,
+      borderRadius: 10,
+      backgroundColor: colors.background,
+      borderWidth: 1,
+      borderColor: colors.border,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    categoryChipActive: {
+      backgroundColor: colors.primaryGreenSoft,
+      borderColor: colors.primaryGreen,
+    },
+    categoryChipText: {
+      fontSize: 12,
+      fontWeight: "600",
+      color: colors.textPrimary,
+    },
+    categoryChipTextActive: {
+      color: colors.primaryGreenDark,
+    },
+    eyeIcon: {
+      position: "absolute",
+      right: 14,
+      top: 17,
+    },
+    checkboxRow: {
+      flexDirection: "row",
+      alignItems: "flex-start",
+      gap: 8,
+    },
+    checkbox: {
+      width: 16,
+      height: 16,
+      borderRadius: 4,
+      borderWidth: 1,
+      borderColor: colors.border,
+      backgroundColor: colors.surface,
+      marginTop: 2,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    checkboxChecked: {
+      backgroundColor: colors.primaryGreen,
+      borderColor: colors.primaryGreen,
+    },
+    checkboxText: {
+      flex: 1,
+      fontSize: 11,
+      lineHeight: 15,
+      color: colors.textSecondary,
+    },
+    linkText: {
+      color: colors.textPrimary,
+      fontWeight: "700",
+    },
+    footer: {
+      marginTop: 18,
+      alignItems: "center",
+    },
+    footerText: {
+      fontSize: 12,
+      color: colors.textSecondary,
+    },
+    footerLink: {
+      color: colors.textPrimary,
+      fontWeight: "700",
+    },
+  });
+}

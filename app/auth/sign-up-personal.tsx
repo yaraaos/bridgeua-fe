@@ -8,9 +8,13 @@ import { AccountTypeSwitch } from "../../src/components/auth";
 import AppButton from "../../src/components/ui/AppButton/AppButton";
 import AppInput from "../../src/components/ui/AppInput/AppInput";
 import AppScreen from "../../src/components/ui/AppScreen/AppScreen";
-import { colors } from "../../src/constants/colors";
+import { AppColors } from "@/src/constants/colors";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
 
 export default function SignUpPersonalScreen() {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
   const [agree, setAgree] = useState(false);
 
   return (
@@ -76,7 +80,7 @@ export default function SignUpPersonalScreen() {
             </View>
 
             <Text style={styles.checkboxText}>
-              I’ve read and agree with the{" "}
+              I&apos;ve read and agree with the{" "}
               <Text style={styles.linkText}>Terms and Conditions</Text> and the{" "}
               <Text style={styles.linkText}>Privacy Policy</Text>.
             </Text>
@@ -104,77 +108,79 @@ export default function SignUpPersonalScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    justifyContent: "center",
-  },
-  content: {
-    paddingHorizontal: 14,
-  },
-  headerBlock: {
-    alignItems: "center",
-    marginBottom: 18,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: "800",
-    color: colors.primaryGreen,
-    textAlign: "center",
-  },
-  subtitle: {
-    marginTop: 6,
-    fontSize: 13,
-    color: colors.textSecondary,
-    textAlign: "center",
-  },
-  form: {
-    gap: 12,
-  },
-  eyeIcon: {
-    position: "absolute",
-    right: 14,
-    top: 17,
-  },
-  checkboxRow: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    gap: 8,
-  },
-  checkbox: {
-    width: 16,
-    height: 16,
-    borderRadius: 4,
-    borderWidth: 1,
-    borderColor: "#BFC7C1",
-    backgroundColor: colors.white,
-    marginTop: 2,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  checkboxChecked: {
-    backgroundColor: colors.primaryGreen,
-    borderColor: colors.primaryGreen,
-  },
-  checkboxText: {
-    flex: 1,
-    fontSize: 11,
-    lineHeight: 15,
-    color: colors.textSecondary,
-  },
-  linkText: {
-    color: colors.textPrimary,
-    fontWeight: "700",
-  },
-  footer: {
-    marginTop: 18,
-    alignItems: "center",
-  },
-  footerText: {
-    fontSize: 12,
-    color: colors.textSecondary,
-  },
-  footerLink: {
-    color: colors.textPrimary,
-    fontWeight: "700",
-  },
-});
+function createStyles(colors: AppColors) {
+  return StyleSheet.create({
+    container: {
+      justifyContent: "center",
+    },
+    content: {
+      paddingHorizontal: 14,
+    },
+    headerBlock: {
+      alignItems: "center",
+      marginBottom: 18,
+    },
+    title: {
+      fontSize: 32,
+      fontWeight: "800",
+      color: colors.primaryGreen,
+      textAlign: "center",
+    },
+    subtitle: {
+      marginTop: 6,
+      fontSize: 13,
+      color: colors.textSecondary,
+      textAlign: "center",
+    },
+    form: {
+      gap: 12,
+    },
+    eyeIcon: {
+      position: "absolute",
+      right: 14,
+      top: 17,
+    },
+    checkboxRow: {
+      flexDirection: "row",
+      alignItems: "flex-start",
+      gap: 8,
+    },
+    checkbox: {
+      width: 16,
+      height: 16,
+      borderRadius: 4,
+      borderWidth: 1,
+      borderColor: colors.border,
+      backgroundColor: colors.surface,
+      marginTop: 2,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    checkboxChecked: {
+      backgroundColor: colors.primaryGreen,
+      borderColor: colors.primaryGreen,
+    },
+    checkboxText: {
+      flex: 1,
+      fontSize: 11,
+      lineHeight: 15,
+      color: colors.textSecondary,
+    },
+    linkText: {
+      color: colors.textPrimary,
+      fontWeight: "700",
+    },
+    footer: {
+      marginTop: 18,
+      alignItems: "center",
+    },
+    footerText: {
+      fontSize: 12,
+      color: colors.textSecondary,
+    },
+    footerLink: {
+      color: colors.textPrimary,
+      fontWeight: "700",
+    },
+  });
+}

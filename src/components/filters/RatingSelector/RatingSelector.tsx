@@ -1,9 +1,10 @@
 import React from "react";
 import { Pressable, Text, View } from "react-native";
 
+import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { RATING_OPTIONS } from "@/src/constants/filters";
 import type { RatingOption } from "@/src/store/filter.store";
-import styles from "./RatingSelector.styles";
+import { createStyles } from "./RatingSelector.styles";
 
 type Props = {
   value: RatingOption;
@@ -11,6 +12,9 @@ type Props = {
 };
 
 export default function RatingSelector({ value, onChange }: Props) {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
   return (
     <View>
       <Text style={styles.title}>FILTER BY RATING</Text>

@@ -1,6 +1,5 @@
 import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { useState } from "react";
 import {
   Pressable,
   ScrollView,
@@ -12,9 +11,12 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import AppAvatar from "../../src/components/ui/AppAvatar/AppAvatar";
 import GradientHeader from "../../src/components/ui/GradientHeader/GradientHeader";
-import { colors } from "@/src/constants/colors";
+import { AppColors } from "@/src/constants/colors";
+import { DISCOVERY_GRADIENT } from "@/src/constants/gradients";
 import { radius } from "@/src/constants/radius";
 import { spacing } from "@/src/constants/spacing";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { useAppStore } from "@/src/store/app.store";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -37,6 +39,9 @@ function SettingsRow({
   onPress,
   rightElement,
 }: SettingsRowProps) {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
   return (
     <Pressable
       style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}
@@ -67,6 +72,9 @@ function SettingsSection({
   label: string;
   children: React.ReactNode;
 }) {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
   return (
     <View style={styles.section}>
       <Text style={styles.sectionLabel}>{label}</Text>
@@ -78,13 +86,18 @@ function SettingsSection({
 // ─── Screen ───────────────────────────────────────────────────────────────────
 
 export default function SettingsScreen() {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
   const router = useRouter();
-  const [darkMode, setDarkMode] = useState(false);
+  const themeMode = useAppStore((s) => s.themeMode);
+  const setThemeMode = useAppStore((s) => s.setThemeMode);
+  const darkMode = themeMode === "dark";
 
   return (
     <SafeAreaView style={styles.safeArea} edges={["top"]}>
       {/* Gradient Header */}
-      <GradientHeader>
+      <GradientHeader colors={DISCOVERY_GRADIENT}>
         <Pressable style={styles.backBtn} onPress={() => router.back()}>
           <Feather name="chevron-left" size={28} color={colors.textPrimary} />
         </Pressable>
@@ -176,9 +189,10 @@ export default function SettingsScreen() {
             rightElement={
               <Switch
                 value={darkMode}
-                onValueChange={setDarkMode}
-                trackColor={{ false: colors.border, true: colors.primaryGreen }}
+                onValueChange={(val) => setThemeMode(val ? "dark" : "light")}
+                trackColor={{ false: colors.textMuted, true: colors.primaryGreen }}
                 thumbColor={colors.white}
+                ios_backgroundColor={colors.textMuted}
               />
             }
           />
@@ -235,132 +249,134 @@ export default function SettingsScreen() {
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  backBtn: {
-    alignSelf: "flex-start",
-    marginTop: -8,
-    marginBottom: spacing.sm,
-    marginLeft: -4,
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-  },
-  headerText: {
-    flex: 1,
-    marginRight: spacing.md,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: "800",
-    color: colors.textPrimary,
-    marginBottom: 4,
-  },
-  subtitle: {
-    fontSize: 13,
-    color: colors.textSecondary,
-  },
-  scroll: {
-    flex: 1,
-  },
-  scrollContent: {
-    paddingTop: spacing.lg,
-    paddingBottom: spacing.xl,
-  },
-  section: {
-    paddingHorizontal: spacing.lg,
-    marginBottom: spacing.xl,
-  },
-  sectionLabel: {
-    fontSize: 12,
-    fontWeight: "600",
-    color: colors.textSecondary,
-    marginBottom: spacing.sm,
-    textTransform: "uppercase",
-    letterSpacing: 0.5,
-  },
-  sectionCard: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    borderWidth: 1,
-    borderColor: colors.border,
-    overflow: "hidden",
-  },
-  divider: {
-    height: 1,
-    backgroundColor: colors.border,
-    marginLeft: 56,
-  },
-  row: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: spacing.md,
-    paddingVertical: 14,
-    gap: spacing.md,
-  },
-  rowPressed: {
-    backgroundColor: colors.background,
-  },
-  iconWrap: {
-    width: 36,
-    height: 36,
-    borderRadius: radius.md,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: colors.primaryGreenSoft,
-  },
-  rowContent: {
-    flex: 1,
-  },
-  rowTitle: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: colors.textPrimary,
-    marginBottom: 2,
-  },
-  rowSubtitle: {
-    fontSize: 12,
-    color: colors.textSecondary,
-  },
-  rowRight: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-  },
-  rowValue: {
-    fontSize: 13,
-    color: colors.textSecondary,
-  },
-  logoutBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: spacing.sm,
-    marginHorizontal: spacing.lg,
-    marginBottom: spacing.md,
-    paddingVertical: 14,
-    borderRadius: radius.lg,
-    borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.surface,
-  },
-  logoutPressed: {
-    backgroundColor: colors.background,
-  },
-  logoutText: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: colors.accentOrange,
-  },
-  version: {
-    textAlign: "center",
-    fontSize: 12,
-    color: colors.textMuted,
-    marginBottom: spacing.xl,
-  },
-});
+function createStyles(colors: AppColors) {
+  return StyleSheet.create({
+    safeArea: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    backBtn: {
+      alignSelf: "flex-start",
+      marginTop: -8,
+      marginBottom: spacing.sm,
+      marginLeft: -4,
+    },
+    header: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "flex-start",
+    },
+    headerText: {
+      flex: 1,
+      marginRight: spacing.md,
+    },
+    title: {
+      fontSize: 28,
+      fontWeight: "800",
+      color: colors.textPrimary,
+      marginBottom: 4,
+    },
+    subtitle: {
+      fontSize: 13,
+      color: colors.textSecondary,
+    },
+    scroll: {
+      flex: 1,
+    },
+    scrollContent: {
+      paddingTop: spacing.lg,
+      paddingBottom: spacing.xl,
+    },
+    section: {
+      paddingHorizontal: spacing.lg,
+      marginBottom: spacing.xl,
+    },
+    sectionLabel: {
+      fontSize: 12,
+      fontWeight: "600",
+      color: colors.textSecondary,
+      marginBottom: spacing.sm,
+      textTransform: "uppercase",
+      letterSpacing: 0.5,
+    },
+    sectionCard: {
+      backgroundColor: colors.surface,
+      borderRadius: radius.lg,
+      borderWidth: 1,
+      borderColor: colors.border,
+      overflow: "hidden",
+    },
+    divider: {
+      height: 1,
+      backgroundColor: colors.border,
+      marginLeft: 56,
+    },
+    row: {
+      flexDirection: "row",
+      alignItems: "center",
+      paddingHorizontal: spacing.md,
+      paddingVertical: 14,
+      gap: spacing.md,
+    },
+    rowPressed: {
+      backgroundColor: colors.background,
+    },
+    iconWrap: {
+      width: 36,
+      height: 36,
+      borderRadius: radius.md,
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: colors.primaryGreenSoft,
+    },
+    rowContent: {
+      flex: 1,
+    },
+    rowTitle: {
+      fontSize: 15,
+      fontWeight: "600",
+      color: colors.textPrimary,
+      marginBottom: 2,
+    },
+    rowSubtitle: {
+      fontSize: 12,
+      color: colors.textSecondary,
+    },
+    rowRight: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 4,
+    },
+    rowValue: {
+      fontSize: 13,
+      color: colors.textSecondary,
+    },
+    logoutBtn: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: spacing.sm,
+      marginHorizontal: spacing.lg,
+      marginBottom: spacing.md,
+      paddingVertical: 14,
+      borderRadius: radius.lg,
+      borderWidth: 1,
+      borderColor: colors.border,
+      backgroundColor: colors.surface,
+    },
+    logoutPressed: {
+      backgroundColor: colors.background,
+    },
+    logoutText: {
+      fontSize: 15,
+      fontWeight: "600",
+      color: colors.accentOrange,
+    },
+    version: {
+      textAlign: "center",
+      fontSize: 12,
+      color: colors.textMuted,
+      marginBottom: spacing.xl,
+    },
+  });
+}

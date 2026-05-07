@@ -1,9 +1,9 @@
-import { colors } from "@/src/constants/colors";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { useEffect, useRef } from "react";
 import { Animated, Easing, StyleSheet, View } from "react-native";
 import Svg, { G, Path, Text as SvgText } from "react-native-svg";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { SCREEN_WIDTH, styles, SVG_WIDTH } from "./splash.styles";
 
 const LEFT_PATH =
@@ -13,6 +13,8 @@ const EASING = Easing.bezier(0.4, 0, 0.2, 1);
 const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient);
 
 export default function SplashScreen() {
+  const { colors } = useAppTheme();
+
   const leftX = useRef(new Animated.Value(-SCREEN_WIDTH)).current;
   const rightX = useRef(new Animated.Value(SCREEN_WIDTH)).current;
   const textOpacity = useRef(new Animated.Value(0)).current;
@@ -56,7 +58,7 @@ export default function SplashScreen() {
     ]).start(() => {
       router.replace("/onboarding");
     });
-  }, []);
+  }, );
 
   return (
     <AnimatedLinearGradient

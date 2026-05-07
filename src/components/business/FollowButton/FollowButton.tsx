@@ -1,9 +1,9 @@
 import { useFollowingStore } from "@/src/store/following.store";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Pressable, StyleProp, Text, ViewStyle } from "react-native";
-import { colors } from "../../../constants/colors";
-import { styles } from "./FollowButton.styles";
+import { createStyles } from "./FollowButton.styles";
 
 type FollowButtonProps = {
   businessId: string | number;
@@ -18,6 +18,9 @@ export default function FollowButton({
   variant = "outline",
   style,
 }: FollowButtonProps) {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
   const followedBusinessIds = useFollowingStore(
     (state) => state.followedBusinessIds,
   );

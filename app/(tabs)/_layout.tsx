@@ -1,8 +1,10 @@
 import { Feather } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
-import { colors } from "../../src/constants/colors";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
 
 export default function TabsLayout() {
+  const { colors } = useAppTheme();
+
   return (
     <Tabs
       screenOptions={{
@@ -14,7 +16,7 @@ export default function TabsLayout() {
           paddingTop: 8,
           borderTopWidth: 1,
           borderTopColor: colors.border,
-          backgroundColor: colors.white,
+          backgroundColor: colors.surface,
         },
       }}
     >

@@ -1,6 +1,7 @@
 import React from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
-import { styles } from "./CategoryScroller.styles";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { createStyles } from "./CategoryScroller.styles";
 
 type Props = {
   categories: string[];
@@ -13,6 +14,9 @@ export default function CategoryScroller({
   selectedCategory,
   onSelectCategory,
 }: Props) {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
   return (
     <View style={styles.wrapper}>
       <ScrollView

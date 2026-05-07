@@ -1,11 +1,12 @@
 import AppButton from "@/src/components/ui/AppButton/AppButton";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
-import { colors } from "@/src/constants/colors";
+import { AppColors } from "@/src/constants/colors";
 import { DISCOVERY_GRADIENT } from "@/src/constants/gradients";
 import { radius } from "@/src/constants/radius";
 import { spacing } from "@/src/constants/spacing";
 import { useBusinessDetails } from "@/src/features/businesses/hooks/useBusiness";
 import { useSubmitReview } from "@/src/features/reviews/hooks/useSubmitReview";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { LinearGradient } from "expo-linear-gradient";
@@ -36,6 +37,9 @@ const MAX_REVIEW_LENGTH = 500;
 const MAX_PHOTOS = 8;
 
 export default function WriteReviewScreen() {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
   const { businessId, rating: initialRating } = useLocalSearchParams<{
     businessId?: string;
     rating?: string;
@@ -294,217 +298,219 @@ export default function WriteReviewScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    padding: 0,
-    backgroundColor: colors.background,
-  },
-  center: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: colors.background,
-  },
-  errorText: {
-    color: colors.textPrimary,
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  header: {
-    height: 56,
-    paddingHorizontal: spacing.lg,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  headerTitle: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: colors.textPrimary,
-  },
-  headerSpacer: {
-    width: 24,
-  },
-  scrollContent: {
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.md,
-  },
-  businessCard: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: spacing.md,
-    borderRadius: radius.xl,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  businessImage: {
-    width: 72,
-    height: 72,
-    borderRadius: radius.lg,
-    backgroundColor: colors.primaryGreenSoft,
-  },
-  businessInfo: {
-    flex: 1,
-    marginLeft: spacing.md,
-  },
-  businessName: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: colors.textPrimary,
-  },
-  businessMeta: {
-    marginTop: spacing.xs,
-    fontSize: 13,
-    color: colors.textSecondary,
-  },
-  businessRatingRow: {
-    marginTop: spacing.xs,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 3,
-  },
-  businessRatingText: {
-    fontSize: 13,
-    fontWeight: "700",
-    color: colors.textPrimary,
-  },
-  card: {
-    marginTop: spacing.md,
-    padding: spacing.lg,
-    borderRadius: radius.xl,
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  label: {
-    fontSize: 13,
-    fontWeight: "700",
-    color: colors.textPrimary,
-  },
-  optional: {
-    fontWeight: "500",
-    color: colors.textMuted,
-  },
-  ratingRow: {
-    marginTop: spacing.md,
-    flexDirection: "row",
-    justifyContent: "center",
-    gap: spacing.md,
-  },
-  ratingLabel: {
-    marginTop: spacing.xs,
-    textAlign: "center",
-    fontSize: 13,
-    fontWeight: "700",
-    color: colors.primaryGreen,
-  },
-  reviewLabel: {
-    marginTop: spacing.xl,
-  },
-  textAreaWrap: {
-    marginTop: spacing.sm,
-    minHeight: 132,
-    borderWidth: 1,
-    borderColor: colors.primaryGreen,
-    borderRadius: radius.md,
-    backgroundColor: colors.white,
-  },
-  textArea: {
-    minHeight: 104,
-    paddingHorizontal: spacing.md,
-    paddingTop: spacing.md,
-    paddingBottom: spacing.sm,
-    fontSize: 14,
-    lineHeight: 20,
-    color: colors.textPrimary,
-  },
-  counter: {
-    paddingRight: spacing.md,
-    paddingBottom: spacing.sm,
-    textAlign: "right",
-    fontSize: 12,
-    color: colors.textMuted,
-  },
-  sectionGap: {
-    marginTop: spacing.xl,
-  },
-  photosRow: {
-    marginTop: spacing.sm,
-    flexDirection: "row",
-    gap: spacing.sm,
-    flexWrap: "wrap",
-  },
-  photoWrap: {
-    width: 74,
-    height: 74,
-  },
-  photo: {
-    width: "100%",
-    height: "100%",
-    borderRadius: radius.md,
-    backgroundColor: colors.primaryGreenSoft,
-  },
-  removePhotoButton: {
-    position: "absolute",
-    top: -6,
-    right: -6,
-    width: 22,
-    height: 22,
-    borderRadius: radius.pill,
-    backgroundColor: colors.white,
-    borderWidth: 1,
-    borderColor: colors.border,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  addPhotoBox: {
-    width: 86,
-    height: 74,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderStyle: "dashed",
-    borderColor: colors.primaryGreenSoft,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: colors.background,
-  },
-  addPhotoText: {
-    marginTop: spacing.xs,
-    fontSize: 12,
-    fontWeight: "600",
-    color: colors.primaryGreen,
-  },
-  tagsWrap: {
-    marginTop: spacing.sm,
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: spacing.sm,
-  },
-  tag: {
-    minHeight: 34,
-    paddingHorizontal: spacing.md,
-    borderRadius: radius.pill,
-    borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.background,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.xs,
-  },
-  tagSelected: {
-    borderColor: colors.primaryGreenSoft,
-    backgroundColor: colors.primaryGreenSoft,
-  },
-  tagText: {
-    fontSize: 12,
-    fontWeight: "600",
-    color: colors.textSecondary,
-  },
-  tagTextSelected: {
-    color: colors.primaryGreen,
-  },
-  submitWrap: {
-    marginTop: spacing.xl,
-  },
-});
+function createStyles(colors: AppColors) {
+  return StyleSheet.create({
+    screen: {
+      flex: 1,
+      padding: 0,
+      backgroundColor: colors.background,
+    },
+    center: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: colors.background,
+    },
+    errorText: {
+      color: colors.textPrimary,
+      fontSize: 16,
+      fontWeight: "600",
+    },
+    header: {
+      height: 56,
+      paddingHorizontal: spacing.lg,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+    },
+    headerTitle: {
+      fontSize: 16,
+      fontWeight: "700",
+      color: colors.textPrimary,
+    },
+    headerSpacer: {
+      width: 24,
+    },
+    scrollContent: {
+      paddingHorizontal: spacing.lg,
+      paddingBottom: spacing.md,
+    },
+    businessCard: {
+      flexDirection: "row",
+      alignItems: "center",
+      padding: spacing.md,
+      borderRadius: radius.xl,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    businessImage: {
+      width: 72,
+      height: 72,
+      borderRadius: radius.lg,
+      backgroundColor: colors.primaryGreenSoft,
+    },
+    businessInfo: {
+      flex: 1,
+      marginLeft: spacing.md,
+    },
+    businessName: {
+      fontSize: 16,
+      fontWeight: "700",
+      color: colors.textPrimary,
+    },
+    businessMeta: {
+      marginTop: spacing.xs,
+      fontSize: 13,
+      color: colors.textSecondary,
+    },
+    businessRatingRow: {
+      marginTop: spacing.xs,
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 3,
+    },
+    businessRatingText: {
+      fontSize: 13,
+      fontWeight: "700",
+      color: colors.textPrimary,
+    },
+    card: {
+      marginTop: spacing.md,
+      padding: spacing.lg,
+      borderRadius: radius.xl,
+      backgroundColor: colors.surface,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    label: {
+      fontSize: 13,
+      fontWeight: "700",
+      color: colors.textPrimary,
+    },
+    optional: {
+      fontWeight: "500",
+      color: colors.textMuted,
+    },
+    ratingRow: {
+      marginTop: spacing.md,
+      flexDirection: "row",
+      justifyContent: "center",
+      gap: spacing.md,
+    },
+    ratingLabel: {
+      marginTop: spacing.xs,
+      textAlign: "center",
+      fontSize: 13,
+      fontWeight: "700",
+      color: colors.primaryGreen,
+    },
+    reviewLabel: {
+      marginTop: spacing.xl,
+    },
+    textAreaWrap: {
+      marginTop: spacing.sm,
+      minHeight: 132,
+      borderWidth: 1,
+      borderColor: colors.primaryGreen,
+      borderRadius: radius.md,
+      backgroundColor: colors.surface,
+    },
+    textArea: {
+      minHeight: 104,
+      paddingHorizontal: spacing.md,
+      paddingTop: spacing.md,
+      paddingBottom: spacing.sm,
+      fontSize: 14,
+      lineHeight: 20,
+      color: colors.textPrimary,
+    },
+    counter: {
+      paddingRight: spacing.md,
+      paddingBottom: spacing.sm,
+      textAlign: "right",
+      fontSize: 12,
+      color: colors.textMuted,
+    },
+    sectionGap: {
+      marginTop: spacing.xl,
+    },
+    photosRow: {
+      marginTop: spacing.sm,
+      flexDirection: "row",
+      gap: spacing.sm,
+      flexWrap: "wrap",
+    },
+    photoWrap: {
+      width: 74,
+      height: 74,
+    },
+    photo: {
+      width: "100%",
+      height: "100%",
+      borderRadius: radius.md,
+      backgroundColor: colors.primaryGreenSoft,
+    },
+    removePhotoButton: {
+      position: "absolute",
+      top: -6,
+      right: -6,
+      width: 22,
+      height: 22,
+      borderRadius: radius.pill,
+      backgroundColor: colors.surface,
+      borderWidth: 1,
+      borderColor: colors.border,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    addPhotoBox: {
+      width: 86,
+      height: 74,
+      borderRadius: radius.md,
+      borderWidth: 1,
+      borderStyle: "dashed",
+      borderColor: colors.primaryGreenSoft,
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: colors.background,
+    },
+    addPhotoText: {
+      marginTop: spacing.xs,
+      fontSize: 12,
+      fontWeight: "600",
+      color: colors.primaryGreen,
+    },
+    tagsWrap: {
+      marginTop: spacing.sm,
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: spacing.sm,
+    },
+    tag: {
+      minHeight: 34,
+      paddingHorizontal: spacing.md,
+      borderRadius: radius.pill,
+      borderWidth: 1,
+      borderColor: colors.border,
+      backgroundColor: colors.background,
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.xs,
+    },
+    tagSelected: {
+      borderColor: colors.primaryGreenSoft,
+      backgroundColor: colors.primaryGreenSoft,
+    },
+    tagText: {
+      fontSize: 12,
+      fontWeight: "600",
+      color: colors.textSecondary,
+    },
+    tagTextSelected: {
+      color: colors.primaryGreen,
+    },
+    submitWrap: {
+      marginTop: spacing.xl,
+    },
+  });
+}

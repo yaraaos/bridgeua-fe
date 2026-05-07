@@ -1,9 +1,10 @@
 import { FollowButton } from "@/src/components/business";
 import { RatingBadge } from "@/src/components/common";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
 import React from "react";
 import { Image, Pressable, Text, View } from "react-native";
-import { Business } from "../../../types/business";
-import { styles } from "./BusinessCard.styles";
+import { Business } from "@/src/types/business";
+import { createStyles } from "./BusinessCard.styles";
 
 type Props = {
   business: Business;
@@ -18,6 +19,9 @@ export default function BusinessCard({
   variant = "default",
   showFollowButton = true,
 }: Props) {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
   return (
     <Pressable
       style={[styles.card, variant === "compact" && styles.cardCompact]}

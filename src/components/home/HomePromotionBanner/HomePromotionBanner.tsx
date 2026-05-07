@@ -1,4 +1,4 @@
-import { colors } from "@/src/constants/colors";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
 import type { HomePromotion } from "@/src/features/promotions/types/promotion.types";
 import { Feather } from "@expo/vector-icons";
 import { useCallback, useEffect, useMemo, useRef } from "react";
@@ -13,7 +13,7 @@ import {
 } from "react-native";
 import {
     HOME_PROMOTION_BANNER_WIDTH,
-    styles,
+    createStyles,
 } from "./HomePromotionBanner.styles";
 
 type Props = {
@@ -31,6 +31,9 @@ export default function HomePromotionBanner({
   onClose,
   onPressPromotion,
 }: Props) {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
   const listRef = useRef<FlatList<HomePromotion>>(null);
   const activeIndexRef = useRef(1);
   const isUserTouchingRef = useRef(false);
