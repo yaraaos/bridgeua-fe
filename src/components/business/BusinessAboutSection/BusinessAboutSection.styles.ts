@@ -76,39 +76,6 @@ export const styles = StyleSheet.create({
   lastExpandableRow: {
     borderBottomWidth: 0,
   },
-  featuresTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: colors.textPrimary,
-    marginBottom: spacing.md,
-  },
-  featuresGrid: {
-    flexDirection: "row",
-    gap: spacing.sm,
-  },
-  featureItem: {
-    flex: 1,
-    alignItems: "center",
-  },
-  featureIconWrap: {
-    width: 36,
-    height: 36,
-    borderRadius: radius.md,
-    backgroundColor: colors.primaryGreenSoft,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: spacing.sm,
-  },
-  featureIcon: {
-    color: colors.primaryGreen,
-  },
-  featureLabel: {
-    fontSize: 13,
-    lineHeight: 18,
-    fontWeight: "500",
-    color: colors.textPrimary,
-    textAlign: "center",
-  },
   chipGrid: {
     flexDirection: "row",
     flexWrap: "wrap",

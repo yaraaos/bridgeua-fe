@@ -8,9 +8,8 @@ import {
 import { colors } from "@/src/constants/colors";
 import type {
     BusinessAbout,
-    BusinessAboutFeature,
     BusinessContactItem,
-    BusinessContactType,
+    BusinessContactType
 } from "@/src/features/businesses/types/business.types";
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
@@ -31,16 +30,6 @@ const contactIcons: Record<
   phone: "call-outline",
   website: "globe-outline",
   instagram: "logo-instagram",
-};
-
-const featureIcons: Record<
-  BusinessAboutFeature["icon"],
-  keyof typeof Ionicons.glyphMap
-> = {
-  shield: "shield-checkmark-outline",
-  leaf: "leaf-outline",
-  heart: "heart-outline",
-  sparkle: "sparkles-outline",
 };
 
 const handlePressContact = async (item: BusinessContactItem) => {
@@ -199,28 +188,6 @@ export default function BusinessAboutSection({ businessName, about }: Props) {
           console.log("Open full recommended by screen");
         }}
       />
-
-      {about.features.length > 0 ? (
-        <View style={styles.card}>
-          <Text style={styles.featuresTitle}>Why clients love us</Text>
-
-          <View style={styles.featuresGrid}>
-            {about.features.map((feature) => (
-              <View key={feature.id} style={styles.featureItem}>
-                <View style={styles.featureIconWrap}>
-                  <Ionicons
-                    name={featureIcons[feature.icon]}
-                    size={18}
-                    style={styles.featureIcon}
-                  />
-                </View>
-
-                <Text style={styles.featureLabel}>{feature.label}</Text>
-              </View>
-            ))}
-          </View>
-        </View>
-      ) : null}
     </>
   );
 }

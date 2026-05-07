@@ -21,12 +21,6 @@ export type BusinessContactItem = {
   actionUrl?: string;
 };
 
-export type BusinessAboutFeature = {
-  id: string;
-  label: string;
-  icon: "shield" | "leaf" | "heart" | "sparkle";
-};
-
 export type BusinessAmenity = {
   id: string;
   label: string;
@@ -56,7 +50,6 @@ export type BusinessAbout = {
   isOpen?: boolean;
   openingHours?: BusinessOpeningHour[];
   contacts: BusinessContactItem[];
-  features: BusinessAboutFeature[];
   languages?: string[];
   amenities?: BusinessAmenity[];
   socialLinks?: BusinessSocialLink[];

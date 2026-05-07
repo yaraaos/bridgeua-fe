@@ -66,28 +66,6 @@ export const businessDetailsMock: BusinessDetails[] = [
           actionUrl: "https://instagram.com/zelenska.beauty",
         },
       ],
-      features: [
-        {
-          id: "feature-experienced",
-          label: "Experienced Professionals",
-          icon: "shield",
-        },
-        {
-          id: "feature-premium",
-          label: "Premium Products",
-          icon: "leaf",
-        },
-        {
-          id: "feature-personalized",
-          label: "Personalized Service",
-          icon: "heart",
-        },
-        {
-          id: "feature-results",
-          label: "Beautiful Results",
-          icon: "sparkle",
-        },
-      ],
       languages: ["Ukrainian", "English", "Spanish"],
 
       amenities: [
