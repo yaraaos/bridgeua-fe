@@ -1,11 +1,48 @@
 import { router } from "expo-router";
+import { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
+
 import AppButton from "../../src/components/ui/AppButton/AppButton";
 import AppInput from "../../src/components/ui/AppInput/AppInput";
+import AppLoader from "../../src/components/ui/AppLoader/AppLoader";
+import AppPasswordInput from "../../src/components/ui/AppPasswordInput/AppPasswordInput";
 import AppScreen from "../../src/components/ui/AppScreen/AppScreen";
 import { colors } from "../../src/constants/colors";
+import { useSignIn } from "../../src/features/auth/hooks/useSignIn";
+import {
+  SignInFormErrors,
+  validateSignInForm,
+} from "../../src/features/auth/validation/signIn.validation";
 
 export default function SignInScreen() {
+  const { submitSignIn, isLoading, apiError, setApiError } = useSignIn();
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [errors, setErrors] = useState<SignInFormErrors>({});
+
+  const handleSubmit = async () => {
+    const values = {
+      email,
+      password,
+    };
+
+    const validationErrors = validateSignInForm(values);
+
+    setErrors(validationErrors);
+    setApiError(null);
+
+    if (Object.keys(validationErrors).length > 0) {
+      return;
+    }
+
+    const response = await submitSignIn(values);
+
+    if (response) {
+      router.replace("/(tabs)/home");
+    }
+  };
+
   return (
     <AppScreen style={styles.container}>
       <View style={styles.header}>
@@ -13,18 +50,65 @@ export default function SignInScreen() {
       </View>
 
       <View style={styles.form}>
-        <AppInput placeholder="Email address" />
-        <AppInput placeholder="Password" secureTextEntry />
-        <Text style={styles.forgot}>Forgot password?</Text>
-        <AppButton
-          title="Login"
-          onPress={() => router.replace("/(tabs)/home")}
-        />
+        <View>
+          <AppInput
+            placeholder="Email address"
+            value={email}
+            onChangeText={(value) => {
+              setEmail(value);
+              setErrors((current) => ({ ...current, email: undefined }));
+              setApiError(null);
+            }}
+            autoCapitalize="none"
+            keyboardType="email-address"
+            error={Boolean(errors.email)}
+            disabled={isLoading}
+          />
+          {errors.email ? (
+            <Text style={styles.errorText}>{errors.email}</Text>
+          ) : null}
+        </View>
+
+        <View>
+          <AppPasswordInput
+            placeholder="Password"
+            value={password}
+            onChangeText={(value) => {
+              setPassword(value);
+              setErrors((current) => ({ ...current, password: undefined }));
+              setApiError(null);
+            }}
+            error={Boolean(errors.password)}
+            disabled={isLoading}
+          />
+          {errors.password ? (
+            <Text style={styles.errorText}>{errors.password}</Text>
+          ) : null}
+        </View>
+
+        <Text
+          style={styles.forgot}
+          onPress={() => router.push("/auth/forgot-password")}
+        >
+          Forgot password?
+        </Text>
+
+        {apiError ? <Text style={styles.apiError}>{apiError}</Text> : null}
+
+        {isLoading ? (
+          <AppLoader />
+        ) : (
+          <AppButton title="Login" onPress={handleSubmit} />
+        )}
       </View>
 
       <Text style={styles.footer}>
-        <Text onPress={() => router.push("/auth/sign-up-personal")}>
-          Not a member? Register now
+        Not a member?{" "}
+        <Text
+          style={styles.link}
+          onPress={() => router.push("/auth/sign-up-personal")}
+        >
+          Register now
         </Text>
       </Text>
     </AppScreen>
@@ -36,25 +120,43 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     gap: 24,
   },
+
   header: {
     alignItems: "center",
   },
+
   title: {
     fontSize: 34,
     fontWeight: "800",
     color: colors.primaryGreen,
   },
+
   form: {
     gap: 12,
   },
+
   forgot: {
     color: colors.primaryGreen,
     fontSize: 13,
   },
+
+  errorText: {
+    marginTop: 4,
+    fontSize: 12,
+    color: "#D92D20",
+  },
+
+  apiError: {
+    fontSize: 13,
+    color: "#D92D20",
+    textAlign: "center",
+  },
+
   footer: {
     textAlign: "center",
     color: colors.textSecondary,
   },
+
   link: {
     color: colors.primaryGreen,
     fontWeight: "700",
