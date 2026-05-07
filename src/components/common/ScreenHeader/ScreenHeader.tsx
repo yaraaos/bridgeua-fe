@@ -6,12 +6,12 @@ import {
 } from "@expo/vector-icons";
 import React from "react";
 import { Image, Pressable, Text, View } from "react-native";
-import { colors } from "../../../constants/colors";
-import { LocationOption } from "../../../constants/locations";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { LocationOption } from "@/src/constants/locations";
 import AppInput from "../../ui/AppInput/AppInput";
 import GradientHeader from "../../ui/GradientHeader/GradientHeader";
 import { LocationSelector } from "../index";
-import { styles } from "./ScreenHeader.styles";
+import { createStyles } from "./ScreenHeader.styles";
 
 type ActionType = "map" | "filter" | "add";
 
@@ -83,6 +83,9 @@ export default function ScreenHeader({
   rightSlot,
   onPressShare,
 }: Props) {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
   const hasSubtitle = !!subtitleLabel || !!subtitleValue;
   const showLocationSelector =
     !!locationOptions && !!onSelectLocationOption && !!onRequestNearby;

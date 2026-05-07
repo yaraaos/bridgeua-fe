@@ -7,9 +7,9 @@ import {
     TouchableWithoutFeedback,
     View,
 } from "react-native";
-import { colors } from "../../../constants/colors";
-import { LocationOption } from "../../../constants/locations";
-import { styles } from "./LocationSelector.styles";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { LocationOption } from "@/src/constants/locations";
+import { createStyles } from "./LocationSelector.styles";
 
 type Props = {
   label?: string;
@@ -30,6 +30,9 @@ export default function LocationSelector({
   subtitleLabel = "Location",
   showChevron = true,
 }: Props) {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
   const triggerRef = useRef<View>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [dropdownPosition, setDropdownPosition] = useState({

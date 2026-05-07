@@ -1,15 +1,19 @@
 import FollowButton from "@/src/components/business/FollowButton/FollowButton";
 import { RatingBadge } from "@/src/components/common";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
 import type { FollowingFeedCardItem } from "@/src/features/following/types/following.types";
 import { router } from "expo-router";
 import { Image, Pressable, Text, View } from "react-native";
-import { styles } from "./FollowingFeedCard.styles";
+import { createStyles } from "./FollowingFeedCard.styles";
 
 type FollowingFeedCardProps = {
   item: FollowingFeedCardItem;
 };
 
 export default function FollowingFeedCard({ item }: FollowingFeedCardProps) {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
   return (
     <Pressable
       style={styles.feedCard}

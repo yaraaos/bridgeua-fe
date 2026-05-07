@@ -1,6 +1,7 @@
 import React from "react";
 import { Pressable, Text } from "react-native";
-import { styles } from "./AppTimeSlot.styles";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { createStyles } from "./AppTimeSlot.styles";
 
 type Props = {
   label: string; // e.g. "09:00"
@@ -15,6 +16,9 @@ export default function AppTimeSlot({
   disabled,
   onPress,
 }: Props) {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
   return (
     <Pressable
       onPress={onPress}

@@ -1,10 +1,10 @@
 import React from "react";
 import { Pressable, Text, TextInput, View } from "react-native";
 
-import { colors } from "@/src/constants/colors";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { DISTANCE_OPTIONS } from "@/src/constants/filters";
 import type { DistanceOption } from "@/src/store/filter.store";
-import styles from "./DistanceSelector.styles";
+import { createStyles } from "./DistanceSelector.styles";
 
 type Props = {
   value: DistanceOption;
@@ -19,6 +19,9 @@ export default function DistanceSelector({
   onChange,
   onChangeCustom,
 }: Props) {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
   return (
     <View>
       <Text style={styles.title}>FILTER BY DISTANCE</Text>

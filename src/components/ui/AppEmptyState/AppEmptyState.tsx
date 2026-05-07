@@ -1,6 +1,6 @@
 import { Text, View } from "react-native";
-
-import { styles } from "./AppEmptyState.styles";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { createStyles } from "./AppEmptyState.styles";
 
 type Props = {
   title: string;
@@ -8,6 +8,9 @@ type Props = {
 };
 
 export default function AppEmptyState({ title, description }: Props) {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{title}</Text>

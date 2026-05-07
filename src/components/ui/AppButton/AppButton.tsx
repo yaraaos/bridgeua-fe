@@ -1,6 +1,7 @@
 import React from "react";
 import { Pressable, Text } from "react-native";
-import { styles } from "./AppButton.styles";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { createStyles } from "./AppButton.styles";
 
 type Props = {
   title: string;
@@ -15,6 +16,9 @@ export default function AppButton({
   variant = "primary",
   disabled = false,
 }: Props) {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
   return (
     <Pressable
       onPress={disabled ? undefined : onPress}

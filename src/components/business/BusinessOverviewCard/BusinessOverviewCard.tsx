@@ -1,14 +1,18 @@
 import BusinessInfoRow from "@/src/components/business/BusinessInfoRow";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
 import type { BusinessDetails } from "@/src/features/businesses/types/business.types";
 import React from "react";
 import { Text, View } from "react-native";
-import { styles } from "./BusinessOverviewCard.styles";
+import { createStyles } from "./BusinessOverviewCard.styles";
 
 type Props = {
   business: BusinessDetails;
 };
 
 export default function BusinessOverviewInfoCard({ business }: Props) {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
   const hoursValue = business.isOpen
     ? `Open now · Closes at ${business.closesAt}`
     : "Closed now";

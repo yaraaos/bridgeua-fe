@@ -2,9 +2,13 @@ import { StyleSheet, Text, View } from "react-native";
 import AppButton from "../../src/components/ui/AppButton/AppButton";
 import AppInput from "../../src/components/ui/AppInput/AppInput";
 import AppScreen from "../../src/components/ui/AppScreen/AppScreen";
-import { colors } from "../../src/constants/colors";
+import { AppColors } from "@/src/constants/colors";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
 
 export default function AddBusinessFormScreen() {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
   return (
     <AppScreen scroll>
       <Text style={styles.title}>Add a business</Text>
@@ -29,20 +33,22 @@ export default function AddBusinessFormScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  title: {
-    fontSize: 30,
-    fontWeight: "800",
-    color: colors.textPrimary,
-    marginTop: 8,
-  },
-  subtitle: {
-    color: colors.textSecondary,
-    marginTop: 6,
-    marginBottom: 20,
-  },
-  form: {
-    gap: 12,
-    marginBottom: 24,
-  },
-});
+function createStyles(colors: AppColors) {
+  return StyleSheet.create({
+    title: {
+      fontSize: 30,
+      fontWeight: "800",
+      color: colors.textPrimary,
+      marginTop: 8,
+    },
+    subtitle: {
+      color: colors.textSecondary,
+      marginTop: 6,
+      marginBottom: 20,
+    },
+    form: {
+      gap: 12,
+      marginBottom: 24,
+    },
+  });
+}

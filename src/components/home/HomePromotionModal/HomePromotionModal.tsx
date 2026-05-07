@@ -1,9 +1,9 @@
 import { Feather } from "@expo/vector-icons";
 import { Image, Modal, Pressable, Text, View } from "react-native";
 
-import { colors } from "@/src/constants/colors";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
 import type { HomePromotion } from "@/src/features/promotions/types/promotion.types";
-import { styles } from "./HomePromotionModal.styles";
+import { createStyles } from "./HomePromotionModal.styles";
 
 type Props = {
   visible: boolean;
@@ -18,6 +18,9 @@ export default function HomePromotionModal({
   onClose,
   onPressCta,
 }: Props) {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
   if (!promotion) {
     return null;
   }

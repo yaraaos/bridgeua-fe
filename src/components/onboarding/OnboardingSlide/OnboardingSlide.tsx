@@ -1,10 +1,11 @@
 import AppText from "@/src/components/ui/AppText/AppText";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { ImageBackground, View } from "react-native";
-import type { OnboardingSlideItem } from "../../../mocks/onboarding.mock";
+import type { OnboardingSlideItem } from "@/src/mocks/onboarding.mock";
 import OnboardingDots from "../OnboardingDots";
-import { styles } from "./OnboardingSlide.styles";
+import { createStyles } from "./OnboardingSlide.styles";
 
 type Props = {
   slide: OnboardingSlideItem;
@@ -17,6 +18,9 @@ export default function OnboardingSlide({
   totalSlides,
   activeIndex,
 }: Props) {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
   return (
     <View style={styles.container}>
       <View style={styles.brandWrap}>

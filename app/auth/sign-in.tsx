@@ -3,9 +3,13 @@ import { StyleSheet, Text, View } from "react-native";
 import AppButton from "../../src/components/ui/AppButton/AppButton";
 import AppInput from "../../src/components/ui/AppInput/AppInput";
 import AppScreen from "../../src/components/ui/AppScreen/AppScreen";
-import { colors } from "../../src/constants/colors";
+import { AppColors } from "@/src/constants/colors";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
 
 export default function SignInScreen() {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
   return (
     <AppScreen style={styles.container}>
       <View style={styles.header}>
@@ -31,32 +35,34 @@ export default function SignInScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    justifyContent: "center",
-    gap: 24,
-  },
-  header: {
-    alignItems: "center",
-  },
-  title: {
-    fontSize: 34,
-    fontWeight: "800",
-    color: colors.primaryGreen,
-  },
-  form: {
-    gap: 12,
-  },
-  forgot: {
-    color: colors.primaryGreen,
-    fontSize: 13,
-  },
-  footer: {
-    textAlign: "center",
-    color: colors.textSecondary,
-  },
-  link: {
-    color: colors.primaryGreen,
-    fontWeight: "700",
-  },
-});
+function createStyles(colors: AppColors) {
+  return StyleSheet.create({
+    container: {
+      justifyContent: "center",
+      gap: 24,
+    },
+    header: {
+      alignItems: "center",
+    },
+    title: {
+      fontSize: 34,
+      fontWeight: "800",
+      color: colors.primaryGreen,
+    },
+    form: {
+      gap: 12,
+    },
+    forgot: {
+      color: colors.primaryGreen,
+      fontSize: 13,
+    },
+    footer: {
+      textAlign: "center",
+      color: colors.textSecondary,
+    },
+    link: {
+      color: colors.primaryGreen,
+      fontWeight: "700",
+    },
+  });
+}

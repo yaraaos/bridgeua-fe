@@ -2,9 +2,13 @@ import { router } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
 import AppButton from "../../src/components/ui/AppButton/AppButton";
 import AppScreen from "../../src/components/ui/AppScreen/AppScreen";
-import { colors } from "../../src/constants/colors";
+import { AppColors } from "@/src/constants/colors";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
 
 export default function ConfirmCodeScreen() {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
   return (
     <AppScreen style={styles.container}>
       <View style={styles.center}>
@@ -27,39 +31,41 @@ export default function ConfirmCodeScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    justifyContent: "space-between",
-    paddingVertical: 40,
-  },
-  center: {
-    alignItems: "center",
-    marginTop: 80,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "800",
-    color: colors.textPrimary,
-  },
-  subtitle: {
-    marginTop: 8,
-    textAlign: "center",
-    color: colors.textSecondary,
-  },
-  row: {
-    flexDirection: "row",
-    gap: 12,
-    marginTop: 24,
-  },
-  box: {
-    width: 52,
-    height: 52,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.white,
-  },
-  actions: {
-    gap: 12,
-  },
-});
+function createStyles(colors: AppColors) {
+  return StyleSheet.create({
+    container: {
+      justifyContent: "space-between",
+      paddingVertical: 40,
+    },
+    center: {
+      alignItems: "center",
+      marginTop: 80,
+    },
+    title: {
+      fontSize: 24,
+      fontWeight: "800",
+      color: colors.textPrimary,
+    },
+    subtitle: {
+      marginTop: 8,
+      textAlign: "center",
+      color: colors.textSecondary,
+    },
+    row: {
+      flexDirection: "row",
+      gap: 12,
+      marginTop: 24,
+    },
+    box: {
+      width: 52,
+      height: 52,
+      borderRadius: 12,
+      borderWidth: 1,
+      borderColor: colors.border,
+      backgroundColor: colors.surface,
+    },
+    actions: {
+      gap: 12,
+    },
+  });
+}

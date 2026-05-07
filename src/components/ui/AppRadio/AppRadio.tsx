@@ -1,6 +1,7 @@
 import React from "react";
 import { Pressable, View } from "react-native";
-import { styles } from "./AppRadio.styles";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { createStyles } from "./AppRadio.styles";
 
 type Props = {
   selected: boolean;
@@ -9,6 +10,9 @@ type Props = {
 };
 
 export default function AppRadio({ selected, onPress, disabled }: Props) {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
   return (
     <Pressable onPress={onPress} disabled={disabled}>
       <View

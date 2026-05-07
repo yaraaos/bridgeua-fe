@@ -1,8 +1,9 @@
+import { useAppTheme } from "@/src/hooks/useAppTheme";
 import type { BusinessDetailsService } from "@/src/features/businesses/types/business.types";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Pressable, Text, View } from "react-native";
-import { styles } from "./BusinessServicesList.styles";
+import { createStyles } from "./BusinessServicesList.styles";
 
 type Props = {
   services: BusinessDetailsService[];
@@ -13,6 +14,9 @@ export default function BusinessServicesList({
   services,
   onPressService,
 }: Props) {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
   if (services.length === 0) {
     return (
       <View style={styles.emptyContainer}>

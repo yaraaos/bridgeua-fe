@@ -24,8 +24,9 @@ import FilterOptionList from "../../src/components/filters/FilterOptionList/Filt
 import FilterSidebar from "../../src/components/filters/FilterSidebar/FilterSidebar";
 import RatingSelector from "../../src/components/filters/RatingSelector/RatingSelector";
 import AppButton from "../../src/components/ui/AppButton/AppButton";
-import { colors } from "../../src/constants/colors";
-import { useFilterStore } from "../../src/store/filter.store";
+import { AppColors } from "@/src/constants/colors";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { useFilterStore } from "@/src/store/filter.store";
 
 type FilterTab = "sort" | "cuisines" | "ratings" | "distance";
 
@@ -65,6 +66,9 @@ const CUISINE_OPTIONS = [
 ];
 
 export default function FilterModalScreen() {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
   const insets = useSafeAreaInsets();
   const SCREEN_HEIGHT = Dimensions.get("window").height;
   const [activeTab, setActiveTab] = useState<FilterTab>("sort");
@@ -251,82 +255,84 @@ export default function FilterModalScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  root: {
-    flex: 1,
-    justifyContent: "flex-end",
-    backgroundColor: "transparent",
-  },
-  backdrop: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0, 0, 0, 0.68)",
-  },
-  sheet: {
-    height: "72%",
-    backgroundColor: colors.white,
-    borderTopLeftRadius: 28,
-    borderTopRightRadius: 28,
-    overflow: "hidden",
-  },
-  handle: {
-    alignSelf: "center",
-    width: 46,
-    height: 5,
-    borderRadius: 999,
-    backgroundColor: "#D7D7D2",
-    marginTop: 10,
-    marginBottom: 6,
-  },
-  header: {
-    minHeight: 64,
-    paddingHorizontal: 24,
-    paddingBottom: 12,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: "800",
-    color: colors.textPrimary,
-  },
-  closeButton: {
-    width: 28,
-    height: 28,
-    borderRadius: 999,
-    backgroundColor: colors.background,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  content: {
-    flex: 1,
-    flexDirection: "row",
-  },
-  rightPanel: {
-    flex: 1,
-    paddingHorizontal: 16,
-    paddingTop: 16,
-  },
-  footer: {
-    minHeight: 70,
-    paddingHorizontal: 24,
-    paddingTop: 14,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: 16,
-  },
-  clearText: {
-    fontSize: 15,
-    paddingHorizontal: 24,
-    fontWeight: "500",
-    color: colors.accentOrange,
-  },
-  applyWrap: {
-    width: 136,
-  },
-});
+function createStyles(colors: AppColors) {
+  return StyleSheet.create({
+    root: {
+      flex: 1,
+      justifyContent: "flex-end",
+      backgroundColor: "transparent",
+    },
+    backdrop: {
+      ...StyleSheet.absoluteFillObject,
+      backgroundColor: "rgba(0, 0, 0, 0.68)",
+    },
+    sheet: {
+      height: "72%",
+      backgroundColor: colors.surface,
+      borderTopLeftRadius: 28,
+      borderTopRightRadius: 28,
+      overflow: "hidden",
+    },
+    handle: {
+      alignSelf: "center",
+      width: 46,
+      height: 5,
+      borderRadius: 999,
+      backgroundColor: colors.border,
+      marginTop: 10,
+      marginBottom: 6,
+    },
+    header: {
+      minHeight: 64,
+      paddingHorizontal: 24,
+      paddingBottom: 12,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+    },
+    headerTitle: {
+      fontSize: 20,
+      fontWeight: "800",
+      color: colors.textPrimary,
+    },
+    closeButton: {
+      width: 28,
+      height: 28,
+      borderRadius: 999,
+      backgroundColor: colors.background,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    content: {
+      flex: 1,
+      flexDirection: "row",
+    },
+    rightPanel: {
+      flex: 1,
+      paddingHorizontal: 16,
+      paddingTop: 16,
+    },
+    footer: {
+      minHeight: 70,
+      paddingHorizontal: 24,
+      paddingTop: 14,
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      gap: 16,
+    },
+    clearText: {
+      fontSize: 15,
+      paddingHorizontal: 24,
+      fontWeight: "500",
+      color: colors.accentOrange,
+    },
+    applyWrap: {
+      width: 136,
+    },
+  });
+}
