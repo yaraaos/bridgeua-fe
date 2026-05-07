@@ -1,4 +1,3 @@
-import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import React, { useRef, useState } from "react";
 import { FlatList, StyleSheet, View, useWindowDimensions } from "react-native";
@@ -30,7 +29,7 @@ export default function OnboardingScreen() {
   };
 
   return (
-    <LinearGradient colors={["#2b803a32", "#FFFFFF"]} style={{ flex: 1 }}>
+    <View style={styles.screen}>
       <AppScreen style={styles.container}>
         <FlatList
           ref={listRef}
@@ -63,7 +62,7 @@ export default function OnboardingScreen() {
           <AppButton title={activeSlide.buttonLabel} onPress={handleNext} />
         </View>
       </AppScreen>
-    </LinearGradient>
+    </View>
   );
 }
 
@@ -73,6 +72,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 0,
     paddingBottom: 32,
     backgroundColor: "transparent",
+  },
+  screen: {
+    flex: 1,
+    backgroundColor: "#dde9e2",
   },
   footer: {
     paddingHorizontal: 18,
