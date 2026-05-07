@@ -14,3 +14,16 @@ export type SignInResponse = {
   accessToken: string;
   refreshToken?: string;
 };
+
+export type RegisterPersonalPayload = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+};
+
+export type RegisterResponse = {
+  userId: string;
+  email: string;
+  verificationRequired: boolean;
+};

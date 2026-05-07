@@ -1,4 +1,8 @@
-import type { SignInPayload, SignInResponse } from "../types/auth.types";
+import type {
+    RegisterPersonalPayload,
+    RegisterResponse,
+    SignInPayload, SignInResponse,
+} from "../types/auth.types";
 
 export async function signIn(payload: SignInPayload): Promise<SignInResponse> {
   // TODO: Replace with real BE request when endpoint is ready.
@@ -16,5 +20,22 @@ export async function signIn(payload: SignInPayload): Promise<SignInResponse> {
     },
     accessToken: "mock-access-token",
     refreshToken: "mock-refresh-token",
+  };
+}
+
+export async function registerPersonal(
+  payload: RegisterPersonalPayload,
+): Promise<RegisterResponse> {
+  // TODO: Replace with real BE request when endpoint is ready.
+  await new Promise((resolve) => setTimeout(resolve, 800));
+
+  if (payload.email === "taken@test.com") {
+    throw new Error("Email is already registered");
+  }
+
+  return {
+    userId: "user-1",
+    email: payload.email,
+    verificationRequired: true,
   };
 }
