@@ -1,3 +1,6 @@
+import { AppColors } from "@/src/constants/colors";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { ONBOARDING_SLIDES } from "@/src/mocks/onboarding.mock";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import React, { useRef, useState } from "react";
@@ -6,9 +9,6 @@ import OnboardingSlide from "../../src/components/onboarding/OnboardingSlide/Onb
 import AppButton from "../../src/components/ui/AppButton/AppButton";
 import AppScreen from "../../src/components/ui/AppScreen/AppScreen";
 import AppText from "../../src/components/ui/AppText/AppText";
-import { AppColors } from "@/src/constants/colors";
-import { useAppTheme } from "@/src/hooks/useAppTheme";
-import { ONBOARDING_SLIDES } from "@/src/mocks/onboarding.mock";
 
 export default function OnboardingScreen() {
   const { colors, isDark } = useAppTheme();
@@ -81,6 +81,10 @@ function createStyles(colors: AppColors) {
       paddingHorizontal: 0,
       paddingBottom: 32,
       backgroundColor: "transparent",
+    },
+    screen: {
+      flex: 1,
+      backgroundColor: "#dde9e2",
     },
     footer: {
       paddingHorizontal: 18,
