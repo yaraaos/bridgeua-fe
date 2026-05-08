@@ -21,6 +21,7 @@ type Props = {
   reviewPhotos: BusinessReviewPhoto[];
   onPressWriteReview?: (rating?: number) => void;
   focusedReviewId?: string | null;
+  onClearFocusedReview?: () => void;
 };
 
 export default function BusinessReviewsList({
@@ -28,6 +29,7 @@ export default function BusinessReviewsList({
   reviewCount,
   reviewPhotos,
   focusedReviewId,
+  onClearFocusedReview,
   onPressWriteReview,
 }: Props) {
   const { colors } = useAppTheme();
@@ -130,7 +132,13 @@ export default function BusinessReviewsList({
         </View>
       ) : null}
 
-      <ReviewFilters value={activeFilter} onChange={setActiveFilter} />
+      <ReviewFilters
+        value={activeFilter}
+        onChange={(nextFilter) => {
+          setActiveFilter(nextFilter);
+          onClearFocusedReview?.();
+        }}
+      />
 
       <View style={styles.listHeader}>
         <Text style={styles.sectionTitle}>All reviews</Text>

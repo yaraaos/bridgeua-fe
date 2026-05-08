@@ -40,9 +40,10 @@ export function createStyles(colors: AppColors) {
       alignItems: "center",
     },
     reviewDate: {
-      marginTop: 2,
-      fontSize: 12,
+      marginLeft: spacing.sm,
+      fontSize: 11,
       color: colors.textSecondary,
+      transform: [{ translateY: -7 }],
     },
     text: {
       marginTop: spacing.md,

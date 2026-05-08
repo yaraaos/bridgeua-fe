@@ -224,6 +224,7 @@ export default function BusinessDetailsScreen() {
                 }
                 reviewPhotos={business.reviewPhotos}
                 focusedReviewId={focusedReviewId}
+                onClearFocusedReview={() => setFocusedReviewId(null)}
                 onPressWriteReview={(rating) =>
                   router.push({
                     pathname: "/business/write-review",
