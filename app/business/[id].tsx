@@ -48,7 +48,6 @@ export default function BusinessDetailsScreen() {
   const {
     reviews,
     reviewCount,
-    isLoading: areReviewsLoading,
     refresh: refreshReviews,
   } = useReviews({
     businessId: id,
@@ -58,12 +57,14 @@ export default function BusinessDetailsScreen() {
     if (tab === "reviews") {
       setActiveTab("reviews");
       refreshReviews();
+      return;
     }
 
     if (tab === "photos") {
       setActiveTab("photos");
     }
-  }, [tab, refreshReviews]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tab]);
 
   const scrollY = useRef(new Animated.Value(0)).current;
   const scrollViewRef = useRef<ScrollView>(null);
