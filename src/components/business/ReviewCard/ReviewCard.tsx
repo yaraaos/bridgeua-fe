@@ -1,9 +1,8 @@
-import ImageGalleryModal from "@/src/components/common/ImageGalleryModal/ImageGalleryModal";
 import AppAvatar from "@/src/components/ui/AppAvatar";
-import { useAppTheme } from "@/src/hooks/useAppTheme";
 import type { BusinessDetailsReview } from "@/src/features/businesses/types/business.types";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { MaterialIcons } from "@expo/vector-icons";
-import React, { useState } from "react";
+import { router } from "expo-router";
 import { Image, Pressable, ScrollView, Text, View } from "react-native";
 import { createStyles } from "./ReviewCard.styles";
 
@@ -24,10 +23,17 @@ export default function ReviewCard({
   const isPreview = variant === "preview";
   const showPhotos = !isPreview && !!review.photos?.length;
 
-  const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(
-    null,
-  );
-
+  const openReviewPhotoViewer = (index: number) => {
+    router.push({
+      pathname: "/modal/image-viewer",
+      params: {
+        images: JSON.stringify(
+          (review.photos ?? []).map(({ id, url }) => ({ id, url })),
+        ),
+        initialIndex: String(index),
+      },
+    });
+  };
   return (
     <View style={[styles.container, isPreview && styles.containerPreview]}>
       <View style={styles.header}>
@@ -78,7 +84,7 @@ export default function ReviewCard({
           {review.photos?.map((photo, index) => (
             <Pressable
               key={photo.id}
-              onPress={() => setSelectedPhotoIndex(index)}
+              onPress={() => openReviewPhotoViewer(index)}
               style={styles.photoItem}
             >
               <Image source={{ uri: photo.url }} style={styles.reviewPhoto} />
@@ -102,13 +108,6 @@ export default function ReviewCard({
           <Text style={styles.moreText}>More</Text>
         </Pressable>
       ) : null}
-
-      <ImageGalleryModal
-        images={review.photos ?? []}
-        visible={selectedPhotoIndex !== null}
-        initialIndex={selectedPhotoIndex ?? 0}
-        onClose={() => setSelectedPhotoIndex(null)}
-      />
     </View>
   );
 }
