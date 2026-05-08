@@ -35,22 +35,35 @@ export default function BusinessDetailsScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
 
-  const { id, tab } = useLocalSearchParams<{ id: string; tab?: string }>();
-  useEffect(() => {
-    if (tab === "photos") {
-      setActiveTab("photos");
-    }
-  }, [tab]);
+  const { id, tab } = useLocalSearchParams<{
+    id?: string;
+    tab?: string;
+  }>();
+
+  const [activeTab, setActiveTab] = useState<BusinessDetailsTab>("overview");
+  const [focusedReviewId, setFocusedReviewId] = useState<string | null>(null);
 
   const { business, isLoading } = useBusinessDetails(id);
+
   const {
     reviews,
     reviewCount,
     isLoading: areReviewsLoading,
+    refresh: refreshReviews,
   } = useReviews({
     businessId: id,
   });
-  const [activeTab, setActiveTab] = useState<BusinessDetailsTab>("overview");
+
+  useEffect(() => {
+    if (tab === "reviews") {
+      setActiveTab("reviews");
+      refreshReviews();
+    }
+
+    if (tab === "photos") {
+      setActiveTab("photos");
+    }
+  }, [tab, refreshReviews]);
 
   const scrollY = useRef(new Animated.Value(0)).current;
   const scrollViewRef = useRef<ScrollView>(null);
@@ -73,8 +86,6 @@ export default function BusinessDetailsScreen() {
     scrollY.setValue(0);
     setActiveTab(tab);
   };
-
-  const [focusedReviewId, setFocusedReviewId] = useState<string | null>(null);
 
   if (isLoading) {
     return (

@@ -114,7 +114,17 @@ export default function WriteReviewScreen() {
     if (!submittedReview) return;
 
     Alert.alert("Review submitted", "Thank you!", [
-      { text: "Done", onPress: () => router.back() },
+      {
+        text: "Done",
+        onPress: () =>
+          router.replace({
+            pathname: "/business/[id]",
+            params: {
+              id: business.id,
+              tab: "reviews",
+            },
+          }),
+      },
     ]);
   };
 

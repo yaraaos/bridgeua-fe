@@ -6,6 +6,8 @@ import type {
   SubmitReviewPayload,
 } from "../types/review.types";
 
+let submittedReviewsMock: Review[] = [];
+
 export const getReviews = async ({
   businessId,
   page = 1,
@@ -23,11 +25,17 @@ export const getReviews = async ({
     };
   }
 
-  let reviews: Review[] = business.reviews.map((review) => ({
+  const mockReviews: Review[] = business.reviews.map((review) => ({
     ...review,
     businessId,
-    createdAt: new Date().toISOString(),
   }));
+
+  let reviews: Review[] = [
+    ...submittedReviewsMock.filter(
+      (review) => review.businessId === businessId,
+    ),
+    ...mockReviews,
+  ];
 
   if (rating) {
     reviews = reviews.filter((review) => review.rating === rating);
@@ -64,6 +72,8 @@ export const submitReview = async (
   };
 
   console.log("API POST /reviews", payload);
+
+  submittedReviewsMock = [newReview, ...submittedReviewsMock];
 
   return Promise.resolve(newReview);
 };
