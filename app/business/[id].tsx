@@ -107,11 +107,7 @@ export default function BusinessDetailsScreen() {
   const heroPhotos =
     business.images.length > 0 ? business.images : business.reviewPhotos;
 
-  const submittedReviewPhotos = reviews.flatMap(
-    (review) => review.photos ?? [],
-  );
-
-  const allReviewPhotos = [...submittedReviewPhotos, ...business.reviewPhotos];
+  const allReviewPhotos = reviews.flatMap((review) => review.photos ?? []);
 
   const openImageViewer = (
     index: number,
