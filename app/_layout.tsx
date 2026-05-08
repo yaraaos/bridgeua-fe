@@ -1,10 +1,10 @@
 //app/_layout.tsx
 
+import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { getNavigationTheme } from "@/src/theme/navigationTheme";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { useAppTheme } from "@/src/hooks/useAppTheme";
-import { getNavigationTheme } from "@/src/theme/navigationTheme";
 
 function RootLayoutInner() {
   const { colors, isDark } = useAppTheme();
@@ -25,6 +25,14 @@ function RootLayoutInner() {
           options={{
             presentation: "transparentModal",
             animation: "none",
+            contentStyle: { backgroundColor: "transparent" },
+          }}
+        />
+        <Stack.Screen
+          name="modal/image-viewer"
+          options={{
+            presentation: "transparentModal",
+            animation: "fade",
             contentStyle: { backgroundColor: "transparent" },
           }}
         />

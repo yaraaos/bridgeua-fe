@@ -12,7 +12,6 @@ import {
   type BusinessDetailsTab,
 } from "@/src/components/business";
 import BusinessGalleryGrid from "@/src/components/business/BusinessGalleryGrid";
-import ImageGalleryModal from "@/src/components/common/ImageGalleryModal/ImageGalleryModal";
 import ScreenHeader from "@/src/components/common/ScreenHeader/ScreenHeader";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
 import { AppColors } from "@/src/constants/colors";
@@ -36,7 +35,13 @@ export default function BusinessDetailsScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
 
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id, tab } = useLocalSearchParams<{ id: string; tab?: string }>();
+  useEffect(() => {
+    if (tab === "photos") {
+      setActiveTab("photos");
+    }
+  }, [tab]);
+
   const { business, isLoading } = useBusinessDetails(id);
   const {
     reviews,
@@ -69,10 +74,6 @@ export default function BusinessDetailsScreen() {
     setActiveTab(tab);
   };
 
-  const [selectedHeroImageIndex, setSelectedHeroImageIndex] = useState<
-    number | null
-  >(null);
-
   const [focusedReviewId, setFocusedReviewId] = useState<string | null>(null);
 
   if (isLoading) {
@@ -93,6 +94,29 @@ export default function BusinessDetailsScreen() {
 
   const heroPhotos =
     business.images.length > 0 ? business.images : business.reviewPhotos;
+
+  const openImageViewer = (
+    index: number,
+    options?: {
+      overlayIndex?: number;
+      overlayText?: string;
+      businessId?: string;
+    },
+  ) => {
+    router.push({
+      pathname: "/modal/image-viewer",
+      params: {
+        images: JSON.stringify(heroPhotos.map(({ id, url }) => ({ id, url }))),
+        initialIndex: String(index),
+        overlayIndex:
+          options?.overlayIndex !== undefined
+            ? String(options.overlayIndex)
+            : undefined,
+        overlayText: options?.overlayText,
+        businessId: options?.businessId,
+      },
+    });
+  };
 
   return (
     <AppScreen withTopInset={false} style={styles.container}>
@@ -129,10 +153,15 @@ export default function BusinessDetailsScreen() {
             <BusinessHeroGallery
               images={heroPhotos}
               onPressImage={(imageId) => {
-                const imageIndex = business.images.findIndex(
+                const imageIndex = heroPhotos.findIndex(
                   (image) => image.id === imageId,
                 );
-                setSelectedHeroImageIndex(imageIndex >= 0 ? imageIndex : 0);
+
+                openImageViewer(imageIndex >= 0 ? imageIndex : 0, {
+                  overlayIndex: heroPhotos.length - 1,
+                  overlayText: "View all",
+                  businessId: business.id,
+                });
               }}
               onPressViewAll={() => handleChangeTab("photos")}
             />
@@ -222,18 +251,6 @@ export default function BusinessDetailsScreen() {
           ) : null}
         </Animated.View>
       </Animated.ScrollView>
-      <ImageGalleryModal
-        images={heroPhotos}
-        visible={selectedHeroImageIndex !== null}
-        initialIndex={selectedHeroImageIndex ?? 0}
-        overlayIndex={2}
-        overlayText="View all"
-        onPressOverlay={() => {
-          setSelectedHeroImageIndex(null);
-          handleChangeTab("photos");
-        }}
-        onClose={() => setSelectedHeroImageIndex(null)}
-      />
     </AppScreen>
   );
 }
