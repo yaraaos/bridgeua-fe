@@ -178,6 +178,7 @@ export const businessDetailsMock: BusinessDetails[] = [
         authorAvatar:
           "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300",
         rating: 4,
+        createdAt: "2026-05-01T10:00:00.000Z",
         text: "Amazing experience from start to finish. Very professional approach, attention to details, high-quality materials...",
       },
       {
@@ -186,6 +187,7 @@ export const businessDetailsMock: BusinessDetails[] = [
         authorAvatar:
           "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300",
         rating: 5,
+        createdAt: "2026-05-05T12:00:00.000Z",
         text: "The team was friendly and the service felt very personal. I would definitely come back again.",
       },
       {
@@ -194,6 +196,7 @@ export const businessDetailsMock: BusinessDetails[] = [
         authorAvatar:
           "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=300",
         rating: 5,
+        createdAt: "2026-04-20T09:30:00.000Z",
         text: "Beautiful salon, clean space, and very professional service. Highly recommended.",
       },
     ],
@@ -206,6 +209,7 @@ export const businessDetailsMock: BusinessDetails[] = [
         authorAvatar:
           "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300",
         rating: 4,
+        createdAt: "2026-05-01T10:00:00.000Z",
         text: "Amazing experience from start to finish. Very professional approach, attention to details, high-quality materials...",
         photos: [
           {
@@ -225,6 +229,7 @@ export const businessDetailsMock: BusinessDetails[] = [
         authorAvatar:
           "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300",
         rating: 5,
+        createdAt: "2026-05-05T12:00:00.000Z",
         text: "The team was friendly and the service felt very personal. I would definitely come back again.",
       },
       {
@@ -233,6 +238,7 @@ export const businessDetailsMock: BusinessDetails[] = [
         authorAvatar:
           "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=300",
         rating: 5,
+        createdAt: "2026-04-20T09:30:00.000Z",
         text: "Beautiful salon, clean space, and very professional service. Highly recommended.",
         tags: ["Good value", "Easy booking"],
       },

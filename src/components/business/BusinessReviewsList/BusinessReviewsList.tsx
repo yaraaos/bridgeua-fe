@@ -36,12 +36,28 @@ export default function BusinessReviewsList({
   const [activeFilter, setActiveFilter] =
     useState<ReviewFilterOption>("Most relevant");
 
+  const sortedReviews = [...reviews].sort((a, b) => {
+    if (activeFilter === "Newest") {
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    }
+
+    if (activeFilter === "Highest") {
+      return b.rating - a.rating;
+    }
+
+    if (activeFilter === "Lowest") {
+      return a.rating - b.rating;
+    }
+
+    return 0;
+  });
+
   const displayedReviews = focusedReviewId
     ? [
-        ...reviews.filter((review) => review.id === focusedReviewId),
-        ...reviews.filter((review) => review.id !== focusedReviewId),
+        ...sortedReviews.filter((review) => review.id === focusedReviewId),
+        ...sortedReviews.filter((review) => review.id !== focusedReviewId),
       ]
-    : reviews;
+    : sortedReviews;
 
   const openReviewPhotoViewer = (index: number) => {
     router.push({

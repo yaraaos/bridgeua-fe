@@ -39,6 +39,11 @@ export function createStyles(colors: AppColors) {
       flexDirection: "row",
       alignItems: "center",
     },
+    reviewDate: {
+      marginTop: 2,
+      fontSize: 12,
+      color: colors.textSecondary,
+    },
     text: {
       marginTop: spacing.md,
       fontSize: 14,

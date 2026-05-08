@@ -66,6 +66,16 @@ export default function ReviewCard({
             })}
           </View>
         </View>
+
+        {!isPreview ? (
+          <Text style={styles.reviewDate}>
+            {new Date(review.createdAt).toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+              year: "numeric",
+            })}
+          </Text>
+        ) : null}
       </View>
 
       <Text
