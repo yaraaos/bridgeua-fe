@@ -27,6 +27,8 @@ export function createStyles(colors: AppColors) {
       alignItems: "center",
       gap: spacing.md,
       paddingVertical: spacing.md,
+    },
+    actionRowBordered: {
       borderTopWidth: 1,
       borderTopColor: colors.border,
     },
