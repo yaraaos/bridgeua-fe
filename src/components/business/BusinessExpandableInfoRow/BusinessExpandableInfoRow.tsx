@@ -1,14 +1,15 @@
+import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { Ionicons } from "@expo/vector-icons";
 import type { ReactNode } from "react";
 import {
-    LayoutAnimation,
-    Platform,
-    Pressable,
-    Text,
-    UIManager,
-    View,
+  LayoutAnimation,
+  Platform,
+  Pressable,
+  Text,
+  UIManager,
+  View,
 } from "react-native";
-import { styles } from "./BusinessExpandableInfoRow.styles";
+import { createStyles } from "./BusinessExpandableInfoRow.styles";
 
 if (Platform.OS === "android") {
   UIManager.setLayoutAnimationEnabledExperimental?.(true);
@@ -45,6 +46,9 @@ export default function BusinessExpandableInfoRow({
   statusText,
   statusColor,
 }: Props) {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
   const isExpandable = Boolean(onToggle);
   const isPressable = Boolean(onToggle || onPress);
 
