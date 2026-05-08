@@ -2,15 +2,15 @@ import ReviewCard from "@/src/components/business/ReviewCard";
 import ReviewFilters, {
   type ReviewFilterOption,
 } from "@/src/components/business/ReviewFilters/ReviewFilters";
-import ImageGalleryModal from "@/src/components/common/ImageGalleryModal/ImageGalleryModal";
 import AppButton from "@/src/components/ui/AppButton/AppButton";
 import AppEmptyState from "@/src/components/ui/AppEmptyState";
-import { useAppTheme } from "@/src/hooks/useAppTheme";
 import type {
   BusinessDetailsReview,
   BusinessReviewPhoto,
 } from "@/src/features/businesses/types/business.types";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 import React, { useState } from "react";
 import { Image, Pressable, ScrollView, Text, View } from "react-native";
 import { createStyles } from "./BusinessReviewsList.styles";
@@ -35,9 +35,6 @@ export default function BusinessReviewsList({
 
   const [activeFilter, setActiveFilter] =
     useState<ReviewFilterOption>("Most relevant");
-  const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(
-    null,
-  );
 
   const displayedReviews = focusedReviewId
     ? [
@@ -45,6 +42,18 @@ export default function BusinessReviewsList({
         ...reviews.filter((review) => review.id !== focusedReviewId),
       ]
     : reviews;
+
+  const openReviewPhotoViewer = (index: number) => {
+    router.push({
+      pathname: "/modal/image-viewer",
+      params: {
+        images: JSON.stringify(
+          reviewPhotos.map(({ id, url }) => ({ id, url })),
+        ),
+        initialIndex: String(index),
+      },
+    });
+  };
 
   return (
     <View style={styles.container}>
@@ -95,7 +104,7 @@ export default function BusinessReviewsList({
             {reviewPhotos.map((photo, index) => (
               <Pressable
                 key={photo.id}
-                onPress={() => setSelectedPhotoIndex(index)}
+                onPress={() => openReviewPhotoViewer(index)}
                 style={styles.photoItem}
               >
                 <Image source={{ uri: photo.url }} style={styles.reviewPhoto} />
@@ -130,13 +139,6 @@ export default function BusinessReviewsList({
           ))}
         </View>
       )}
-
-      <ImageGalleryModal
-        images={reviewPhotos}
-        visible={selectedPhotoIndex !== null}
-        initialIndex={selectedPhotoIndex ?? 0}
-        onClose={() => setSelectedPhotoIndex(null)}
-      />
     </View>
   );
 }
