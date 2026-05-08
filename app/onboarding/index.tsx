@@ -1,6 +1,7 @@
 import { AppColors } from "@/src/constants/colors";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { ONBOARDING_SLIDES } from "@/src/mocks/onboarding.mock";
+import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import React, { useRef, useState } from "react";
 import { FlatList, StyleSheet, View, useWindowDimensions } from "react-native";
@@ -10,8 +11,11 @@ import AppScreen from "../../src/components/ui/AppScreen/AppScreen";
 import AppText from "../../src/components/ui/AppText/AppText";
 
 export default function OnboardingScreen() {
-  const { colors } = useAppTheme();
+  const { colors, isDark } = useAppTheme();
   const styles = createStyles(colors);
+  const gradientColors = isDark
+    ? ([`${colors.primaryGreen}40`, colors.background] as const)
+    : (["#2b803a32", colors.background] as const);
 
   const { width } = useWindowDimensions();
   const listRef = useRef<FlatList>(null);
@@ -33,7 +37,7 @@ export default function OnboardingScreen() {
   };
 
   return (
-    <View style={styles.screen}>
+    <LinearGradient colors={gradientColors} style={{ flex: 1 }}>
       <AppScreen style={styles.container}>
         <FlatList
           ref={listRef}
@@ -66,7 +70,7 @@ export default function OnboardingScreen() {
           <AppButton title={activeSlide.buttonLabel} onPress={handleNext} />
         </View>
       </AppScreen>
-    </View>
+    </LinearGradient>
   );
 }
 
@@ -87,18 +91,15 @@ function createStyles(colors: AppColors) {
       paddingBottom: 24,
       gap: 50,
     },
-
     textWrap: {
       gap: 8,
     },
-
     title: {
       fontSize: 28,
       lineHeight: 38,
       fontWeight: "800",
       color: colors.textPrimary,
     },
-
     subtitle: {
       fontSize: 16,
       lineHeight: 24,
