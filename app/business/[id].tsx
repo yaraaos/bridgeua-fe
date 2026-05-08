@@ -230,9 +230,7 @@ export default function BusinessDetailsScreen() {
 
               <BusinessReviewsList
                 reviews={reviews}
-                reviewCount={
-                  areReviewsLoading ? business.reviewCount : reviewCount
-                }
+                reviewCount={reviewCount}
                 reviewPhotos={business.reviewPhotos}
                 focusedReviewId={focusedReviewId}
                 onClearFocusedReview={() => setFocusedReviewId(null)}
