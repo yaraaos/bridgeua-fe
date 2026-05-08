@@ -1,10 +1,10 @@
-import ImageGalleryModal from "@/src/components/common/ImageGalleryModal/ImageGalleryModal";
 import AppEmptyState from "@/src/components/ui/AppEmptyState";
-import { useAppTheme } from "@/src/hooks/useAppTheme";
 import type {
-    BusinessDetailsImage,
-    BusinessReviewPhoto,
+  BusinessDetailsImage,
+  BusinessReviewPhoto,
 } from "@/src/features/businesses/types/business.types";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { router } from "expo-router";
 import React, { useMemo, useState } from "react";
 import { Image, Pressable, Text, View } from "react-native";
 import { createStyles } from "./BusinessGalleryGrid.styles";
@@ -36,9 +36,6 @@ export default function BusinessGalleryGrid({
   const styles = createStyles(colors);
 
   const [activeTab, setActiveTab] = useState<PhotoTab>("all");
-  const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(
-    null,
-  );
 
   const allPhotos = useMemo<GalleryPhoto[]>(
     () => [
@@ -74,6 +71,18 @@ export default function BusinessGalleryGrid({
         : "No photos yet";
 
   const hasAnyPhotos = allPhotos.length > 0;
+
+  const openImageViewer = (index: number) => {
+    router.push({
+      pathname: "/modal/image-viewer",
+      params: {
+        images: JSON.stringify(
+          visiblePhotos.map(({ id, url }) => ({ id, url })),
+        ),
+        initialIndex: String(index),
+      },
+    });
+  };
 
   return (
     <View style={styles.container}>
@@ -118,7 +127,7 @@ export default function BusinessGalleryGrid({
               <Pressable
                 key={photo.id}
                 style={[styles.photoWrap, photoStyle]}
-                onPress={() => setSelectedPhotoIndex(index)}
+                onPress={() => openImageViewer(index)}
               >
                 <Image source={{ uri: photo.url }} style={styles.photo} />
               </Pressable>
@@ -126,13 +135,6 @@ export default function BusinessGalleryGrid({
           })}
         </View>
       )}
-
-      <ImageGalleryModal
-        images={visiblePhotos}
-        visible={selectedPhotoIndex !== null}
-        initialIndex={selectedPhotoIndex ?? 0}
-        onClose={() => setSelectedPhotoIndex(null)}
-      />
     </View>
   );
 }
