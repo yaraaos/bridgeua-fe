@@ -56,7 +56,7 @@ export default function BusinessOverviewCard({ business }: Props) {
           <BusinessExpandableInfoRow
             key={item.id}
             icon={contactIcons[item.type]}
-            title={item.label}
+            title={undefined}
             value={item.value}
             isLast={isLastItem}
             numberOfLines={undefined}

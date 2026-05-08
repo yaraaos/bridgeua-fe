@@ -18,9 +18,6 @@ export function createStyles(colors: AppColors) {
       paddingVertical: spacing.md,
       gap: spacing.md,
     },
-    rowExpanded: {
-      alignItems: "flex-start",
-    },
     iconBox: {
       width: 38,
       height: 38,
@@ -54,11 +51,11 @@ export function createStyles(colors: AppColors) {
       fontWeight: "700",
     },
     chevron: {
-      marginTop: 8,
       color: colors.textSecondary,
     },
     expandedContent: {
-      paddingLeft: 44,
+      paddingLeft: 51,
+      paddingRight: 28,
       paddingBottom: spacing.md,
     },
   });

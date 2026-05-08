@@ -104,7 +104,10 @@ export default function ReviewCard({
       ) : null}
 
       {isPreview ? (
-        <Pressable onPress={() => onPressMore?.(review.id)}>
+        <Pressable
+          style={styles.moreButton}
+          onPress={() => onPressMore?.(review.id)}
+        >
           <Text style={styles.moreText}>More</Text>
         </Pressable>
       ) : null}

@@ -10,7 +10,7 @@ export function createStyles(colors: AppColors) {
     },
     containerPreview: {
       width: 200,
-      minHeight: 150,
+      height: 150,
       padding: spacing.md,
       borderTopWidth: 0,
       borderWidth: 1,
@@ -50,9 +50,11 @@ export function createStyles(colors: AppColors) {
       fontSize: 12,
       lineHeight: 17,
     },
-    moreText: {
-      marginTop: spacing.xs,
+    moreButton: {
+      marginTop: "auto",
       alignSelf: "flex-end",
+    },
+    moreText: {
       fontSize: 12,
       fontWeight: "700",
       color: colors.primaryGreen,

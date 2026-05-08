@@ -28,7 +28,6 @@ export function createStyles(colors: AppColors) {
       fontSize: 13,
       fontWeight: "700",
       color: colors.primaryGreen,
-      textDecorationLine: "underline",
     },
     viewAllIcon: {
       color: colors.primaryGreen,
