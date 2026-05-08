@@ -1,7 +1,7 @@
+import { useAppTheme } from "@/src/hooks/useAppTheme";
 import React, { PropsWithChildren } from "react";
 import { ScrollView, ViewStyle } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { createStyles } from "./AppScreen.styles";
 
 type Props = PropsWithChildren<{
