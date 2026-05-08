@@ -15,6 +15,7 @@ import { useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  Animated,
   Image,
   Pressable,
   ScrollView,
@@ -33,7 +34,7 @@ const REVIEW_TAGS = [
   "Relaxing atmosphere",
 ];
 
-const MAX_REVIEW_LENGTH = 500;
+const MAX_REVIEW_LENGTH = 1000;
 const MAX_PHOTOS = 8;
 
 export default function WriteReviewScreen() {
@@ -50,6 +51,7 @@ export default function WriteReviewScreen() {
   const [review, setReview] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [photos, setPhotos] = useState<string[]>([]);
+  const counterShake = useState(new Animated.Value(0))[0];
 
   const ratingLabel = useMemo(() => {
     if (rating === 5) return "Excellent";
@@ -98,6 +100,36 @@ export default function WriteReviewScreen() {
 
   const handleRemovePhoto = (uri: string) => {
     setPhotos((current) => current.filter((photo) => photo !== uri));
+  };
+
+  const shakeCounter = () => {
+    Animated.sequence([
+      Animated.timing(counterShake, {
+        toValue: -4,
+        duration: 50,
+        useNativeDriver: true,
+      }),
+      Animated.timing(counterShake, {
+        toValue: 4,
+        duration: 50,
+        useNativeDriver: true,
+      }),
+      Animated.timing(counterShake, {
+        toValue: -3,
+        duration: 50,
+        useNativeDriver: true,
+      }),
+      Animated.timing(counterShake, {
+        toValue: 3,
+        duration: 50,
+        useNativeDriver: true,
+      }),
+      Animated.timing(counterShake, {
+        toValue: 0,
+        duration: 50,
+        useNativeDriver: true,
+      }),
+    ]).start();
   };
 
   const handleSubmit = async () => {
@@ -216,9 +248,25 @@ export default function WriteReviewScreen() {
           <View style={styles.textAreaWrap}>
             <TextInput
               value={review}
-              onChangeText={(text) =>
-                setReview(text.slice(0, MAX_REVIEW_LENGTH))
-              }
+              maxLength={MAX_REVIEW_LENGTH}
+              onKeyPress={({ nativeEvent }) => {
+                if (
+                  review.length >= MAX_REVIEW_LENGTH &&
+                  nativeEvent.key !== "Backspace"
+                ) {
+                  shakeCounter();
+                }
+              }}
+              onChangeText={(text) => {
+                if (
+                  text.length >= MAX_REVIEW_LENGTH &&
+                  review.length >= MAX_REVIEW_LENGTH
+                ) {
+                  shakeCounter();
+                }
+
+                setReview(text);
+              }}
               multiline
               textAlignVertical="top"
               placeholder="Share about your experience (min 10 characters)..."
@@ -226,9 +274,15 @@ export default function WriteReviewScreen() {
               style={styles.textArea}
             />
 
-            <Text style={styles.counter}>
+            <Animated.Text
+              style={[
+                styles.counter,
+                review.length >= MAX_REVIEW_LENGTH && styles.counterLimit,
+                { transform: [{ translateX: counterShake }] },
+              ]}
+            >
               {review.length}/{MAX_REVIEW_LENGTH}
-            </Text>
+            </Animated.Text>
           </View>
 
           <Text style={[styles.label, styles.sectionGap]}>
@@ -391,6 +445,10 @@ function createStyles(colors: AppColors) {
       backgroundColor: colors.surface,
       borderWidth: 1,
       borderColor: colors.border,
+    },
+    counterLimit: {
+      color: colors.error,
+      fontWeight: "700",
     },
     label: {
       fontSize: 13,
