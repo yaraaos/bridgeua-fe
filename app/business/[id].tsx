@@ -107,6 +107,12 @@ export default function BusinessDetailsScreen() {
   const heroPhotos =
     business.images.length > 0 ? business.images : business.reviewPhotos;
 
+  const submittedReviewPhotos = reviews.flatMap(
+    (review) => review.photos ?? [],
+  );
+
+  const allReviewPhotos = [...submittedReviewPhotos, ...business.reviewPhotos];
+
   const openImageViewer = (
     index: number,
     options?: {
@@ -232,7 +238,7 @@ export default function BusinessDetailsScreen() {
               <BusinessReviewsList
                 reviews={reviews}
                 reviewCount={reviewCount}
-                reviewPhotos={business.reviewPhotos}
+                reviewPhotos={allReviewPhotos}
                 focusedReviewId={focusedReviewId}
                 onClearFocusedReview={() => setFocusedReviewId(null)}
                 onPressWriteReview={(rating) =>
@@ -250,7 +256,7 @@ export default function BusinessDetailsScreen() {
           {activeTab === "photos" ? (
             <BusinessGalleryGrid
               businessPhotos={business.images}
-              reviewPhotos={business.reviewPhotos}
+              reviewPhotos={allReviewPhotos}
             />
           ) : null}
 
