@@ -21,6 +21,7 @@ export default function ReviewCard({
   const styles = createStyles(colors);
 
   const isPreview = variant === "preview";
+  const shouldShowReadMore = !isPreview && review.text.length > 120;
   const showPhotos = !isPreview && !!review.photos?.length;
 
   const openReviewPhotoViewer = (index: number) => {
@@ -119,6 +120,13 @@ export default function ReviewCard({
           onPress={() => onPressMore?.(review.id)}
         >
           <Text style={styles.moreText}>More</Text>
+        </Pressable>
+      ) : onPressMore && shouldShowReadMore ? (
+        <Pressable
+          style={styles.moreButton}
+          onPress={() => onPressMore(review.id)}
+        >
+          <Text style={styles.moreText}>Read more</Text>
         </Pressable>
       ) : null}
     </View>

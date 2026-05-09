@@ -154,7 +154,12 @@ export default function BusinessReviewsList({
         <View style={styles.list}>
           {displayedReviews.map((review, index) => (
             <View key={review.id}>
-              <ReviewCard review={review} />
+              <ReviewCard
+                review={review}
+                onPressMore={() => {
+                  // TODO: expand review / open modal later
+                }}
+              />
 
               {index < displayedReviews.length - 1 ? (
                 <View style={styles.separator} />
