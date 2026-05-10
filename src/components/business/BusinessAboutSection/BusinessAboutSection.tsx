@@ -1,8 +1,7 @@
 import {
   BusinessAmenitiesSection,
   BusinessLanguagesSection,
-  BusinessRecommendedBySection,
-  BusinessSocialLinksSection,
+  BusinessRecommendedBySection
 } from "@/src/components/business";
 import type { BusinessAbout } from "@/src/features/businesses/types/business.types";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
@@ -34,8 +33,6 @@ export default function BusinessAboutSection({ about }: Props) {
           console.log("Open full recommended by screen");
         }}
       />
-
-      <BusinessSocialLinksSection socialLinks={about.socialLinks} />
 
       <BusinessLanguagesSection languages={about.languages} />
 
