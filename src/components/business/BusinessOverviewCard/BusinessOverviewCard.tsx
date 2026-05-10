@@ -1,8 +1,10 @@
 import BusinessExpandableInfoRow from "@/src/components/business/BusinessExpandableInfoRow";
+import BusinessSocialLinksSection from "@/src/components/business/BusinessSocialLinksSection";
 import type {
   BusinessContactItem,
   BusinessContactType,
   BusinessDetails,
+  BusinessSocialLink,
 } from "@/src/features/businesses/types/business.types";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { Ionicons } from "@expo/vector-icons";
@@ -42,61 +44,85 @@ export default function BusinessOverviewCard({ business }: Props) {
   const [areHoursExpanded, setAreHoursExpanded] = useState(false);
 
   const overviewContacts = business.about.contacts.filter((item) =>
-    ["address", "hours", "website"].includes(item.type),
+    ["address", "hours", "phone"].includes(item.type),
   );
 
-  return (
-    <View style={styles.container}>
-      {overviewContacts.map((item, index) => {
-        const isLastItem = index === overviewContacts.length - 1;
-        const isHoursRow =
-          item.type === "hours" && Boolean(business.about.openingHours?.length);
+  const websiteUrl = business.about.contacts.find(
+    (item) => item.type === "website",
+  )?.actionUrl;
 
-        return (
-          <BusinessExpandableInfoRow
-            key={item.id}
-            icon={contactIcons[item.type]}
-            title={undefined}
-            value={item.value}
-            isLast={isLastItem}
-            numberOfLines={undefined}
-            onPress={
-              !isHoursRow && item.actionUrl
-                ? () => handlePressContact(item)
-                : undefined
-            }
-            statusText={
-              isHoursRow
-                ? business.about.isOpen
-                  ? "Open now"
-                  : "Closed"
-                : undefined
-            }
-            statusColor={
-              isHoursRow
-                ? business.about.isOpen
-                  ? colors.primaryGreen
-                  : "#D9534F"
-                : undefined
-            }
-            isExpanded={isHoursRow ? areHoursExpanded : false}
-            onToggle={
-              isHoursRow
-                ? () => setAreHoursExpanded((value) => !value)
-                : undefined
-            }
-          >
-            {isHoursRow
-              ? business.about.openingHours?.map((hour) => (
-                  <View key={hour.id} style={styles.hoursRow}>
-                    <Text style={styles.hoursDay}>{hour.day}</Text>
-                    <Text style={styles.hoursValue}>{hour.hours}</Text>
-                  </View>
-                ))
-              : null}
-          </BusinessExpandableInfoRow>
-        );
-      })}
-    </View>
+  const overviewSocialLinks: BusinessSocialLink[] = [
+    ...(websiteUrl
+      ? [
+          {
+            id: "website",
+            label: "Website",
+            icon: "website" as const,
+            url: websiteUrl,
+          },
+        ]
+      : []),
+    ...(business.about.socialLinks ?? []).filter(
+      (item) => item.icon !== "telegram",
+    ),
+  ];
+
+  return (
+    <>
+      <View style={styles.container}>
+        {overviewContacts.map((item, index) => {
+          const isLastItem = index === overviewContacts.length - 1;
+          const isHoursRow =
+            item.type === "hours" &&
+            Boolean(business.about.openingHours?.length);
+
+          return (
+            <BusinessExpandableInfoRow
+              key={item.id}
+              icon={contactIcons[item.type]}
+              title={undefined}
+              value={item.value}
+              isLast={isLastItem}
+              numberOfLines={undefined}
+              onPress={
+                !isHoursRow && item.actionUrl
+                  ? () => handlePressContact(item)
+                  : undefined
+              }
+              statusText={
+                isHoursRow
+                  ? business.about.isOpen
+                    ? "Open now"
+                    : "Closed"
+                  : undefined
+              }
+              statusColor={
+                isHoursRow
+                  ? business.about.isOpen
+                    ? colors.primaryGreen
+                    : "#D9534F"
+                  : undefined
+              }
+              isExpanded={isHoursRow ? areHoursExpanded : false}
+              onToggle={
+                isHoursRow
+                  ? () => setAreHoursExpanded((value) => !value)
+                  : undefined
+              }
+            >
+              {isHoursRow
+                ? business.about.openingHours?.map((hour) => (
+                    <View key={hour.id} style={styles.hoursRow}>
+                      <Text style={styles.hoursDay}>{hour.day}</Text>
+                      <Text style={styles.hoursValue}>{hour.hours}</Text>
+                    </View>
+                  ))
+                : null}
+            </BusinessExpandableInfoRow>
+          );
+        })}
+      </View>
+      <BusinessSocialLinksSection socialLinks={overviewSocialLinks} />
+    </>
   );
 }

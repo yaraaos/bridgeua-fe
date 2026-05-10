@@ -15,6 +15,7 @@ const socialIcons: Record<
   telegram: "paper-plane-outline",
   tiktok: "musical-notes-outline",
   whatsapp: "logo-whatsapp",
+  website: "globe-outline",
 };
 
 export default function BusinessSocialLinksSection({ socialLinks }: Props) {
