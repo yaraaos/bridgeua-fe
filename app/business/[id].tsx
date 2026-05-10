@@ -48,6 +48,7 @@ export default function BusinessDetailsScreen() {
   const {
     reviews,
     reviewCount,
+    summary: reviewsSummary,
     refresh: refreshReviews,
   } = useReviews({
     businessId: id,
@@ -209,26 +210,17 @@ export default function BusinessDetailsScreen() {
           ) : null}
 
           {activeTab === "services" ? (
-            <BusinessServicesList
-              services={business.services}
-              onPressService={(serviceId) =>
-                router.push({
-                  pathname: "/bookings/choose-service",
-                  params: {
-                    businessId: business.id,
-                    serviceId,
-                  },
-                })
-              }
-            />
+            <BusinessServicesList services={business.services} />
           ) : null}
 
           {activeTab === "reviews" ? (
             <>
               <BusinessRatingSummary
-                rating={business.rating}
-                reviewCount={business.reviewCount}
-                breakdown={business.ratingBreakdown}
+                rating={reviewsSummary?.rating ?? business.rating}
+                reviewCount={reviewsSummary?.reviewCount ?? reviewCount}
+                breakdown={
+                  reviewsSummary?.breakdown ?? business.ratingBreakdown
+                }
               />
 
               <BusinessReviewsList

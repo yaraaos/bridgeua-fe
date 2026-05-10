@@ -8,6 +8,11 @@ import type {
 
 let submittedReviewsMock: Review[] = [];
 
+const EMPTY_BREAKDOWN = ([5, 4, 3, 2, 1] as const).map((rating) => ({
+  rating,
+  count: 0,
+}));
+
 export const getReviews = async ({
   businessId,
   page = 1,
@@ -22,6 +27,11 @@ export const getReviews = async ({
       page: 1,
       totalPages: 1,
       total: 0,
+      summary: {
+        rating: 0,
+        reviewCount: 0,
+        breakdown: EMPTY_BREAKDOWN,
+      },
     };
   }
 
@@ -41,6 +51,20 @@ export const getReviews = async ({
     reviews = reviews.filter((review) => review.rating === rating);
   }
 
+  const reviewCount = reviews.length;
+
+  const averageRating =
+    reviewCount > 0
+      ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviewCount
+      : 0;
+
+  const breakdown = ([5, 4, 3, 2, 1] as const).map((ratingValue) => ({
+    rating: ratingValue,
+    count: reviews.filter(
+      (review) => Math.round(review.rating) === ratingValue,
+    ).length,
+  }));
+
   const start = (page - 1) * limit;
   const paginated = reviews.slice(start, start + limit);
   const totalPages = Math.max(1, Math.ceil(reviews.length / limit));
@@ -50,6 +74,11 @@ export const getReviews = async ({
     page,
     totalPages,
     total: reviews.length,
+    summary: {
+      rating: averageRating,
+      reviewCount,
+      breakdown,
+    },
   };
 };
 

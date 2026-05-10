@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { getReviews } from "../services/review.service";
-import type { Review } from "../types/review.types";
+import type { Review, ReviewsSummary } from "../types/review.types";
 
 type Params = {
   businessId?: string;
@@ -10,6 +10,7 @@ type Params = {
 
 export const useReviews = ({ businessId, rating, limit = 10 }: Params) => {
   const [reviews, setReviews] = useState<Review[]>([]);
+  const [summary, setSummary] = useState<ReviewsSummary | null>(null);
   const [page, setPage] = useState(1);
   const [reviewCount, setReviewCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
@@ -19,6 +20,7 @@ export const useReviews = ({ businessId, rating, limit = 10 }: Params) => {
   const loadReviews = async (nextPage = 1) => {
     if (!businessId) {
       setReviews([]);
+      setSummary(null);
       setReviewCount(0);
       setHasMore(false);
       setIsLoading(false);
@@ -44,6 +46,7 @@ export const useReviews = ({ businessId, rating, limit = 10 }: Params) => {
       setReviews((current) =>
         isFirstPage ? response.data : [...current, ...response.data],
       );
+      setSummary(response.summary);
       setReviewCount(response.total);
       setPage(response.page);
       setHasMore(response.page < response.totalPages);
@@ -59,6 +62,7 @@ export const useReviews = ({ businessId, rating, limit = 10 }: Params) => {
 
   return {
     reviews,
+    summary,
     reviewCount,
     isLoading,
     isLoadingMore,
