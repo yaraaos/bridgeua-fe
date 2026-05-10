@@ -3,6 +3,7 @@ import type { BusinessDetailsReview } from "@/src/features/businesses/types/busi
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
+import { useState } from "react";
 import { Image, Pressable, ScrollView, Text, View } from "react-native";
 import { createStyles } from "./ReviewCard.styles";
 
@@ -21,6 +22,7 @@ export default function ReviewCard({
   const styles = createStyles(colors);
 
   const isPreview = variant === "preview";
+  const [isExpanded, setIsExpanded] = useState(false);
   const shouldShowReadMore = !isPreview && review.text.length > 120;
   const showPhotos = !isPreview && !!review.photos?.length;
 
@@ -81,10 +83,28 @@ export default function ReviewCard({
 
       <Text
         style={[styles.text, isPreview && styles.textPreview]}
-        numberOfLines={isPreview ? 4 : 3}
+        numberOfLines={isPreview ? 4 : isExpanded ? undefined : 3}
       >
         {review.text}
       </Text>
+
+      {isPreview ? (
+        <Pressable
+          style={styles.moreButton}
+          onPress={() => onPressMore?.(review.id)}
+        >
+          <Text style={styles.moreText}>More</Text>
+        </Pressable>
+      ) : shouldShowReadMore ? (
+        <Pressable
+          style={styles.moreButton}
+          onPress={() => setIsExpanded((value) => !value)}
+        >
+          <Text style={styles.moreText}>
+            {isExpanded ? "Show less" : "Read more"}
+          </Text>
+        </Pressable>
+      ) : null}
 
       {showPhotos ? (
         <ScrollView
@@ -112,22 +132,6 @@ export default function ReviewCard({
             </View>
           ))}
         </View>
-      ) : null}
-
-      {isPreview ? (
-        <Pressable
-          style={styles.moreButton}
-          onPress={() => onPressMore?.(review.id)}
-        >
-          <Text style={styles.moreText}>More</Text>
-        </Pressable>
-      ) : onPressMore && shouldShowReadMore ? (
-        <Pressable
-          style={styles.moreButton}
-          onPress={() => onPressMore(review.id)}
-        >
-          <Text style={styles.moreText}>Read more</Text>
-        </Pressable>
       ) : null}
     </View>
   );

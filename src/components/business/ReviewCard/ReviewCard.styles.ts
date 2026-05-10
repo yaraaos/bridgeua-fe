@@ -57,7 +57,7 @@ export function createStyles(colors: AppColors) {
       lineHeight: 17,
     },
     moreButton: {
-      marginTop: "auto",
+      marginTop: spacing.xs,
       alignSelf: "flex-end",
     },
     moreText: {
@@ -81,7 +81,7 @@ export function createStyles(colors: AppColors) {
       backgroundColor: "rgba(0,0,0,0.92)",
     },
     photosScroll: {
-      marginTop: spacing.md,
+      marginTop: spacing.sm,
     },
     photoItem: {
       marginRight: spacing.sm,
