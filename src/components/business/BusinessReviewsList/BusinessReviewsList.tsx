@@ -21,6 +21,7 @@ type Props = {
   reviewPhotos: BusinessReviewPhoto[];
   onPressWriteReview?: (rating?: number) => void;
   focusedReviewId?: string | null;
+  onClearFocusedReview?: () => void;
 };
 
 export default function BusinessReviewsList({
@@ -28,6 +29,7 @@ export default function BusinessReviewsList({
   reviewCount,
   reviewPhotos,
   focusedReviewId,
+  onClearFocusedReview,
   onPressWriteReview,
 }: Props) {
   const { colors } = useAppTheme();
@@ -36,12 +38,28 @@ export default function BusinessReviewsList({
   const [activeFilter, setActiveFilter] =
     useState<ReviewFilterOption>("Most relevant");
 
+  const sortedReviews = [...reviews].sort((a, b) => {
+    if (activeFilter === "Newest") {
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    }
+
+    if (activeFilter === "Highest") {
+      return b.rating - a.rating;
+    }
+
+    if (activeFilter === "Lowest") {
+      return a.rating - b.rating;
+    }
+
+    return 0;
+  });
+
   const displayedReviews = focusedReviewId
     ? [
-        ...reviews.filter((review) => review.id === focusedReviewId),
-        ...reviews.filter((review) => review.id !== focusedReviewId),
+        ...sortedReviews.filter((review) => review.id === focusedReviewId),
+        ...sortedReviews.filter((review) => review.id !== focusedReviewId),
       ]
-    : reviews;
+    : sortedReviews;
 
   const openReviewPhotoViewer = (index: number) => {
     router.push({
@@ -114,7 +132,13 @@ export default function BusinessReviewsList({
         </View>
       ) : null}
 
-      <ReviewFilters value={activeFilter} onChange={setActiveFilter} />
+      <ReviewFilters
+        value={activeFilter}
+        onChange={(nextFilter) => {
+          setActiveFilter(nextFilter);
+          onClearFocusedReview?.();
+        }}
+      />
 
       <View style={styles.listHeader}>
         <Text style={styles.sectionTitle}>All reviews</Text>
@@ -130,7 +154,12 @@ export default function BusinessReviewsList({
         <View style={styles.list}>
           {displayedReviews.map((review, index) => (
             <View key={review.id}>
-              <ReviewCard review={review} />
+              <ReviewCard
+                review={review}
+                onPressMore={() => {
+                  // TODO: expand review / open modal later
+                }}
+              />
 
               {index < displayedReviews.length - 1 ? (
                 <View style={styles.separator} />

@@ -17,7 +17,7 @@ export const businessDetailsMock: BusinessDetails[] = [
     about: {
       title: "About Zelenska Beauty",
       description:
-        "At Zelenska Beauty, we believe beauty is personal. Our team of expert stylists and beauty specialists is dedicated to helping you look and feel your absolute best.",
+        "At Zelenska Beauty, we believe beauty is personal. Our team of expert stylists and beauty specialists is dedicated to helping you look and feel your absolute best. At Zelenska Beauty, we believe beauty is personal. Our team of expert stylists and beauty specialists is dedicated to helping you look and feel your absolute best.",
       isOpen: true,
       openingHours: [
         { id: "monday", day: "Monday", hours: "10:00 – 21:00" },
@@ -152,21 +152,63 @@ export const businessDetailsMock: BusinessDetails[] = [
     services: [
       {
         id: "service-1",
-        name: "Manicure",
+        name: "Classic Manicure",
         priceFrom: "$45",
         duration: "45 min",
       },
       {
         id: "service-2",
-        name: "Hair styling",
+        name: "Gel Manicure",
+        priceFrom: "$60",
+        duration: "1h",
+      },
+      {
+        id: "service-3",
+        name: "Pedicure",
+        priceFrom: "$70",
+        duration: "1h 10 min",
+      },
+      {
+        id: "service-4",
+        name: "Hair Styling",
         priceFrom: "$80",
         duration: "1h 15 min",
       },
       {
-        id: "service-3",
-        name: "Makeup",
+        id: "service-5",
+        name: "Hair Coloring",
+        priceFrom: "$140",
+        duration: "2h 30 min",
+      },
+      {
+        id: "service-6",
+        name: "Blow Dry",
+        priceFrom: "$55",
+        duration: "40 min",
+      },
+      {
+        id: "service-7",
+        name: "Professional Makeup",
         priceFrom: "$95",
         duration: "1h",
+      },
+      {
+        id: "service-8",
+        name: "Bridal Makeup",
+        priceFrom: "$180",
+        duration: "2h",
+      },
+      {
+        id: "service-9",
+        name: "Eyebrow Shaping",
+        priceFrom: "$25",
+        duration: "20 min",
+      },
+      {
+        id: "service-10",
+        name: "Lash Lift",
+        priceFrom: "$65",
+        duration: "50 min",
       },
     ],
 
@@ -178,7 +220,8 @@ export const businessDetailsMock: BusinessDetails[] = [
         authorAvatar:
           "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300",
         rating: 4,
-        text: "Amazing experience from start to finish. Very professional approach, attention to details, high-quality materials...",
+        createdAt: "2026-05-01T10:00:00.000Z",
+        text: "Amazing experience from start to finish. The whole team had a very professional approach and paid close attention to every small detail throughout the appointment. The space was clean, comfortable, and beautifully organized, which made the experience even better. I really appreciated how carefully everything was explained and how much effort was put into making me feel comfortable. The results exceeded my expectations and I will definitely be coming back again.",
       },
       {
         id: "review-2",
@@ -186,7 +229,8 @@ export const businessDetailsMock: BusinessDetails[] = [
         authorAvatar:
           "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300",
         rating: 5,
-        text: "The team was friendly and the service felt very personal. I would definitely come back again.",
+        createdAt: "2026-05-05T12:00:00.000Z",
+        text: "The team was incredibly friendly and welcoming from the moment I arrived, and the whole experience felt very personal and professional. Everything was explained clearly, the atmosphere was relaxing, and I never felt rushed during the appointment. You can really tell they care about the quality of their work and customer experience. I would definitely come back again and would also recommend this place to friends looking for reliable service. ",
       },
       {
         id: "review-3",
@@ -194,6 +238,7 @@ export const businessDetailsMock: BusinessDetails[] = [
         authorAvatar:
           "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=300",
         rating: 5,
+        createdAt: "2026-04-20T09:30:00.000Z",
         text: "Beautiful salon, clean space, and very professional service. Highly recommended.",
       },
     ],
@@ -206,7 +251,8 @@ export const businessDetailsMock: BusinessDetails[] = [
         authorAvatar:
           "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300",
         rating: 4,
-        text: "Amazing experience from start to finish. Very professional approach, attention to details, high-quality materials...",
+        createdAt: "2026-05-01T10:00:00.000Z",
+        text: "Amazing experience from start to finish. The whole team had a very professional approach and paid close attention to every small detail throughout the appointment. The space was clean, comfortable, and beautifully organized, which made the experience even better. I really appreciated how carefully everything was explained and how much effort was put into making me feel comfortable. The results exceeded my expectations and I will definitely be coming back again.",
         photos: [
           {
             id: "photo-1",
@@ -225,7 +271,8 @@ export const businessDetailsMock: BusinessDetails[] = [
         authorAvatar:
           "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300",
         rating: 5,
-        text: "The team was friendly and the service felt very personal. I would definitely come back again.",
+        createdAt: "2026-05-05T12:00:00.000Z",
+        text: "The team was incredibly friendly and welcoming from the moment I arrived, and the whole experience felt very personal and professional. Everything was explained clearly, the atmosphere was relaxing, and I never felt rushed during the appointment. You can really tell they care about the quality of their work and customer experience. I would definitely come back again and would also recommend this place to friends looking for reliable service.",
       },
       {
         id: "review-3",
@@ -233,6 +280,7 @@ export const businessDetailsMock: BusinessDetails[] = [
         authorAvatar:
           "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=300",
         rating: 5,
+        createdAt: "2026-04-20T09:30:00.000Z",
         text: "Beautiful salon, clean space, and very professional service. Highly recommended.",
         tags: ["Good value", "Easy booking"],
       },

@@ -6,6 +6,13 @@ import type {
   SubmitReviewPayload,
 } from "../types/review.types";
 
+let submittedReviewsMock: Review[] = [];
+
+const EMPTY_BREAKDOWN = ([5, 4, 3, 2, 1] as const).map((rating) => ({
+  rating,
+  count: 0,
+}));
+
 export const getReviews = async ({
   businessId,
   page = 1,
@@ -20,18 +27,43 @@ export const getReviews = async ({
       page: 1,
       totalPages: 1,
       total: 0,
+      summary: {
+        rating: 0,
+        reviewCount: 0,
+        breakdown: EMPTY_BREAKDOWN,
+      },
     };
   }
 
-  let reviews: Review[] = business.reviews.map((review) => ({
+  const mockReviews: Review[] = business.reviews.map((review) => ({
     ...review,
     businessId,
-    createdAt: new Date().toISOString(),
   }));
+
+  let reviews: Review[] = [
+    ...submittedReviewsMock.filter(
+      (review) => review.businessId === businessId,
+    ),
+    ...mockReviews,
+  ];
 
   if (rating) {
     reviews = reviews.filter((review) => review.rating === rating);
   }
+
+  const reviewCount = reviews.length;
+
+  const averageRating =
+    reviewCount > 0
+      ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviewCount
+      : 0;
+
+  const breakdown = ([5, 4, 3, 2, 1] as const).map((ratingValue) => ({
+    rating: ratingValue,
+    count: reviews.filter(
+      (review) => Math.round(review.rating) === ratingValue,
+    ).length,
+  }));
 
   const start = (page - 1) * limit;
   const paginated = reviews.slice(start, start + limit);
@@ -42,6 +74,11 @@ export const getReviews = async ({
     page,
     totalPages,
     total: reviews.length,
+    summary: {
+      rating: averageRating,
+      reviewCount,
+      breakdown,
+    },
   };
 };
 
@@ -64,6 +101,8 @@ export const submitReview = async (
   };
 
   console.log("API POST /reviews", payload);
+
+  submittedReviewsMock = [newReview, ...submittedReviewsMock];
 
   return Promise.resolve(newReview);
 };

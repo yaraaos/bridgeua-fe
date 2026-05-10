@@ -9,7 +9,7 @@ export { default as BusinessInfoRow } from "./BusinessInfoRow";
 export { default as BusinessLanguagesSection } from "./BusinessLanguagesSection";
 export { default as BusinessOverviewCard } from "./BusinessOverviewCard";
 export { default as BusinessRatingSummary } from "./BusinessRatingsSummary";
-export { default as BusinessRecommendedBySection } from "./BusinessRecommendedBySection";
+export { default as BusinessRecommendedBySection } from "./BusinessRecommendsSection";
 export { default as BusinessReviewsList } from "./BusinessReviewsList";
 export { default as BusinessServicesList } from "./BusinessServicesList";
 export { default as BusinessSocialLinksSection } from "./BusinessSocialLinksSection";

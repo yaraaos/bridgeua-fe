@@ -1,4 +1,7 @@
-import type { BusinessReviewPhoto } from "@/src/features/businesses/types/business.types";
+import type {
+  BusinessRatingBreakdownItem,
+  BusinessReviewPhoto,
+} from "@/src/features/businesses/types/business.types";
 
 export type Review = {
   id: string;
@@ -24,6 +27,7 @@ export type GetReviewsResponse = {
   page: number;
   totalPages: number;
   total: number;
+  summary: ReviewsSummary;
 };
 
 export type SubmitReviewPayload = {
@@ -32,4 +36,10 @@ export type SubmitReviewPayload = {
   text: string;
   tags?: string[];
   photos?: string[];
+};
+
+export type ReviewsSummary = {
+  rating: number;
+  reviewCount: number;
+  breakdown: BusinessRatingBreakdownItem[];
 };

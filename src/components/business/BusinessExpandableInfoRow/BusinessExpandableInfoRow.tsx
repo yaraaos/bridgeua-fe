@@ -1,14 +1,15 @@
+import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { Ionicons } from "@expo/vector-icons";
 import type { ReactNode } from "react";
 import {
-    LayoutAnimation,
-    Platform,
-    Pressable,
-    Text,
-    UIManager,
-    View,
+  LayoutAnimation,
+  Platform,
+  Pressable,
+  Text,
+  UIManager,
+  View,
 } from "react-native";
-import { styles } from "./BusinessExpandableInfoRow.styles";
+import { createStyles } from "./BusinessExpandableInfoRow.styles";
 
 if (Platform.OS === "android") {
   UIManager.setLayoutAnimationEnabledExperimental?.(true);
@@ -16,7 +17,7 @@ if (Platform.OS === "android") {
 
 type Props = {
   icon: keyof typeof Ionicons.glyphMap;
-  title: string;
+  title?: string;
   value: string;
   isExpanded?: boolean;
   onToggle?: () => void;
@@ -45,6 +46,9 @@ export default function BusinessExpandableInfoRow({
   statusText,
   statusColor,
 }: Props) {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
   const isExpandable = Boolean(onToggle);
   const isPressable = Boolean(onToggle || onPress);
 
@@ -75,7 +79,7 @@ export default function BusinessExpandableInfoRow({
   return (
     <View style={[styles.container, isLast ? styles.containerLast : null]}>
       <Pressable
-        style={[styles.row, isExpanded && children ? styles.rowExpanded : null]}
+        style={styles.row}
         onPress={handlePress}
         disabled={!isPressable}
       >
@@ -84,7 +88,7 @@ export default function BusinessExpandableInfoRow({
         </View>
 
         <View style={styles.content}>
-          <Text style={styles.title}>{title}</Text>
+          {title ? <Text style={styles.title}>{title}</Text> : null}
 
           <Text
             style={[styles.value, isLinkValue ? styles.linkValue : null]}

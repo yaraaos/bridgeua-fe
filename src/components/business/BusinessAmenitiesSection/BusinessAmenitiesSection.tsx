@@ -1,7 +1,8 @@
 import type { BusinessAmenity } from "@/src/features/businesses/types/business.types";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { Ionicons } from "@expo/vector-icons";
 import { Text, View } from "react-native";
-import { styles } from "./BusinessAmenitiesSection.styles";
+import { createStyles } from "./BusinessAmenitiesSection.styles";
 
 type Props = {
   amenities?: BusinessAmenity[];
@@ -19,6 +20,9 @@ const amenityIcons: Record<
 };
 
 export default function BusinessAmenitiesSection({ amenities }: Props) {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
   if (!amenities?.length) return null;
 
   return (

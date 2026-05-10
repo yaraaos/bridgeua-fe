@@ -18,34 +18,57 @@ export function createStyles(colors: AppColors) {
       fontSize: 18,
       fontWeight: "700",
       color: colors.textPrimary,
-      marginBottom: spacing.md,
     },
-    grid: {
-      flexDirection: "row",
-      gap: spacing.sm,
+    list: {
+      gap: spacing.md,
     },
     item: {
-      flex: 1,
+      flexDirection: "row",
       alignItems: "center",
+      gap: spacing.md,
     },
-    iconWrap: {
-      width: 36,
-      height: 36,
-      borderRadius: radius.md,
+    avatar: {
+      width: 42,
+      height: 42,
+      borderRadius: radius.pill,
+      backgroundColor: colors.primaryGreenSoft,
+    },
+    avatarFallback: {
+      width: 42,
+      height: 42,
+      borderRadius: radius.pill,
       backgroundColor: colors.primaryGreenSoft,
       alignItems: "center",
       justifyContent: "center",
-      marginBottom: spacing.sm,
     },
-    icon: {
+    avatarFallbackText: {
+      fontSize: 16,
+      fontWeight: "700",
       color: colors.primaryGreen,
     },
-    label: {
-      fontSize: 13,
-      lineHeight: 18,
-      fontWeight: "500",
+    textWrap: {
+      flex: 1,
+    },
+    name: {
+      fontSize: 15,
+      fontWeight: "700",
       color: colors.textPrimary,
-      textAlign: "center",
+    },
+    subtitle: {
+      marginTop: spacing.xs,
+      fontSize: 13,
+      color: colors.textSecondary,
+    },
+    headerRow: {
+      flexDirection: "row",
+      alignItems: "baseline",
+      justifyContent: "space-between",
+      marginBottom: spacing.md,
+    },
+    seeAllText: {
+      fontSize: 14,
+      fontWeight: "700",
+      color: colors.primaryGreen,
     },
   });
 }

@@ -10,7 +10,7 @@ export function createStyles(colors: AppColors) {
     },
     containerPreview: {
       width: 200,
-      minHeight: 150,
+      height: 150,
       padding: spacing.md,
       borderTopWidth: 0,
       borderWidth: 1,
@@ -39,6 +39,12 @@ export function createStyles(colors: AppColors) {
       flexDirection: "row",
       alignItems: "center",
     },
+    reviewDate: {
+      marginLeft: spacing.sm,
+      fontSize: 11,
+      color: colors.textSecondary,
+      transform: [{ translateY: -7 }],
+    },
     text: {
       marginTop: spacing.md,
       fontSize: 14,
@@ -50,9 +56,11 @@ export function createStyles(colors: AppColors) {
       fontSize: 12,
       lineHeight: 17,
     },
-    moreText: {
+    moreButton: {
       marginTop: spacing.xs,
       alignSelf: "flex-end",
+    },
+    moreText: {
       fontSize: 12,
       fontWeight: "700",
       color: colors.primaryGreen,
@@ -73,7 +81,7 @@ export function createStyles(colors: AppColors) {
       backgroundColor: "rgba(0,0,0,0.92)",
     },
     photosScroll: {
-      marginTop: spacing.md,
+      marginTop: spacing.sm,
     },
     photoItem: {
       marginRight: spacing.sm,

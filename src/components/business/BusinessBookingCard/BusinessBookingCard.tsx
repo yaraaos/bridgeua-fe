@@ -56,10 +56,13 @@ export default function BusinessBookingCard({ businessId }: Props) {
       <Text style={styles.title}>Book an appointment</Text>
 
       <View style={styles.actions}>
-        {BOOKING_ACTIONS.map((action) => (
+        {BOOKING_ACTIONS.map((action, index) => (
           <Pressable
             key={action.pathname}
-            style={styles.actionRow}
+            style={[
+              styles.actionRow,
+              index !== 0 ? styles.actionRowBordered : null,
+            ]}
             onPress={() => handlePress(action.pathname)}
           >
             <View style={styles.iconBox}>

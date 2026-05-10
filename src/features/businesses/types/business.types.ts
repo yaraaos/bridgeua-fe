@@ -30,7 +30,7 @@ export type BusinessAmenity = {
 export type BusinessSocialLink = {
   id: string;
   label: string;
-  icon: "instagram" | "telegram" | "tiktok" | "whatsapp";
+  icon: "instagram" | "telegram" | "tiktok" | "whatsapp" | "website";
   url: string;
 };
 
@@ -62,6 +62,7 @@ export type BusinessDetailsReview = {
   authorAvatar: string;
   rating: number;
   text: string;
+  createdAt: string;
   tags?: string[];
   photos?: BusinessReviewPhoto[];
 };

@@ -35,22 +35,37 @@ export default function BusinessDetailsScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
 
-  const { id, tab } = useLocalSearchParams<{ id: string; tab?: string }>();
-  useEffect(() => {
-    if (tab === "photos") {
-      setActiveTab("photos");
-    }
-  }, [tab]);
+  const { id, tab } = useLocalSearchParams<{
+    id?: string;
+    tab?: string;
+  }>();
+
+  const [activeTab, setActiveTab] = useState<BusinessDetailsTab>("overview");
+  const [focusedReviewId, setFocusedReviewId] = useState<string | null>(null);
 
   const { business, isLoading } = useBusinessDetails(id);
+
   const {
     reviews,
     reviewCount,
-    isLoading: areReviewsLoading,
+    summary: reviewsSummary,
+    refresh: refreshReviews,
   } = useReviews({
     businessId: id,
   });
-  const [activeTab, setActiveTab] = useState<BusinessDetailsTab>("overview");
+
+  useEffect(() => {
+    if (tab === "reviews") {
+      setActiveTab("reviews");
+      refreshReviews();
+      return;
+    }
+
+    if (tab === "photos") {
+      setActiveTab("photos");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tab]);
 
   const scrollY = useRef(new Animated.Value(0)).current;
   const scrollViewRef = useRef<ScrollView>(null);
@@ -74,8 +89,6 @@ export default function BusinessDetailsScreen() {
     setActiveTab(tab);
   };
 
-  const [focusedReviewId, setFocusedReviewId] = useState<string | null>(null);
-
   if (isLoading) {
     return (
       <AppScreen style={styles.center}>
@@ -94,6 +107,8 @@ export default function BusinessDetailsScreen() {
 
   const heroPhotos =
     business.images.length > 0 ? business.images : business.reviewPhotos;
+
+  const allReviewPhotos = reviews.flatMap((review) => review.photos ?? []);
 
   const openImageViewer = (
     index: number,
@@ -195,35 +210,25 @@ export default function BusinessDetailsScreen() {
           ) : null}
 
           {activeTab === "services" ? (
-            <BusinessServicesList
-              services={business.services}
-              onPressService={(serviceId) =>
-                router.push({
-                  pathname: "/bookings/choose-service",
-                  params: {
-                    businessId: business.id,
-                    serviceId,
-                  },
-                })
-              }
-            />
+            <BusinessServicesList services={business.services} />
           ) : null}
 
           {activeTab === "reviews" ? (
             <>
               <BusinessRatingSummary
-                rating={business.rating}
-                reviewCount={business.reviewCount}
-                breakdown={business.ratingBreakdown}
+                rating={reviewsSummary?.rating ?? business.rating}
+                reviewCount={reviewsSummary?.reviewCount ?? reviewCount}
+                breakdown={
+                  reviewsSummary?.breakdown ?? business.ratingBreakdown
+                }
               />
 
               <BusinessReviewsList
                 reviews={reviews}
-                reviewCount={
-                  areReviewsLoading ? business.reviewCount : reviewCount
-                }
-                reviewPhotos={business.reviewPhotos}
+                reviewCount={reviewCount}
+                reviewPhotos={allReviewPhotos}
                 focusedReviewId={focusedReviewId}
+                onClearFocusedReview={() => setFocusedReviewId(null)}
                 onPressWriteReview={(rating) =>
                   router.push({
                     pathname: "/business/write-review",
@@ -239,7 +244,7 @@ export default function BusinessDetailsScreen() {
           {activeTab === "photos" ? (
             <BusinessGalleryGrid
               businessPhotos={business.images}
-              reviewPhotos={business.reviewPhotos}
+              reviewPhotos={allReviewPhotos}
             />
           ) : null}
 

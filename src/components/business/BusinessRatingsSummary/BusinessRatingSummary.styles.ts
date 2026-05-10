@@ -65,7 +65,7 @@ export function createStyles(colors: AppColors) {
       width: 18,
       fontSize: 12,
       color: colors.textMuted,
-      textAlign: "right",
+      textAlign: "center",
     },
   });
 }

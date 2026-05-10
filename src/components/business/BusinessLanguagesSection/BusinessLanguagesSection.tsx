@@ -1,11 +1,15 @@
+import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { Text, View } from "react-native";
-import { styles } from "./BusinessLanguagesSection.styles";
+import { createStyles } from "./BusinessLanguagesSection.styles";
 
 type Props = {
   languages?: string[];
 };
 
 export default function BusinessLanguagesSection({ languages }: Props) {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
   if (!languages?.length) return null;
 
   return (
