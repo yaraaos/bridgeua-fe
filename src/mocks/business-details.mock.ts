@@ -17,7 +17,7 @@ export const businessDetailsMock: BusinessDetails[] = [
     about: {
       title: "About Zelenska Beauty",
       description:
-        "At Zelenska Beauty, we believe beauty is personal. Our team of expert stylists and beauty specialists is dedicated to helping you look and feel your absolute best.",
+        "At Zelenska Beauty, we believe beauty is personal. Our team of expert stylists and beauty specialists is dedicated to helping you look and feel your absolute best. At Zelenska Beauty, we believe beauty is personal. Our team of expert stylists and beauty specialists is dedicated to helping you look and feel your absolute best.",
       isOpen: true,
       openingHours: [
         { id: "monday", day: "Monday", hours: "10:00 – 21:00" },

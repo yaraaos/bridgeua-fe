@@ -31,21 +31,6 @@ export const styles = StyleSheet.create({
     fontWeight: "500",
     color: colors.textPrimary,
   },
-  readMoreButton: {
-    marginTop: spacing.sm,
-    flexDirection: "row",
-    alignItems: "center",
-    alignSelf: "flex-start",
-  },
-  readMoreText: {
-    fontSize: 14,
-    fontWeight: "700",
-    color: colors.primaryGreen,
-  },
-  readMoreIcon: {
-    color: colors.primaryGreen,
-    marginLeft: 2,
-  },
   contactList: {
     marginTop: spacing.md,
     borderTopWidth: 1,
