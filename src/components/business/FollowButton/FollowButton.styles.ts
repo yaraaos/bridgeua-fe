@@ -41,10 +41,10 @@ export function createStyles(colors: AppColors) {
       color: colors.white,
     },
     iconButton: {
-      width: 34,
-      height: 34,
+      width: 36,
+      height: 36,
       borderRadius: 10,
-      backgroundColor: colors.primaryGreenSoft,
+      backgroundColor: colors.accentOrange,
       alignItems: "center",
       justifyContent: "center",
     },

@@ -1,3 +1,5 @@
+import { LocationOption } from "@/src/constants/locations";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
 import {
   AntDesign,
   Feather,
@@ -6,8 +8,6 @@ import {
 } from "@expo/vector-icons";
 import React from "react";
 import { Image, Pressable, Text, View } from "react-native";
-import { useAppTheme } from "@/src/hooks/useAppTheme";
-import { LocationOption } from "@/src/constants/locations";
 import AppInput from "../../ui/AppInput/AppInput";
 import GradientHeader from "../../ui/GradientHeader/GradientHeader";
 import { LocationSelector } from "../index";
@@ -79,7 +79,6 @@ export default function ScreenHeader({
   category,
   location,
   isOpen,
-  closesAt,
   rightSlot,
   onPressShare,
 }: Props) {
@@ -119,32 +118,11 @@ export default function ScreenHeader({
   if (variant === "business") {
     return (
       <GradientHeader colors={gradientColors}>
-        <View style={styles.businessHeaderRow}>
-          {!!imageUrl && (
-            <Image source={{ uri: imageUrl }} style={styles.businessLogo} />
-          )}
-
-          <View style={styles.businessInfo}>
-            <View style={styles.businessTitleRow}>
-              <Text style={styles.businessTitle} numberOfLines={2}>
-                {title}
-              </Text>
-
-              <View style={styles.businessInlineActions}>
-                {rightSlot}
-
-                <Pressable
-                  style={styles.businessIconButton}
-                  onPress={onPressShare}
-                >
-                  <Ionicons
-                    name="share-outline"
-                    size={18}
-                    color={colors.primaryGreen}
-                  />
-                </Pressable>
-              </View>
-            </View>
+        <View style={styles.businessContent}>
+          <View style={styles.businessInfoWrap}>
+            <Text style={styles.businessTitle} numberOfLines={2}>
+              {title}
+            </Text>
 
             <View style={styles.businessRatingRow}>
               {typeof rating === "number" &&
@@ -152,33 +130,73 @@ export default function ScreenHeader({
                   <MaterialIcons
                     key={index}
                     name={index < Math.round(rating) ? "star" : "star-border"}
-                    size={14}
+                    size={18}
                     color={colors.accentOrange}
                   />
                 ))}
 
-              {typeof rating === "number" && (
+              {typeof rating === "number" ? (
                 <Text style={styles.businessRatingValue}>
                   {rating.toFixed(1)}
                 </Text>
-              )}
+              ) : null}
 
-              {typeof reviewCount === "number" && (
+              {typeof reviewCount === "number" ? (
                 <Text style={styles.businessReviewText}>
                   ({reviewCount} reviews)
                 </Text>
-              )}
+              ) : null}
             </View>
 
-            {!!category && <Text style={styles.businessMeta}>{category}</Text>}
-            {!!location && <Text style={styles.businessMeta}>{location}</Text>}
+            <View style={styles.businessMetaRow}>
+              {!!category ? (
+                <Text style={styles.businessMeta}>{category}</Text>
+              ) : null}
 
-            {typeof isOpen === "boolean" && (
-              <Text style={styles.businessStatus}>
-                {isOpen ? "Open" : "Closed"}
-                {!!closesAt ? ` · Closes at ${closesAt}` : ""}
-              </Text>
+              {!!category && !!location ? (
+                <Text style={styles.businessMetaDivider}>•</Text>
+              ) : null}
+
+              {!!location ? (
+                <Text style={styles.businessMeta} numberOfLines={1}>
+                  {location}
+                </Text>
+              ) : null}
+            </View>
+
+            {typeof isOpen === "boolean" ? (
+              <View style={styles.businessStatusRow}>
+                <View style={styles.businessStatusDot} />
+
+                {typeof isOpen === "boolean" ? (
+                  <Text style={styles.businessStatus}>
+                    {isOpen ? "Open" : "Closed"}
+                  </Text>
+                ) : null}
+              </View>
+            ) : null}
+          </View>
+
+          <View style={styles.businessImageWrap}>
+            {!!imageUrl ? (
+              <Image source={{ uri: imageUrl }} style={styles.businessImage} />
+            ) : (
+              <View style={styles.businessImageFallback}>
+                <Ionicons
+                  name="storefront-outline"
+                  size={30}
+                  color={colors.primaryGreen}
+                />
+              </View>
             )}
+          </View>
+
+          <View style={styles.businessActionsColumn}>
+            {rightSlot}
+
+            <Pressable style={styles.actionButton} onPress={onPressShare}>
+              <Ionicons name="share-outline" size={16} color={colors.white} />
+            </Pressable>
           </View>
         </View>
       </GradientHeader>
