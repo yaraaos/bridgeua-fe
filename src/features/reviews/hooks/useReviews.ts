@@ -8,7 +8,7 @@ type Params = {
   limit?: number;
 };
 
-export const useReviews = ({ businessId, rating, limit = 10 }: Params) => {
+export const useReviews = ({ businessId, rating, limit = 1000 }: Params) => {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [summary, setSummary] = useState<ReviewsSummary | null>(null);
   const [page, setPage] = useState(1);
