@@ -8,8 +8,8 @@ export function createStyles(colors: AppColors) {
     container: {
       marginHorizontal: spacing.lg,
       marginTop: spacing.md,
-      marginBottom: spacing.xxl,
-      padding: spacing.lg,
+      paddingHorizontal: spacing.lg,
+      paddingVertical: spacing.sm,
       borderRadius: radius.xl,
       backgroundColor: colors.surface,
       borderWidth: 1,
@@ -20,14 +20,13 @@ export function createStyles(colors: AppColors) {
       fontWeight: "700",
       color: colors.textPrimary,
     },
-    list: {
-      marginTop: spacing.md,
-    },
     serviceRow: {
       flexDirection: "row",
       alignItems: "center",
       gap: spacing.md,
       paddingVertical: spacing.md,
+    },
+    serviceRowBordered: {
       borderTopWidth: 1,
       borderTopColor: colors.border,
     },

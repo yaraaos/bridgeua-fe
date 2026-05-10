@@ -1,5 +1,5 @@
-import { useAppTheme } from "@/src/hooks/useAppTheme";
 import type { BusinessDetailsService } from "@/src/features/businesses/types/business.types";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Pressable, Text, View } from "react-native";
@@ -30,13 +30,14 @@ export default function BusinessServicesList({
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Services</Text>
-
-      <View style={styles.list}>
-        {services.map((service) => (
+      <View>
+        {services.map((service, index) => (
           <Pressable
             key={service.id}
-            style={styles.serviceRow}
+            style={[
+              styles.serviceRow,
+              index !== 0 ? styles.serviceRowBordered : null,
+            ]}
             onPress={() => onPressService?.(service.id)}
           >
             <View style={styles.iconBox}>
