@@ -1,7 +1,8 @@
 import type { BusinessSocialLink } from "@/src/features/businesses/types/business.types";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { Ionicons } from "@expo/vector-icons";
 import { Linking, Pressable, Text, View } from "react-native";
-import { styles } from "./BusinessSocialLinksSection.styles";
+import { createStyles } from "./BusinessSocialLinksSection.styles";
 
 type Props = {
   socialLinks?: BusinessSocialLink[];
@@ -19,6 +20,8 @@ const socialIcons: Record<
 };
 
 export default function BusinessSocialLinksSection({ socialLinks }: Props) {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
   if (!socialLinks?.length) return null;
 
   return (
