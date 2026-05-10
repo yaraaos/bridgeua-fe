@@ -2,18 +2,14 @@ import type { BusinessDetailsService } from "@/src/features/businesses/types/bus
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { createStyles } from "./BusinessServicesList.styles";
 
 type Props = {
   services: BusinessDetailsService[];
-  onPressService?: (serviceId: string) => void;
 };
 
-export default function BusinessServicesList({
-  services,
-  onPressService,
-}: Props) {
+export default function BusinessServicesList({ services }: Props) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
 
@@ -32,13 +28,12 @@ export default function BusinessServicesList({
     <View style={styles.container}>
       <View>
         {services.map((service, index) => (
-          <Pressable
+          <View
             key={service.id}
             style={[
               styles.serviceRow,
               index !== 0 ? styles.serviceRowBordered : null,
             ]}
-            onPress={() => onPressService?.(service.id)}
           >
             <View style={styles.iconBox}>
               <Ionicons name="sparkles-outline" size={18} style={styles.icon} />
@@ -61,9 +56,7 @@ export default function BusinessServicesList({
                 )}
               </View>
             </View>
-
-            <Ionicons name="chevron-forward" size={18} style={styles.chevron} />
-          </Pressable>
+          </View>
         ))}
       </View>
     </View>

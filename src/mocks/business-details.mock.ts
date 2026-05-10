@@ -152,21 +152,63 @@ export const businessDetailsMock: BusinessDetails[] = [
     services: [
       {
         id: "service-1",
-        name: "Manicure",
+        name: "Classic Manicure",
         priceFrom: "$45",
         duration: "45 min",
       },
       {
         id: "service-2",
-        name: "Hair styling",
+        name: "Gel Manicure",
+        priceFrom: "$60",
+        duration: "1h",
+      },
+      {
+        id: "service-3",
+        name: "Pedicure",
+        priceFrom: "$70",
+        duration: "1h 10 min",
+      },
+      {
+        id: "service-4",
+        name: "Hair Styling",
         priceFrom: "$80",
         duration: "1h 15 min",
       },
       {
-        id: "service-3",
-        name: "Makeup",
+        id: "service-5",
+        name: "Hair Coloring",
+        priceFrom: "$140",
+        duration: "2h 30 min",
+      },
+      {
+        id: "service-6",
+        name: "Blow Dry",
+        priceFrom: "$55",
+        duration: "40 min",
+      },
+      {
+        id: "service-7",
+        name: "Professional Makeup",
         priceFrom: "$95",
         duration: "1h",
+      },
+      {
+        id: "service-8",
+        name: "Bridal Makeup",
+        priceFrom: "$180",
+        duration: "2h",
+      },
+      {
+        id: "service-9",
+        name: "Eyebrow Shaping",
+        priceFrom: "$25",
+        duration: "20 min",
+      },
+      {
+        id: "service-10",
+        name: "Lash Lift",
+        priceFrom: "$65",
+        duration: "50 min",
       },
     ],
 
