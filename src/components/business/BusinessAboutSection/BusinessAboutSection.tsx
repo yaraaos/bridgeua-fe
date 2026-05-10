@@ -29,7 +29,7 @@ export default function BusinessAboutSection({ about }: Props) {
       </View>
 
       <BusinessRecommendedBySection
-        recommendedBy={about.recommendedBy}
+        recommends={about.recommendedBy}
         onPressSeeAll={() => {
           console.log("Open full recommended by screen");
         }}

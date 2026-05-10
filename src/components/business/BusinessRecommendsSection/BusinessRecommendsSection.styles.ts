@@ -59,11 +59,6 @@ export function createStyles(colors: AppColors) {
       fontSize: 13,
       color: colors.textSecondary,
     },
-    meta: {
-      marginTop: spacing.xs,
-      fontSize: 12,
-      color: colors.textMuted,
-    },
     headerRow: {
       flexDirection: "row",
       alignItems: "baseline",

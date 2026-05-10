@@ -1,21 +1,21 @@
 import type { BusinessRecommendation } from "@/src/features/businesses/types/business.types";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { Image, Pressable, Text, View } from "react-native";
-import { createStyles } from "./BusinessRecommendedBySection.styles";
+import { createStyles } from "./BusinessRecommendsSection.styles";
 
 type Props = {
-  recommendedBy?: BusinessRecommendation[];
+  recommends?: BusinessRecommendation[];
   onPressSeeAll?: () => void;
 };
 
-export default function BusinessRecommendedBySection({
-  recommendedBy,
+export default function BusinessRecommendsSection({
+  recommends,
   onPressSeeAll,
 }: Props) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
 
-  if (!recommendedBy?.length) return null;
+  if (!recommends?.length) return null;
 
   return (
     <View style={styles.card}>
@@ -30,7 +30,7 @@ export default function BusinessRecommendedBySection({
       </View>
 
       <View style={styles.list}>
-        {recommendedBy.map((item) => (
+        {recommends.map((item) => (
           <View key={item.id} style={styles.item}>
             {item.businessImageUrl ? (
               <Image
@@ -52,12 +52,6 @@ export default function BusinessRecommendedBySection({
                 {item.businessCategory}
                 {item.businessLocation ? ` · ${item.businessLocation}` : ""}
               </Text>
-
-              {item.recommendationsCount ? (
-                <Text style={styles.meta}>
-                  {item.recommendationsCount} recommendations made
-                </Text>
-              ) : null}
             </View>
           </View>
         ))}
