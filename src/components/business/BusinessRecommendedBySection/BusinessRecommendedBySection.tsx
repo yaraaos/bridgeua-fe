@@ -1,6 +1,7 @@
 import type { BusinessRecommendation } from "@/src/features/businesses/types/business.types";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { Image, Pressable, Text, View } from "react-native";
-import { styles } from "./BusinessRecommendedBySection.styles";
+import { createStyles } from "./BusinessRecommendedBySection.styles";
 
 type Props = {
   recommendedBy?: BusinessRecommendation[];
@@ -11,12 +12,15 @@ export default function BusinessRecommendedBySection({
   recommendedBy,
   onPressSeeAll,
 }: Props) {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
   if (!recommendedBy?.length) return null;
 
   return (
     <View style={styles.card}>
       <View style={styles.headerRow}>
-        <Text style={styles.title}>Recommended by</Text>
+        <Text style={styles.title}>Recommends</Text>
 
         {onPressSeeAll ? (
           <Pressable onPress={onPressSeeAll}>
