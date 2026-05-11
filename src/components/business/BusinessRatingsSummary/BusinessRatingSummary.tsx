@@ -1,8 +1,8 @@
-import { useAppTheme } from "@/src/hooks/useAppTheme";
 import type { BusinessRatingBreakdownItem } from "@/src/features/businesses/types/business.types";
-import { MaterialIcons } from "@expo/vector-icons";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
 import React from "react";
 import { Text, View } from "react-native";
+import RatingStars from "../../ui/AppRatingStars";
 import { createStyles } from "./BusinessRatingSummary.styles";
 
 type Props = {
@@ -30,14 +30,7 @@ export default function BusinessRatingSummary({
         <Text style={styles.rating}>{rating.toFixed(1)}</Text>
 
         <View style={styles.starsRow}>
-          {Array.from({ length: 5 }).map((_, index) => (
-            <MaterialIcons
-              key={index}
-              name={index < Math.round(rating) ? "star" : "star-border"}
-              size={18}
-              color={colors.accentOrange}
-            />
-          ))}
+          <RatingStars rating={rating} size={18} />
         </View>
 
         <Text style={styles.reviewCount}>{reviewCount} reviews</Text>

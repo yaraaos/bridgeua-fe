@@ -1,14 +1,10 @@
-import {
-  AntDesign,
-  Feather,
-  Ionicons,
-  MaterialIcons,
-} from "@expo/vector-icons";
-import React from "react";
-import { Image, Pressable, Text, View } from "react-native";
-import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { LocationOption } from "@/src/constants/locations";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { AntDesign, Feather, Ionicons } from "@expo/vector-icons";
+import React, { useState } from "react";
+import { Image, Pressable, Text, View } from "react-native";
 import AppInput from "../../ui/AppInput/AppInput";
+import RatingStars from "../../ui/AppRatingStars";
 import GradientHeader from "../../ui/GradientHeader/GradientHeader";
 import { LocationSelector } from "../index";
 import { createStyles } from "./ScreenHeader.styles";
@@ -85,6 +81,9 @@ export default function ScreenHeader({
 }: Props) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+  const [titleLines, setTitleLines] = useState(1);
+  const businessHeaderHeight =
+    titleLines >= 3 ? 188 : titleLines === 2 ? 158 : 133;
 
   const hasSubtitle = !!subtitleLabel || !!subtitleValue;
   const showLocationSelector =
@@ -118,67 +117,105 @@ export default function ScreenHeader({
 
   if (variant === "business") {
     return (
-      <GradientHeader colors={gradientColors}>
-        <View style={styles.businessHeaderRow}>
-          {!!imageUrl && (
-            <Image source={{ uri: imageUrl }} style={styles.businessLogo} />
-          )}
-
-          <View style={styles.businessInfo}>
-            <View style={styles.businessTitleRow}>
-              <Text style={styles.businessTitle} numberOfLines={2}>
-                {title}
-              </Text>
-
-              <View style={styles.businessInlineActions}>
-                {rightSlot}
-
-                <Pressable
-                  style={styles.businessIconButton}
-                  onPress={onPressShare}
-                >
-                  <Ionicons
-                    name="share-outline"
-                    size={18}
-                    color={colors.primaryGreen}
-                  />
-                </Pressable>
-              </View>
-            </View>
+      <GradientHeader
+        colors={gradientColors}
+        innerStyle={[
+          styles.businessHeaderInner,
+          { height: businessHeaderHeight },
+        ]}
+      >
+        <View style={styles.businessContent}>
+          <View
+            style={[
+              styles.businessInfoWrap,
+              {
+                paddingBottom: titleLines >= 3 ? 10 : 0,
+              },
+            ]}
+          >
+            <Text
+              style={styles.businessTitle}
+              numberOfLines={3}
+              onTextLayout={(event) => {
+                setTitleLines(event.nativeEvent.lines.length);
+              }}
+            >
+              {title}
+            </Text>
 
             <View style={styles.businessRatingRow}>
-              {typeof rating === "number" &&
-                Array.from({ length: 5 }).map((_, index) => (
-                  <MaterialIcons
-                    key={index}
-                    name={index < Math.round(rating) ? "star" : "star-border"}
-                    size={14}
-                    color={colors.accentOrange}
-                  />
-                ))}
+              {typeof rating === "number" ? (
+                <RatingStars rating={rating} size={18} />
+              ) : null}
 
-              {typeof rating === "number" && (
+              {typeof rating === "number" ? (
                 <Text style={styles.businessRatingValue}>
                   {rating.toFixed(1)}
                 </Text>
-              )}
+              ) : null}
 
-              {typeof reviewCount === "number" && (
+              {typeof reviewCount === "number" ? (
                 <Text style={styles.businessReviewText}>
                   ({reviewCount} reviews)
                 </Text>
-              )}
+              ) : null}
             </View>
 
-            {!!category && <Text style={styles.businessMeta}>{category}</Text>}
-            {!!location && <Text style={styles.businessMeta}>{location}</Text>}
+            <View style={styles.businessMetaRow}>
+              {!!category ? (
+                <Text style={styles.businessMeta}>{category}</Text>
+              ) : null}
 
-            {typeof isOpen === "boolean" && (
-              <Text style={styles.businessStatus}>
-                {isOpen ? "Open" : "Closed"}
-                {!!closesAt ? ` · Closes at ${closesAt}` : ""}
-              </Text>
+              {!!category && !!location ? (
+                <Text style={styles.businessMetaDivider}>•</Text>
+              ) : null}
+
+              {!!location ? (
+                <Text style={styles.businessMeta} numberOfLines={1}>
+                  {location}
+                </Text>
+              ) : null}
+            </View>
+
+            {typeof isOpen === "boolean" ? (
+              <View style={styles.businessStatusRow}>
+                <Text style={styles.businessStatus}>
+                  {isOpen ? "Open" : "Closed"}
+                </Text>
+
+                {!!closesAt ? (
+                  <>
+                    <Text style={styles.businessStatusSeparator}>•</Text>
+
+                    <Text style={styles.businessStatusMuted}>
+                      Closes at {closesAt}
+                    </Text>
+                  </>
+                ) : null}
+              </View>
+            ) : null}
+          </View>
+
+          <View style={styles.businessImageWrap}>
+            {!!imageUrl ? (
+              <Image source={{ uri: imageUrl }} style={styles.businessImage} />
+            ) : (
+              <View style={styles.businessImageFallback}>
+                <Ionicons
+                  name="storefront-outline"
+                  size={30}
+                  color={colors.primaryGreen}
+                />
+              </View>
             )}
+          </View>
+
+          <View style={styles.businessActionsColumn}>
+            {rightSlot}
+
+            <Pressable style={styles.actionButton} onPress={onPressShare}>
+              <Ionicons name="share-outline" size={16} color={colors.white} />
+            </Pressable>
           </View>
         </View>
       </GradientHeader>

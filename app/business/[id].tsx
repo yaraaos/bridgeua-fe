@@ -49,7 +49,6 @@ export default function BusinessDetailsScreen() {
     reviews,
     reviewCount,
     summary: reviewsSummary,
-    refresh: refreshReviews,
   } = useReviews({
     businessId: id,
   });
@@ -57,14 +56,13 @@ export default function BusinessDetailsScreen() {
   useEffect(() => {
     if (tab === "reviews") {
       setActiveTab("reviews");
-      refreshReviews();
       return;
     }
 
     if (tab === "photos") {
       setActiveTab("photos");
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [tab]);
 
   const scrollY = useRef(new Animated.Value(0)).current;
@@ -139,8 +137,8 @@ export default function BusinessDetailsScreen() {
         variant="business"
         title={business.name}
         imageUrl={business.images[0]?.url}
-        rating={business.rating}
-        reviewCount={business.reviewCount}
+        rating={reviewsSummary?.rating ?? business.rating}
+        reviewCount={reviewsSummary?.reviewCount ?? reviewCount}
         category={business.category}
         location={business.location}
         isOpen={business.isOpen}

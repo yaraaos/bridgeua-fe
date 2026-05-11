@@ -1,5 +1,5 @@
-import { useFollowingStore } from "@/src/store/following.store";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { useFollowingStore } from "@/src/store/following.store";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Pressable, StyleProp, Text, ViewStyle } from "react-native";
@@ -40,9 +40,9 @@ export default function FollowButton({
         style={[styles.iconButton, style]}
       >
         <Ionicons
-          name={isFollowing ? "person" : "person-add-outline"}
-          size={18}
-          color={colors.primaryGreen}
+          name={isFollowing ? "heart" : "heart-outline"}
+          size={16}
+          color={colors.white}
         />
       </Pressable>
     );

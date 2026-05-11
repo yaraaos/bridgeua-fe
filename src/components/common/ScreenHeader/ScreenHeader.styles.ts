@@ -62,76 +62,136 @@ export function createStyles(colors: AppColors) {
       alignItems: "center",
       justifyContent: "center",
     },
-    businessIconButton: {
-      width: 34,
-      height: 34,
-      borderRadius: radius.md,
-      backgroundColor: colors.primaryGreenSoft,
+
+    businessContent: {
+      height: "100%",
+      flexDirection: "row",
       alignItems: "center",
+      gap: spacing.sm,
+    },
+    businessHeaderInner: {
+      height: 154,
       justifyContent: "center",
     },
-    businessHeaderRow: {
-      flexDirection: "row",
-      alignItems: "flex-start",
-      gap: spacing.lg,
-      transform: [{ translateY: 10 }],
-      paddingBottom: spacing.sm,
-    },
-    businessLogo: {
-      width: 98,
-      height: 98,
-      borderRadius: radius.lg,
-      backgroundColor: colors.surface,
-    },
-    businessInfo: {
+    businessInfoWrap: {
       flex: 1,
+      height: "100%",
       minWidth: 0,
+      justifyContent: "flex-start",
+      paddingTop: 7,
     },
+
     businessTitle: {
-      fontSize: 22,
-      lineHeight: 26,
+      fontSize: 24,
+      lineHeight: 29,
       fontWeight: "800",
       color: colors.textPrimary,
     },
+
     businessRatingRow: {
+      marginTop: 6,
       flexDirection: "row",
       alignItems: "center",
-      gap: 3,
-      marginTop: 6,
+      gap: 2,
     },
+
     businessRatingValue: {
-      fontSize: 13,
+      marginLeft: 2,
+      fontSize: 14,
       fontWeight: "700",
       color: colors.textPrimary,
-      marginLeft: 4,
     },
+
     businessReviewText: {
       fontSize: 12,
       color: colors.textSecondary,
     },
+
+    businessMetaRow: {
+      marginTop: 4,
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6,
+      maxWidth: "100%",
+    },
+
+    businessMetaItem: {
+      minWidth: 0,
+    },
+
     businessMeta: {
-      marginTop: 2,
-      fontSize: 14,
-      lineHeight: 18,
+      fontSize: 13,
+      lineHeight: 17,
       color: colors.textSecondary,
     },
-    businessStatus: {
+
+    businessMetaDivider: {
+      fontSize: 13,
+      color: colors.textSecondary,
+    },
+
+    businessStatusRow: {
       marginTop: 4,
-      fontSize: 14,
-      lineHeight: 18,
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6,
+    },
+
+    businessStatusSeparator: {
+      fontSize: 13,
+      color: colors.textSecondary,
+    },
+
+    businessStatus: {
+      fontSize: 13,
+      lineHeight: 17,
       fontWeight: "700",
       color: colors.primaryGreen,
     },
-    businessTitleRow: {
-      flexDirection: "row",
+
+    businessStatusMuted: {
+      fontSize: 13,
+      lineHeight: 17,
+      color: colors.textSecondary,
+    },
+
+    businessImageWrap: {
+      width: 96,
+      height: 96,
+      flexShrink: 0,
+    },
+
+    businessImage: {
+      width: "100%",
+      height: "100%",
+      borderRadius: radius.xl,
+      backgroundColor: colors.surface,
+    },
+
+    businessImageFallback: {
+      width: "100%",
+      height: "100%",
+      borderRadius: radius.xl,
+      backgroundColor: colors.primaryGreenSoft,
       alignItems: "center",
-      justifyContent: "space-between",
+      justifyContent: "center",
+    },
+
+    businessActionsColumn: {
+      width: 36,
+      flexShrink: 0,
+      alignItems: "center",
+      justifyContent: "center",
       gap: spacing.sm,
     },
-    businessInlineActions: {
-      flexDirection: "row",
+
+    businessIconButton: {
+      width: 36,
+      height: 36,
+      borderRadius: 10,
+      backgroundColor: colors.accentOrange,
       alignItems: "center",
-      gap: spacing.sm,
+      justifyContent: "center",
     },
   });
 }
