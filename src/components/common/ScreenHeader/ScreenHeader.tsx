@@ -83,7 +83,7 @@ export default function ScreenHeader({
   const styles = createStyles(colors);
   const [titleLines, setTitleLines] = useState(1);
   const businessHeaderHeight =
-    titleLines >= 3 ? 190 : titleLines === 2 ? 166 : 140;
+    titleLines >= 3 ? 188 : titleLines === 2 ? 158 : 133;
 
   const hasSubtitle = !!subtitleLabel || !!subtitleValue;
   const showLocationSelector =

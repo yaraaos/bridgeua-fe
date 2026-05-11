@@ -78,7 +78,7 @@ export function createStyles(colors: AppColors) {
       height: "100%",
       minWidth: 0,
       justifyContent: "flex-start",
-      paddingTop: 6,
+      paddingTop: 7,
     },
 
     businessTitle: {
