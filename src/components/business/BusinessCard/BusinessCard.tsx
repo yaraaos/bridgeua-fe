@@ -1,8 +1,9 @@
 import { FollowButton } from "@/src/components/business";
-import { RatingBadge } from "@/src/components/common";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Image, Pressable, Text, View } from "react-native";
+
 import { Business } from "@/src/types/business";
 import { createStyles } from "./BusinessCard.styles";
 
@@ -22,6 +23,10 @@ export default function BusinessCard({
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
 
+  const recommendedByText = business.recommendedBy
+    ?.replace(/^Recommended by\s*/i, "")
+    .trim();
+
   return (
     <Pressable
       style={[styles.card, variant === "compact" && styles.cardCompact]}
@@ -33,41 +38,46 @@ export default function BusinessCard({
         style={[styles.image, variant === "compact" && styles.imageCompact]}
       />
 
-      <View style={styles.info}>
-        <View style={styles.topRow}>
+      <View style={styles.content}>
+        <View style={styles.textContent}>
           <Text style={styles.name} numberOfLines={1}>
             {business.name}
           </Text>
 
-          <View style={styles.rightSide}>
-            <RatingBadge
-              rating={business.rating}
-              compact={variant === "compact"}
-            />
+          <View style={styles.ratingRow}>
+            <Ionicons name="star" size={13} color={colors.accentOrange} />
 
-            {showFollowButton ? (
-              <FollowButton
-                businessId={String(business.id)}
-                size="sm"
-                variant="outline"
-              />
-            ) : null}
+            <Text style={styles.ratingText}>{business.rating.toFixed(1)}</Text>
           </View>
+
+          <View style={styles.metaRow}>
+            <Text style={styles.metaText} numberOfLines={1}>
+              {business.category}
+            </Text>
+
+            <Text style={styles.dot}>•</Text>
+
+            <Text style={styles.metaText} numberOfLines={1}>
+              {business.location}
+            </Text>
+          </View>
+
+          {!!recommendedByText && (
+            <Text style={styles.recommendedBy} numberOfLines={1}>
+              Recommended by {recommendedByText}
+            </Text>
+          )}
         </View>
 
-        <Text style={styles.meta} numberOfLines={1}>
-          {business.category}
-        </Text>
-
-        <Text style={styles.meta} numberOfLines={1}>
-          {business.location}
-        </Text>
-
-        {!!business.recommendedBy && (
-          <Text style={styles.recommended} numberOfLines={1}>
-            {business.recommendedBy}
-          </Text>
-        )}
+        {showFollowButton ? (
+          <View style={styles.actionSlot}>
+            <FollowButton
+              businessId={String(business.id)}
+              size="icon"
+              variant="soft"
+            />
+          </View>
+        ) : null}
       </View>
     </Pressable>
   );
