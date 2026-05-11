@@ -2,16 +2,19 @@
 
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { getNavigationTheme } from "@/src/theme/navigationTheme";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
+import { useState } from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 function RootLayoutInner() {
   const { colors, isDark } = useAppTheme();
   const navTheme = getNavigationTheme(colors, isDark);
+  const [queryClient] = useState(() => new QueryClient());
 
   return (
-    <>
+    <QueryClientProvider client={queryClient}>
       <StatusBar style={isDark ? "light" : "dark"} />
       <Stack
         screenOptions={{ headerShown: false }}
@@ -37,7 +40,7 @@ function RootLayoutInner() {
           }}
         />
       </Stack>
-    </>
+    </QueryClientProvider>
   );
 }
 
