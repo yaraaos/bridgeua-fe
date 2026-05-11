@@ -68,12 +68,14 @@ export function createStyles(colors: AppColors) {
       alignItems: "center",
       gap: spacing.sm,
     },
-
+    businessHeaderInner: {
+      height: 154,
+      justifyContent: "center",
+    },
     businessInfoWrap: {
       flex: 1,
       minWidth: 0,
     },
-
     businessTitle: {
       fontSize: 24,
       lineHeight: 29,
@@ -171,7 +173,7 @@ export function createStyles(colors: AppColors) {
     },
 
     businessActionsColumn: {
-      width: 44,
+      width: 36,
       flexShrink: 0,
       alignItems: "center",
       justifyContent: "center",

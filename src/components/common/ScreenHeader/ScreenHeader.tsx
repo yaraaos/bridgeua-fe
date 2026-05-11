@@ -117,7 +117,10 @@ export default function ScreenHeader({
 
   if (variant === "business") {
     return (
-      <GradientHeader colors={gradientColors}>
+      <GradientHeader
+        colors={gradientColors}
+        innerStyle={styles.businessHeaderInner}
+      >
         <View style={styles.businessContent}>
           <View style={styles.businessInfoWrap}>
             <Text style={styles.businessTitle} numberOfLines={2}>
