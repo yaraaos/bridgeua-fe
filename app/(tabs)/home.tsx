@@ -139,10 +139,6 @@ export default function HomeScreen() {
     });
   };
 
-  const handleAddPress = () => {
-    router.push("/add-business/search");
-  };
-
   const selectedHomeCategory =
     cuisines.length === 0
       ? "All Categories"
@@ -183,10 +179,9 @@ export default function HomeScreen() {
       onRequestNearby={handleRequestNearby}
       showSearch
       searchPlaceholder="Find services, food or places"
-      actions={["map", "filter", "add"]}
+      actions={["map", "filter"]}
       onPressMap={handleMapPress}
       onPressFilter={handleFilterPress}
-      onPressAdd={handleAddPress}
     />
   );
 

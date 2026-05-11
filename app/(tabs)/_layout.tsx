@@ -1,6 +1,6 @@
+import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { Feather } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
-import { useAppTheme } from "@/src/hooks/useAppTheme";
 
 export default function TabsLayout() {
   const { colors } = useAppTheme();
@@ -39,11 +39,11 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="add"
+        name="map"
         options={{
-          title: "Add",
+          title: "Map",
           tabBarIcon: ({ color, size }) => (
-            <Feather name="plus-circle" size={size} color={color} />
+            <Feather name="map" size={size} color={color} />
           ),
         }}
       />

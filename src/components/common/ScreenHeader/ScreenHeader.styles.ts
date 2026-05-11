@@ -49,7 +49,7 @@ export function createStyles(colors: AppColors) {
     searchRow: {
       flexDirection: "row",
       alignItems: "center",
-      gap: 8,
+      gap: 6,
     },
     searchInputWrap: {
       flex: 1,
