@@ -114,5 +114,18 @@ export function createStyles(colors: AppColors) {
       fontWeight: "700",
       lineHeight: 16,
     },
+    cardEmbedded: {
+      borderWidth: 0,
+      backgroundColor: "transparent",
+      padding: 0,
+      marginBottom: 0,
+      minHeight: 76,
+    },
+
+    imageEmbedded: {
+      width: 72,
+      height: 72,
+      borderRadius: 14,
+    },
   });
 }

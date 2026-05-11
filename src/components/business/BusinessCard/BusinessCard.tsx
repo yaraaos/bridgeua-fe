@@ -10,7 +10,7 @@ import { createStyles } from "./BusinessCard.styles";
 type Props = {
   business: Business;
   onPress?: () => void;
-  variant?: "default" | "compact";
+  variant?: "default" | "compact" | "embedded";
   showFollowButton?: boolean;
 };
 
@@ -27,13 +27,21 @@ export default function BusinessCard({
 
   return (
     <Pressable
-      style={[styles.card, variant === "compact" && styles.cardCompact]}
+      style={[
+        styles.card,
+        variant === "compact" && styles.cardCompact,
+        variant === "embedded" && styles.cardEmbedded,
+      ]}
       onPress={onPress}
       disabled={!onPress}
     >
       <Image
         source={{ uri: business.image }}
-        style={[styles.image, variant === "compact" && styles.imageCompact]}
+        style={[
+          styles.image,
+          variant === "compact" && styles.imageCompact,
+          variant === "embedded" && styles.imageEmbedded,
+        ]}
       />
 
       <View style={styles.content}>
