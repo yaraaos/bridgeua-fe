@@ -79,6 +79,7 @@ export default function ScreenHeader({
   category,
   location,
   isOpen,
+  closesAt,
   rightSlot,
   onPressShare,
 }: Props) {
@@ -169,12 +170,18 @@ export default function ScreenHeader({
 
             {typeof isOpen === "boolean" ? (
               <View style={styles.businessStatusRow}>
-                <View style={styles.businessStatusDot} />
+                <Text style={styles.businessStatus}>
+                  {isOpen ? "Open" : "Closed"}
+                </Text>
 
-                {typeof isOpen === "boolean" ? (
-                  <Text style={styles.businessStatus}>
-                    {isOpen ? "Open" : "Closed"}
-                  </Text>
+                {!!closesAt ? (
+                  <>
+                    <Text style={styles.businessStatusSeparator}>•</Text>
+
+                    <Text style={styles.businessStatusMuted}>
+                      Closes at {closesAt}
+                    </Text>
+                  </>
                 ) : null}
               </View>
             ) : null}

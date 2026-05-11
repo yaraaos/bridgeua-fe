@@ -132,11 +132,9 @@ export function createStyles(colors: AppColors) {
       gap: 6,
     },
 
-    businessStatusDot: {
-      width: 7,
-      height: 7,
-      borderRadius: 999,
-      backgroundColor: colors.primaryGreen,
+    businessStatusSeparator: {
+      fontSize: 13,
+      color: colors.textSecondary,
     },
 
     businessStatus: {
@@ -147,7 +145,9 @@ export function createStyles(colors: AppColors) {
     },
 
     businessStatusMuted: {
-      display: "none",
+      fontSize: 13,
+      lineHeight: 17,
+      color: colors.textSecondary,
     },
 
     businessImageWrap: {
