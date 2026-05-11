@@ -139,8 +139,8 @@ export default function BusinessDetailsScreen() {
         variant="business"
         title={business.name}
         imageUrl={business.images[0]?.url}
-        rating={business.rating}
-        reviewCount={business.reviewCount}
+        rating={reviewsSummary?.rating ?? business.rating}
+        reviewCount={reviewsSummary?.reviewCount ?? reviewCount}
         category={business.category}
         location={business.location}
         isOpen={business.isOpen}
