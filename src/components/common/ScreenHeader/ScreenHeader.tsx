@@ -1,14 +1,10 @@
 import { LocationOption } from "@/src/constants/locations";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
-import {
-  AntDesign,
-  Feather,
-  Ionicons,
-  MaterialIcons,
-} from "@expo/vector-icons";
+import { AntDesign, Feather, Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import { Image, Pressable, Text, View } from "react-native";
 import AppInput from "../../ui/AppInput/AppInput";
+import RatingStars from "../../ui/AppRatingStars";
 import GradientHeader from "../../ui/GradientHeader/GradientHeader";
 import { LocationSelector } from "../index";
 import { createStyles } from "./ScreenHeader.styles";
@@ -148,15 +144,9 @@ export default function ScreenHeader({
             </Text>
 
             <View style={styles.businessRatingRow}>
-              {typeof rating === "number" &&
-                Array.from({ length: 5 }).map((_, index) => (
-                  <MaterialIcons
-                    key={index}
-                    name={index < Math.round(rating) ? "star" : "star-border"}
-                    size={18}
-                    color={colors.accentOrange}
-                  />
-                ))}
+              {typeof rating === "number" ? (
+                <RatingStars rating={rating} size={18} />
+              ) : null}
 
               {typeof rating === "number" ? (
                 <Text style={styles.businessRatingValue}>
