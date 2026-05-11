@@ -91,10 +91,27 @@ export function createStyles(colors: AppColors) {
       lineHeight: 16,
     },
 
-    recommendedBy: {
+    recommendedRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      alignSelf: "flex-start",
+      maxWidth: "100%",
+    },
+
+    recommendedLabel: {
+      flexShrink: 1,
       fontSize: 12,
       color: colors.primaryGreen,
       fontWeight: "600",
+      lineHeight: 16,
+    },
+
+    recommendedCount: {
+      flexShrink: 0,
+      marginLeft: 4,
+      fontSize: 12,
+      color: colors.primaryGreen,
+      fontWeight: "700",
       lineHeight: 16,
     },
   });

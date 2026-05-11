@@ -23,9 +23,7 @@ export default function BusinessCard({
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
 
-  const recommendedByText = business.recommendedBy
-    ?.replace(/^Recommended by\s*/i, "")
-    .trim();
+  const recommendedPreview = business.recommendedByPreview.join(", ");
 
   return (
     <Pressable
@@ -62,10 +60,18 @@ export default function BusinessCard({
             </Text>
           </View>
 
-          {!!recommendedByText && (
-            <Text style={styles.recommendedBy} numberOfLines={1}>
-              Recommended by {recommendedByText}
-            </Text>
+          {!!business.recommendedByPreview.length && (
+            <View style={styles.recommendedRow}>
+              <Text style={styles.recommendedLabel} numberOfLines={1}>
+                Recommended by {recommendedPreview}
+              </Text>
+
+              {business.recommendedByCount > 0 ? (
+                <Text style={styles.recommendedCount}>
+                  +{business.recommendedByCount}
+                </Text>
+              ) : null}
+            </View>
           )}
         </View>
 
