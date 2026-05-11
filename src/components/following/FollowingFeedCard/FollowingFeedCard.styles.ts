@@ -9,7 +9,7 @@ export function createStyles(colors: AppColors) {
       borderWidth: 1,
       borderColor: colors.border,
       padding: 14,
-      marginBottom: 12,
+      marginBottom: 6,
     },
 
     feedHeader: {
