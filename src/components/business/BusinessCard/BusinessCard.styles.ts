@@ -12,53 +12,120 @@ export function createStyles(colors: AppColors) {
       borderColor: colors.border,
       padding: 10,
       gap: 12,
-      marginBottom: 12,
+      marginBottom: 6,
+      minHeight: 96,
     },
     cardCompact: {
       padding: 8,
       gap: 10,
+      minHeight: 96,
     },
+
     image: {
+      width: 76,
+      height: 76,
+      borderRadius: 18,
+    },
+
+    imageCompact: {
       width: 72,
       height: 72,
-      borderRadius: 12,
+      borderRadius: 14,
     },
-    imageCompact: {
-      width: 60,
-      height: 60,
-      borderRadius: 10,
-    },
-    info: {
+
+    content: {
       flex: 1,
-      justifyContent: "center",
-    },
-    topRow: {
       flexDirection: "row",
-      alignItems: "center",
-      marginBottom: 4,
+      alignItems: "flex-start",
     },
-    name: {
+
+    textContent: {
       flex: 1,
+    },
+
+    actionSlot: {
+      marginLeft: 8,
+      paddingTop: 0,
+      flexShrink: 0,
+    },
+
+    name: {
       fontSize: 16,
       fontWeight: "700",
       color: colors.textPrimary,
-      marginRight: 8,
-    },
-    rightSide: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 8,
-      flexShrink: 0,
-    },
-    meta: {
-      fontSize: 12,
-      color: colors.textSecondary,
+      lineHeight: 20,
       marginBottom: 2,
     },
-    recommended: {
-      fontSize: 11,
+
+    ratingRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      marginBottom: 3,
+    },
+
+    ratingText: {
+      fontSize: 13,
+      fontWeight: "600",
+      color: colors.textPrimary,
+      marginLeft: 4,
+      lineHeight: 17,
+    },
+
+    metaRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      marginBottom: 3,
+    },
+
+    metaText: {
+      fontSize: 12,
+      color: colors.textSecondary,
+      lineHeight: 16,
+      flexShrink: 1,
+    },
+
+    dot: {
+      fontSize: 12,
       color: colors.textMuted,
-      marginTop: 4,
+      marginHorizontal: 6,
+      lineHeight: 16,
+    },
+
+    recommendedRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      alignSelf: "flex-start",
+      maxWidth: "100%",
+    },
+
+    recommendedLabel: {
+      flexShrink: 1,
+      fontSize: 12,
+      color: colors.primaryGreen,
+      fontWeight: "600",
+      lineHeight: 16,
+    },
+
+    recommendedCount: {
+      flexShrink: 0,
+      marginLeft: 4,
+      fontSize: 12,
+      color: colors.primaryGreen,
+      fontWeight: "700",
+      lineHeight: 16,
+    },
+    cardEmbedded: {
+      borderWidth: 0,
+      backgroundColor: "transparent",
+      padding: 0,
+      marginBottom: 0,
+      minHeight: 76,
+    },
+
+    imageEmbedded: {
+      width: 72,
+      height: 72,
+      borderRadius: 14,
     },
   });
 }

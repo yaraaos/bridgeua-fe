@@ -1,15 +1,16 @@
 import { FollowButton } from "@/src/components/business";
-import { RatingBadge } from "@/src/components/common";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Image, Pressable, Text, View } from "react-native";
+
 import { Business } from "@/src/types/business";
 import { createStyles } from "./BusinessCard.styles";
 
 type Props = {
   business: Business;
   onPress?: () => void;
-  variant?: "default" | "compact";
+  variant?: "default" | "compact" | "embedded";
   showFollowButton?: boolean;
 };
 
@@ -22,52 +23,75 @@ export default function BusinessCard({
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
 
+  const recommendedPreview = business.recommendedByPreview.join(", ");
+
   return (
     <Pressable
-      style={[styles.card, variant === "compact" && styles.cardCompact]}
+      style={[
+        styles.card,
+        variant === "compact" && styles.cardCompact,
+        variant === "embedded" && styles.cardEmbedded,
+      ]}
       onPress={onPress}
       disabled={!onPress}
     >
       <Image
         source={{ uri: business.image }}
-        style={[styles.image, variant === "compact" && styles.imageCompact]}
+        style={[
+          styles.image,
+          variant === "compact" && styles.imageCompact,
+          variant === "embedded" && styles.imageEmbedded,
+        ]}
       />
 
-      <View style={styles.info}>
-        <View style={styles.topRow}>
+      <View style={styles.content}>
+        <View style={styles.textContent}>
           <Text style={styles.name} numberOfLines={1}>
             {business.name}
           </Text>
 
-          <View style={styles.rightSide}>
-            <RatingBadge
-              rating={business.rating}
-              compact={variant === "compact"}
-            />
+          <View style={styles.ratingRow}>
+            <Ionicons name="star" size={13} color={colors.accentOrange} />
 
-            {showFollowButton ? (
-              <FollowButton
-                businessId={String(business.id)}
-                size="sm"
-                variant="outline"
-              />
-            ) : null}
+            <Text style={styles.ratingText}>{business.rating.toFixed(1)}</Text>
           </View>
+
+          <View style={styles.metaRow}>
+            <Text style={styles.metaText} numberOfLines={1}>
+              {business.category}
+            </Text>
+
+            <Text style={styles.dot}>•</Text>
+
+            <Text style={styles.metaText} numberOfLines={1}>
+              {business.location}
+            </Text>
+          </View>
+
+          {!!business.recommendedByPreview.length && (
+            <View style={styles.recommendedRow}>
+              <Text style={styles.recommendedLabel} numberOfLines={1}>
+                Recommended by {recommendedPreview}
+              </Text>
+
+              {business.recommendedByCount > 0 ? (
+                <Text style={styles.recommendedCount}>
+                  +{business.recommendedByCount}
+                </Text>
+              ) : null}
+            </View>
+          )}
         </View>
 
-        <Text style={styles.meta} numberOfLines={1}>
-          {business.category}
-        </Text>
-
-        <Text style={styles.meta} numberOfLines={1}>
-          {business.location}
-        </Text>
-
-        {!!business.recommendedBy && (
-          <Text style={styles.recommended} numberOfLines={1}>
-            {business.recommendedBy}
-          </Text>
-        )}
+        {showFollowButton ? (
+          <View style={styles.actionSlot}>
+            <FollowButton
+              businessId={String(business.id)}
+              size="icon"
+              variant="soft"
+            />
+          </View>
+        ) : null}
       </View>
     </Pressable>
   );

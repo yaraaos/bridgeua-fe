@@ -211,47 +211,44 @@ export default function HomeScreen() {
       {header}
 
       <View style={styles.contentArea}>
-        {isBannerVisible && (
-          <Animated.View
-            style={{
-              height: bannerMaxHeight,
-              opacity: bannerOpacity,
-              overflow: "hidden",
-            }}
-          >
-            <HomePromotionBanner
-              promotions={bannerPromotions}
-              visible={isBannerVisible}
-              onClose={closeBanner}
-              onPressPromotion={handlePromotionBannerPress}
-            />
-          </Animated.View>
-        )}
-
-        {categoryBar}
-
-        <Animated.FlatList
-          data={filteredBusinesses}
-          keyExtractor={(item) => String(item.id)}
+        <Animated.ScrollView
+          stickyHeaderIndices={[1]}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContent}
           onScroll={Animated.event(
             [{ nativeEvent: { contentOffset: { y: scrollY } } }],
             { useNativeDriver: false },
           )}
           scrollEventThrottle={16}
-          renderItem={({ item }) => (
-            <BusinessCard
-              business={item}
-              onPress={() =>
-                router.push({
-                  pathname: "/business/[id]",
-                  params: { id: String(item.id) },
-                })
-              }
-            />
-          )}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.listContent}
-        />
+        >
+          {isBannerVisible ? (
+            <View style={styles.bannerWrap}>
+              <HomePromotionBanner
+                promotions={bannerPromotions}
+                visible={isBannerVisible}
+                onClose={closeBanner}
+                onPressPromotion={handlePromotionBannerPress}
+              />
+            </View>
+          ) : null}
+
+          <View style={styles.stickyCategoryWrap}>{categoryBar}</View>
+
+          <View style={styles.listContent}>
+            {filteredBusinesses.map((item) => (
+              <BusinessCard
+                key={String(item.id)}
+                business={item}
+                onPress={() =>
+                  router.push({
+                    pathname: "/business/[id]",
+                    params: { id: String(item.id) },
+                  })
+                }
+              />
+            ))}
+          </View>
+        </Animated.ScrollView>
       </View>
 
       <HomePromotionModal
@@ -271,6 +268,23 @@ const styles = StyleSheet.create({
   contentArea: {
     flex: 1,
   },
+  cardWrap: {
+    paddingHorizontal: 16,
+  },
+  scrollContent: {
+    paddingBottom: 4,
+  },
+  bannerWrap: {
+    overflow: "hidden",
+    marginBottom: -10,
+  },
+
+  stickyCategoryWrap: {
+    backgroundColor: "#F7F7F5",
+    zIndex: 10,
+    marginBottom: -2,
+  },
+
   listContent: {
     paddingHorizontal: 16,
     paddingTop: 8,
