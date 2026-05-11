@@ -3,7 +3,7 @@ import type { BusinessDetails } from "@/src/features/businesses/types/business.t
 export const businessDetailsMock: BusinessDetails[] = [
   {
     id: "1",
-    name: "Zelenska Beaut Salon jjhjh hghghhg hghghghghghgy",
+    name: "Zelenska Beauty",
     category: "Beauty",
     location: "Beverly Hills / California",
     address: "9455 S Santa Monica Blvd, Beverly Hills, CA 90210, United States",

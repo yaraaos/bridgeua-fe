@@ -6,7 +6,7 @@ import {
   Ionicons,
   MaterialIcons,
 } from "@expo/vector-icons";
-import React from "react";
+import React, { useState } from "react";
 import { Image, Pressable, Text, View } from "react-native";
 import AppInput from "../../ui/AppInput/AppInput";
 import GradientHeader from "../../ui/GradientHeader/GradientHeader";
@@ -85,6 +85,9 @@ export default function ScreenHeader({
 }: Props) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+  const [titleLines, setTitleLines] = useState(1);
+  const businessHeaderHeight =
+    titleLines >= 3 ? 190 : titleLines === 2 ? 166 : 140;
 
   const hasSubtitle = !!subtitleLabel || !!subtitleValue;
   const showLocationSelector =
@@ -120,11 +123,27 @@ export default function ScreenHeader({
     return (
       <GradientHeader
         colors={gradientColors}
-        innerStyle={styles.businessHeaderInner}
+        innerStyle={[
+          styles.businessHeaderInner,
+          { height: businessHeaderHeight },
+        ]}
       >
         <View style={styles.businessContent}>
-          <View style={styles.businessInfoWrap}>
-            <Text style={styles.businessTitle} numberOfLines={2}>
+          <View
+            style={[
+              styles.businessInfoWrap,
+              {
+                paddingBottom: titleLines >= 3 ? 10 : 0,
+              },
+            ]}
+          >
+            <Text
+              style={styles.businessTitle}
+              numberOfLines={3}
+              onTextLayout={(event) => {
+                setTitleLines(event.nativeEvent.lines.length);
+              }}
+            >
               {title}
             </Text>
 

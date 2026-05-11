@@ -64,6 +64,7 @@ export function createStyles(colors: AppColors) {
     },
 
     businessContent: {
+      height: "100%",
       flexDirection: "row",
       alignItems: "center",
       gap: spacing.sm,
@@ -74,8 +75,12 @@ export function createStyles(colors: AppColors) {
     },
     businessInfoWrap: {
       flex: 1,
+      height: "100%",
       minWidth: 0,
+      justifyContent: "flex-start",
+      paddingTop: 6,
     },
+
     businessTitle: {
       fontSize: 24,
       lineHeight: 29,
