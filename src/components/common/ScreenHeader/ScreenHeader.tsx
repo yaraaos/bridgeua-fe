@@ -1,6 +1,6 @@
 import { LocationOption } from "@/src/constants/locations";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
-import { AntDesign, Feather, Ionicons } from "@expo/vector-icons";
+import { Feather, Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import { Image, Pressable, Text, View } from "react-native";
 import AppInput from "../../ui/AppInput/AppInput";
@@ -9,7 +9,7 @@ import GradientHeader from "../../ui/GradientHeader/GradientHeader";
 import { LocationSelector } from "../index";
 import { createStyles } from "./ScreenHeader.styles";
 
-type ActionType = "map" | "filter" | "add";
+type ActionType = "map" | "filter";
 
 type Props = {
   variant?: "default" | "business";
@@ -30,7 +30,6 @@ type Props = {
   actions?: ActionType[];
   onPressMap?: () => void;
   onPressFilter?: () => void;
-  onPressAdd?: () => void;
 
   gradientColors?: readonly [string, string, ...string[]];
 
@@ -64,7 +63,6 @@ export default function ScreenHeader({
   actions = [],
   onPressMap,
   onPressFilter,
-  onPressAdd,
   gradientColors,
   locationOptions,
   onSelectLocationOption,
@@ -94,11 +92,7 @@ export default function ScreenHeader({
       return <Feather name="map" size={16} color={colors.white} />;
     }
 
-    if (action === "filter") {
-      return <Ionicons name="options-outline" size={16} color={colors.white} />;
-    }
-
-    return <AntDesign name="plus" size={16} color={colors.white} />;
+    return <Ionicons name="options-outline" size={16} color={colors.white} />;
   };
 
   const handleActionPress = (action: ActionType) => {
@@ -107,12 +101,7 @@ export default function ScreenHeader({
       return;
     }
 
-    if (action === "filter") {
-      onPressFilter?.();
-      return;
-    }
-
-    onPressAdd?.();
+    onPressFilter?.();
   };
 
   if (variant === "business") {

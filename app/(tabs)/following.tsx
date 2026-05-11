@@ -83,10 +83,6 @@ export default function FollowingScreen() {
     });
   };
 
-  const handleAddPress = () => {
-    console.log("Add action pressed");
-  };
-
   if (isLoading) {
     return (
       <AppScreen withTopInset={false} style={styles.container}>
@@ -102,10 +98,9 @@ export default function FollowingScreen() {
           searchPlaceholder="Search here..."
           searchValue={searchQuery}
           onSearchChangeText={setSearchQuery}
-          actions={["map", "filter", "add"]}
+          actions={["map", "filter"]}
           onPressMap={handleMapPress}
           onPressFilter={handleFilterPress}
-          onPressAdd={handleAddPress}
           gradientColors={DISCOVERY_GRADIENT}
         />
 
@@ -142,10 +137,9 @@ export default function FollowingScreen() {
         searchPlaceholder="Search here..."
         searchValue={searchQuery}
         onSearchChangeText={setSearchQuery}
-        actions={["map", "filter", "add"]}
+        actions={["map", "filter"]}
         onPressMap={handleMapPress}
         onPressFilter={handleFilterPress}
-        onPressAdd={handleAddPress}
         gradientColors={DISCOVERY_GRADIENT}
       />
 
