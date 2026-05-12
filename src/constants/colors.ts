@@ -1,4 +1,6 @@
-export const colors = {
+export type AppColors = typeof lightColors;
+
+export const lightColors = {
   primaryGreen: "#1F5E46",
   primaryGreenDark: "#184C38",
   primaryGreenSoft: "#DDEBE4",
@@ -13,3 +15,22 @@ export const colors = {
   textMuted: "#98A09A",
   error: "#D9534F",
 };
+
+export const darkColors: AppColors = {
+  primaryGreen: "#1F5E46",
+  primaryGreenDark: "#184C38",
+  primaryGreenSoft: "#1A3D2E",
+  accentOrange: "#F79A2E",
+  accentOrangeSoft: "#3D2810",
+  white: "#FFFFFF",
+  background: "#0F1A16",
+  surface: "#1C2B24",
+  border: "#2A3D32",
+  textPrimary: "#F2F5F3",
+  textSecondary: "#8FA896",
+  textMuted: "#5A7063",
+  error: "#D9534F",
+};
+
+// Backward-compatible default export (light palette)
+export const colors = lightColors;

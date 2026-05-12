@@ -4,19 +4,23 @@ import FollowingFeedCard from "@/src/components/following/FollowingFeedCard";
 import AppEmptyState from "@/src/components/ui/AppEmptyState";
 import AppLoader from "@/src/components/ui/AppLoader/AppLoader";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
-import { colors } from "@/src/constants/colors";
+import { AppColors } from "@/src/constants/colors";
 import { DISCOVERY_GRADIENT } from "@/src/constants/gradients";
 import {
   DEFAULT_LOCATION_OPTIONS,
   LocationOption,
 } from "@/src/constants/locations";
 import { useFollowingFeed } from "@/src/features/following";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { useFollowingLocationStore } from "@/src/store/following-location.store";
 import { router } from "expo-router";
 import React from "react";
 import { Alert, FlatList, StyleSheet, View } from "react-native";
 
 export default function FollowingScreen() {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
   const {
     label: selectedLocationLabel,
     setManualLocation,
@@ -79,10 +83,6 @@ export default function FollowingScreen() {
     });
   };
 
-  const handleAddPress = () => {
-    console.log("Add action pressed");
-  };
-
   if (isLoading) {
     return (
       <AppScreen withTopInset={false} style={styles.container}>
@@ -98,10 +98,9 @@ export default function FollowingScreen() {
           searchPlaceholder="Search here..."
           searchValue={searchQuery}
           onSearchChangeText={setSearchQuery}
-          actions={["map", "filter", "add"]}
+          actions={["map", "filter"]}
           onPressMap={handleMapPress}
           onPressFilter={handleFilterPress}
-          onPressAdd={handleAddPress}
           gradientColors={DISCOVERY_GRADIENT}
         />
 
@@ -138,10 +137,9 @@ export default function FollowingScreen() {
         searchPlaceholder="Search here..."
         searchValue={searchQuery}
         onSearchChangeText={setSearchQuery}
-        actions={["map", "filter", "add"]}
+        actions={["map", "filter"]}
         onPressMap={handleMapPress}
         onPressFilter={handleFilterPress}
-        onPressAdd={handleAddPress}
         gradientColors={DISCOVERY_GRADIENT}
       />
 
@@ -185,23 +183,25 @@ export default function FollowingScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    padding: 0,
-    backgroundColor: colors.background,
-  },
-  switchWrap: {
-    paddingHorizontal: 16,
-    paddingTop: 12,
-    paddingBottom: 8,
-  },
-  loaderWrap: {
-    flex: 1,
-    justifyContent: "center",
-  },
-  listContent: {
-    paddingHorizontal: 16,
-    paddingTop: 8,
-    paddingBottom: 24,
-  },
-});
+function createStyles(colors: AppColors) {
+  return StyleSheet.create({
+    container: {
+      padding: 0,
+      backgroundColor: colors.background,
+    },
+    switchWrap: {
+      paddingHorizontal: 16,
+      paddingTop: 12,
+      paddingBottom: 8,
+    },
+    loaderWrap: {
+      flex: 1,
+      justifyContent: "center",
+    },
+    listContent: {
+      paddingHorizontal: 16,
+      paddingTop: 8,
+      paddingBottom: 24,
+    },
+  });
+}

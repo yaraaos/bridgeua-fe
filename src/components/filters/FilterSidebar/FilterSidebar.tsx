@@ -1,6 +1,7 @@
 import React from "react";
 import { Pressable, Text, View } from "react-native";
-import styles from "./FilterSidebar.styles";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { createStyles } from "./FilterSidebar.styles";
 
 type Item<T extends string> = {
   key: T;
@@ -18,6 +19,9 @@ export default function FilterSidebar<T extends string>({
   activeKey,
   onChange,
 }: Props<T>) {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
   return (
     <View style={styles.sidebar}>
       {items.map((item) => {

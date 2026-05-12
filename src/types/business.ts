@@ -3,7 +3,8 @@ export type Business = {
   name: string;
   category: string;
   location: string;
-  recommendedBy: string;
+  recommendedByPreview: string[];
+  recommendedByCount: number;
   rating: number;
   image: string;
   distanceKm: number;

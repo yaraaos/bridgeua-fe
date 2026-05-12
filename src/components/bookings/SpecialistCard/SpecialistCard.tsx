@@ -3,7 +3,8 @@
 import React from "react";
 import { Image, Pressable, Text, View } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
-import styles from "./SpecialistCard.styles";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { createStyles } from "./SpecialistCard.styles";
 
 export type SpecialistCardProps = {
   name: string;
@@ -28,6 +29,9 @@ export default function SpecialistCard({
   badgeText,
   onPress,
 }: SpecialistCardProps) {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
   return (
     <Pressable
       onPress={onPress}
@@ -38,7 +42,7 @@ export default function SpecialistCard({
           <Image source={{ uri: avatarUrl }} style={styles.avatar} />
         ) : (
           <View style={styles.avatarPlaceholder}>
-            <MaterialIcons name="person" size={24} color="#1F5E46" />
+            <MaterialIcons name="person" size={24} color={colors.primaryGreen} />
           </View>
         )}
 
@@ -57,7 +61,7 @@ export default function SpecialistCard({
           </View>
 
           <View style={styles.ratingRow}>
-            <MaterialIcons name="star" size={14} color="#F79A2E" />
+            <MaterialIcons name="star" size={14} color={colors.accentOrange} />
             <Text style={styles.ratingText}>
               {rating.toFixed(1)} ({reviewsCount} reviews)
             </Text>
@@ -72,7 +76,7 @@ export default function SpecialistCard({
       </View>
 
       <View style={[styles.checkCircle, isSelected && styles.checkCircleSelected]}>
-        {isSelected && <MaterialIcons name="check" size={14} color="#FFFFFF" />}
+        {isSelected && <MaterialIcons name="check" size={14} color={colors.white} />}
       </View>
     </Pressable>
   );

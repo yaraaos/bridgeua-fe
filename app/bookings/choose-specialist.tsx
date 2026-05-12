@@ -5,9 +5,13 @@ import { StyleSheet, Text, View } from "react-native";
 import AppScreen from "../../src/components/ui/AppScreen/AppScreen";
 import AppButton from "../../src/components/ui/AppButton/AppButton";
 import ServiceSelectionCard from "../../src/components/bookings/ServiceSelectionCard/ServiceSelectionCard";
-import { colors } from "../../src/constants/colors";
+import { AppColors } from "@/src/constants/colors";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
 
 export default function ChooseServicesScreen() {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
   const [selectedId, setSelectedId] = useState<string>("1");
 
   const services = [
@@ -55,21 +59,23 @@ export default function ChooseServicesScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    justifyContent: "space-between",
-  },
-  header: {
-    marginTop: 10,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: "800",
-    color: colors.textPrimary,
-  },
-  list: {
-    flex: 1,
-    gap: 12,
-    marginTop: 16,
-  },
-});
+function createStyles(colors: AppColors) {
+  return StyleSheet.create({
+    container: {
+      justifyContent: "space-between",
+    },
+    header: {
+      marginTop: 10,
+    },
+    title: {
+      fontSize: 20,
+      fontWeight: "800",
+      color: colors.textPrimary,
+    },
+    list: {
+      flex: 1,
+      gap: 12,
+      marginTop: 16,
+    },
+  });
+}

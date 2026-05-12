@@ -2,9 +2,9 @@ import { Feather } from "@expo/vector-icons";
 import React from "react";
 import { Pressable, Text, View } from "react-native";
 
-import { colors } from "@/src/constants/colors";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
 import type { FilterOption } from "@/src/constants/filters";
-import styles from "./FilterOptionList.styles";
+import { createStyles } from "./FilterOptionList.styles";
 
 type RadioProps<T extends string> = {
   title: string;
@@ -25,6 +25,9 @@ type CheckboxProps = {
 type Props<T extends string> = RadioProps<T> | CheckboxProps;
 
 export default function FilterOptionList<T extends string>(props: Props<T>) {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
   return (
     <View>
       <Text style={styles.title}>{props.title}</Text>
