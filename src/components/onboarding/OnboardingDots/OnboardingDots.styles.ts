@@ -16,7 +16,7 @@ export function createStyles(colors: AppColors) {
     },
     activeDot: {
       width: 20,
-      backgroundColor: colors.primaryGreen,
+      backgroundColor: colors.surface,
     },
   });
 }

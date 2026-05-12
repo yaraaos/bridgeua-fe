@@ -84,7 +84,7 @@ function createStyles(colors: AppColors) {
     },
     screen: {
       flex: 1,
-      backgroundColor: "#dde9e2",
+      backgroundColor: colors.background,
     },
     footer: {
       paddingHorizontal: 18,

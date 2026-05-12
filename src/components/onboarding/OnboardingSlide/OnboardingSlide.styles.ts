@@ -19,7 +19,8 @@ export function createStyles(colors: AppColors) {
     tagline: {
       marginTop: 4,
       fontSize: 12,
-      color: colors.textSecondary,
+      fontWeight: "600",
+      color: colors.textMuted,
     },
     cardsWrap: {
       alignItems: "center",

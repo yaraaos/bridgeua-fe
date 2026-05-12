@@ -21,7 +21,7 @@ export default function AuthSuccessScreen() {
         <Text style={styles.title}>Account confirmed</Text>
         <Text style={styles.subtitle}>
           Your account has been verified successfully. You can now start using
-          BridgeUA.
+          BridgeUA
         </Text>
       </View>
 
