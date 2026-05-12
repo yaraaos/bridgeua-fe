@@ -4,9 +4,13 @@ import { StyleSheet, Text, View } from "react-native";
 
 import AppButton from "../../src/components/ui/AppButton/AppButton";
 import AppScreen from "../../src/components/ui/AppScreen/AppScreen";
-import { colors } from "../../src/constants/colors";
+import { AppColors } from "../../src/constants/colors";
+import { useAppTheme } from "../../src/hooks/useAppTheme";
 
 export default function AuthSuccessScreen() {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
   return (
     <AppScreen style={styles.container}>
       <View style={styles.content}>
@@ -29,40 +33,42 @@ export default function AuthSuccessScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    justifyContent: "space-between",
-    paddingVertical: 40,
-  },
+function createStyles(colors: AppColors) {
+  return StyleSheet.create({
+    container: {
+      justifyContent: "space-between",
+      paddingVertical: 40,
+    },
 
-  content: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
+    content: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+    },
 
-  iconWrap: {
-    width: 84,
-    height: 84,
-    borderRadius: 42,
-    backgroundColor: colors.primaryGreen,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 24,
-  },
+    iconWrap: {
+      width: 84,
+      height: 84,
+      borderRadius: 42,
+      backgroundColor: colors.primaryGreen,
+      alignItems: "center",
+      justifyContent: "center",
+      marginBottom: 24,
+    },
 
-  title: {
-    fontSize: 28,
-    fontWeight: "800",
-    color: colors.textPrimary,
-    textAlign: "center",
-  },
+    title: {
+      fontSize: 28,
+      fontWeight: "800",
+      color: colors.textPrimary,
+      textAlign: "center",
+    },
 
-  subtitle: {
-    marginTop: 10,
-    fontSize: 15,
-    lineHeight: 22,
-    color: colors.textSecondary,
-    textAlign: "center",
-  },
-});
+    subtitle: {
+      marginTop: 10,
+      fontSize: 15,
+      lineHeight: 22,
+      color: colors.textSecondary,
+      textAlign: "center",
+    },
+  });
+}
