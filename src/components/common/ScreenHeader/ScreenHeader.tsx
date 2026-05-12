@@ -12,7 +12,7 @@ import { createStyles } from "./ScreenHeader.styles";
 type ActionType = "map" | "filter";
 
 type Props = {
-  variant?: "default" | "business";
+  variant?: "default" | "business" | "profile";
 
   title: string;
   titleSubtitle?: string;
@@ -48,6 +48,8 @@ type Props = {
   closesAt?: string;
   rightSlot?: React.ReactNode;
   onPressShare?: () => void;
+
+  profileContent?: React.ReactNode;
 };
 
 export default function ScreenHeader({
@@ -79,6 +81,7 @@ export default function ScreenHeader({
   closesAt,
   rightSlot,
   onPressShare,
+  profileContent,
 }: Props) {
   const { colors, isDark } = useAppTheme();
   const styles = createStyles(colors);
@@ -218,6 +221,23 @@ export default function ScreenHeader({
     );
   }
 
+  if (variant === "profile") {
+    return (
+      <GradientHeader
+        colors={headerGradientColors}
+        innerStyle={styles.profileHeaderInner}
+      >
+        <View style={styles.profileHeaderTopRow}>
+          <Text style={styles.profileHeaderTitle}>{title}</Text>
+
+          {rightSlot ? <View>{rightSlot}</View> : null}
+        </View>
+
+        {profileContent}
+      </GradientHeader>
+    );
+  }
+
   return (
     <GradientHeader colors={headerGradientColors}>
       <View style={styles.topRow}>
@@ -294,6 +314,7 @@ export default function ScreenHeader({
           {!!titleSubtitle && (
             <Text style={styles.titleSubtitle}>{titleSubtitle}</Text>
           )}
+          {rightSlot ? <View>{rightSlot}</View> : null}
         </View>
       </View>
 

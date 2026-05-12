@@ -1,28 +1,28 @@
-import type { Href } from "expo-router";
-
 export type ProfileAccountType = "personal" | "business";
 
 export type PersonalProfileStat = {
-  id: string;
+  id: "following" | "reviews";
   label: string;
   value: number;
 };
 
-export type PersonalProfileAction = {
+export type PersonalProfileFollowedBusiness = {
   id: string;
-  label: string;
-  route: Href;
+  name: string;
+  imageUrl: string;
+  rating: number;
+  category: string;
+  location: string;
 };
 
 export type PersonalProfileReview = {
   id: string;
   businessId: string;
   businessName: string;
-  businessCategory: string;
-  businessLocation: string;
+  businessImageUrl: string;
   rating: number;
   text: string;
-  createdAt: string;
+  createdAtLabel: string;
 };
 
 export type PersonalProfile = {
@@ -31,8 +31,7 @@ export type PersonalProfile = {
   username: string;
   displayName: string;
   avatarUrl?: string;
-  joinedAt: string;
   stats: PersonalProfileStat[];
-  actions: PersonalProfileAction[];
+  followedBusinesses: PersonalProfileFollowedBusiness[];
   reviews: PersonalProfileReview[];
 };

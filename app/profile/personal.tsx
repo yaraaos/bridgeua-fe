@@ -1,3 +1,5 @@
+import FollowButton from "@/src/components/business/FollowButton/FollowButton";
+import ScreenHeader from "@/src/components/common/ScreenHeader/ScreenHeader";
 import AppAvatar from "@/src/components/ui/AppAvatar/AppAvatar";
 import AppButton from "@/src/components/ui/AppButton/AppButton";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
@@ -7,14 +9,14 @@ import { spacing } from "@/src/constants/spacing";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { personalProfileMock } from "@/src/mocks/profile.mock";
 import type {
-  PersonalProfileMenuItem,
+  PersonalProfileFollowedBusiness,
   PersonalProfileReview,
   PersonalProfileStat,
 } from "@/src/types/profile";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React from "react";
-import { Pressable, ScrollView, StyleSheet, View } from "react-native";
+import { Image, Pressable, ScrollView, StyleSheet, View } from "react-native";
 
 export default function PersonalProfileScreen() {
   const { colors } = useAppTheme();
@@ -23,66 +25,96 @@ export default function PersonalProfileScreen() {
 
   return (
     <AppScreen style={styles.container} withTopInset={false}>
+      <ScreenHeader
+        variant="profile"
+        title="Profile"
+        rightSlot={
+          <Pressable
+            style={styles.settingsButton}
+            onPress={() => router.push("/settings")}
+          >
+            <Ionicons name="settings-outline" size={22} color={colors.white} />
+          </Pressable>
+        }
+        profileContent={
+          <View>
+            <View style={styles.identityRow}>
+              <AppAvatar
+                imageUrl={profile.avatarUrl}
+                name={profile.displayName}
+                size="lg"
+              />
+
+              <View style={styles.identityTextWrap}>
+                <AppText style={styles.displayName}>
+                  {profile.displayName}
+                </AppText>
+
+                <AppText style={styles.username}>@{profile.username}</AppText>
+              </View>
+            </View>
+
+            <View style={styles.statsRow}>
+              {profile.stats.map((stat, index) => (
+                <React.Fragment key={stat.id}>
+                  <ProfileStatItem stat={stat} />
+                  {index !== profile.stats.length - 1 ? (
+                    <View style={styles.statDivider} />
+                  ) : null}
+                </React.Fragment>
+              ))}
+            </View>
+
+            <View style={styles.actionsRow}>
+              <View style={styles.actionItem}>
+                <AppButton
+                  title="Edit profile"
+                  variant="primary"
+                  onPress={() => router.push("/profile/edit")}
+                />
+              </View>
+
+              <View style={styles.actionItem}>
+                <AppButton
+                  title="Switch account"
+                  variant="secondary"
+                  onPress={() => router.push("/profile/switch-account")}
+                />
+              </View>
+            </View>
+          </View>
+        }
+      />
+
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.content}
       >
-        <View style={styles.hero}>
-          <View style={styles.topActionsRow}>
-            <Pressable
-              style={styles.iconButton}
-              onPress={() => router.push("/settings")}
-            >
-              <Ionicons
-                name="settings-outline"
-                size={20}
-                color={colors.textPrimary}
-              />
-            </Pressable>
-          </View>
-
-          <View style={styles.profileIdentity}>
-            <AppAvatar
-              imageUrl={profile.avatarUrl}
-              name={profile.displayName}
-              size="lg"
-            />
-
-            <View style={styles.identityTextWrap}>
-              <AppText style={styles.username}>@{profile.username}</AppText>
-              <AppText style={styles.displayName}>
-                {profile.displayName}
-              </AppText>
-            </View>
-          </View>
-
-          <View style={styles.statsCard}>
-            {profile.stats.map((stat) => (
-              <ProfileStatItem key={stat.id} stat={stat} />
-            ))}
-          </View>
-
-          <View style={styles.actionsRow}>
-            <View style={styles.actionItem}>
-              <AppButton
-                title="Edit profile"
-                variant="primary"
-                onPress={() => router.push("/profile/edit")}
-              />
-            </View>
-
-            <View style={styles.actionItem}>
-              <AppButton
-                title="Switch account"
-                variant="secondary"
-                onPress={() => router.push("/profile/switch-account")}
-              />
-            </View>
-          </View>
+        <View style={styles.sectionHeaderRow}>
+          <AppText style={styles.sectionTitle}>You follow</AppText>
+          <Pressable onPress={() => router.push("/profile/following")}>
+            <AppText style={styles.seeAllText}>See all</AppText>
+          </Pressable>
         </View>
 
-        <View style={styles.section}>
-          <AppText style={styles.sectionTitle}>Your reviews</AppText>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.followedList}
+        >
+          {profile.followedBusinesses.map((business) => (
+            <FollowedBusinessCard key={business.id} business={business} />
+          ))}
+        </ScrollView>
+
+        <View style={styles.reviewsSection}>
+          <View style={styles.sectionHeaderRow}>
+            <AppText style={styles.sectionTitle}>Your reviews</AppText>
+
+            <Pressable onPress={() => router.push("/profile/reviews")}>
+              <AppText style={styles.seeAllText}>See all</AppText>
+            </Pressable>
+          </View>
 
           <View style={styles.reviewsList}>
             {profile.reviews.map((review) => (
@@ -107,6 +139,56 @@ function ProfileStatItem({ stat }: { stat: PersonalProfileStat }) {
   );
 }
 
+function FollowedBusinessCard({
+  business,
+}: {
+  business: PersonalProfileFollowedBusiness;
+}) {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
+  return (
+    <Pressable
+      style={styles.followedCard}
+      onPress={() =>
+        router.push({
+          pathname: "/business/[id]",
+          params: { id: business.id },
+        })
+      }
+    >
+      <View>
+        <Image
+          source={{ uri: business.imageUrl }}
+          style={styles.followedImage}
+        />
+        <FollowButton
+          businessId={business.id}
+          size="icon"
+          style={styles.followHeart}
+        />
+      </View>
+
+      <View style={styles.followedInfo}>
+        <AppText style={styles.followedName} numberOfLines={1}>
+          {business.name}
+        </AppText>
+
+        <View style={styles.followedRatingRow}>
+          <Ionicons name="star" size={14} color={colors.accentOrange} />
+          <AppText style={styles.followedRating}>
+            {business.rating.toFixed(1)}
+          </AppText>
+        </View>
+
+        <AppText style={styles.followedLocation} numberOfLines={1}>
+          {business.location}
+        </AppText>
+      </View>
+    </Pressable>
+  );
+}
+
 function ReviewCard({ review }: { review: PersonalProfileReview }) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
@@ -121,36 +203,36 @@ function ReviewCard({ review }: { review: PersonalProfileReview }) {
         })
       }
     >
-      <View style={styles.reviewTopRow}>
-        <View style={styles.reviewBusinessWrap}>
-          <AppText style={styles.reviewBusinessName}>
-            {review.businessName}
-          </AppText>
+      <Image
+        source={{ uri: review.businessImageUrl }}
+        style={styles.reviewImage}
+      />
 
-          <AppText style={styles.reviewMeta}>
-            {review.businessCategory} • {review.businessLocation}
+      <View style={styles.reviewContent}>
+        <AppText style={styles.reviewBusinessName} numberOfLines={1}>
+          {review.businessName}
+        </AppText>
+
+        <View style={styles.reviewRatingRow}>
+          <Ionicons name="star" size={14} color={colors.accentOrange} />
+          <AppText style={styles.reviewRating}>
+            {review.rating.toFixed(1)}
           </AppText>
         </View>
 
+        <AppText style={styles.reviewText} numberOfLines={1}>
+          {review.text}
+        </AppText>
+      </View>
+
+      <View style={styles.reviewRight}>
+        <AppText style={styles.reviewDate}>{review.createdAtLabel}</AppText>
         <Ionicons
           name="chevron-forward"
           size={18}
           color={colors.textSecondary}
         />
       </View>
-
-      <View style={styles.ratingRow}>
-        {Array.from({ length: 5 }).map((_, index) => (
-          <Ionicons
-            key={index}
-            name={index < review.rating ? "star" : "star-outline"}
-            size={15}
-            color={colors.accentOrange}
-          />
-        ))}
-      </View>
-
-      <AppText style={styles.reviewText}>{review.text}</AppText>
     </Pressable>
   );
 }
@@ -162,170 +244,191 @@ function createStyles(colors: AppColors) {
       backgroundColor: colors.background,
     },
     content: {
+      paddingHorizontal: spacing.lg,
+      paddingTop: spacing.xl,
       paddingBottom: 120,
     },
-    hero: {
-      paddingTop: 62,
-      paddingHorizontal: spacing.lg,
-      paddingBottom: spacing.xl,
-      backgroundColor: colors.surface,
-      borderBottomLeftRadius: 28,
-      borderBottomRightRadius: 28,
-      borderBottomWidth: 1,
-      borderColor: colors.border,
-    },
-    topActionsRow: {
-      alignItems: "flex-end",
-      marginBottom: spacing.md,
-    },
-    iconButton: {
-      width: 42,
-      height: 42,
+    settingsButton: {
+      width: 46,
+      height: 46,
       borderRadius: 16,
       alignItems: "center",
       justifyContent: "center",
-      backgroundColor: colors.background,
-      borderWidth: 1,
-      borderColor: colors.border,
+      backgroundColor: colors.accentOrange,
     },
-    profileIdentity: {
+    identityRow: {
       flexDirection: "row",
       alignItems: "center",
-      gap: spacing.md,
+      gap: spacing.lg,
     },
     identityTextWrap: {
       flex: 1,
     },
-    username: {
-      fontSize: 30,
+    displayName: {
+      fontSize: 24,
+      lineHeight: 30,
       fontWeight: "900",
       color: colors.textPrimary,
     },
-    displayName: {
+    username: {
       marginTop: 4,
-      fontSize: 17,
+      fontSize: 15,
       fontWeight: "700",
-      color: colors.textPrimary,
+      color: colors.textSecondary,
     },
-    statsCard: {
+    statsRow: {
       marginTop: spacing.xl,
-      paddingVertical: spacing.lg,
-      borderRadius: 24,
-      backgroundColor: colors.background,
-      borderWidth: 1,
-      borderColor: colors.border,
       flexDirection: "row",
-      justifyContent: "space-around",
+      alignItems: "center",
     },
     statItem: {
-      alignItems: "center",
       flex: 1,
+      alignItems: "center",
     },
     statValue: {
-      fontSize: 20,
+      fontSize: 24,
       fontWeight: "900",
       color: colors.textPrimary,
     },
     statLabel: {
       marginTop: 4,
-      fontSize: 12,
+      fontSize: 14,
       fontWeight: "600",
       color: colors.textSecondary,
     },
+    statDivider: {
+      width: 1,
+      height: 42,
+      backgroundColor: colors.border,
+    },
     actionsRow: {
-      marginTop: spacing.lg,
+      marginTop: spacing.xl,
       flexDirection: "row",
       gap: spacing.sm,
     },
     actionItem: {
       flex: 1,
     },
-    section: {
-      marginTop: spacing.xl,
-      paddingHorizontal: spacing.lg,
-    },
-    sectionTitle: {
-      fontSize: 22,
-      fontWeight: "900",
-      color: colors.textPrimary,
+    sectionHeaderRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
       marginBottom: spacing.md,
     },
+    sectionTitle: {
+      fontSize: 24,
+      lineHeight: 30,
+      fontWeight: "900",
+      color: colors.textPrimary,
+    },
+    seeAllText: {
+      fontSize: 15,
+      fontWeight: "800",
+      color: colors.primaryGreen,
+    },
+    followedList: {
+      gap: spacing.md,
+      paddingRight: spacing.lg,
+    },
+    followedCard: {
+      width: 136,
+      overflow: "hidden",
+      borderRadius: 22,
+      backgroundColor: colors.surface,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    followedImage: {
+      width: "100%",
+      height: 118,
+      backgroundColor: colors.primaryGreenSoft,
+    },
+    followHeart: {
+      position: "absolute",
+      top: 10,
+      right: 10,
+      width: 34,
+      height: 34,
+      borderRadius: 12,
+    },
+    followedInfo: {
+      padding: spacing.md,
+    },
+    followedName: {
+      fontSize: 15,
+      fontWeight: "900",
+      color: colors.textPrimary,
+    },
+    followedRatingRow: {
+      marginTop: 8,
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 4,
+    },
+    followedRating: {
+      fontSize: 13,
+      fontWeight: "700",
+      color: colors.textPrimary,
+    },
+    followedLocation: {
+      marginTop: 8,
+      fontSize: 13,
+      color: colors.textSecondary,
+    },
+    reviewsSection: {
+      marginTop: spacing.xxl,
+    },
     reviewsList: {
+      marginTop: spacing.md,
       gap: spacing.md,
     },
     reviewCard: {
-      padding: spacing.lg,
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.md,
+      padding: spacing.md,
       borderRadius: 24,
       backgroundColor: colors.surface,
       borderWidth: 1,
       borderColor: colors.border,
     },
-    reviewTopRow: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: spacing.md,
+    reviewImage: {
+      width: 72,
+      height: 72,
+      borderRadius: 18,
+      backgroundColor: colors.primaryGreenSoft,
     },
-    reviewBusinessWrap: {
+    reviewContent: {
       flex: 1,
+      minWidth: 0,
     },
     reviewBusinessName: {
       fontSize: 17,
       fontWeight: "900",
       color: colors.textPrimary,
     },
-    reviewMeta: {
-      marginTop: 4,
-      fontSize: 13,
-      color: colors.textSecondary,
-    },
-    ratingRow: {
-      marginTop: spacing.md,
+    reviewRatingRow: {
+      marginTop: 6,
       flexDirection: "row",
-      gap: 2,
+      alignItems: "center",
+      gap: 4,
     },
-    reviewText: {
-      marginTop: spacing.sm,
+    reviewRating: {
       fontSize: 14,
-      lineHeight: 21,
-      color: colors.textSecondary,
-    },
-    menuCard: {
-      overflow: "hidden",
-      borderRadius: 24,
-      backgroundColor: colors.surface,
-      borderWidth: 1,
-      borderColor: colors.border,
-    },
-    menuItem: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: spacing.md,
-      padding: spacing.lg,
-    },
-    menuItemBorder: {
-      borderBottomWidth: 1,
-      borderBottomColor: colors.border,
-    },
-    menuIcon: {
-      width: 42,
-      height: 42,
-      borderRadius: 16,
-      alignItems: "center",
-      justifyContent: "center",
-      backgroundColor: colors.primaryGreenSoft,
-    },
-    menuTextWrap: {
-      flex: 1,
-    },
-    menuTitle: {
-      fontSize: 16,
-      fontWeight: "900",
+      fontWeight: "700",
       color: colors.textPrimary,
     },
-    menuSubtitle: {
-      marginTop: 4,
-      fontSize: 13,
-      lineHeight: 18,
+    reviewText: {
+      marginTop: 8,
+      fontSize: 14,
+      color: colors.textSecondary,
+    },
+    reviewRight: {
+      alignItems: "flex-end",
+      gap: spacing.md,
+    },
+    reviewDate: {
+      fontSize: 12,
       color: colors.textSecondary,
     },
   });

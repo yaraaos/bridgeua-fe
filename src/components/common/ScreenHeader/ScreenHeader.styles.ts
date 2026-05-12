@@ -69,6 +69,25 @@ export function createStyles(colors: AppColors) {
       justifyContent: "center",
     },
 
+    profileHeaderInner: {
+      paddingTop: 28,
+      paddingBottom: 26,
+    },
+
+    profileHeaderTopRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      marginBottom: 26,
+    },
+
+    profileHeaderTitle: {
+      fontSize: 34,
+      lineHeight: 40,
+      fontWeight: "900",
+      color: colors.textPrimary,
+    },
+
     businessContent: {
       height: "100%",
       flexDirection: "row",
