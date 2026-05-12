@@ -8,11 +8,8 @@ import {
   Text,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import AppAvatar from "../../src/components/ui/AppAvatar/AppAvatar";
-import GradientHeader from "../../src/components/ui/GradientHeader/GradientHeader";
+import ScreenHeader from "@/src/components/common/ScreenHeader/ScreenHeader";
 import { AppColors } from "@/src/constants/colors";
-import { DISCOVERY_GRADIENT } from "@/src/constants/gradients";
 import { radius } from "@/src/constants/radius";
 import { spacing } from "@/src/constants/spacing";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
@@ -93,22 +90,12 @@ export default function SettingsScreen() {
   const setThemeMode = useAppStore((s) => s.setThemeMode);
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={["top"]}>
-      {/* Gradient Header */}
-      <GradientHeader colors={DISCOVERY_GRADIENT}>
-        <Pressable style={styles.backBtn} onPress={() => router.back()}>
-          <Feather name="chevron-left" size={28} color={colors.textPrimary} />
-        </Pressable>
-        <View style={styles.header}>
-          <View style={styles.headerText}>
-            <Text style={styles.title}>Settings</Text>
-            <Text style={styles.subtitle}>
-              Manage your preferences and account
-            </Text>
-          </View>
-          <AppAvatar name="Alex Kovalenko" size="md" />
-        </View>
-      </GradientHeader>
+    <View style={styles.safeArea}>
+      <ScreenHeader
+        title="Settings"
+        titleSubtitle="Manage your preferences and account"
+        onBack={() => router.back()}
+      />
 
       {/* Scrollable content */}
       <ScrollView
@@ -149,20 +136,6 @@ export default function SettingsScreen() {
 
         {/* Preferences */}
         <SettingsSection label="Preferences">
-          <SettingsRow
-            icon="heart"
-            title="Interests"
-            subtitle="Choose what you like"
-            onPress={() => {}}
-          />
-          <View style={styles.divider} />
-          <SettingsRow
-            icon="sliders"
-            title="Content Preferences"
-            subtitle="Customize your experience"
-            onPress={() => {}}
-          />
-          <View style={styles.divider} />
           <SettingsRow
             icon="globe"
             title="Language"
@@ -241,7 +214,7 @@ export default function SettingsScreen() {
 
         <Text style={styles.version}>Version 2.4.7</Text>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -252,31 +225,6 @@ function createStyles(colors: AppColors) {
     safeArea: {
       flex: 1,
       backgroundColor: colors.background,
-    },
-    backBtn: {
-      alignSelf: "flex-start",
-      marginTop: -8,
-      marginBottom: spacing.sm,
-      marginLeft: -4,
-    },
-    header: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "flex-start",
-    },
-    headerText: {
-      flex: 1,
-      marginRight: spacing.md,
-    },
-    title: {
-      fontSize: 28,
-      fontWeight: "800",
-      color: colors.textPrimary,
-      marginBottom: 4,
-    },
-    subtitle: {
-      fontSize: 13,
-      color: colors.textSecondary,
     },
     scroll: {
       flex: 1,

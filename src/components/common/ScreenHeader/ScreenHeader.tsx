@@ -17,6 +17,8 @@ type Props = {
   title: string;
   titleSubtitle?: string;
 
+  onBack?: () => void;
+
   subtitleLabel?: string;
   subtitleValue?: string;
   onSubtitlePress?: () => void;
@@ -52,6 +54,7 @@ export default function ScreenHeader({
   variant = "default",
   title,
   titleSubtitle,
+  onBack,
   subtitleLabel,
   subtitleValue,
   onSubtitlePress,
@@ -267,6 +270,20 @@ export default function ScreenHeader({
               )}
             </View>
           )
+        ) : onBack ? (
+          <Pressable
+            style={styles.backButton}
+            onPress={onBack}
+            hitSlop={12}
+            accessibilityRole="button"
+            accessibilityLabel="Go back"
+          >
+            <Ionicons
+              name="chevron-back"
+              size={28}
+              color={colors.textPrimary}
+            />
+          </Pressable>
         ) : (
           <View style={styles.leftBlock} />
         )}

@@ -5,6 +5,12 @@ import { StyleSheet } from "react-native";
 
 export function createStyles(colors: AppColors) {
   return StyleSheet.create({
+    backButton: {
+      flex: 1,
+      alignSelf: "flex-start",
+      marginLeft: -4,
+      paddingTop: 4,
+    },
     topRow: {
       flexDirection: "row",
       alignItems: "flex-start",
