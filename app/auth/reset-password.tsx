@@ -20,6 +20,7 @@ export default function ResetPasswordScreen() {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async () => {
+    if (isLoading) return;
     if (!password.trim() || !confirmPassword.trim()) {
       setError("All fields are required");
       return;
@@ -48,7 +49,7 @@ export default function ResetPasswordScreen() {
   };
 
   return (
-    <AppScreen style={styles.container}>
+    <AppScreen scroll style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Reset Password</Text>
 

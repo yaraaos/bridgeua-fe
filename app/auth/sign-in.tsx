@@ -26,6 +26,7 @@ export default function SignInScreen() {
   const [errors, setErrors] = useState<SignInFormErrors>({});
 
   const handleSubmit = async () => {
+    if (isLoading) return;
     const values = { email, password };
     const validationErrors = validateSignInForm(values);
 
@@ -42,7 +43,7 @@ export default function SignInScreen() {
   };
 
   return (
-    <AppScreen style={styles.container}>
+    <AppScreen scroll style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Welcome!</Text>
       </View>

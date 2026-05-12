@@ -18,6 +18,7 @@ export default function ForgotPasswordScreen() {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async () => {
+    if (isLoading) return;
     if (!email.trim()) {
       setError("Email is required");
       return;
@@ -42,7 +43,7 @@ export default function ForgotPasswordScreen() {
   };
 
   return (
-    <AppScreen style={styles.container}>
+    <AppScreen scroll style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Forgot Password</Text>
 

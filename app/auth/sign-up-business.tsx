@@ -50,6 +50,7 @@ export default function SignUpBusinessScreen() {
   };
 
   const handleSubmit = async () => {
+    if (isLoading) return;
     const values = {
       businessName,
       ownerName,

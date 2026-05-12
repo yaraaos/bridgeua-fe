@@ -1,6 +1,7 @@
 import { AppColors } from "@/src/constants/colors";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { ONBOARDING_SLIDES } from "@/src/mocks/onboarding.mock";
+import { setOnboardingSeen } from "@/src/services/storage/onboarding";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import React, { useRef, useState } from "react";
@@ -24,8 +25,9 @@ export default function OnboardingScreen() {
   const activeSlide = ONBOARDING_SLIDES[activeIndex];
   const isLastSlide = activeIndex === ONBOARDING_SLIDES.length - 1;
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (isLastSlide) {
+      await setOnboardingSeen();
       router.replace("/auth/sign-in");
       return;
     }

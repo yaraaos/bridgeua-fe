@@ -1,9 +1,11 @@
+import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { getAuthSession } from "@/src/services/auth/session";
+import { getOnboardingSeen } from "@/src/services/storage/onboarding";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { useEffect, useRef } from "react";
 import { Animated, Easing, StyleSheet, View } from "react-native";
 import Svg, { G, Path, Text as SvgText } from "react-native-svg";
-import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { SCREEN_WIDTH, styles, SVG_WIDTH } from "./splash.styles";
 
 const LEFT_PATH =
@@ -22,53 +24,74 @@ export default function SplashScreen() {
   const rightX = useRef(new Animated.Value(SCREEN_WIDTH)).current;
   const textOpacity = useRef(new Animated.Value(0)).current;
   const textY = useRef(new Animated.Value(8)).current;
-  const screenOpacity = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
-    Animated.sequence([
-      Animated.parallel([
-        Animated.timing(leftX, {
-          toValue: 0,
-          duration: 900,
-          easing: EASING,
-          useNativeDriver: true,
-        }),
-        Animated.timing(rightX, {
-          toValue: 0,
-          duration: 900,
-          easing: EASING,
-          useNativeDriver: true,
-        }),
-      ]),
-      Animated.parallel([
-        Animated.timing(textOpacity, {
-          toValue: 1,
-          duration: 500,
-          useNativeDriver: true,
-        }),
-        Animated.timing(textY, {
-          toValue: 0,
-          duration: 500,
-          useNativeDriver: true,
-        }),
-      ]),
-      Animated.timing(screenOpacity, {
-        toValue: 0,
-        duration: 500,
-        delay: 800,
-        useNativeDriver: true,
-      }),
-    ]).start(() => {
-      router.replace("/onboarding");
-    });
-  }, );
+    let isMounted = true;
+
+    async function resolveInitialRoute() {
+      const [session, onboardingSeen] = await Promise.all([
+        getAuthSession(),
+        getOnboardingSeen(),
+      ]);
+
+      if (session) return "/(tabs)/home";
+      if (onboardingSeen) return "/auth/sign-in";
+
+      return "/onboarding";
+    }
+
+    async function startSplash() {
+      const initialRoute = await resolveInitialRoute();
+
+      if (!isMounted) return;
+
+      Animated.sequence([
+        Animated.parallel([
+          Animated.timing(leftX, {
+            toValue: 0,
+            duration: 900,
+            easing: EASING,
+            useNativeDriver: true,
+          }),
+          Animated.timing(rightX, {
+            toValue: 0,
+            duration: 900,
+            easing: EASING,
+            useNativeDriver: true,
+          }),
+        ]),
+        Animated.parallel([
+          Animated.timing(textOpacity, {
+            toValue: 1,
+            duration: 500,
+            useNativeDriver: true,
+          }),
+          Animated.timing(textY, {
+            toValue: 0,
+            duration: 500,
+            useNativeDriver: true,
+          }),
+        ]),
+        Animated.delay(800),
+      ]).start(() => {
+        if (!isMounted) return;
+        router.replace(initialRoute as never);
+      });
+    }
+
+    startSplash();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [leftX, rightX, textOpacity, textY]);
 
   return (
     <AnimatedLinearGradient
       colors={gradientColors}
       start={{ x: 0, y: 0 }}
       end={{ x: 0, y: 1 }}
-      style={[styles.container, { opacity: screenOpacity }]}
+      style={[styles.container]}
     >
       <View style={styles.logoWrap}>
         <Animated.View
