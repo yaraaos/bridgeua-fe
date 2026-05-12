@@ -1,8 +1,10 @@
+import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { Feather } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
-import { colors } from "../../src/constants/colors";
 
 export default function TabsLayout() {
+  const { colors } = useAppTheme();
+
   return (
     <Tabs
       screenOptions={{
@@ -14,7 +16,7 @@ export default function TabsLayout() {
           paddingTop: 8,
           borderTopWidth: 1,
           borderTopColor: colors.border,
-          backgroundColor: colors.white,
+          backgroundColor: colors.surface,
         },
       }}
     >
@@ -37,11 +39,11 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="add"
+        name="map"
         options={{
-          title: "Add",
+          title: "Map",
           tabBarIcon: ({ color, size }) => (
-            <Feather name="plus-circle" size={size} color={color} />
+            <Feather name="map" size={size} color={color} />
           ),
         }}
       />

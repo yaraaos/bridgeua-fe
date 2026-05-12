@@ -1,6 +1,7 @@
 import React from "react";
 import { Pressable, Text, View } from "react-native";
-import { styles } from "./AccountTypeSwitch.styles";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { createStyles } from "./AccountTypeSwitch.styles";
 
 type SwitchOption<T extends string> = {
   label: string;
@@ -18,6 +19,9 @@ export default function AccountTypeSwitch<T extends string>({
   value,
   onChange,
 }: Props<T>) {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
   return (
     <View style={styles.switchRow}>
       {options.map((option) => {

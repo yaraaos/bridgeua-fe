@@ -1,7 +1,8 @@
+import { useAppTheme } from "@/src/hooks/useAppTheme";
 import React, { PropsWithChildren } from "react";
 import { ScrollView, ViewStyle } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { styles } from "./AppScreen.styles";
+import { createStyles } from "./AppScreen.styles";
 
 type Props = PropsWithChildren<{
   scroll?: boolean;
@@ -15,6 +16,9 @@ export default function AppScreen({
   style,
   withTopInset = true,
 }: Props) {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
   const edges = withTopInset
     ? (["top", "left", "right"] as const)
     : (["left", "right"] as const);

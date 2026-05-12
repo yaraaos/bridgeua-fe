@@ -1,6 +1,8 @@
 import BusinessCard from "@/src/components/business/BusinessCard/BusinessCard";
 import ScreenHeader from "@/src/components/common/ScreenHeader/ScreenHeader";
 import CategoryScroller from "@/src/components/home/CategoryScroller/CategoryScroller";
+import HomePromotionBanner from "@/src/components/home/HomePromotionBanner";
+import HomePromotionModal from "@/src/components/home/HomePromotionModal/HomePromotionModal";
 import AppLoader from "@/src/components/ui/AppLoader/AppLoader";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
 import { HOME_CATEGORIES } from "@/src/constants/categories";
@@ -10,12 +12,14 @@ import {
 } from "@/src/constants/locations";
 import { useBusinesses } from "@/src/features/businesses";
 import { useDiscoveryFeed } from "@/src/features/discovery/hooks/useDiscoveryFeed";
+import { useHomePromotion } from "@/src/features/promotions/hooks/useHomePromotion";
+import { useHomePromotionBanner } from "@/src/features/promotions/hooks/useHomePromotionBanner";
+import type { HomePromotion } from "@/src/features/promotions/types/promotion.types";
 import { useDiscoveryLocationStore } from "@/src/store/discovery-location";
 import { useFilterStore } from "@/src/store/filter.store";
 import { router } from "expo-router";
-import { Alert, FlatList, StyleSheet, View } from "react-native";
-
-const CATEGORY_BAR_HEIGHT = 48;
+import { useRef } from "react";
+import { Alert, Animated, StyleSheet, View } from "react-native";
 
 export default function HomeScreen() {
   const {
@@ -24,6 +28,8 @@ export default function HomeScreen() {
     setNearbyLocation,
     setPermissionStatus,
   } = useDiscoveryLocationStore();
+
+  const scrollY = useRef(new Animated.Value(0)).current;
 
   const { sort, cuisines, rating, distance, customDistance } = useFilterStore(
     (state) => state.discoveryFilters,
@@ -38,6 +44,35 @@ export default function HomeScreen() {
     distance,
     customDistance,
   });
+
+  const {
+    promotion,
+    isVisible: isPromotionVisible,
+    closePromotion,
+  } = useHomePromotion();
+
+  const { promotions: bannerPromotions, isVisible: isBannerVisible } =
+    useHomePromotionBanner();
+
+  const handlePromotionBannerPress = (promotion: HomePromotion) => {
+    router.push({
+      pathname: "/business/[id]",
+      params: { id: String(promotion.businessId) },
+    });
+  };
+
+  const handlePromotionPress = () => {
+    if (!promotion) {
+      return;
+    }
+
+    closePromotion();
+
+    router.push({
+      pathname: "/business/[id]",
+      params: { id: String(promotion.businessId) },
+    });
+  };
 
   const handleLocationPress = () => {
     console.log("Location selector is handled inside ScreenHeader");
@@ -87,10 +122,6 @@ export default function HomeScreen() {
     });
   };
 
-  const handleAddPress = () => {
-    router.push("/add-business/search");
-  };
-
   const selectedHomeCategory =
     cuisines.length === 0
       ? "All Categories"
@@ -131,21 +162,18 @@ export default function HomeScreen() {
       onRequestNearby={handleRequestNearby}
       showSearch
       searchPlaceholder="Find services, food or places"
-      actions={["map", "filter", "add"]}
+      actions={["map", "filter"]}
       onPressMap={handleMapPress}
       onPressFilter={handleFilterPress}
-      onPressAdd={handleAddPress}
     />
   );
 
   const categoryBar = (
-    <View style={styles.categoryOverlay}>
-      <CategoryScroller
-        categories={HOME_CATEGORIES}
-        selectedCategory={selectedHomeCategory}
-        onSelectCategory={handleSelectCategory}
-      />
-    </View>
+    <CategoryScroller
+      categories={HOME_CATEGORIES}
+      selectedCategory={selectedHomeCategory}
+      onSelectCategory={handleSelectCategory}
+    />
   );
 
   if (isLoading) {
@@ -166,26 +194,51 @@ export default function HomeScreen() {
       {header}
 
       <View style={styles.contentArea}>
-        {categoryBar}
-
-        <FlatList
-          data={filteredBusinesses}
-          keyExtractor={(item) => String(item.id)}
-          renderItem={({ item }) => (
-            <BusinessCard
-              business={item}
-              onPress={() =>
-                router.push({
-                  pathname: "/business/[id]",
-                  params: { id: String(item.id) },
-                })
-              }
-            />
-          )}
+        <Animated.ScrollView
+          stickyHeaderIndices={[1]}
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.listContent}
-        />
+          contentContainerStyle={styles.scrollContent}
+          onScroll={Animated.event(
+            [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+            { useNativeDriver: false },
+          )}
+          scrollEventThrottle={16}
+        >
+          {isBannerVisible ? (
+            <View style={styles.bannerWrap}>
+              <HomePromotionBanner
+                promotions={bannerPromotions}
+                visible={isBannerVisible}
+                onPressPromotion={handlePromotionBannerPress}
+              />
+            </View>
+          ) : null}
+
+          <View style={styles.stickyCategoryWrap}>{categoryBar}</View>
+
+          <View style={styles.listContent}>
+            {filteredBusinesses.map((item) => (
+              <BusinessCard
+                key={String(item.id)}
+                business={item}
+                onPress={() =>
+                  router.push({
+                    pathname: "/business/[id]",
+                    params: { id: String(item.id) },
+                  })
+                }
+              />
+            ))}
+          </View>
+        </Animated.ScrollView>
       </View>
+
+      <HomePromotionModal
+        visible={isPromotionVisible}
+        promotion={promotion}
+        onClose={closePromotion}
+        onPressCta={handlePromotionPress}
+      />
     </AppScreen>
   );
 }
@@ -196,18 +249,27 @@ const styles = StyleSheet.create({
   },
   contentArea: {
     flex: 1,
-    position: "relative",
   },
-  categoryOverlay: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    zIndex: 20,
-  },
-  listContent: {
-    paddingTop: CATEGORY_BAR_HEIGHT + 8,
+  cardWrap: {
     paddingHorizontal: 16,
+  },
+  scrollContent: {
+    paddingBottom: 4,
+  },
+  bannerWrap: {
+    overflow: "hidden",
+    marginBottom: -10,
+  },
+
+  stickyCategoryWrap: {
+    backgroundColor: "#F7F7F5",
+    zIndex: 10,
+    marginBottom: -2,
+  },
+
+  listContent: {
+    paddingHorizontal: 16,
+    paddingTop: 8,
     paddingBottom: 4,
   },
 });

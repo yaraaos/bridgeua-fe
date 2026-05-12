@@ -1,7 +1,8 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import React from "react";
 import { Text, View } from "react-native";
-import { styles } from "./RatingBadge.styles";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { createStyles } from "./RatingBadge.styles";
 
 type Props = {
   rating: number;
@@ -9,6 +10,9 @@ type Props = {
 };
 
 export default function RatingBadge({ rating, compact = false }: Props) {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
   return (
     <View
       style={[
@@ -19,7 +23,7 @@ export default function RatingBadge({ rating, compact = false }: Props) {
       <MaterialIcons
         name="star"
         size={compact ? 12 : 14}
-        color="#F79A2E"
+        color={colors.accentOrange}
       />
 
       <Text

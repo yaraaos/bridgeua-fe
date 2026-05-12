@@ -3,7 +3,8 @@
 import React from "react";
 import { Image, Pressable, Text, View } from "react-native";
 import { Feather, MaterialIcons } from "@expo/vector-icons";
-import styles from "./BusinessProfileHeader.styles";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { createStyles } from "./BusinessProfileHeader.styles";
 
 export type BusinessProfileHeaderProps = {
   username: string;
@@ -36,17 +37,20 @@ export default function BusinessProfileHeader({
   onViewPublicPagePress,
   onPromotionsPress,
 }: BusinessProfileHeaderProps) {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
   return (
     <View style={styles.wrapper}>
       <View style={styles.topBar}>
         <Pressable onPress={onBackPress} hitSlop={10}>
-          <Feather name="chevron-left" size={22} color="#222222" />
+          <Feather name="chevron-left" size={22} color={colors.textPrimary} />
         </Pressable>
 
         <Text style={styles.username}>{username}</Text>
 
         <Pressable onPress={onSettingsPress} hitSlop={10}>
-          <Feather name="settings" size={20} color="#1F5E46" />
+          <Feather name="settings" size={20} color={colors.primaryGreen} />
         </Pressable>
       </View>
 
@@ -55,7 +59,7 @@ export default function BusinessProfileHeader({
           <Image source={{ uri: avatarUrl }} style={styles.avatar} />
         ) : (
           <View style={styles.avatarPlaceholder}>
-            <MaterialIcons name="storefront" size={26} color="#1F5E46" />
+            <MaterialIcons name="storefront" size={26} color={colors.primaryGreen} />
           </View>
         )}
 
@@ -69,12 +73,12 @@ export default function BusinessProfileHeader({
 
       <View style={styles.actionsRow}>
         <Pressable style={styles.secondaryButton} onPress={onViewPublicPagePress}>
-          <Feather name="eye" size={14} color="#222222" />
+          <Feather name="eye" size={14} color={colors.textPrimary} />
           <Text style={styles.secondaryButtonText}>View public page</Text>
         </Pressable>
 
         <Pressable style={styles.secondaryButton} onPress={onPromotionsPress}>
-          <MaterialIcons name="campaign" size={14} color="#222222" />
+          <MaterialIcons name="campaign" size={14} color={colors.textPrimary} />
           <Text style={styles.secondaryButtonText}>Promotions</Text>
         </Pressable>
       </View>
