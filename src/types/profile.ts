@@ -25,14 +25,6 @@ export type PersonalProfileReview = {
   createdAt: string;
 };
 
-export type PersonalProfileMenuItem = {
-  id: string;
-  title: string;
-  subtitle?: string;
-  icon: string;
-  route: Href;
-};
-
 export type PersonalProfile = {
   id: string;
   accountType: "personal";
@@ -43,5 +35,4 @@ export type PersonalProfile = {
   stats: PersonalProfileStat[];
   actions: PersonalProfileAction[];
   reviews: PersonalProfileReview[];
-  accountItems: PersonalProfileMenuItem[];
 };

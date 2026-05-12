@@ -35,13 +35,4 @@ export const personalProfileMock: PersonalProfile = {
       createdAt: "2026-04-24T12:00:00.000Z",
     },
   ],
-  accountItems: [
-    {
-      id: "switch-account",
-      title: "Switch account",
-      subtitle: "Personal or business profile",
-      icon: "swap-horizontal-outline",
-      route: "/profile/switch-account",
-    },
-  ],
 };

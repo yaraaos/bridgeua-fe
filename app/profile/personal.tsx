@@ -63,15 +63,21 @@ export default function PersonalProfileScreen() {
           </View>
 
           <View style={styles.actionsRow}>
-            {profile.actions.map((action) => (
-              <View key={action.id} style={styles.actionItem}>
-                <AppButton
-                  title={action.label}
-                  variant="primary"
-                  onPress={() => router.push(action.route)}
-                />
-              </View>
-            ))}
+            <View style={styles.actionItem}>
+              <AppButton
+                title="Edit profile"
+                variant="primary"
+                onPress={() => router.push("/profile/edit")}
+              />
+            </View>
+
+            <View style={styles.actionItem}>
+              <AppButton
+                title="Switch account"
+                variant="secondary"
+                onPress={() => router.push("/profile/switch-account")}
+              />
+            </View>
           </View>
         </View>
 
@@ -84,11 +90,6 @@ export default function PersonalProfileScreen() {
             ))}
           </View>
         </View>
-
-        <ProfileMenuSection
-          title="Account"
-          items={profile.accountItems ?? []}
-        />
       </ScrollView>
     </AppScreen>
   );
@@ -151,61 +152,6 @@ function ReviewCard({ review }: { review: PersonalProfileReview }) {
 
       <AppText style={styles.reviewText}>{review.text}</AppText>
     </Pressable>
-  );
-}
-
-function ProfileMenuSection({
-  title,
-  items,
-}: {
-  title: string;
-  items: PersonalProfileMenuItem[];
-}) {
-  const { colors } = useAppTheme();
-  const styles = createStyles(colors);
-
-  if (items.length === 0) {
-    return null;
-  }
-
-  return (
-    <View style={styles.section}>
-      <AppText style={styles.sectionTitle}>{title}</AppText>
-
-      <View style={styles.menuCard}>
-        {items.map((item, index) => (
-          <Pressable
-            key={item.id}
-            style={[
-              styles.menuItem,
-              index !== items.length - 1 && styles.menuItemBorder,
-            ]}
-            onPress={() => router.push(item.route)}
-          >
-            <View style={styles.menuIcon}>
-              <Ionicons
-                name={item.icon as keyof typeof Ionicons.glyphMap}
-                size={20}
-                color={colors.primaryGreen}
-              />
-            </View>
-
-            <View style={styles.menuTextWrap}>
-              <AppText style={styles.menuTitle}>{item.title}</AppText>
-              {!!item.subtitle ? (
-                <AppText style={styles.menuSubtitle}>{item.subtitle}</AppText>
-              ) : null}
-            </View>
-
-            <Ionicons
-              name="chevron-forward"
-              size={18}
-              color={colors.textSecondary}
-            />
-          </Pressable>
-        ))}
-      </View>
-    </View>
   );
 }
 
