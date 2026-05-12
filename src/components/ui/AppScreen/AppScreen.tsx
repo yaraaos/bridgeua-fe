@@ -30,7 +30,8 @@ export default function AppScreen({
           contentContainerStyle={[styles.content, styles.scrollContent, style]}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
-          keyboardDismissMode="on-drag"
+          keyboardDismissMode="interactive"
+          automaticallyAdjustKeyboardInsets
         >
           {children}
         </ScrollView>

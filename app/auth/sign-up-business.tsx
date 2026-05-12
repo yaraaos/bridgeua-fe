@@ -204,12 +204,6 @@ export default function SignUpBusinessScreen() {
               disabled={isLoading}
               error={Boolean(errors.password)}
             />
-            <Feather
-              name="eye-off"
-              size={16}
-              color={colors.textMuted}
-              style={styles.eyeIcon}
-            />
             {errors.password ? (
               <Text style={styles.errorText}>{errors.password}</Text>
             ) : null}
@@ -225,12 +219,6 @@ export default function SignUpBusinessScreen() {
               }}
               disabled={isLoading}
               error={Boolean(errors.confirmPassword)}
-            />
-            <Feather
-              name="eye-off"
-              size={16}
-              color={colors.textMuted}
-              style={styles.eyeIcon}
             />
             {errors.confirmPassword ? (
               <Text style={styles.errorText}>{errors.confirmPassword}</Text>
@@ -362,12 +350,6 @@ function createStyles(colors: AppColors) {
 
     categoryChipTextActive: {
       color: colors.primaryGreenDark,
-    },
-
-    eyeIcon: {
-      position: "absolute",
-      right: 14,
-      top: 17,
     },
 
     checkboxRow: {
