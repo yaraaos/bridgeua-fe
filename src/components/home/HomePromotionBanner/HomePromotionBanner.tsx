@@ -1,6 +1,5 @@
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import type { HomePromotion } from "@/src/features/promotions/types/promotion.types";
-import { Feather } from "@expo/vector-icons";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import {
     FlatList,
@@ -19,7 +18,6 @@ import {
 type Props = {
   promotions: HomePromotion[];
   visible: boolean;
-  onClose: () => void;
   onPressPromotion: (promotion: HomePromotion) => void;
 };
 
@@ -28,7 +26,6 @@ const AUTO_SWIPE_INTERVAL_MS = 8000;
 export default function HomePromotionBanner({
   promotions,
   visible,
-  onClose,
   onPressPromotion,
 }: Props) {
   const { colors } = useAppTheme();
@@ -144,10 +141,6 @@ export default function HomePromotionBanner({
                 imageStyle={styles.imageRadius}
               >
                 <View style={styles.overlay} />
-
-                <Pressable style={styles.closeButton} onPress={onClose}>
-                  <Feather name="x" size={12} color={colors.textPrimary} />
-                </Pressable>
 
                 <View style={styles.badge}>
                   <Text style={styles.badgeText}>Promo</Text>

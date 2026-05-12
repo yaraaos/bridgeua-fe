@@ -39,18 +39,6 @@ export function createStyles(colors: AppColors) {
       ...StyleSheet.absoluteFillObject,
       backgroundColor: "rgba(0, 0, 0, 0.28)",
     },
-    closeButton: {
-      position: "absolute",
-      top: 10,
-      right: 10,
-      zIndex: 3,
-      width: 28,
-      height: 28,
-      borderRadius: 999,
-      backgroundColor: colors.white,
-      alignItems: "center",
-      justifyContent: "center",
-    },
     badge: {
       alignSelf: "flex-start",
       borderRadius: 999,

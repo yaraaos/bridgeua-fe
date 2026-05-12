@@ -21,8 +21,6 @@ import { router } from "expo-router";
 import { useRef } from "react";
 import { Alert, Animated, StyleSheet, View } from "react-native";
 
-const PROMO_BANNER_COLLAPSE_HEIGHT = 144;
-
 export default function HomeScreen() {
   const {
     label: selectedLocationLabel,
@@ -32,18 +30,6 @@ export default function HomeScreen() {
   } = useDiscoveryLocationStore();
 
   const scrollY = useRef(new Animated.Value(0)).current;
-
-  const bannerMaxHeight = scrollY.interpolate({
-    inputRange: [0, PROMO_BANNER_COLLAPSE_HEIGHT],
-    outputRange: [PROMO_BANNER_COLLAPSE_HEIGHT, 0],
-    extrapolate: "clamp",
-  });
-
-  const bannerOpacity = scrollY.interpolate({
-    inputRange: [0, PROMO_BANNER_COLLAPSE_HEIGHT * 0.7],
-    outputRange: [1, 0],
-    extrapolate: "clamp",
-  });
 
   const { sort, cuisines, rating, distance, customDistance } = useFilterStore(
     (state) => state.discoveryFilters,
@@ -65,11 +51,8 @@ export default function HomeScreen() {
     closePromotion,
   } = useHomePromotion();
 
-  const {
-    promotions: bannerPromotions,
-    isVisible: isBannerVisible,
-    closeBanner,
-  } = useHomePromotionBanner();
+  const { promotions: bannerPromotions, isVisible: isBannerVisible } =
+    useHomePromotionBanner();
 
   const handlePromotionBannerPress = (promotion: HomePromotion) => {
     router.push({
@@ -226,7 +209,6 @@ export default function HomeScreen() {
               <HomePromotionBanner
                 promotions={bannerPromotions}
                 visible={isBannerVisible}
-                onClose={closeBanner}
                 onPressPromotion={handlePromotionBannerPress}
               />
             </View>
