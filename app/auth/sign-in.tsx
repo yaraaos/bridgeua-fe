@@ -42,7 +42,7 @@ export default function SignInScreen() {
   };
 
   return (
-    <AppScreen style={styles.container}>
+    <AppScreen scroll style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Welcome!</Text>
       </View>

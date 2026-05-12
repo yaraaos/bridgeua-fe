@@ -48,7 +48,7 @@ export default function ResetPasswordScreen() {
   };
 
   return (
-    <AppScreen style={styles.container}>
+    <AppScreen scroll style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Reset Password</Text>
 

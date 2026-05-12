@@ -71,7 +71,7 @@ export default function SignUpPersonalScreen() {
   };
 
   return (
-    <AppScreen style={styles.container}>
+    <AppScreen scroll style={styles.container}>
       <View style={styles.content}>
         <View style={styles.headerBlock}>
           <Text style={styles.title}>Create your account</Text>
