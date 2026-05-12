@@ -18,6 +18,7 @@ export default function ForgotPasswordScreen() {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async () => {
+    if (isLoading) return;
     if (!email.trim()) {
       setError("Email is required");
       return;

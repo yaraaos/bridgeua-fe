@@ -26,6 +26,7 @@ export default function SignInScreen() {
   const [errors, setErrors] = useState<SignInFormErrors>({});
 
   const handleSubmit = async () => {
+    if (isLoading) return;
     const values = { email, password };
     const validationErrors = validateSignInForm(values);
 

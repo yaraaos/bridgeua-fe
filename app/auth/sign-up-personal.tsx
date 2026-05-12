@@ -39,6 +39,7 @@ export default function SignUpPersonalScreen() {
   };
 
   const handleSubmit = async () => {
+    if (isLoading) return;
     const values = {
       firstName,
       lastName,

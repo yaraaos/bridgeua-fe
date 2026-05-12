@@ -20,6 +20,7 @@ export default function ResetPasswordScreen() {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async () => {
+    if (isLoading) return;
     if (!password.trim() || !confirmPassword.trim()) {
       setError("All fields are required");
       return;

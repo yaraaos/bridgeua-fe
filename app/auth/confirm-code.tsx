@@ -60,6 +60,7 @@ export default function ConfirmCodeScreen() {
   };
 
   const handleSubmit = async () => {
+    if (isLoading) return;
     if (code.length !== OTP_LENGTH) {
       setLocalError("Enter the 4-digit code");
       return;
@@ -73,7 +74,7 @@ export default function ConfirmCodeScreen() {
   };
 
   const handleResend = async () => {
-    if (!canResend) return;
+    if (!canResend || isResending) return;
 
     const response = await submitResendCode({ email });
 
