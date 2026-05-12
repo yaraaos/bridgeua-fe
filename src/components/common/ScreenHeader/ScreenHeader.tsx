@@ -77,9 +77,13 @@ export default function ScreenHeader({
   rightSlot,
   onPressShare,
 }: Props) {
-  const { colors } = useAppTheme();
+  const { colors, isDark } = useAppTheme();
   const styles = createStyles(colors);
   const [titleLines, setTitleLines] = useState(1);
+  const headerGradientColors =
+    isDark && gradientColors
+      ? (["#102019", "#183327", "#0F1A16"] as const)
+      : gradientColors;
   const businessHeaderHeight =
     titleLines >= 3 ? 188 : titleLines === 2 ? 158 : 133;
 
@@ -107,7 +111,7 @@ export default function ScreenHeader({
   if (variant === "business") {
     return (
       <GradientHeader
-        colors={gradientColors}
+        colors={headerGradientColors}
         innerStyle={[
           styles.businessHeaderInner,
           { height: businessHeaderHeight },
@@ -212,7 +216,7 @@ export default function ScreenHeader({
   }
 
   return (
-    <GradientHeader colors={gradientColors}>
+    <GradientHeader colors={headerGradientColors}>
       <View style={styles.topRow}>
         {showLocationSelector ? (
           <View style={styles.leftBlock}>
