@@ -96,6 +96,36 @@ export function createStyles(colors: AppColors) {
       alignItems: "center",
       gap: spacing.md,
     },
+    filterIconWrap: {
+      width: 20,
+      height: 20,
+      alignItems: "center",
+      justifyContent: "center",
+      overflow: "visible",
+    },
+
+    filterBadge: {
+      position: "absolute",
+      top: -11,
+      right: -13,
+      minWidth: 16,
+      height: 16,
+      borderRadius: 8,
+      paddingHorizontal: 4,
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: colors.accentOrange,
+      borderWidth: 1,
+      borderColor: colors.white,
+      zIndex: 10,
+    },
+
+    filterBadgeText: {
+      color: colors.white,
+      fontSize: 11,
+      fontWeight: "700",
+      lineHeight: 13,
+    },
 
     businessContent: {
       height: "100%",

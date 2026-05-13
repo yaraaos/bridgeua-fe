@@ -5,16 +5,24 @@ import { followingFeedMock } from "@/src/mocks/following-feed.mock";
 import { useFilterStore } from "@/src/store/filter.store";
 import { useFollowingStore } from "@/src/store/following.store";
 import {
-    FollowingFeedCardItem,
-    FollowingFeedType,
+  FollowingFeedCardItem,
+  FollowingFeedType,
 } from "../types/following.types";
 
-export const useFollowingFeed = () => {
+type UseFollowingFeedParams = {
+  visibleBusinessIds?: string[];
+};
+
+export const useFollowingFeed = ({
+  visibleBusinessIds,
+}: UseFollowingFeedParams = {}) => {
   const { businesses, isLoading } = useBusinesses();
 
   const followedBusinessIds = useFollowingStore(
     (state) => state.followedBusinessIds,
   );
+
+  const feedBusinessIds = visibleBusinessIds ?? followedBusinessIds.map(String);
 
   const { sort, cuisines, rating, distance, customDistance } = useFilterStore(
     (state) => state.followingFilters,
@@ -25,7 +33,7 @@ export const useFollowingFeed = () => {
 
   const feedItems = useMemo<FollowingFeedCardItem[]>(() => {
     return followingFeedMock
-      .filter((item) => followedBusinessIds.includes(String(item.businessId)))
+      .filter((item) => feedBusinessIds.includes(String(item.businessId)))
       .map((item) => {
         const business = businesses.find(
           (entry) => String(entry.id) === String(item.businessId),
@@ -44,11 +52,12 @@ export const useFollowingFeed = () => {
           businessRating: business.rating,
           businessDistanceKm: business.distanceKm,
           businessPriceLevel: business.priceLevel,
-          recommendedBy: business.recommendedBy,
+          recommendedByPreview: business.recommendedByPreview ?? [],
+          recommendedByCount: business.recommendedByCount ?? 0,
         };
       })
       .filter(Boolean) as FollowingFeedCardItem[];
-  }, [businesses, followedBusinessIds]);
+  }, [businesses, feedBusinessIds]);
 
   const filteredItems = useMemo(() => {
     const normalizedQuery = searchQuery.trim().toLowerCase();
@@ -146,6 +155,6 @@ export const useFollowingFeed = () => {
     items: filteredItems,
     isLoading,
     isEmpty: !isLoading && filteredItems.length === 0,
-    hasFollowedBusinesses: followedBusinessIds.length > 0,
+    hasFollowedBusinesses: feedBusinessIds.length > 0,
   };
 };

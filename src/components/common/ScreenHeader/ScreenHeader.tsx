@@ -2,7 +2,14 @@ import { LocationOption } from "@/src/constants/locations";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
-import { Image, Pressable, Text, View } from "react-native";
+import {
+  Image,
+  Pressable,
+  StyleProp,
+  Text,
+  View,
+  ViewStyle,
+} from "react-native";
 import AppInput from "../../ui/AppInput/AppInput";
 import RatingStars from "../../ui/AppRatingStars";
 import GradientHeader from "../../ui/GradientHeader/GradientHeader";
@@ -29,6 +36,8 @@ type Props = {
   searchValue?: string;
   onSearchChangeText?: (text: string) => void;
 
+  activeFilterCount?: number;
+
   actions?: ActionType[];
   onPressMap?: () => void;
   onPressFilter?: () => void;
@@ -38,6 +47,8 @@ type Props = {
   locationOptions?: LocationOption[];
   onSelectLocationOption?: (option: LocationOption) => void;
   onRequestNearby?: () => void;
+
+  headerInnerStyle?: StyleProp<ViewStyle>;
 
   imageUrl?: string;
   rating?: number;
@@ -67,12 +78,14 @@ export default function ScreenHeader({
   searchValue,
   onSearchChangeText,
   actions = [],
+  activeFilterCount = 0,
   onPressMap,
   onPressFilter,
   gradientColors,
   locationOptions,
   onSelectLocationOption,
   onRequestNearby,
+  headerInnerStyle,
   imageUrl,
   rating,
   reviewCount,
@@ -104,7 +117,17 @@ export default function ScreenHeader({
       return <Feather name="map" size={16} color={colors.white} />;
     }
 
-    return <Ionicons name="options-outline" size={16} color={colors.white} />;
+    return (
+      <View style={styles.filterIconWrap}>
+        <Ionicons name="options-outline" size={16} color={colors.white} />
+
+        {activeFilterCount > 0 ? (
+          <View style={styles.filterBadge}>
+            <Text style={styles.filterBadgeText}>{activeFilterCount}</Text>
+          </View>
+        ) : null}
+      </View>
+    );
   };
 
   const handleActionPress = (action: ActionType) => {
@@ -235,7 +258,7 @@ export default function ScreenHeader({
   }
 
   return (
-    <GradientHeader colors={headerGradientColors}>
+    <GradientHeader colors={headerGradientColors} innerStyle={headerInnerStyle}>
       <View style={styles.topRow}>
         {leftSlot ? (
           <View style={styles.leftBlock}>{leftSlot}</View>
