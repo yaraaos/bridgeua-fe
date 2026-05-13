@@ -4,21 +4,67 @@ import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
 import AppText from "@/src/components/ui/AppText/AppText";
 import { AppColors } from "@/src/constants/colors";
 import { spacing } from "@/src/constants/spacing";
+import { getMyReviews } from "@/src/features/reviews/services/review.service";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { businessesMock } from "@/src/mocks/businesses.mock";
 import { personalProfileMock } from "@/src/mocks/profile.mock";
+import { useFollowingStore } from "@/src/store/following.store";
 import type {
   PersonalProfileFollowedBusiness,
   PersonalProfileReview,
 } from "@/src/types/profile";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
+
+
 import { Image, Pressable, ScrollView, StyleSheet, View } from "react-native";
 
 export default function PersonalProfileScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
   const profile = personalProfileMock;
+
+  const followedBusinessIds = useFollowingStore(
+    (state) => state.followedBusinessIds,
+  );
+
+  const [myReviews, setMyReviews] = useState<PersonalProfileReview[]>([]);
+
+  useEffect(() => {
+    getMyReviews().then(setMyReviews);
+  }, []);
+
+  const followedBusinesses = useMemo(
+    () =>
+      businessesMock
+        .filter((business) => followedBusinessIds.includes(String(business.id)))
+        .map((business) => ({
+          id: String(business.id),
+          name: business.name,
+          imageUrl: business.image,
+          rating: business.rating,
+          category: business.category,
+          location: business.location,
+        })),
+    [followedBusinessIds],
+  );
+
+  const profileStats = useMemo(
+    () => [
+      {
+        id: "following" as const,
+        label: "Following",
+        value: followedBusinesses.length,
+      },
+      {
+        id: "reviews" as const,
+        label: "Reviews",
+        value: myReviews.length,
+      },
+    ],
+    [followedBusinesses.length, myReviews.length],
+  );
 
   return (
     <AppScreen style={styles.container} withTopInset={false}>
@@ -87,14 +133,14 @@ export default function PersonalProfileScreen() {
             </View>
 
             <View style={styles.statsRow}>
-              {profile.stats.map((stat, index) => (
+              {profileStats.map((stat, index) => (
                 <React.Fragment key={stat.id}>
                   <View style={styles.statItem}>
                     <AppText style={styles.statValue}>{stat.value}</AppText>
                     <AppText style={styles.statLabel}>{stat.label}</AppText>
                   </View>
 
-                  {index !== profile.stats.length - 1 ? (
+                  {index !== profileStats.length - 1 ? (
                     <View style={styles.statDivider} />
                   ) : null}
                 </React.Fragment>
@@ -121,7 +167,7 @@ export default function PersonalProfileScreen() {
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.followedList}
         >
-          {profile.followedBusinesses.map((business) => (
+          {followedBusinesses.map((business) => (
             <FollowedBusinessCard key={business.id} business={business} />
           ))}
         </ScrollView>
@@ -136,7 +182,7 @@ export default function PersonalProfileScreen() {
           </View>
 
           <View style={styles.reviewsList}>
-            {profile.reviews.map((review) => (
+            {myReviews.map((review) => (
               <ReviewCard key={review.id} review={review} />
             ))}
           </View>
@@ -234,7 +280,9 @@ function ReviewCard({ review }: { review: PersonalProfileReview }) {
 
       <View style={styles.reviewRight}>
         <View style={styles.reviewDateWrap}>
-          <AppText style={styles.reviewDate}>{review.createdAtLabel}</AppText>
+          <AppText style={styles.reviewDate}>
+            {formatReviewDate(review.createdAt)}
+          </AppText>
         </View>
 
         <Ionicons
@@ -245,6 +293,19 @@ function ReviewCard({ review }: { review: PersonalProfileReview }) {
       </View>
     </Pressable>
   );
+}
+
+function formatReviewDate(value: string) {
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return "";
+  }
+
+  return date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+  });
 }
 
 function createStyles(colors: AppColors) {

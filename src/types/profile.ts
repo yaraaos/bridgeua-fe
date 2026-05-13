@@ -1,5 +1,13 @@
 export type ProfileAccountType = "personal" | "business";
 
+export type PersonalProfile = {
+  id: string;
+  accountType: "personal";
+  username: string;
+  displayName: string;
+  avatarUrl?: string;
+};
+
 export type PersonalProfileStat = {
   id: "following" | "reviews";
   label: string;
@@ -22,16 +30,5 @@ export type PersonalProfileReview = {
   businessImageUrl: string;
   rating: number;
   text: string;
-  createdAtLabel: string;
-};
-
-export type PersonalProfile = {
-  id: string;
-  accountType: "personal";
-  username: string;
-  displayName: string;
-  avatarUrl?: string;
-  stats: PersonalProfileStat[];
-  followedBusinesses: PersonalProfileFollowedBusiness[];
-  reviews: PersonalProfileReview[];
+  createdAt: string;
 };
