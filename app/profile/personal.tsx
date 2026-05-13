@@ -427,8 +427,8 @@ function createStyles(colors: AppColors) {
 
     heroActionButton: {
       flex: 1,
-      minHeight: 32,
-      borderRadius: 14,
+      minHeight: 30,
+      borderRadius: 10,
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "center",
