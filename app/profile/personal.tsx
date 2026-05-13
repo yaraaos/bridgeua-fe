@@ -467,7 +467,6 @@ function createStyles(colors: AppColors) {
       borderColor: colors.border,
       flexDirection: "row",
       alignItems: "center",
-      marginHorizontal: spacing.lg,
     },
     statItem: {
       flex: 1,
