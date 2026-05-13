@@ -132,25 +132,23 @@ export default function PersonalProfileScreen() {
                 </AppText>
               </Pressable>
             </View>
-
-            <View style={styles.statsRow}>
-              {profileStats.map((stat, index) => (
-                <React.Fragment key={stat.id}>
-                  <View style={styles.statItem}>
-                    <AppText style={styles.statValue}>{stat.value}</AppText>
-                    <AppText style={styles.statLabel}>{stat.label}</AppText>
-                  </View>
-
-                  {index !== profileStats.length - 1 ? (
-                    <View style={styles.statDivider} />
-                  ) : null}
-                </React.Fragment>
-              ))}
-            </View>
           </View>
         }
       />
+      <View style={styles.statsRow}>
+        {profileStats.map((stat, index) => (
+          <React.Fragment key={stat.id}>
+            <View style={styles.statItem}>
+              <AppText style={styles.statValue}>{stat.value}</AppText>
+              <AppText style={styles.statLabel}>{stat.label}</AppText>
+            </View>
 
+            {index !== profileStats.length - 1 ? (
+              <View style={styles.statDivider} />
+            ) : null}
+          </React.Fragment>
+        ))}
+      </View>
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.content}
@@ -408,6 +406,7 @@ function createStyles(colors: AppColors) {
       borderColor: colors.border,
       flexDirection: "row",
       alignItems: "center",
+      marginHorizontal: spacing.lg,
     },
     statItem: {
       flex: 1,
@@ -565,6 +564,11 @@ function createStyles(colors: AppColors) {
     heroAvatar: {
       width: "100%",
       height: "100%",
+    },
+    profileSummaryCard: {
+      marginHorizontal: spacing.lg,
+      marginTop: -16,
+      marginBottom: spacing.xl,
     },
   });
 }
