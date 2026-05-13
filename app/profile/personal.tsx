@@ -168,6 +168,32 @@ export default function PersonalProfileScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.content}
       >
+        <View style={styles.appointmentsSection}>
+          <View style={styles.sectionHeaderRow}>
+            <AppText style={styles.sectionTitle}>Upcoming appointments</AppText>
+          </View>
+
+          <View style={styles.appointmentCard}>
+            <View style={styles.appointmentIconBox}>
+              <Ionicons
+                name="calendar-outline"
+                size={20}
+                color={colors.primaryGreen}
+              />
+            </View>
+
+            <View style={styles.appointmentTextWrap}>
+              <AppText style={styles.appointmentTitle}>
+                No upcoming appointments
+              </AppText>
+
+              <AppText style={styles.appointmentDescription}>
+                Appointments booked through BridgeUA will appear here.
+              </AppText>
+            </View>
+          </View>
+        </View>
+
         <View style={styles.sectionHeaderRow}>
           <AppText style={styles.sectionTitle}>You follow</AppText>
 
@@ -354,7 +380,7 @@ function createStyles(colors: AppColors) {
       paddingHorizontal: spacing.lg,
       paddingTop: spacing.lg,
       paddingBottom: 14,
-      marginTop: -10,
+      marginTop: -2,
     },
     settingsButton: {
       width: 36,
@@ -462,6 +488,46 @@ function createStyles(colors: AppColors) {
       width: 1,
       height: 34,
       backgroundColor: colors.border,
+    },
+    appointmentsSection: {
+      marginBottom: spacing.xl,
+    },
+
+    appointmentCard: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.md,
+      padding: spacing.lg,
+      borderRadius: 24,
+      backgroundColor: colors.surface,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+
+    appointmentIconBox: {
+      width: 44,
+      height: 44,
+      borderRadius: 16,
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: colors.primaryGreenSoft,
+    },
+
+    appointmentTextWrap: {
+      flex: 1,
+    },
+
+    appointmentTitle: {
+      fontSize: 15,
+      fontWeight: "800",
+      color: colors.textPrimary,
+    },
+
+    appointmentDescription: {
+      marginTop: 4,
+      fontSize: 13,
+      lineHeight: 18,
+      color: colors.textSecondary,
     },
     sectionHeaderRow: {
       flexDirection: "row",
