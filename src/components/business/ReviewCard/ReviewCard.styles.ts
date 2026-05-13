@@ -125,5 +125,72 @@ export function createStyles(colors: AppColors) {
       fontWeight: "700",
       color: colors.primaryGreen,
     },
+    profileHeader: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 10,
+    },
+
+    profileBusinessImageWrap: {
+      width: 44,
+      height: 44,
+      borderRadius: 12,
+      overflow: "hidden",
+      backgroundColor: colors.primaryGreenSoft,
+    },
+
+    profileBusinessImage: {
+      width: "100%",
+      height: "100%",
+    },
+
+    profileBusinessInfo: {
+      flex: 1,
+    },
+
+    profileBusinessName: {
+      fontSize: 15,
+      fontWeight: "700",
+      color: colors.textPrimary,
+    },
+    reviewContent: {
+      flex: 1,
+    },
+
+    reviewCard: {
+      flexDirection: "row",
+      alignItems: "flex-start",
+      gap: spacing.md,
+      paddingVertical: spacing.md,
+    },
+
+    reviewRight: {
+      alignItems: "flex-end",
+      justifyContent: "space-between",
+      minHeight: 44,
+    },
+
+    reviewDateWrap: {
+      alignItems: "flex-end",
+    },
+
+    reviewPhotosScroll: {
+      marginTop: spacing.sm,
+    },
+
+    reviewPhotoPreview: {
+      width: 74,
+      height: 74,
+      borderRadius: radius.md,
+      marginRight: spacing.sm,
+      backgroundColor: colors.primaryGreenSoft,
+    },
+
+    reviewReadMore: {
+      marginTop: spacing.xs,
+      fontSize: 12,
+      fontWeight: "700",
+      color: colors.primaryGreen,
+    },
   });
 }
