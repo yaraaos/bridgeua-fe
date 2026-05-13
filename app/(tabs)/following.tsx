@@ -13,9 +13,10 @@ import {
 import { useFollowingFeed } from "@/src/features/following";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { useFollowingStore } from "@/src/store";
+import { useFilterStore } from "@/src/store/filter.store";
 import { useFollowingLocationStore } from "@/src/store/following-location.store";
 import { router, useFocusEffect } from "expo-router";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import {
   Alert,
   FlatList,
@@ -41,6 +42,22 @@ export default function FollowingScreen() {
       value: option.value,
     });
   };
+
+  const { sort, cuisines, rating, distance, customDistance } = useFilterStore(
+    (state) => state.followingFilters,
+  );
+
+  const activeFilterCount = useMemo(() => {
+    let count = 0;
+
+    if (sort && sort !== "relevance") count += 1;
+    if (cuisines.length > 0) count += cuisines.length;
+    if (rating) count += 1;
+    if (distance) count += 1;
+    if (distance === "custom" && customDistance) count += 1;
+
+    return count;
+  }, [sort, cuisines, rating, distance, customDistance]);
 
   const handleRequestNearby = () => {
     Alert.alert(
@@ -129,6 +146,7 @@ export default function FollowingScreen() {
           onPressMap={handleMapPress}
           onPressFilter={handleFilterPress}
           gradientColors={DISCOVERY_GRADIENT}
+          activeFilterCount={activeFilterCount}
         />
 
         <View style={styles.switchWrap}>
@@ -168,6 +186,7 @@ export default function FollowingScreen() {
         onPressMap={handleMapPress}
         onPressFilter={handleFilterPress}
         gradientColors={DISCOVERY_GRADIENT}
+        activeFilterCount={activeFilterCount}
       />
 
       <View style={styles.switchWrap}>

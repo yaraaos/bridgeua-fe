@@ -36,6 +36,8 @@ type Props = {
   searchValue?: string;
   onSearchChangeText?: (text: string) => void;
 
+  activeFilterCount?: number;
+
   actions?: ActionType[];
   onPressMap?: () => void;
   onPressFilter?: () => void;
@@ -76,6 +78,7 @@ export default function ScreenHeader({
   searchValue,
   onSearchChangeText,
   actions = [],
+  activeFilterCount = 0,
   onPressMap,
   onPressFilter,
   gradientColors,
@@ -114,7 +117,17 @@ export default function ScreenHeader({
       return <Feather name="map" size={16} color={colors.white} />;
     }
 
-    return <Ionicons name="options-outline" size={16} color={colors.white} />;
+    return (
+      <View style={styles.filterIconWrap}>
+        <Ionicons name="options-outline" size={16} color={colors.white} />
+
+        {activeFilterCount > 0 ? (
+          <View style={styles.filterBadge}>
+            <Text style={styles.filterBadgeText}>{activeFilterCount}</Text>
+          </View>
+        ) : null}
+      </View>
+    );
   };
 
   const handleActionPress = (action: ActionType) => {

@@ -24,6 +24,18 @@ export default function ProfileFollowingScreen() {
     (state) => state.followingFilters,
   );
 
+  const activeFilterCount = useMemo(() => {
+    let count = 0;
+
+    if (sort && sort !== "relevance") count += 1;
+    if (cuisines.length > 0) count += cuisines.length;
+    if (rating) count += 1;
+    if (distance) count += 1;
+    if (distance === "custom" && customDistance) count += 1;
+
+    return count;
+  }, [sort, cuisines, rating, distance, customDistance]);
+
   const [visibleBusinessIds, setVisibleBusinessIds] = useState<string[]>([]);
 
   useEffect(() => {
@@ -136,6 +148,7 @@ export default function ProfileFollowingScreen() {
         actions={["map", "filter"]}
         onPressMap={handleMapPress}
         onPressFilter={handleFilterPress}
+        activeFilterCount={activeFilterCount}
       />
 
       <FlatList
