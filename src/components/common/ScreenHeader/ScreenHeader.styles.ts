@@ -76,8 +76,8 @@ export function createStyles(colors: AppColors) {
       color: colors.textPrimary,
     },
     profileHeaderInner: {
-      paddingTop: 8,
-      paddingBottom: 22,
+      height: 154,
+      justifyContent: "center",
     },
 
     profileHeaderRow: {

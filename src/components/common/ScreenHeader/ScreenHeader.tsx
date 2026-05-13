@@ -229,11 +229,7 @@ export default function ScreenHeader({
         colors={headerGradientColors}
         innerStyle={styles.profileHeaderInner}
       >
-        <View style={styles.profileHeaderRow}>
-          <View style={styles.profileHeaderContent}>{profileContent}</View>
-
-          {rightSlot ? <View>{rightSlot}</View> : null}
-        </View>
+        <View style={styles.profileHeaderContent}>{profileContent}</View>
       </GradientHeader>
     );
   }
