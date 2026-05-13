@@ -12,7 +12,7 @@ import { createStyles } from "./ScreenHeader.styles";
 type ActionType = "map" | "filter";
 
 type Props = {
-  variant?: "default" | "business";
+  variant?: "default" | "business" | "profile";
 
   title: string;
   titleSubtitle?: string;
@@ -47,7 +47,10 @@ type Props = {
   isOpen?: boolean;
   closesAt?: string;
   rightSlot?: React.ReactNode;
+  leftSlot?: React.ReactNode;
   onPressShare?: () => void;
+
+  profileContent?: React.ReactNode;
 };
 
 export default function ScreenHeader({
@@ -78,7 +81,9 @@ export default function ScreenHeader({
   isOpen,
   closesAt,
   rightSlot,
+  leftSlot,
   onPressShare,
+  profileContent,
 }: Props) {
   const { colors, isDark } = useAppTheme();
   const styles = createStyles(colors);
@@ -218,10 +223,23 @@ export default function ScreenHeader({
     );
   }
 
+  if (variant === "profile") {
+    return (
+      <GradientHeader
+        colors={headerGradientColors}
+        innerStyle={styles.profileHeaderInner}
+      >
+        <View style={styles.profileHeaderContent}>{profileContent}</View>
+      </GradientHeader>
+    );
+  }
+
   return (
     <GradientHeader colors={headerGradientColors}>
       <View style={styles.topRow}>
-        {showLocationSelector ? (
+        {leftSlot ? (
+          <View style={styles.leftBlock}>{leftSlot}</View>
+        ) : showLocationSelector ? (
           <View style={styles.leftBlock}>
             <LocationSelector
               subtitleLabel={subtitleLabel}
@@ -294,6 +312,7 @@ export default function ScreenHeader({
           {!!titleSubtitle && (
             <Text style={styles.titleSubtitle}>{titleSubtitle}</Text>
           )}
+          {rightSlot ? <View>{rightSlot}</View> : null}
         </View>
       </View>
 

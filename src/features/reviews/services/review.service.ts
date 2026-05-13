@@ -1,4 +1,5 @@
 import { businessDetailsMock } from "@/src/mocks/business-details.mock";
+import { PersonalProfileReview } from "@/src/types/profile";
 import type {
   GetReviewsParams,
   GetReviewsResponse,
@@ -60,9 +61,8 @@ export const getReviews = async ({
 
   const breakdown = ([5, 4, 3, 2, 1] as const).map((ratingValue) => ({
     rating: ratingValue,
-    count: reviews.filter(
-      (review) => Math.round(review.rating) === ratingValue,
-    ).length,
+    count: reviews.filter((review) => Math.round(review.rating) === ratingValue)
+      .length,
   }));
 
   const start = (page - 1) * limit;
@@ -105,4 +105,41 @@ export const submitReview = async (
   submittedReviewsMock = [newReview, ...submittedReviewsMock];
 
   return Promise.resolve(newReview);
+};
+export const getMyReviews = async (): Promise<PersonalProfileReview[]> => {
+  const currentUserNames = ["Kateryna", "You"];
+
+  const mockReviews = businessDetailsMock.flatMap((business) =>
+    business.reviews
+      .filter((review) => currentUserNames.includes(review.authorName))
+      .map((review) => ({
+        id: review.id,
+        businessId: business.id,
+        businessName: business.name,
+        businessImageUrl: business.images[0]?.url ?? "",
+        rating: review.rating,
+        text: review.text,
+        createdAt: review.createdAt,
+        photos: review.photos,
+      })),
+  );
+
+  const submittedReviews = submittedReviewsMock.map((review) => {
+    const business = businessDetailsMock.find(
+      (item) => item.id === review.businessId,
+    );
+
+    return {
+      id: review.id,
+      businessId: review.businessId,
+      businessName: business?.name ?? "Business",
+      businessImageUrl: business?.images[0]?.url ?? "",
+      rating: review.rating,
+      text: review.text,
+      createdAt: review.createdAt,
+      photos: review.photos,
+    };
+  });
+
+  return Promise.resolve([...submittedReviews, ...mockReviews]);
 };

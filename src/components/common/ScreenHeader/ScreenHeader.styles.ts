@@ -20,7 +20,7 @@ export function createStyles(colors: AppColors) {
     },
     leftBlock: {
       flex: 1,
-      paddingTop: 18,
+      paddingTop: 8,
       gap: 6,
     },
     subtitleLabel: {
@@ -67,6 +67,34 @@ export function createStyles(colors: AppColors) {
       backgroundColor: colors.accentOrange,
       alignItems: "center",
       justifyContent: "center",
+    },
+
+    profileHeaderTitle: {
+      fontSize: 34,
+      lineHeight: 38,
+      fontWeight: "800",
+      color: colors.textPrimary,
+    },
+    profileHeaderInner: {
+      height: 154,
+      justifyContent: "center",
+    },
+
+    profileHeaderRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      gap: spacing.md,
+    },
+
+    profileHeaderContent: {
+      flex: 1,
+    },
+
+    profileContent: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.md,
     },
 
     businessContent: {

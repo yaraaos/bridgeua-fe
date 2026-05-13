@@ -23,7 +23,9 @@ export default function ReviewCard({
 
   const isPreview = variant === "preview";
   const [isExpanded, setIsExpanded] = useState(false);
-  const shouldShowReadMore = !isPreview && review.text.length > 120;
+  const hasReviewText = !!review.text?.trim();
+  const shouldShowReadMore =
+    !isPreview && hasReviewText && review.text.length > 120;
   const showPhotos = !isPreview && !!review.photos?.length;
 
   const openReviewPhotoViewer = (index: number) => {
@@ -81,12 +83,14 @@ export default function ReviewCard({
         ) : null}
       </View>
 
-      <Text
-        style={[styles.text, isPreview && styles.textPreview]}
-        numberOfLines={isPreview ? 4 : isExpanded ? undefined : 3}
-      >
-        {review.text}
-      </Text>
+      {hasReviewText ? (
+        <Text
+          style={[styles.text, isPreview && styles.textPreview]}
+          numberOfLines={isPreview ? 4 : isExpanded ? undefined : 3}
+        >
+          {review.text}
+        </Text>
+      ) : null}
 
       {isPreview ? (
         <Pressable
