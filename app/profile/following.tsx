@@ -4,6 +4,7 @@ import AppEmptyState from "@/src/components/ui/AppEmptyState";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
 import { spacing } from "@/src/constants/spacing";
 import { useBusinesses } from "@/src/features/businesses";
+import { useFilterStore } from "@/src/store/filter.store";
 import { useFollowingStore } from "@/src/store/following.store";
 import { router } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
@@ -19,6 +20,10 @@ export default function ProfileFollowingScreen() {
     (state) => state.followedBusinessIds,
   );
 
+  const { sort, cuisines, rating, distance, customDistance } = useFilterStore(
+    (state) => state.followingFilters,
+  );
+
   const [visibleBusinessIds, setVisibleBusinessIds] = useState<string[]>([]);
 
   useEffect(() => {
@@ -28,17 +33,75 @@ export default function ProfileFollowingScreen() {
   const followedBusinesses = useMemo(() => {
     const normalizedSearch = search.trim().toLowerCase();
 
-    return businesses.filter((business) => {
-      const isVisible = visibleBusinessIds.includes(String(business.id));
+    const selectedDistanceKm =
+      distance === "custom"
+        ? Number(customDistance || 0)
+        : distance === "nearby"
+          ? 1
+          : distance
+            ? Number(distance)
+            : null;
 
-      const matchesSearch =
-        business.name.toLowerCase().includes(normalizedSearch) ||
-        business.category.toLowerCase().includes(normalizedSearch) ||
-        business.location.toLowerCase().includes(normalizedSearch);
+    const selectedRatingValue =
+      rating && rating !== "custom" ? Number(rating) : null;
 
-      return isVisible && matchesSearch;
-    });
-  }, [businesses, visibleBusinessIds, search]);
+    return businesses
+      .filter((business) => visibleBusinessIds.includes(String(business.id)))
+      .filter((business) => {
+        const cuisineMatch =
+          cuisines.length === 0 || cuisines.includes(business.category);
+
+        const ratingMatch =
+          selectedRatingValue === null ||
+          Number(business.rating ?? 0) >= selectedRatingValue;
+
+        const distanceMatch =
+          selectedDistanceKm === null ||
+          Number.isNaN(selectedDistanceKm) ||
+          Number(business.distanceKm ?? 0) <= selectedDistanceKm;
+
+        return cuisineMatch && ratingMatch && distanceMatch;
+      })
+      .filter((business) => {
+        if (!normalizedSearch) {
+          return true;
+        }
+
+        return (
+          business.name.toLowerCase().includes(normalizedSearch) ||
+          business.category.toLowerCase().includes(normalizedSearch) ||
+          business.location.toLowerCase().includes(normalizedSearch)
+        );
+      })
+      .sort((a, b) => {
+        if (sort === "distance") {
+          return Number(a.distanceKm ?? 0) - Number(b.distanceKm ?? 0);
+        }
+
+        if (sort === "rating") {
+          return Number(b.rating ?? 0) - Number(a.rating ?? 0);
+        }
+
+        if (sort === "price_low") {
+          return Number(a.priceLevel ?? 0) - Number(b.priceLevel ?? 0);
+        }
+
+        if (sort === "price_high") {
+          return Number(b.priceLevel ?? 0) - Number(a.priceLevel ?? 0);
+        }
+
+        return 0;
+      });
+  }, [
+    businesses,
+    visibleBusinessIds,
+    search,
+    sort,
+    cuisines,
+    rating,
+    distance,
+    customDistance,
+  ]);
 
   const handleRefresh = () => {
     setRefreshing(true);
