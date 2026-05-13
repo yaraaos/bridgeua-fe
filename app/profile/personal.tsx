@@ -1,5 +1,6 @@
 import FollowButton from "@/src/components/business/FollowButton/FollowButton";
 import ScreenHeader from "@/src/components/common/ScreenHeader/ScreenHeader";
+import AppEmptyState from "@/src/components/ui/AppEmptyState";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
 import AppText from "@/src/components/ui/AppText/AppText";
 import { AppColors } from "@/src/constants/colors";
@@ -161,15 +162,24 @@ export default function PersonalProfileScreen() {
           </Pressable>
         </View>
 
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.followedList}
-        >
-          {followedBusinesses.map((business) => (
-            <FollowedBusinessCard key={business.id} business={business} />
-          ))}
-        </ScrollView>
+        {followedBusinesses.length === 0 ? (
+          <View style={styles.emptyStateWrap}>
+            <AppEmptyState
+              title="No followed businesses yet"
+              description="Businesses you follow will appear here."
+            />
+          </View>
+        ) : (
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.followedList}
+          >
+            {followedBusinesses.map((business) => (
+              <FollowedBusinessCard key={business.id} business={business} />
+            ))}
+          </ScrollView>
+        )}
 
         <View style={styles.reviewsSection}>
           <View style={styles.sectionHeaderRow}>
@@ -180,11 +190,20 @@ export default function PersonalProfileScreen() {
             </Pressable>
           </View>
 
-          <View style={styles.reviewsList}>
-            {myReviews.map((review) => (
-              <ReviewCard key={review.id} review={review} />
-            ))}
-          </View>
+          {myReviews.length === 0 ? (
+            <View style={styles.emptyStateWrap}>
+              <AppEmptyState
+                title="No reviews yet"
+                description="Your reviews will appear here after you share your experience."
+              />
+            </View>
+          ) : (
+            <View style={styles.reviewsList}>
+              {myReviews.map((review) => (
+                <ReviewCard key={review.id} review={review} />
+              ))}
+            </View>
+          )}
         </View>
       </ScrollView>
     </AppScreen>
@@ -569,6 +588,9 @@ function createStyles(colors: AppColors) {
       marginHorizontal: spacing.lg,
       marginTop: -16,
       marginBottom: spacing.xl,
+    },
+    emptyStateWrap: {
+      paddingVertical: spacing.lg,
     },
   });
 }
