@@ -12,10 +12,17 @@ import {
 } from "@/src/constants/locations";
 import { useFollowingFeed } from "@/src/features/following";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { useFollowingStore } from "@/src/store";
 import { useFollowingLocationStore } from "@/src/store/following-location.store";
-import { router } from "expo-router";
-import React from "react";
-import { Alert, FlatList, StyleSheet, View } from "react-native";
+import { router, useFocusEffect } from "expo-router";
+import React, { useCallback, useState } from "react";
+import {
+  Alert,
+  FlatList,
+  RefreshControl,
+  StyleSheet,
+  View,
+} from "react-native";
 
 export default function FollowingScreen() {
   const { colors } = useAppTheme();
@@ -60,6 +67,26 @@ export default function FollowingScreen() {
       ],
     );
   };
+  const [visibleBusinessIds, setVisibleBusinessIds] = useState<string[]>([]);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const syncVisibleBusinessIds = useCallback(() => {
+    const ids = useFollowingStore.getState().followedBusinessIds.map(String);
+
+    setVisibleBusinessIds(ids);
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      syncVisibleBusinessIds();
+    }, [syncVisibleBusinessIds]),
+  );
+
+  const handleRefresh = () => {
+    setRefreshing(true);
+    syncVisibleBusinessIds();
+    setRefreshing(false);
+  };
 
   const {
     activeTab,
@@ -70,7 +97,7 @@ export default function FollowingScreen() {
     isLoading,
     isEmpty,
     hasFollowedBusinesses,
-  } = useFollowingFeed();
+  } = useFollowingFeed({ visibleBusinessIds });
 
   const handleMapPress = () => {
     console.log("Following map is not implemented yet");
@@ -176,6 +203,9 @@ export default function FollowingScreen() {
           keyExtractor={(item) => item.id}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.listContent}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+          }
           renderItem={({ item }) => <FollowingFeedCard item={item} />}
         />
       )}
