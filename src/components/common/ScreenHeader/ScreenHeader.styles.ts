@@ -83,8 +83,8 @@ export function createStyles(colors: AppColors) {
 
     profileHeaderTitle: {
       fontSize: 34,
-      lineHeight: 40,
-      fontWeight: "900",
+      lineHeight: 38,
+      fontWeight: "800",
       color: colors.textPrimary,
     },
 

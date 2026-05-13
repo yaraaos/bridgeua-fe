@@ -265,15 +265,16 @@ function createStyles(colors: AppColors) {
       flex: 1,
     },
     displayName: {
-      fontSize: 24,
-      lineHeight: 30,
-      fontWeight: "900",
+      fontSize: 20,
+      lineHeight: 24,
+      fontWeight: "800",
       color: colors.textPrimary,
     },
+
     username: {
-      marginTop: 4,
-      fontSize: 15,
-      fontWeight: "700",
+      marginTop: 2,
+      fontSize: 13,
+      fontWeight: "600",
       color: colors.textSecondary,
     },
     statsRow: {
@@ -286,8 +287,8 @@ function createStyles(colors: AppColors) {
       alignItems: "center",
     },
     statValue: {
-      fontSize: 24,
-      fontWeight: "900",
+      fontSize: 20,
+      fontWeight: "800",
       color: colors.textPrimary,
     },
     statLabel: {
@@ -316,9 +317,9 @@ function createStyles(colors: AppColors) {
       marginBottom: spacing.md,
     },
     sectionTitle: {
-      fontSize: 24,
-      lineHeight: 30,
-      fontWeight: "900",
+      fontSize: 18,
+      lineHeight: 22,
+      fontWeight: "800",
       color: colors.textPrimary,
     },
     seeAllText: {
@@ -355,8 +356,8 @@ function createStyles(colors: AppColors) {
       padding: spacing.md,
     },
     followedName: {
-      fontSize: 15,
-      fontWeight: "900",
+      fontSize: 14,
+      fontWeight: "700",
       color: colors.textPrimary,
     },
     followedRatingRow: {
@@ -403,8 +404,8 @@ function createStyles(colors: AppColors) {
       minWidth: 0,
     },
     reviewBusinessName: {
-      fontSize: 17,
-      fontWeight: "900",
+      fontSize: 15,
+      fontWeight: "800",
       color: colors.textPrimary,
     },
     reviewRatingRow: {
