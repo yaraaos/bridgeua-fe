@@ -364,7 +364,7 @@ function createStyles(colors: AppColors) {
       flexDirection: "row",
       alignItems: "center",
       gap: spacing.lg,
-      marginTop: 10,
+      marginTop: 5,
     },
 
     heroTextWrap: {
@@ -396,7 +396,7 @@ function createStyles(colors: AppColors) {
 
     heroActionButton: {
       flex: 1,
-      minHeight: 36,
+      minHeight: 32,
       borderRadius: 14,
       flexDirection: "row",
       alignItems: "center",
