@@ -233,7 +233,10 @@ function ReviewCard({ review }: { review: PersonalProfileReview }) {
       </View>
 
       <View style={styles.reviewRight}>
-        <AppText style={styles.reviewDate}>{review.createdAtLabel}</AppText>
+        <View style={styles.reviewDateWrap}>
+          <AppText style={styles.reviewDate}>{review.createdAtLabel}</AppText>
+        </View>
+
         <Ionicons
           name="chevron-forward"
           size={18}
@@ -253,7 +256,7 @@ function createStyles(colors: AppColors) {
     content: {
       paddingHorizontal: spacing.lg,
       paddingTop: spacing.lg,
-      paddingBottom: 120,
+      paddingBottom: 14,
     },
     settingsButton: {
       width: 36,
@@ -378,7 +381,7 @@ function createStyles(colors: AppColors) {
       color: colors.primaryGreen,
     },
     followedList: {
-      gap: spacing.md,
+      gap: spacing.sm,
       paddingRight: spacing.lg,
     },
     followedCard: {
@@ -430,8 +433,7 @@ function createStyles(colors: AppColors) {
       marginTop: spacing.xxl,
     },
     reviewsList: {
-      marginTop: spacing.md,
-      gap: spacing.md,
+      gap: spacing.sm,
     },
     reviewCard: {
       flexDirection: "row",
@@ -475,8 +477,12 @@ function createStyles(colors: AppColors) {
       color: colors.textSecondary,
     },
     reviewRight: {
+      alignSelf: "flex-start",
       alignItems: "flex-end",
       gap: spacing.md,
+    },
+    reviewDateWrap: {
+      transform: [{ translateY: -3 }],
     },
     reviewDate: {
       fontSize: 12,
