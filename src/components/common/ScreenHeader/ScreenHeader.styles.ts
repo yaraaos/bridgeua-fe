@@ -20,7 +20,7 @@ export function createStyles(colors: AppColors) {
     },
     leftBlock: {
       flex: 1,
-      paddingTop: 18,
+      paddingTop: 8,
       gap: 6,
     },
     subtitleLabel: {
@@ -69,23 +69,32 @@ export function createStyles(colors: AppColors) {
       justifyContent: "center",
     },
 
-    profileHeaderInner: {
-      paddingTop: 28,
-      paddingBottom: 26,
-    },
-
-    profileHeaderTopRow: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-      marginBottom: 26,
-    },
-
     profileHeaderTitle: {
       fontSize: 34,
       lineHeight: 38,
       fontWeight: "800",
       color: colors.textPrimary,
+    },
+    profileHeaderInner: {
+      paddingTop: 8,
+      paddingBottom: 22,
+    },
+
+    profileHeaderRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      gap: spacing.md,
+    },
+
+    profileHeaderContent: {
+      flex: 1,
+    },
+
+    profileContent: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.md,
     },
 
     businessContent: {

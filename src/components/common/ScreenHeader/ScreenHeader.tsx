@@ -47,6 +47,7 @@ type Props = {
   isOpen?: boolean;
   closesAt?: string;
   rightSlot?: React.ReactNode;
+  leftSlot?: React.ReactNode;
   onPressShare?: () => void;
 
   profileContent?: React.ReactNode;
@@ -80,6 +81,7 @@ export default function ScreenHeader({
   isOpen,
   closesAt,
   rightSlot,
+  leftSlot,
   onPressShare,
   profileContent,
 }: Props) {
@@ -227,13 +229,11 @@ export default function ScreenHeader({
         colors={headerGradientColors}
         innerStyle={styles.profileHeaderInner}
       >
-        <View style={styles.profileHeaderTopRow}>
-          <Text style={styles.profileHeaderTitle}>{title}</Text>
+        <View style={styles.profileHeaderRow}>
+          <View style={styles.profileHeaderContent}>{profileContent}</View>
 
           {rightSlot ? <View>{rightSlot}</View> : null}
         </View>
-
-        {profileContent}
       </GradientHeader>
     );
   }
@@ -241,7 +241,9 @@ export default function ScreenHeader({
   return (
     <GradientHeader colors={headerGradientColors}>
       <View style={styles.topRow}>
-        {showLocationSelector ? (
+        {leftSlot ? (
+          <View style={styles.leftBlock}>{leftSlot}</View>
+        ) : showLocationSelector ? (
           <View style={styles.leftBlock}>
             <LocationSelector
               subtitleLabel={subtitleLabel}

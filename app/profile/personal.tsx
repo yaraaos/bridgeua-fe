@@ -1,7 +1,5 @@
 import FollowButton from "@/src/components/business/FollowButton/FollowButton";
 import ScreenHeader from "@/src/components/common/ScreenHeader/ScreenHeader";
-import AppAvatar from "@/src/components/ui/AppAvatar/AppAvatar";
-import AppButton from "@/src/components/ui/AppButton/AppButton";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
 import AppText from "@/src/components/ui/AppText/AppText";
 import { AppColors } from "@/src/constants/colors";
@@ -11,7 +9,6 @@ import { personalProfileMock } from "@/src/mocks/profile.mock";
 import type {
   PersonalProfileFollowedBusiness,
   PersonalProfileReview,
-  PersonalProfileStat,
 } from "@/src/types/profile";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
@@ -27,60 +24,81 @@ export default function PersonalProfileScreen() {
     <AppScreen style={styles.container} withTopInset={false}>
       <ScreenHeader
         variant="profile"
-        title="Profile"
-        rightSlot={
-          <Pressable
-            style={styles.settingsButton}
-            onPress={() => router.push("/settings")}
-          >
-            <Ionicons name="settings-outline" size={22} color={colors.white} />
-          </Pressable>
-        }
+        title=""
+        rightSlot={null}
         profileContent={
           <View>
-            <View style={styles.identityRow}>
-              <AppAvatar
-                imageUrl={profile.avatarUrl}
-                name={profile.displayName}
-                size="lg"
-              />
+            <View style={styles.heroIdentityRow}>
+              <View style={styles.heroAvatarWrap}>
+                <Image
+                  source={{ uri: profile.avatarUrl }}
+                  style={styles.heroAvatar}
+                />
+              </View>
 
-              <View style={styles.identityTextWrap}>
-                <AppText style={styles.displayName}>
+              <View style={styles.heroTextWrap}>
+                <AppText style={styles.heroName} numberOfLines={1}>
                   {profile.displayName}
                 </AppText>
 
-                <AppText style={styles.username}>@{profile.username}</AppText>
+                <AppText style={styles.heroUsername} numberOfLines={1}>
+                  @{profile.username}
+                </AppText>
               </View>
+
+              <Pressable
+                style={styles.settingsButton}
+                onPress={() => router.push("/settings")}
+              >
+                <Ionicons
+                  name="settings-outline"
+                  size={20}
+                  color={colors.white}
+                />
+              </Pressable>
+            </View>
+
+            <View style={styles.heroActionsRow}>
+              <Pressable
+                style={[styles.heroActionButton, styles.editButton]}
+                onPress={() => router.push("/profile/edit")}
+              >
+                <Ionicons
+                  name="create-outline"
+                  size={18}
+                  color={colors.white}
+                />
+                <AppText style={styles.editButtonText}>Edit profile</AppText>
+              </Pressable>
+
+              <Pressable
+                style={[styles.heroActionButton, styles.switchButton]}
+                onPress={() => router.push("/profile/switch-account")}
+              >
+                <Ionicons
+                  name="person-add-outline"
+                  size={18}
+                  color={colors.textPrimary}
+                />
+                <AppText style={styles.switchButtonText}>
+                  Switch account
+                </AppText>
+              </Pressable>
             </View>
 
             <View style={styles.statsRow}>
               {profile.stats.map((stat, index) => (
                 <React.Fragment key={stat.id}>
-                  <ProfileStatItem stat={stat} />
+                  <View style={styles.statItem}>
+                    <AppText style={styles.statValue}>{stat.value}</AppText>
+                    <AppText style={styles.statLabel}>{stat.label}</AppText>
+                  </View>
+
                   {index !== profile.stats.length - 1 ? (
                     <View style={styles.statDivider} />
                   ) : null}
                 </React.Fragment>
               ))}
-            </View>
-
-            <View style={styles.actionsRow}>
-              <View style={styles.actionItem}>
-                <AppButton
-                  title="Edit profile"
-                  variant="primary"
-                  onPress={() => router.push("/profile/edit")}
-                />
-              </View>
-
-              <View style={styles.actionItem}>
-                <AppButton
-                  title="Switch account"
-                  variant="secondary"
-                  onPress={() => router.push("/profile/switch-account")}
-                />
-              </View>
             </View>
           </View>
         }
@@ -92,6 +110,7 @@ export default function PersonalProfileScreen() {
       >
         <View style={styles.sectionHeaderRow}>
           <AppText style={styles.sectionTitle}>You follow</AppText>
+
           <Pressable onPress={() => router.push("/profile/following")}>
             <AppText style={styles.seeAllText}>See all</AppText>
           </Pressable>
@@ -124,18 +143,6 @@ export default function PersonalProfileScreen() {
         </View>
       </ScrollView>
     </AppScreen>
-  );
-}
-
-function ProfileStatItem({ stat }: { stat: PersonalProfileStat }) {
-  const { colors } = useAppTheme();
-  const styles = createStyles(colors);
-
-  return (
-    <View style={styles.statItem}>
-      <AppText style={styles.statValue}>{stat.value}</AppText>
-      <AppText style={styles.statLabel}>{stat.label}</AppText>
-    </View>
   );
 }
 
@@ -245,40 +252,84 @@ function createStyles(colors: AppColors) {
     },
     content: {
       paddingHorizontal: spacing.lg,
-      paddingTop: spacing.xl,
+      paddingTop: spacing.lg,
       paddingBottom: 120,
     },
     settingsButton: {
-      width: 46,
-      height: 46,
-      borderRadius: 16,
+      width: 36,
+      height: 36,
+      borderRadius: 10,
       alignItems: "center",
       justifyContent: "center",
       backgroundColor: colors.accentOrange,
+      alignSelf: "flex-start",
     },
-    identityRow: {
+    heroIdentityRow: {
       flexDirection: "row",
       alignItems: "center",
       gap: spacing.lg,
     },
-    identityTextWrap: {
+
+    heroTextWrap: {
       flex: 1,
+      minWidth: 0,
+      justifyContent: "center",
     },
-    displayName: {
-      fontSize: 20,
-      lineHeight: 24,
+
+    heroName: {
+      fontSize: 22,
+      lineHeight: 27,
       fontWeight: "800",
       color: colors.textPrimary,
     },
 
-    username: {
-      marginTop: 2,
-      fontSize: 13,
-      fontWeight: "600",
+    heroUsername: {
+      marginTop: 6,
+      fontSize: 16,
+      lineHeight: 20,
+      fontWeight: "700",
       color: colors.textSecondary,
     },
-    statsRow: {
+
+    heroActionsRow: {
       marginTop: spacing.xl,
+      flexDirection: "row",
+      gap: spacing.sm,
+    },
+    heroActionButton: {
+      flex: 1,
+      minHeight: 48,
+      borderRadius: 16,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: spacing.sm,
+    },
+    editButton: {
+      backgroundColor: colors.accentOrange,
+    },
+    switchButton: {
+      backgroundColor: "transparent",
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    editButtonText: {
+      fontSize: 15,
+      fontWeight: "800",
+      color: colors.white,
+    },
+    switchButtonText: {
+      fontSize: 15,
+      fontWeight: "800",
+      color: colors.textPrimary,
+    },
+    statsRow: {
+      marginTop: spacing.lg,
+      paddingVertical: spacing.lg,
+      borderRadius: 22,
+      backgroundColor: colors.surface,
+      borderWidth: 1,
+      borderColor: colors.border,
       flexDirection: "row",
       alignItems: "center",
     },
@@ -301,14 +352,6 @@ function createStyles(colors: AppColors) {
       width: 1,
       height: 42,
       backgroundColor: colors.border,
-    },
-    actionsRow: {
-      marginTop: spacing.xl,
-      flexDirection: "row",
-      gap: spacing.sm,
-    },
-    actionItem: {
-      flex: 1,
     },
     sectionHeaderRow: {
       flexDirection: "row",
@@ -348,9 +391,9 @@ function createStyles(colors: AppColors) {
       position: "absolute",
       top: 10,
       right: 10,
-      width: 34,
-      height: 34,
-      borderRadius: 12,
+      width: 36,
+      height: 36,
+      borderRadius: 10,
     },
     followedInfo: {
       padding: spacing.md,
@@ -431,6 +474,18 @@ function createStyles(colors: AppColors) {
     reviewDate: {
       fontSize: 12,
       color: colors.textSecondary,
+    },
+    heroAvatarWrap: {
+      width: 96,
+      height: 96,
+      borderRadius: 48,
+      overflow: "hidden",
+      backgroundColor: colors.primaryGreenSoft,
+    },
+
+    heroAvatar: {
+      width: "100%",
+      height: "100%",
     },
   });
 }
