@@ -354,6 +354,7 @@ function createStyles(colors: AppColors) {
       paddingHorizontal: spacing.lg,
       paddingTop: spacing.lg,
       paddingBottom: 14,
+      marginTop: -10,
     },
     settingsButton: {
       width: 36,
