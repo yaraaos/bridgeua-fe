@@ -303,6 +303,9 @@ function FollowedBusinessCard({
 function ReviewCard({ review }: { review: PersonalProfileReview }) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  const shouldShowReadMore = !!review.text?.trim() && review.text.length > 140;
 
   return (
     <Pressable
@@ -339,9 +342,22 @@ function ReviewCard({ review }: { review: PersonalProfileReview }) {
         </View>
 
         {!!review.text?.trim() ? (
-          <AppText style={styles.reviewText} numberOfLines={1}>
-            {review.text}
-          </AppText>
+          <>
+            <AppText
+              style={styles.reviewText}
+              numberOfLines={isExpanded ? undefined : 3}
+            >
+              {review.text}
+            </AppText>
+
+            {shouldShowReadMore ? (
+              <Pressable onPress={() => setIsExpanded((value) => !value)}>
+                <AppText style={styles.reviewReadMore}>
+                  {isExpanded ? "Show less" : "Read more"}
+                </AppText>
+              </Pressable>
+            ) : null}
+          </>
         ) : null}
         {review.photos?.length ? (
           <ScrollView
@@ -672,6 +688,12 @@ function createStyles(colors: AppColors) {
       borderRadius: 14,
       marginRight: spacing.sm,
       backgroundColor: colors.primaryGreenSoft,
+    },
+    reviewReadMore: {
+      marginTop: 6,
+      fontSize: 13,
+      fontWeight: "700",
+      color: colors.primaryGreen,
     },
     heroAvatarWrap: {
       width: 96,
