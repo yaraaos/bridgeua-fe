@@ -65,8 +65,8 @@ export default function PersonalProfileScreen() {
               >
                 <Ionicons
                   name="create-outline"
-                  size={18}
-                  color={colors.white}
+                  size={16}
+                  color={colors.primaryGreen}
                 />
                 <AppText style={styles.editButtonText}>Edit profile</AppText>
               </Pressable>
@@ -76,9 +76,9 @@ export default function PersonalProfileScreen() {
                 onPress={() => router.push("/profile/switch-account")}
               >
                 <Ionicons
-                  name="person-add-outline"
-                  size={18}
-                  color={colors.textPrimary}
+                  name="swap-horizontal-outline"
+                  size={16}
+                  color={colors.textMuted}
                 />
                 <AppText style={styles.switchButtonText}>
                   Switch account
@@ -292,41 +292,48 @@ function createStyles(colors: AppColors) {
     },
 
     heroActionsRow: {
-      marginTop: spacing.xl,
+      marginTop: spacing.lg,
       flexDirection: "row",
       gap: spacing.sm,
     },
+
     heroActionButton: {
       flex: 1,
-      minHeight: 48,
-      borderRadius: 16,
+      minHeight: 42,
+      borderRadius: 14,
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "center",
-      gap: spacing.sm,
+      gap: 6,
     },
+
     editButton: {
-      backgroundColor: colors.accentOrange,
+      backgroundColor: colors.primaryGreenSoft,
+      borderWidth: 1,
+      borderColor: colors.primaryGreenSoft,
     },
+
     switchButton: {
-      backgroundColor: "transparent",
+      backgroundColor: colors.surface,
       borderWidth: 1,
       borderColor: colors.border,
     },
+
     editButtonText: {
-      fontSize: 15,
+      fontSize: 13,
       fontWeight: "800",
-      color: colors.white,
+      color: colors.primaryGreen,
     },
+
     switchButtonText: {
-      fontSize: 15,
+      fontSize: 13,
       fontWeight: "800",
-      color: colors.textPrimary,
+      color: colors.textMuted,
     },
     statsRow: {
-      marginTop: spacing.lg,
-      paddingVertical: spacing.lg,
-      borderRadius: 22,
+      marginTop: spacing.md,
+      paddingVertical: 14,
+      borderRadius: 18,
       backgroundColor: colors.surface,
       borderWidth: 1,
       borderColor: colors.border,
