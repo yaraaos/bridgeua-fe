@@ -2,7 +2,14 @@ import { LocationOption } from "@/src/constants/locations";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
-import { Image, Pressable, Text, View } from "react-native";
+import {
+  Image,
+  Pressable,
+  StyleProp,
+  Text,
+  View,
+  ViewStyle,
+} from "react-native";
 import AppInput from "../../ui/AppInput/AppInput";
 import RatingStars from "../../ui/AppRatingStars";
 import GradientHeader from "../../ui/GradientHeader/GradientHeader";
@@ -39,6 +46,8 @@ type Props = {
   onSelectLocationOption?: (option: LocationOption) => void;
   onRequestNearby?: () => void;
 
+  headerInnerStyle?: StyleProp<ViewStyle>;
+
   imageUrl?: string;
   rating?: number;
   reviewCount?: number;
@@ -73,6 +82,7 @@ export default function ScreenHeader({
   locationOptions,
   onSelectLocationOption,
   onRequestNearby,
+  headerInnerStyle,
   imageUrl,
   rating,
   reviewCount,
@@ -235,7 +245,7 @@ export default function ScreenHeader({
   }
 
   return (
-    <GradientHeader colors={headerGradientColors}>
+    <GradientHeader colors={headerGradientColors} innerStyle={headerInnerStyle}>
       <View style={styles.topRow}>
         {leftSlot ? (
           <View style={styles.leftBlock}>{leftSlot}</View>

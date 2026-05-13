@@ -2,26 +2,37 @@ import BusinessCard from "@/src/components/business/BusinessCard/BusinessCard";
 import ScreenHeader from "@/src/components/common/ScreenHeader/ScreenHeader";
 import AppEmptyState from "@/src/components/ui/AppEmptyState";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
-import { businessesMock } from "@/src/mocks/businesses.mock";
+import { spacing } from "@/src/constants/spacing";
+import { useBusinesses } from "@/src/features/businesses";
 import { useFollowingStore } from "@/src/store/following.store";
 import { router } from "expo-router";
 import { useMemo, useState } from "react";
 import { FlatList, RefreshControl, StyleSheet, View } from "react-native";
 
 export default function ProfileFollowingScreen() {
+  const [search, setSearch] = useState("");
+  const [refreshing, setRefreshing] = useState(false);
+
+  const { businesses } = useBusinesses();
+
   const followedBusinessIds = useFollowingStore(
     (state) => state.followedBusinessIds,
   );
 
-  const [refreshing, setRefreshing] = useState(false);
+  const followedBusinesses = useMemo(() => {
+    const normalizedSearch = search.trim().toLowerCase();
 
-  const followedBusinesses = useMemo(
-    () =>
-      businessesMock.filter((business) =>
-        followedBusinessIds.includes(String(business.id)),
-      ),
-    [followedBusinessIds],
-  );
+    return businesses.filter((business) => {
+      const isFollowed = followedBusinessIds.includes(String(business.id));
+
+      const matchesSearch =
+        business.name.toLowerCase().includes(normalizedSearch) ||
+        business.category.toLowerCase().includes(normalizedSearch) ||
+        business.location.toLowerCase().includes(normalizedSearch);
+
+      return isFollowed && matchesSearch;
+    });
+  }, [businesses, followedBusinessIds, search]);
 
   const handleRefresh = () => {
     setRefreshing(true);
@@ -31,9 +42,30 @@ export default function ProfileFollowingScreen() {
     }, 600);
   };
 
+  const handleFilterPress = () => {
+    router.push({
+      pathname: "/modal/filter",
+      params: { scope: "following" },
+    });
+  };
+
+  const handleMapPress = () => {
+    router.push("/(tabs)/map");
+  };
+
   return (
     <AppScreen withTopInset={false} style={styles.container}>
-      <ScreenHeader title="Following" titleSubtitle="Businesses you follow" />
+      <ScreenHeader
+        title="Following"
+        titleSubtitle="Businesses you follow"
+        showSearch
+        searchValue={search}
+        onSearchChangeText={setSearch}
+        searchPlaceholder="Find followed businesses"
+        actions={["map", "filter"]}
+        onPressMap={handleMapPress}
+        onPressFilter={handleFilterPress}
+      />
 
       <FlatList
         data={followedBusinesses}
@@ -46,6 +78,7 @@ export default function ProfileFollowingScreen() {
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
         }
+        ItemSeparatorComponent={() => <View style={styles.separator} />}
         renderItem={({ item }) => (
           <BusinessCard
             business={item}
@@ -57,7 +90,6 @@ export default function ProfileFollowingScreen() {
             }
           />
         )}
-        ItemSeparatorComponent={() => <View style={styles.separator} />}
         ListEmptyComponent={
           <AppEmptyState
             title="No followed businesses yet"
@@ -75,7 +107,7 @@ const styles = StyleSheet.create({
   },
   listContent: {
     paddingHorizontal: 16,
-    paddingTop: 12,
+    paddingTop: 16,
     paddingBottom: 24,
   },
   emptyContent: {
@@ -83,6 +115,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   separator: {
-    height: 12,
+    height: spacing.xs,
   },
 });
