@@ -318,26 +318,46 @@ function ReviewCard({ review }: { review: PersonalProfileReview }) {
         })
       }
     >
-      <Image
-        source={{ uri: review.businessImageUrl }}
-        style={styles.reviewImage}
-      />
-
       <View style={styles.reviewContent}>
         <AppText style={styles.reviewBusinessName} numberOfLines={1}>
           {review.businessName}
         </AppText>
 
         <View style={styles.reviewRatingRow}>
-          <Ionicons name="star" size={14} color={colors.accentOrange} />
-          <AppText style={styles.reviewRating}>
-            {review.rating.toFixed(1)}
-          </AppText>
+          {Array.from({ length: 5 }).map((_, index) => {
+            const isFilled = index < Math.round(review.rating);
+
+            return (
+              <Ionicons
+                key={index}
+                name={isFilled ? "star" : "star-outline"}
+                size={14}
+                color={colors.accentOrange}
+              />
+            );
+          })}
         </View>
 
-        <AppText style={styles.reviewText} numberOfLines={1}>
-          {review.text}
-        </AppText>
+        {!!review.text?.trim() ? (
+          <AppText style={styles.reviewText} numberOfLines={1}>
+            {review.text}
+          </AppText>
+        ) : null}
+        {review.photos?.length ? (
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.reviewPhotosScroll}
+          >
+            {review.photos.map((photo) => (
+              <Image
+                key={photo.id}
+                source={{ uri: photo.url }}
+                style={styles.reviewPhotoPreview}
+              />
+            ))}
+          </ScrollView>
+        ) : null}
       </View>
 
       <View style={styles.reviewRight}>
@@ -610,12 +630,6 @@ function createStyles(colors: AppColors) {
       borderWidth: 1,
       borderColor: colors.border,
     },
-    reviewImage: {
-      width: 72,
-      height: 72,
-      borderRadius: 18,
-      backgroundColor: colors.primaryGreenSoft,
-    },
     reviewContent: {
       flex: 1,
       minWidth: 0,
@@ -630,11 +644,6 @@ function createStyles(colors: AppColors) {
       flexDirection: "row",
       alignItems: "center",
       gap: 4,
-    },
-    reviewRating: {
-      fontSize: 14,
-      fontWeight: "700",
-      color: colors.textPrimary,
     },
     reviewText: {
       marginTop: 8,
@@ -652,6 +661,17 @@ function createStyles(colors: AppColors) {
     reviewDate: {
       fontSize: 12,
       color: colors.textSecondary,
+    },
+    reviewPhotosScroll: {
+      marginTop: spacing.sm,
+    },
+
+    reviewPhotoPreview: {
+      width: 72,
+      height: 72,
+      borderRadius: 14,
+      marginRight: spacing.sm,
+      backgroundColor: colors.primaryGreenSoft,
     },
     heroAvatarWrap: {
       width: 96,

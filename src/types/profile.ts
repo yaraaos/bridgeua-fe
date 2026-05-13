@@ -31,4 +31,8 @@ export type PersonalProfileReview = {
   rating: number;
   text: string;
   createdAt: string;
+  photos?: {
+    id: string;
+    url: string;
+  }[];
 };

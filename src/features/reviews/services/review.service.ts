@@ -120,6 +120,7 @@ export const getMyReviews = async (): Promise<PersonalProfileReview[]> => {
         rating: review.rating,
         text: review.text,
         createdAt: review.createdAt,
+        photos: review.photos,
       })),
   );
 
@@ -136,6 +137,7 @@ export const getMyReviews = async (): Promise<PersonalProfileReview[]> => {
       rating: review.rating,
       text: review.text,
       createdAt: review.createdAt,
+      photos: review.photos,
     };
   });
 
