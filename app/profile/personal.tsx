@@ -364,6 +364,7 @@ function createStyles(colors: AppColors) {
       flexDirection: "row",
       alignItems: "center",
       gap: spacing.lg,
+      marginTop: 10,
     },
 
     heroTextWrap: {
@@ -388,14 +389,14 @@ function createStyles(colors: AppColors) {
     },
 
     heroActionsRow: {
-      marginTop: spacing.lg,
+      marginTop: spacing.sm,
       flexDirection: "row",
       gap: spacing.sm,
     },
 
     heroActionButton: {
       flex: 1,
-      minHeight: 42,
+      minHeight: 36,
       borderRadius: 14,
       flexDirection: "row",
       alignItems: "center",
@@ -416,14 +417,14 @@ function createStyles(colors: AppColors) {
     },
 
     editButtonText: {
-      fontSize: 13,
-      fontWeight: "800",
+      fontSize: 12,
+      fontWeight: "700",
       color: colors.primaryGreen,
     },
 
     switchButtonText: {
-      fontSize: 13,
-      fontWeight: "800",
+      fontSize: 12,
+      fontWeight: "700",
       color: colors.textMuted,
     },
     statsRow: {
