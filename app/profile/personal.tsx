@@ -139,10 +139,20 @@ export default function PersonalProfileScreen() {
       <View style={styles.statsRow}>
         {profileStats.map((stat, index) => (
           <React.Fragment key={stat.id}>
-            <View style={styles.statItem}>
+            <Pressable
+              style={styles.statItem}
+              onPress={() => {
+                if (stat.id === "following") {
+                  router.push("/profile/following");
+                  return;
+                }
+
+                router.push("/profile/reviews");
+              }}
+            >
               <AppText style={styles.statValue}>{stat.value}</AppText>
               <AppText style={styles.statLabel}>{stat.label}</AppText>
-            </View>
+            </Pressable>
 
             {index !== profileStats.length - 1 ? (
               <View style={styles.statDivider} />
