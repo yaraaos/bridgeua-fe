@@ -6,7 +6,7 @@ import { spacing } from "@/src/constants/spacing";
 import { useBusinesses } from "@/src/features/businesses";
 import { useFollowingStore } from "@/src/store/following.store";
 import { router } from "expo-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { FlatList, RefreshControl, StyleSheet, View } from "react-native";
 
 export default function ProfileFollowingScreen() {
@@ -19,23 +19,31 @@ export default function ProfileFollowingScreen() {
     (state) => state.followedBusinessIds,
   );
 
+  const [visibleBusinessIds, setVisibleBusinessIds] = useState<string[]>([]);
+
+  useEffect(() => {
+    setVisibleBusinessIds(followedBusinessIds.map(String));
+  }, []);
+
   const followedBusinesses = useMemo(() => {
     const normalizedSearch = search.trim().toLowerCase();
 
     return businesses.filter((business) => {
-      const isFollowed = followedBusinessIds.includes(String(business.id));
+      const isVisible = visibleBusinessIds.includes(String(business.id));
 
       const matchesSearch =
         business.name.toLowerCase().includes(normalizedSearch) ||
         business.category.toLowerCase().includes(normalizedSearch) ||
         business.location.toLowerCase().includes(normalizedSearch);
 
-      return isFollowed && matchesSearch;
+      return isVisible && matchesSearch;
     });
-  }, [businesses, followedBusinessIds, search]);
+  }, [businesses, visibleBusinessIds, search]);
 
   const handleRefresh = () => {
     setRefreshing(true);
+
+    setVisibleBusinessIds(followedBusinessIds.map(String));
 
     setTimeout(() => {
       setRefreshing(false);
