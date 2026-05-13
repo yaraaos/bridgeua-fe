@@ -14,9 +14,8 @@ import type {
   PersonalProfileReview,
 } from "@/src/types/profile";
 import { Ionicons } from "@expo/vector-icons";
-import { router } from "expo-router";
-import React, { useEffect, useMemo, useState } from "react";
-
+import { router, useFocusEffect } from "expo-router";
+import React, { useCallback, useMemo, useState } from "react";
 
 import { Image, Pressable, ScrollView, StyleSheet, View } from "react-native";
 
@@ -31,9 +30,11 @@ export default function PersonalProfileScreen() {
 
   const [myReviews, setMyReviews] = useState<PersonalProfileReview[]>([]);
 
-  useEffect(() => {
-    getMyReviews().then(setMyReviews);
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      getMyReviews().then(setMyReviews);
+    }, []),
+  );
 
   const followedBusinesses = useMemo(
     () =>
@@ -252,7 +253,11 @@ function ReviewCard({ review }: { review: PersonalProfileReview }) {
       onPress={() =>
         router.push({
           pathname: "/business/[id]",
-          params: { id: review.businessId },
+          params: {
+            id: review.businessId,
+            tab: "reviews",
+            focusedReviewId: review.id,
+          },
         })
       }
     >

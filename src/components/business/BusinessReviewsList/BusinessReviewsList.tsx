@@ -22,6 +22,7 @@ type Props = {
   onPressWriteReview?: (rating?: number) => void;
   focusedReviewId?: string | null;
   onClearFocusedReview?: () => void;
+  onReviewsListLayout?: (y: number) => void;
 };
 
 export default function BusinessReviewsList({
@@ -31,6 +32,7 @@ export default function BusinessReviewsList({
   focusedReviewId,
   onClearFocusedReview,
   onPressWriteReview,
+  onReviewsListLayout,
 }: Props) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
@@ -140,7 +142,12 @@ export default function BusinessReviewsList({
         }}
       />
 
-      <View style={styles.listHeader}>
+      <View
+        style={styles.listHeader}
+        onLayout={(event) => {
+          onReviewsListLayout?.(event.nativeEvent.layout.y);
+        }}
+      >
         <Text style={styles.sectionTitle}>All reviews</Text>
         <Text style={styles.reviewCount}>{reviewCount} total</Text>
       </View>
@@ -151,21 +158,23 @@ export default function BusinessReviewsList({
           description="Be the first to share your experience."
         />
       ) : (
-        <View style={styles.list}>
-          {displayedReviews.map((review, index) => (
-            <View key={review.id}>
-              <ReviewCard
-                review={review}
-                onPressMore={() => {
-                  // TODO: expand review / open modal later
-                }}
-              />
+        <View>
+          <View style={styles.list}>
+            {displayedReviews.map((review, index) => (
+              <View key={review.id}>
+                <ReviewCard
+                  review={review}
+                  onPressMore={() => {
+                    // TODO: expand review / open modal later
+                  }}
+                />
 
-              {index < displayedReviews.length - 1 ? (
-                <View style={styles.separator} />
-              ) : null}
-            </View>
-          ))}
+                {index < displayedReviews.length - 1 ? (
+                  <View style={styles.separator} />
+                ) : null}
+              </View>
+            ))}
+          </View>
         </View>
       )}
     </View>
