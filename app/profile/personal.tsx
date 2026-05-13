@@ -429,8 +429,8 @@ function createStyles(colors: AppColors) {
     },
     statsRow: {
       marginTop: spacing.md,
-      paddingVertical: 14,
-      borderRadius: 18,
+      paddingVertical: 10,
+      borderRadius: 16,
       backgroundColor: colors.surface,
       borderWidth: 1,
       borderColor: colors.border,
@@ -443,19 +443,19 @@ function createStyles(colors: AppColors) {
       alignItems: "center",
     },
     statValue: {
-      fontSize: 20,
+      fontSize: 19,
       fontWeight: "800",
       color: colors.textPrimary,
     },
     statLabel: {
-      marginTop: 4,
-      fontSize: 14,
+      marginTop: 2,
+      fontSize: 12,
       fontWeight: "600",
       color: colors.textSecondary,
     },
     statDivider: {
       width: 1,
-      height: 42,
+      height: 34,
       backgroundColor: colors.border,
     },
     sectionHeaderRow: {
@@ -596,9 +596,9 @@ function createStyles(colors: AppColors) {
       height: "100%",
     },
     profileSummaryCard: {
-      marginHorizontal: spacing.lg,
-      marginTop: -16,
-      marginBottom: spacing.xl,
+      paddingHorizontal: spacing.lg,
+      marginTop: -12,
+      marginBottom: spacing.lg,
     },
     emptyStateWrap: {
       paddingVertical: spacing.lg,
