@@ -46,6 +46,11 @@ export default function ProfileReviewsScreen() {
         title="My Reviews"
         titleSubtitle="Reviews you have written"
         gradientColors={DISCOVERY_GRADIENT}
+        //for same height as in discovery
+        /*headerInnerStyle={{
+          paddingBottom: 20,
+          minHeight: 153,
+        }}*/
       />
 
       {isLoading ? (
