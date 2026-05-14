@@ -21,7 +21,6 @@ import {
     Pressable,
     ScrollView,
     StyleSheet,
-    TextInput,
     View,
 } from "react-native";
 
@@ -44,7 +43,7 @@ export default function EditProfileScreen() {
   const [avatarUrl, setAvatarUrl] = useState(profile.avatarUrl);
   const [firstName, setFirstName] = useState(initialNames.firstName);
   const [lastName, setLastName] = useState(initialNames.lastName);
-  const [bio, setBio] = useState(profile.bio ?? "");
+  const [username, setUsername] = useState(profile.username ?? "");
 
   const { saveProfile, isSaving } = useEditProfile();
 
@@ -75,7 +74,7 @@ export default function EditProfileScreen() {
     const success = await saveProfile({
       firstName: firstName.trim(),
       lastName: lastName.trim(),
-      bio: bio.trim(),
+      username: username.trim(),
       avatarUrl,
     });
 
@@ -128,16 +127,13 @@ export default function EditProfileScreen() {
           </View>
 
           <View>
-            <AppText style={styles.label}>Bio</AppText>
+            <AppText style={styles.label}>Username</AppText>
 
-            <TextInput
-              value={bio}
-              onChangeText={setBio}
-              placeholder="Tell people a little about you"
-              placeholderTextColor={colors.textMuted}
-              multiline
-              textAlignVertical="top"
-              style={styles.bioInput}
+            <AppInput
+              value={username}
+              onChangeText={setUsername}
+              placeholder="Enter username"
+              autoCapitalize="none"
             />
           </View>
         </View>
@@ -205,19 +201,6 @@ function createStyles(colors: AppColors) {
       marginBottom: spacing.xs,
       fontSize: 13,
       fontWeight: "700",
-      color: colors.textPrimary,
-    },
-    bioInput: {
-      minHeight: 120,
-      paddingHorizontal: spacing.md,
-      paddingTop: spacing.md,
-      paddingBottom: spacing.md,
-      borderWidth: 1,
-      borderColor: colors.border,
-      borderRadius: radius.lg,
-      backgroundColor: colors.surface,
-      fontSize: 14,
-      lineHeight: 20,
       color: colors.textPrimary,
     },
     footer: {

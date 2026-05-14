@@ -1,10 +1,10 @@
-import { useState } from "react";
 import { useProfileStore } from "@/src/store/profile.store";
+import { useState } from "react";
 
 type EditProfilePayload = {
   firstName: string;
   lastName: string;
-  bio: string;
+  username: string;
   avatarUrl?: string;
 };
 
@@ -23,7 +23,7 @@ export function useEditProfile() {
         displayName: `${payload.firstName} ${payload.lastName}`.trim(),
         firstName: payload.firstName,
         lastName: payload.lastName,
-        bio: payload.bio,
+        username: payload.username,
         avatarUrl: payload.avatarUrl,
       });
 
