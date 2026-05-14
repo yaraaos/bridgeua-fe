@@ -5,12 +5,15 @@ import AppLoader from "@/src/components/ui/AppLoader/AppLoader";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
 import { DISCOVERY_GRADIENT } from "@/src/constants/gradients";
 import { getMyReviews } from "@/src/features/reviews/services/review.service";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
+import type { PersonalProfileReview } from "@/src/types/profile";
 import { useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
 import { FlatList, RefreshControl, StyleSheet, View } from "react-native";
 
 export default function ProfileReviewsScreen() {
-  const [reviews, setReviews] = useState<any[]>([]);
+  const { colors } = useAppTheme();
+  const [reviews, setReviews] = useState<PersonalProfileReview[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -61,7 +64,15 @@ export default function ProfileReviewsScreen() {
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
           }
-          ItemSeparatorComponent={() => <View style={styles.separator} />}
+          ItemSeparatorComponent={() => (
+            <View
+              style={{
+                height: 1,
+                marginHorizontal: 16,
+                backgroundColor: colors.border,
+              }}
+            />
+          )}
           renderItem={({ item }) => (
             <ReviewCard review={item} variant="profile" />
           )}
@@ -93,8 +104,5 @@ const styles = StyleSheet.create({
   emptyContent: {
     flexGrow: 1,
     justifyContent: "center",
-  },
-  separator: {
-    height: 12,
   },
 });

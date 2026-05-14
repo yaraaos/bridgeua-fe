@@ -83,24 +83,13 @@ export default function ReviewCard({
   return (
     <Pressable
       disabled={!isProfile}
-      style={[
-        styles.container,
-        isPreview && styles.containerPreview,
-        isProfile && styles.reviewCard,
-      ]}
+      style={[styles.container, isPreview && styles.containerPreview]}
       onPress={handlePressCard}
     >
       {isProfile && profileReview ? (
         <>
           <View style={styles.reviewContent}>
             <View style={styles.profileHeader}>
-              <View style={styles.profileBusinessImageWrap}>
-                <Image
-                  source={{ uri: profileReview.businessImageUrl }}
-                  style={styles.profileBusinessImage}
-                />
-              </View>
-
               <View style={styles.profileBusinessInfo}>
                 <Text style={styles.profileBusinessName} numberOfLines={1}>
                   {profileReview.businessName}
@@ -115,12 +104,20 @@ export default function ReviewCard({
                         key={index}
                         name={isFilled ? "star" : "star-border"}
                         size={14}
-                        color={colors.primaryGreen}
+                        color={colors.accentOrange}
                       />
                     );
                   })}
                 </View>
               </View>
+
+              <Text style={styles.profileReviewDate}>
+                {new Date(profileReview.createdAt).toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "numeric",
+                  year: "numeric",
+                })}
+              </Text>
             </View>
 
             {hasReviewText ? (
@@ -165,18 +162,6 @@ export default function ReviewCard({
               </ScrollView>
             ) : null}
           </View>
-
-          <View style={styles.reviewRight}>
-            <View style={styles.reviewDateWrap}>
-              <Text style={styles.reviewDate}>
-                {new Date(profileReview.createdAt).toLocaleDateString("en-US", {
-                  month: "short",
-                  day: "numeric",
-                  year: "numeric",
-                })}
-              </Text>
-            </View>
-          </View>
         </>
       ) : businessReview ? (
         <>
@@ -207,7 +192,7 @@ export default function ReviewCard({
                       key={index}
                       name={isFilled ? "star" : "star-border"}
                       size={isPreview ? 11 : 14}
-                      color={colors.primaryGreen}
+                      color={colors.accentOrange}
                     />
                   );
                 })}

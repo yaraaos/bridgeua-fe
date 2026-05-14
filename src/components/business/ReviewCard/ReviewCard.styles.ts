@@ -125,11 +125,6 @@ export function createStyles(colors: AppColors) {
       fontWeight: "700",
       color: colors.primaryGreen,
     },
-    profileHeader: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 10,
-    },
 
     profileBusinessImageWrap: {
       width: 44,
@@ -164,10 +159,17 @@ export function createStyles(colors: AppColors) {
       paddingVertical: spacing.md,
     },
 
-    reviewRight: {
-      alignItems: "flex-end",
+    profileHeader: {
+      flexDirection: "row",
+      alignItems: "flex-start",
       justifyContent: "space-between",
-      minHeight: 44,
+      gap: 12,
+    },
+
+    profileReviewDate: {
+      marginTop: 2,
+      fontSize: 11,
+      color: colors.textSecondary,
     },
 
     reviewDateWrap: {
