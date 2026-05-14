@@ -137,15 +137,14 @@ export default function EditProfileScreen() {
             />
           </View>
         </View>
+        <View style={styles.saveButtonWrap}>
+          <AppButton
+            title={isSaving ? "Saving..." : "Save changes"}
+            onPress={handleSave}
+            disabled={isSaving}
+          />
+        </View>
       </ScrollView>
-
-      <View style={styles.footer}>
-        <AppButton
-          title={isSaving ? "Saving..." : "Save changes"}
-          onPress={handleSave}
-          disabled={isSaving}
-        />
-      </View>
     </AppScreen>
   );
 }
@@ -159,7 +158,7 @@ function createStyles(colors: AppColors) {
     content: {
       paddingHorizontal: spacing.lg,
       paddingTop: spacing.xl,
-      paddingBottom: 120,
+      paddingBottom: spacing.xl,
     },
     avatarSection: {
       alignItems: "center",
@@ -203,16 +202,8 @@ function createStyles(colors: AppColors) {
       fontWeight: "700",
       color: colors.textPrimary,
     },
-    footer: {
-      position: "absolute",
-      left: 0,
-      right: 0,
-      bottom: 0,
-      padding: spacing.lg,
-      paddingBottom: spacing.xl,
-      borderTopWidth: 1,
-      borderTopColor: colors.border,
-      backgroundColor: colors.background,
+    saveButtonWrap: {
+      marginTop: spacing.xl,
     },
   });
 }
