@@ -16,7 +16,9 @@ import DateTimePicker, {
     DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
 import * as ImagePicker from "expo-image-picker";
+import * as Localization from "expo-localization";
 import { router } from "expo-router";
+import type { CountryCode } from "libphonenumber-js";
 import React, { useMemo, useState } from "react";
 import {
     Alert,
@@ -31,30 +33,13 @@ import {
     TextInputProps,
     View,
 } from "react-native";
+import IntlPhoneField from "react-native-intl-phone-field";
 
 type ClearableInputProps = TextInputProps & {
   value: string;
   onClear: () => void;
   rightSlot?: React.ReactNode;
 };
-
-const COUNTRY_CODES = [
-  { code: "+1", flag: "🇺🇸" },
-  { code: "+34", flag: "🇪🇸" },
-  { code: "+43", flag: "🇦🇹" },
-  { code: "+44", flag: "🇬🇧" },
-  { code: "+49", flag: "🇩🇪" },
-  { code: "+380", flag: "🇺🇦" },
-  { code: "+962", flag: "🇯🇴" },
-];
-
-function getPhoneFlag(value: string) {
-  const normalized = value.replace(/\s/g, "");
-
-  return COUNTRY_CODES.sort((a, b) => b.code.length - a.code.length).find(
-    (item) => normalized.startsWith(item.code),
-  )?.flag;
-}
 
 export default function EditProfileScreen() {
   const { colors } = useAppTheme();
@@ -77,6 +62,12 @@ export default function EditProfileScreen() {
   const [lastName, setLastName] = useState(initialNames.lastName);
   const [username, setUsername] = useState(profile.username ?? "");
   const [phoneNumber, setPhoneNumber] = useState(profile.phoneNumber ?? "");
+  const [phoneInputKey, setPhoneInputKey] = useState(0);
+  const [isPhoneValid, setIsPhoneValid] = useState(false);
+
+  const defaultPhoneCountry = useMemo<CountryCode>(() => {
+    return (Localization.getLocales()[0]?.regionCode ?? "ES") as CountryCode;
+  }, []);
   const [dateOfBirth, setDateOfBirth] = useState(profile.dateOfBirth ?? "");
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [draftDateOfBirth, setDraftDateOfBirth] = useState<Date>(
@@ -84,7 +75,6 @@ export default function EditProfileScreen() {
   );
 
   const { saveProfile, isSaving } = useEditProfile();
-  const phoneFlag = getPhoneFlag(phoneNumber);
 
   const handlePickAvatar = async () => {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -123,8 +113,7 @@ export default function EditProfileScreen() {
       : "";
 
   const phoneError =
-    phoneNumber.trim().length > 0 &&
-    !/^[+0-9\s()-]{6,20}$/.test(phoneNumber.trim())
+    phoneNumber.trim().length > 0 && !isPhoneValid
       ? "Enter a valid phone number."
       : "";
 
@@ -266,24 +255,51 @@ export default function EditProfileScreen() {
 
             <View>
               <AppText style={styles.label}>Phone number</AppText>
-              <ClearableInput
-                value={phoneNumber}
-                onChangeText={setPhoneNumber}
-                onClear={() => setPhoneNumber("")}
-                placeholder="Add phone number"
-                keyboardType="phone-pad"
-                maxLength={20}
-                rightSlot={
-                  phoneFlag ? (
-                    <AppText style={styles.phoneFlag}>{phoneFlag}</AppText>
-                  ) : null
-                }
-                styles={styles}
-                colors={colors}
-              />
+
+              <View style={styles.phoneFieldWrap}>
+                <IntlPhoneField
+                  key={phoneInputKey}
+                  defaultCountry={defaultPhoneCountry}
+                  defaultValue={phoneNumber}
+                  flagUndetermined=""
+                  onValueUpdate={(value: string) => {
+                    setPhoneNumber(value);
+                  }}
+                  onValidation={(isValid: boolean) => {
+                    setIsPhoneValid(isValid);
+                  }}
+                  containerStyle={styles.phoneContainer}
+                  textInputStyle={styles.phoneInput}
+                  flagTextStyle={styles.phoneFlag}
+                  textInputProps={{
+                    placeholder: "Add phone number",
+                    returnKeyType: "done",
+                  }}
+                />
+
+                {phoneNumber.trim().length > 0 ? (
+                  <Pressable
+                    onPress={() => {
+                      setPhoneNumber("");
+                      setIsPhoneValid(false);
+                      setPhoneInputKey((value) => value + 1);
+                    }}
+                    hitSlop={10}
+                    style={styles.phoneClearButton}
+                  >
+                    <Ionicons
+                      name="close-circle"
+                      size={18}
+                      color={colors.textMuted}
+                    />
+                  </Pressable>
+                ) : null}
+              </View>
+
               {phoneError ? (
                 <AppText style={styles.errorText}>{phoneError}</AppText>
               ) : null}
+
               <AppText style={styles.helperText}>
                 Your phone number is private and will not be visible to other
                 users.
@@ -527,6 +543,40 @@ function createStyles(colors: AppColors) {
     datePicker: {
       alignSelf: "center",
     },
+
+    phoneFieldWrap: {
+      position: "relative",
+    },
+
+    phoneContainer: {
+      minHeight: 52,
+      borderRadius: radius.lg,
+      borderWidth: 1,
+      borderColor: colors.border,
+      backgroundColor: colors.surface,
+      paddingHorizontal: spacing.md,
+      alignItems: "center",
+    },
+
+    phoneInput: {
+      flex: 1,
+      color: colors.textPrimary,
+      fontSize: 15,
+      paddingRight: 28,
+    },
+
+    phoneClearButton: {
+      position: "absolute",
+      right: spacing.md,
+      top: 0,
+      bottom: 0,
+      justifyContent: "center",
+      zIndex: 10,
+    },
+
+    phoneFlag: {
+      fontSize: 18,
+    },
     saveButtonWrap: {
       marginTop: spacing.xl,
       marginBottom: spacing.xl,
@@ -552,9 +602,6 @@ function createStyles(colors: AppColors) {
       height: 22,
       alignItems: "center",
       justifyContent: "center",
-    },
-    phoneFlag: {
-      fontSize: 18,
     },
   });
 }
