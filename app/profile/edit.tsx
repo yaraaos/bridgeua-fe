@@ -2,6 +2,7 @@ import ScreenHeader from "@/src/components/common/ScreenHeader/ScreenHeader";
 import DateField from "@/src/components/profile/DateField/DateField";
 import PhoneField from "@/src/components/profile/PhoneField/PhoneField";
 import ProfileField from "@/src/components/profile/ProfileField/ProfileField";
+import AppAvatar from "@/src/components/ui/AppAvatar";
 import AppButton from "@/src/components/ui/AppButton/AppButton";
 import AppInput from "@/src/components/ui/AppInput/AppInput";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
@@ -20,14 +21,7 @@ import { useNavigation, usePreventRemove } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
 import React, { useMemo, useState } from "react";
-import {
-  Alert,
-  Image,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  View,
-} from "react-native";
+import { Alert, Pressable, ScrollView, StyleSheet, View } from "react-native";
 
 export default function EditProfileScreen() {
   const { colors } = useAppTheme();
@@ -187,7 +181,12 @@ export default function EditProfileScreen() {
       >
         <View style={styles.avatarSection}>
           <Pressable style={styles.avatarWrap} onPress={handlePickAvatar}>
-            <Image source={{ uri: avatarUrl }} style={styles.avatar} />
+            <AppAvatar
+              imageUrl={avatarUrl}
+              name={`${firstName} ${lastName}`.trim() || profile.displayName}
+              username={username || profile.username}
+              size="lg"
+            />
 
             <View style={styles.avatarEditButton}>
               <Ionicons name="camera-outline" size={18} color={colors.white} />
