@@ -1,8 +1,12 @@
 import ScreenHeader from "@/src/components/common/ScreenHeader/ScreenHeader";
+import DateField from "@/src/components/profile/DateField/DateField";
+import PhoneField from "@/src/components/profile/PhoneField/PhoneField";
+import ProfileField from "@/src/components/profile/ProfileField/ProfileField";
 import AppButton from "@/src/components/ui/AppButton/AppButton";
 import AppInput from "@/src/components/ui/AppInput/AppInput";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
 import AppText from "@/src/components/ui/AppText/AppText";
+import ClearableInput from "@/src/components/ui/ClearableInput/ClearableInput";
 import { AppColors } from "@/src/constants/colors";
 import { DISCOVERY_GRADIENT } from "@/src/constants/gradients";
 import { radius } from "@/src/constants/radius";
@@ -12,34 +16,18 @@ import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { personalProfileMock } from "@/src/mocks/profile.mock";
 import { useProfileStore } from "@/src/store/profile.store";
 import { Ionicons } from "@expo/vector-icons";
-import DateTimePicker, {
-    DateTimePickerEvent,
-} from "@react-native-community/datetimepicker";
 import { useNavigation, usePreventRemove } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
-import * as Localization from "expo-localization";
 import { router } from "expo-router";
-import type { CountryCode } from "libphonenumber-js";
 import React, { useMemo, useState } from "react";
 import {
-    Alert,
-    Image,
-    Keyboard,
-    Modal,
-    Platform,
-    Pressable,
-    ScrollView,
-    StyleSheet,
-    TextInputProps,
-    View,
+  Alert,
+  Image,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  View,
 } from "react-native";
-import IntlPhoneField from "react-native-intl-phone-field";
-
-type ClearableInputProps = TextInputProps & {
-  value: string;
-  onClear: () => void;
-  rightSlot?: React.ReactNode;
-};
 
 export default function EditProfileScreen() {
   const { colors } = useAppTheme();
@@ -64,17 +52,8 @@ export default function EditProfileScreen() {
   const [lastName, setLastName] = useState(initialNames.lastName);
   const [username, setUsername] = useState(profile.username ?? "");
   const [phoneNumber, setPhoneNumber] = useState(profile.phoneNumber ?? "");
-  const [phoneInputKey, setPhoneInputKey] = useState(0);
   const [isPhoneValid, setIsPhoneValid] = useState(false);
-
-  const defaultPhoneCountry = useMemo<CountryCode>(() => {
-    return (Localization.getLocales()[0]?.regionCode ?? "ES") as CountryCode;
-  }, []);
   const [dateOfBirth, setDateOfBirth] = useState(profile.dateOfBirth ?? "");
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [draftDateOfBirth, setDraftDateOfBirth] = useState<Date>(
-    dateOfBirth ? new Date(dateOfBirth) : new Date(),
-  );
 
   const { saveProfile, isSaving } = useEditProfile();
 
@@ -169,30 +148,6 @@ export default function EditProfileScreen() {
     );
   };
 
-  const handleDateChange = (
-    event: DateTimePickerEvent,
-    selectedDate?: Date,
-  ) => {
-    if (event.type === "dismissed") {
-      return;
-    }
-
-    if (selectedDate) {
-      setDraftDateOfBirth(selectedDate);
-    }
-  };
-
-  const handleOpenDatePicker = () => {
-    Keyboard.dismiss();
-    setDraftDateOfBirth(dateOfBirth ? new Date(dateOfBirth) : new Date());
-    setShowDatePicker(true);
-  };
-
-  const handleConfirmDate = () => {
-    setDateOfBirth(draftDateOfBirth.toISOString().split("T")[0]);
-    setShowDatePicker(false);
-  };
-
   const handleSave = async () => {
     const success = await saveProfile({
       firstName: firstName.trim(),
@@ -205,6 +160,13 @@ export default function EditProfileScreen() {
 
     if (success) router.back();
   };
+
+  console.log({
+    DateField,
+    PhoneField,
+    ProfileField,
+    ClearableInput,
+  });
 
   return (
     <AppScreen withTopInset={false} style={styles.container}>
@@ -236,34 +198,27 @@ export default function EditProfileScreen() {
         </View>
 
         <View style={styles.form}>
-          <View>
-            <AppText style={styles.label}>First name</AppText>
+          <ProfileField label="First name">
             <ClearableInput
               value={firstName}
               onChangeText={setFirstName}
               onClear={() => setFirstName("")}
               placeholder="Enter first name"
               maxLength={30}
-              styles={styles}
-              colors={colors}
             />
-          </View>
+          </ProfileField>
 
-          <View>
-            <AppText style={styles.label}>Last name</AppText>
+          <ProfileField label="Last name">
             <ClearableInput
               value={lastName}
               onChangeText={setLastName}
               onClear={() => setLastName("")}
               placeholder="Enter last name"
               maxLength={30}
-              styles={styles}
-              colors={colors}
             />
-          </View>
+          </ProfileField>
 
-          <View>
-            <AppText style={styles.label}>Username</AppText>
+          <ProfileField label="Username" errorText={usernameError}>
             <ClearableInput
               value={username}
               onChangeText={setUsername}
@@ -271,124 +226,42 @@ export default function EditProfileScreen() {
               placeholder="Enter username"
               autoCapitalize="none"
               maxLength={20}
-              styles={styles}
-              colors={colors}
             />
-            {usernameError ? (
-              <AppText style={styles.errorText}>{usernameError}</AppText>
-            ) : null}
-          </View>
+          </ProfileField>
 
-          <View>
-            <AppText style={styles.label}>Email</AppText>
+          <ProfileField
+            label="Email"
+            helperText="This email is linked to your account and cannot be changed here."
+          >
             <AppInput
               value={profile.email}
               editable={false}
               placeholder="Email"
             />
-            <AppText style={styles.helperText}>
-              This email is linked to your account and cannot be changed here.
-            </AppText>
-          </View>
+          </ProfileField>
 
-          <View>
-            <AppText style={styles.label}>Phone number</AppText>
+          <ProfileField
+            label="Phone number"
+            errorText={phoneError}
+            helperText="Your phone number is private and will not be visible to other users."
+          >
+            <PhoneField
+              value={phoneNumber}
+              onChange={setPhoneNumber}
+              onValidationChange={setIsPhoneValid}
+            />
+          </ProfileField>
 
-            <View style={styles.phoneFieldWrap}>
-              <IntlPhoneField
-                key={phoneInputKey}
-                defaultCountry={defaultPhoneCountry}
-                defaultValue={phoneNumber}
-                flagUndetermined=""
-                onValueUpdate={(value: string) => {
-                  setPhoneNumber(value);
-                }}
-                onValidation={(isValid: boolean) => {
-                  setIsPhoneValid(isValid);
-                }}
-                containerStyle={styles.phoneContainer}
-                textInputStyle={styles.phoneInput}
-                flagTextStyle={styles.phoneFlag}
-                textInputProps={{
-                  placeholder: "Add phone number",
-                  returnKeyType: "done",
-                }}
-              />
-
-              {phoneNumber.trim().length > 0 ? (
-                <Pressable
-                  onPress={() => {
-                    setPhoneNumber("");
-                    setIsPhoneValid(false);
-                    setPhoneInputKey((value) => value + 1);
-                  }}
-                  hitSlop={10}
-                  style={styles.phoneClearButton}
-                >
-                  <Ionicons
-                    name="close-circle"
-                    size={18}
-                    color={colors.textMuted}
-                  />
-                </Pressable>
-              ) : null}
-            </View>
-
-            {phoneError ? (
-              <AppText style={styles.errorText}>{phoneError}</AppText>
-            ) : null}
-
-            <AppText style={styles.helperText}>
-              Your phone number is private and will not be visible to other
-              users.
-            </AppText>
-          </View>
-
-          <View>
-            <AppText style={styles.label}>Date of birth</AppText>
-
-            <View style={styles.inputWrap}>
-              <Pressable
-                style={styles.dateInputPressable}
-                onPress={handleOpenDatePicker}
-              >
-                <AppInput
-                  value={dateOfBirth}
-                  placeholder="Select date of birth"
-                  editable={false}
-                  pointerEvents="none"
-                  style={styles.clearableInput}
-                />
-              </Pressable>
-
-              <View style={styles.inputRightContent}>
-                <Ionicons
-                  name="calendar-outline"
-                  size={18}
-                  color={colors.textMuted}
-                />
-
-                {dateOfBirth ? (
-                  <Pressable
-                    onPress={() => setDateOfBirth("")}
-                    hitSlop={10}
-                    style={styles.clearButton}
-                  >
-                    <Ionicons
-                      name="close-circle"
-                      size={18}
-                      color={colors.textMuted}
-                    />
-                  </Pressable>
-                ) : null}
-              </View>
-            </View>
-
-            <AppText style={styles.helperText}>
-              Your date of birth is private and is only used to suggest birthday
-              promotions.
-            </AppText>
-          </View>
+          <ProfileField
+            label="Date of birth"
+            helperText="Your date of birth is private and is only used to suggest birthday promotions."
+          >
+            <DateField
+              value={dateOfBirth}
+              onChange={setDateOfBirth}
+              placeholder="Select date of birth"
+            />
+          </ProfileField>
         </View>
 
         <View style={styles.saveButtonWrap}>
@@ -399,66 +272,7 @@ export default function EditProfileScreen() {
           />
         </View>
       </ScrollView>
-      <Modal
-        visible={showDatePicker}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setShowDatePicker(false)}
-      >
-        <View style={styles.datePickerOverlay}>
-          <View style={styles.datePickerCard}>
-            <View style={styles.datePickerHeader}>
-              <Pressable onPress={() => setShowDatePicker(false)}>
-                <AppText style={styles.datePickerCancel}>Cancel</AppText>
-              </Pressable>
-
-              <AppText style={styles.datePickerTitle}>Date of birth</AppText>
-
-              <Pressable onPress={handleConfirmDate}>
-                <AppText style={styles.datePickerDone}>Done</AppText>
-              </Pressable>
-            </View>
-
-            <DateTimePicker
-              value={draftDateOfBirth}
-              mode="date"
-              display={Platform.OS === "ios" ? "spinner" : "spinner"}
-              maximumDate={new Date()}
-              onChange={handleDateChange}
-              style={styles.datePicker}
-            />
-          </View>
-        </View>
-      </Modal>
     </AppScreen>
-  );
-}
-
-function ClearableInput({
-  value,
-  onClear,
-  rightSlot,
-  styles,
-  colors,
-  ...props
-}: ClearableInputProps & {
-  styles: ReturnType<typeof createStyles>;
-  colors: AppColors;
-}) {
-  return (
-    <View style={styles.inputWrap}>
-      <AppInput {...props} value={value} style={styles.clearableInput} />
-
-      <View style={styles.inputRightContent}>
-        {rightSlot}
-
-        {value.trim().length > 0 ? (
-          <Pressable onPress={onClear} hitSlop={10} style={styles.clearButton}>
-            <Ionicons name="close-circle" size={18} color={colors.textMuted} />
-          </Pressable>
-        ) : null}
-      </View>
-    </View>
   );
 }
 
@@ -509,133 +323,9 @@ function createStyles(colors: AppColors) {
     form: {
       gap: spacing.lg,
     },
-    label: {
-      marginBottom: spacing.xs,
-      fontSize: 13,
-      fontWeight: "700",
-      color: colors.textPrimary,
-    },
-    helperText: {
-      marginTop: spacing.xs,
-      fontSize: 12,
-      lineHeight: 17,
-      color: colors.textSecondary,
-    },
-    errorText: {
-      marginTop: spacing.xs,
-      fontSize: 12,
-      lineHeight: 17,
-      color: colors.error,
-    },
-    dateInputPressable: {
-      width: "100%",
-    },
-
-    datePickerOverlay: {
-      flex: 1,
-      alignItems: "center",
-      justifyContent: "center",
-      paddingHorizontal: spacing.lg,
-      backgroundColor: "rgba(0,0,0,0.35)",
-    },
-
-    datePickerCard: {
-      width: "100%",
-      borderRadius: radius.xl,
-      backgroundColor: colors.surface,
-      overflow: "hidden",
-    },
-
-    datePickerHeader: {
-      minHeight: 52,
-      paddingHorizontal: spacing.lg,
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-      borderBottomWidth: 1,
-      borderBottomColor: colors.border,
-    },
-
-    datePickerTitle: {
-      fontSize: 15,
-      fontWeight: "700",
-      color: colors.textPrimary,
-    },
-
-    datePickerCancel: {
-      fontSize: 14,
-      fontWeight: "600",
-      color: colors.textSecondary,
-    },
-
-    datePickerDone: {
-      fontSize: 14,
-      fontWeight: "700",
-      color: colors.primaryGreen,
-    },
-
-    datePicker: {
-      alignSelf: "center",
-    },
-
-    phoneFieldWrap: {
-      position: "relative",
-    },
-
-    phoneContainer: {
-      minHeight: 52,
-      borderRadius: radius.lg,
-      borderWidth: 1,
-      borderColor: colors.border,
-      backgroundColor: colors.surface,
-      paddingHorizontal: spacing.md,
-      alignItems: "center",
-    },
-
-    phoneInput: {
-      flex: 1,
-      color: colors.textPrimary,
-      fontSize: 15,
-      paddingRight: 28,
-    },
-
-    phoneClearButton: {
-      position: "absolute",
-      right: spacing.md,
-      top: 0,
-      bottom: 0,
-      justifyContent: "center",
-      zIndex: 10,
-    },
-
-    phoneFlag: {
-      fontSize: 18,
-    },
     saveButtonWrap: {
       marginTop: spacing.xl,
       marginBottom: spacing.xl,
-    },
-    inputWrap: {
-      position: "relative",
-      justifyContent: "center",
-    },
-    clearableInput: {
-      paddingRight: 72,
-    },
-    inputRightContent: {
-      position: "absolute",
-      right: spacing.md,
-      top: 0,
-      bottom: 0,
-      flexDirection: "row",
-      alignItems: "center",
-      gap: spacing.xs,
-    },
-    clearButton: {
-      width: 22,
-      height: 22,
-      alignItems: "center",
-      justifyContent: "center",
     },
   });
 }
