@@ -12,9 +12,10 @@ import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { personalProfileMock } from "@/src/mocks/profile.mock";
 import { useProfileStore } from "@/src/store/profile.store";
 import { Ionicons } from "@expo/vector-icons";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
-import { useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
     Alert,
     Image,
@@ -73,6 +74,7 @@ export default function EditProfileScreen() {
   const [username, setUsername] = useState(profile.username ?? "");
   const [phoneNumber, setPhoneNumber] = useState(profile.phoneNumber ?? "");
   const [dateOfBirth, setDateOfBirth] = useState(profile.dateOfBirth ?? "");
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
   const { saveProfile, isSaving } = useEditProfile();
   const phoneFlag = getPhoneFlag(phoneNumber);
@@ -113,12 +115,6 @@ export default function EditProfileScreen() {
       ? "Username must be 3–20 characters and can only use letters, numbers, dots, or underscores."
       : "";
 
-  const dateOfBirthError =
-    dateOfBirth.trim().length > 0 &&
-    !/^\d{4}-\d{2}-\d{2}$/.test(dateOfBirth.trim())
-      ? "Use format YYYY-MM-DD."
-      : "";
-
   const phoneError =
     phoneNumber.trim().length > 0 &&
     !/^[+0-9\s()-]{6,20}$/.test(phoneNumber.trim())
@@ -128,12 +124,21 @@ export default function EditProfileScreen() {
   const canSave =
     hasChanges &&
     !usernameError &&
-    !dateOfBirthError &&
     !phoneError &&
     firstName.trim().length > 0 &&
     lastName.trim().length > 0 &&
     username.trim().length > 0 &&
     !isSaving;
+
+  const handleDateChange = (_: any, selectedDate?: Date) => {
+    setShowDatePicker(false);
+
+    if (!selectedDate) return;
+
+    const formatted = selectedDate.toISOString().split("T")[0];
+
+    setDateOfBirth(formatted);
+  };
 
   const handleSave = async () => {
     const success = await saveProfile({
@@ -266,19 +271,38 @@ export default function EditProfileScreen() {
 
             <View>
               <AppText style={styles.label}>Date of birth</AppText>
-              <ClearableInput
-                value={dateOfBirth}
-                onChangeText={setDateOfBirth}
-                onClear={() => setDateOfBirth("")}
-                placeholder="YYYY-MM-DD"
-                keyboardType="numbers-and-punctuation"
-                maxLength={10}
-                styles={styles}
-                colors={colors}
-              />
-              {dateOfBirthError ? (
-                <AppText style={styles.errorText}>{dateOfBirthError}</AppText>
+
+              <Pressable onPress={() => setShowDatePicker(true)}>
+                <View pointerEvents="none">
+                  <ClearableInput
+                    value={dateOfBirth}
+                    onChangeText={() => undefined}
+                    onClear={() => setDateOfBirth("")}
+                    placeholder="Select date of birth"
+                    editable={false}
+                    styles={styles}
+                    colors={colors}
+                    rightSlot={
+                      <Ionicons
+                        name="calendar-outline"
+                        size={18}
+                        color={colors.textMuted}
+                      />
+                    }
+                  />
+                </View>
+              </Pressable>
+
+              {showDatePicker ? (
+                <DateTimePicker
+                  value={dateOfBirth ? new Date(dateOfBirth) : new Date()}
+                  mode="date"
+                  display={Platform.OS === "ios" ? "spinner" : "default"}
+                  maximumDate={new Date()}
+                  onChange={handleDateChange}
+                />
               ) : null}
+
               <AppText style={styles.helperText}>
                 Your date of birth is private and is only used to suggest
                 birthday promotions.
