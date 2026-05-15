@@ -8,6 +8,9 @@ export type PersonalProfile = {
 
   firstName?: string;
   lastName?: string;
+  email: string;
+  phoneNumber?: string;
+  dateOfBirth?: string;
 };
 
 export type PersonalProfileStat = {

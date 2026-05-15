@@ -44,6 +44,8 @@ export default function EditProfileScreen() {
   const [firstName, setFirstName] = useState(initialNames.firstName);
   const [lastName, setLastName] = useState(initialNames.lastName);
   const [username, setUsername] = useState(profile.username ?? "");
+  const [phoneNumber, setPhoneNumber] = useState(profile.phoneNumber ?? "");
+  const [dateOfBirth, setDateOfBirth] = useState(profile.dateOfBirth ?? "");
 
   const { saveProfile, isSaving } = useEditProfile();
 
@@ -75,6 +77,8 @@ export default function EditProfileScreen() {
       firstName: firstName.trim(),
       lastName: lastName.trim(),
       username: username.trim(),
+      phoneNumber: phoneNumber.trim(),
+      dateOfBirth: dateOfBirth.trim(),
       avatarUrl,
     });
 
@@ -135,6 +139,46 @@ export default function EditProfileScreen() {
               placeholder="Enter username"
               autoCapitalize="none"
             />
+          </View>
+          <View style={styles.privateSection}>
+            <View>
+              <AppText style={styles.label}>Email</AppText>
+              <AppInput
+                value={profile.email}
+                editable={false}
+                placeholder="Email"
+              />
+              <AppText style={styles.helperText}>
+                This email is linked to your account and cannot be changed here.
+              </AppText>
+            </View>
+
+            <View>
+              <AppText style={styles.label}>Phone number</AppText>
+              <AppInput
+                value={phoneNumber}
+                onChangeText={setPhoneNumber}
+                placeholder="Add phone number"
+                keyboardType="phone-pad"
+              />
+              <AppText style={styles.helperText}>
+                Your phone number is private and will not be visible to other
+                users.
+              </AppText>
+            </View>
+
+            <View>
+              <AppText style={styles.label}>Date of birth</AppText>
+              <AppInput
+                value={dateOfBirth}
+                onChangeText={setDateOfBirth}
+                placeholder="YYYY-MM-DD"
+              />
+              <AppText style={styles.helperText}>
+                Your date of birth is private and is only used to suggest
+                birthday promotions.
+              </AppText>
+            </View>
           </View>
         </View>
         <View style={styles.saveButtonWrap}>
@@ -201,6 +245,16 @@ function createStyles(colors: AppColors) {
       fontSize: 13,
       fontWeight: "700",
       color: colors.textPrimary,
+    },
+    privateSection: {
+      gap: spacing.lg,
+    },
+
+    helperText: {
+      marginTop: spacing.xs,
+      fontSize: 12,
+      lineHeight: 17,
+      color: colors.textSecondary,
     },
     saveButtonWrap: {
       marginTop: spacing.xl,

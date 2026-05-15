@@ -5,6 +5,8 @@ type EditProfilePayload = {
   firstName: string;
   lastName: string;
   username: string;
+  phoneNumber?: string;
+  dateOfBirth?: string;
   avatarUrl?: string;
 };
 
@@ -24,6 +26,8 @@ export function useEditProfile() {
         firstName: payload.firstName,
         lastName: payload.lastName,
         username: payload.username,
+        phoneNumber: payload.phoneNumber,
+        dateOfBirth: payload.dateOfBirth,
         avatarUrl: payload.avatarUrl,
       });
 
