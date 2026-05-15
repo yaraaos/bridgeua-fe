@@ -8,8 +8,8 @@ import { spacing } from "@/src/constants/spacing";
 import { getMyReviews } from "@/src/features/reviews/services/review.service";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { businessesMock } from "@/src/mocks/businesses.mock";
-import { personalProfileMock } from "@/src/mocks/profile.mock";
 import { useFollowingStore } from "@/src/store/following.store";
+import { useProfileStore } from "@/src/store/profile.store";
 import type {
   PersonalProfileFollowedBusiness,
   PersonalProfileReview,
@@ -23,7 +23,7 @@ import { Image, Pressable, ScrollView, StyleSheet, View } from "react-native";
 export default function PersonalProfileScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
-  const profile = personalProfileMock;
+  const profile = useProfileStore((state) => state.profile);
 
   const followedBusinessIds = useFollowingStore(
     (state) => state.followedBusinessIds,
