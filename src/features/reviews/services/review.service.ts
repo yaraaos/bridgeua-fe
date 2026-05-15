@@ -110,7 +110,9 @@ export const submitReview = async (
   return Promise.resolve(newReview);
 };
 export const getMyReviews = async (): Promise<PersonalProfileReview[]> => {
-  const currentUserNames = ["Kateryna", "You"];
+  const profile = useProfileStore.getState().profile;
+
+  const currentUserNames = [profile.displayName];
 
   const mockReviews = businessDetailsMock.flatMap((business) =>
     business.reviews
