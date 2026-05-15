@@ -168,6 +168,7 @@ export default function ReviewCard({
           <View style={styles.header}>
             <AppAvatar
               name={businessReview.authorName}
+              username={businessReview.authorUsername}
               imageUrl={businessReview.authorAvatar}
               size={isPreview ? "sm" : "md"}
             />
