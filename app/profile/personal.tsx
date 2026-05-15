@@ -1,5 +1,6 @@
 import FollowButton from "@/src/components/business/FollowButton/FollowButton";
 import ScreenHeader from "@/src/components/common/ScreenHeader/ScreenHeader";
+import AppAvatar from "@/src/components/ui/AppAvatar";
 import AppEmptyState from "@/src/components/ui/AppEmptyState";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
 import AppText from "@/src/components/ui/AppText/AppText";
@@ -92,12 +93,12 @@ export default function PersonalProfileScreen() {
         profileContent={
           <View>
             <View style={styles.heroIdentityRow}>
-              <View style={styles.heroAvatarWrap}>
-                <Image
-                  source={{ uri: profile.avatarUrl }}
-                  style={styles.heroAvatar}
-                />
-              </View>
+              <AppAvatar
+                name={profile.displayName}
+                username={profile.username}
+                imageUrl={profile.avatarUrl}
+                size="lg"
+              />
 
               <View style={styles.heroTextWrap}>
                 <AppText style={styles.heroName} numberOfLines={1}>
@@ -712,18 +713,6 @@ function createStyles(colors: AppColors) {
       fontSize: 13,
       fontWeight: "700",
       color: colors.primaryGreen,
-    },
-    heroAvatarWrap: {
-      width: 96,
-      height: 96,
-      borderRadius: 48,
-      overflow: "hidden",
-      backgroundColor: colors.primaryGreenSoft,
-    },
-
-    heroAvatar: {
-      width: "100%",
-      height: "100%",
     },
     profileSummaryCard: {
       paddingHorizontal: spacing.lg,
