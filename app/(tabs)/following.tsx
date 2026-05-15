@@ -117,7 +117,7 @@ export default function FollowingScreen() {
   } = useFollowingFeed({ visibleBusinessIds });
 
   const handleMapPress = () => {
-    console.log("Following map is not implemented yet");
+    router.push("/(tabs)/map");
   };
 
   const handleFilterPress = () => {

@@ -112,7 +112,7 @@ export default function HomeScreen() {
   };
 
   const handleMapPress = () => {
-    console.log("Open map");
+    router.push("/(tabs)/map");
   };
 
   const handleFilterPress = () => {
