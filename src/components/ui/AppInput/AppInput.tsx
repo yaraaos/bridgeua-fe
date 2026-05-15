@@ -1,6 +1,6 @@
+import { useAppTheme } from "@/src/hooks/useAppTheme";
 import React, { useState } from "react";
 import { TextInput, TextInputProps, View } from "react-native";
-import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { createStyles } from "./AppInput.styles";
 
 type Props = TextInputProps & {
@@ -19,6 +19,8 @@ export default function AppInput({ error, disabled, style, ...props }: Props) {
         editable={!disabled}
         placeholderTextColor={colors.textMuted}
         {...props}
+        returnKeyType={props.returnKeyType ?? "done"}
+        submitBehavior={props.submitBehavior ?? "blurAndSubmit"}
         style={[
           styles.input,
           isFocused && styles.focused,
@@ -26,8 +28,14 @@ export default function AppInput({ error, disabled, style, ...props }: Props) {
           disabled && styles.disabled,
           style,
         ]}
-        onFocus={() => setIsFocused(true)}
-        onBlur={() => setIsFocused(false)}
+        onFocus={(event) => {
+          setIsFocused(true);
+          props.onFocus?.(event);
+        }}
+        onBlur={(event) => {
+          setIsFocused(false);
+          props.onBlur?.(event);
+        }}
       />
     </View>
   );
