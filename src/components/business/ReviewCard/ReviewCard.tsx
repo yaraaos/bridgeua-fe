@@ -166,12 +166,31 @@ export default function ReviewCard({
       ) : businessReview ? (
         <>
           <View style={styles.header}>
-            <AppAvatar
-              name={businessReview.authorName}
-              username={businessReview.authorUsername}
-              imageUrl={businessReview.authorAvatar}
-              size={isPreview ? "sm" : "md"}
-            />
+            <Pressable
+              onPress={() => {
+                if (!businessReview.authorAvatar?.trim()) return;
+
+                router.push({
+                  pathname: "/modal/image-viewer",
+                  params: {
+                    images: JSON.stringify([
+                      {
+                        id: "author-avatar",
+                        url: businessReview.authorAvatar,
+                      },
+                    ]),
+                    initialIndex: "0",
+                  },
+                });
+              }}
+            >
+              <AppAvatar
+                name={businessReview.authorName}
+                username={businessReview.authorUsername}
+                imageUrl={businessReview.authorAvatar}
+                size={isPreview ? "sm" : "md"}
+              />
+            </Pressable>
 
             <Pressable
               style={styles.authorInfo}
