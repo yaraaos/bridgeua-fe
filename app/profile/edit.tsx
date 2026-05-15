@@ -12,14 +12,18 @@ import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { personalProfileMock } from "@/src/mocks/profile.mock";
 import { useProfileStore } from "@/src/store/profile.store";
 import { Ionicons } from "@expo/vector-icons";
-import DateTimePicker from "@react-native-community/datetimepicker";
+import DateTimePicker, {
+    DateTimePickerEvent,
+} from "@react-native-community/datetimepicker";
 import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
 import React, { useMemo, useState } from "react";
 import {
     Alert,
     Image,
+    Keyboard,
     KeyboardAvoidingView,
+    Modal,
     Platform,
     Pressable,
     ScrollView,
@@ -75,6 +79,9 @@ export default function EditProfileScreen() {
   const [phoneNumber, setPhoneNumber] = useState(profile.phoneNumber ?? "");
   const [dateOfBirth, setDateOfBirth] = useState(profile.dateOfBirth ?? "");
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [draftDateOfBirth, setDraftDateOfBirth] = useState<Date>(
+    dateOfBirth ? new Date(dateOfBirth) : new Date(),
+  );
 
   const { saveProfile, isSaving } = useEditProfile();
   const phoneFlag = getPhoneFlag(phoneNumber);
@@ -130,14 +137,28 @@ export default function EditProfileScreen() {
     username.trim().length > 0 &&
     !isSaving;
 
-  const handleDateChange = (_: any, selectedDate?: Date) => {
+  const handleDateChange = (
+    event: DateTimePickerEvent,
+    selectedDate?: Date,
+  ) => {
+    if (event.type === "dismissed") {
+      return;
+    }
+
+    if (selectedDate) {
+      setDraftDateOfBirth(selectedDate);
+    }
+  };
+
+  const handleOpenDatePicker = () => {
+    Keyboard.dismiss();
+    setDraftDateOfBirth(dateOfBirth ? new Date(dateOfBirth) : new Date());
+    setShowDatePicker(true);
+  };
+
+  const handleConfirmDate = () => {
+    setDateOfBirth(draftDateOfBirth.toISOString().split("T")[0]);
     setShowDatePicker(false);
-
-    if (!selectedDate) return;
-
-    const formatted = selectedDate.toISOString().split("T")[0];
-
-    setDateOfBirth(formatted);
   };
 
   const handleSave = async () => {
@@ -272,36 +293,42 @@ export default function EditProfileScreen() {
             <View>
               <AppText style={styles.label}>Date of birth</AppText>
 
-              <Pressable onPress={() => setShowDatePicker(true)}>
-                <View pointerEvents="none">
-                  <ClearableInput
+              <View style={styles.inputWrap}>
+                <Pressable
+                  style={styles.dateInputPressable}
+                  onPress={handleOpenDatePicker}
+                >
+                  <AppInput
                     value={dateOfBirth}
-                    onChangeText={() => undefined}
-                    onClear={() => setDateOfBirth("")}
                     placeholder="Select date of birth"
                     editable={false}
-                    styles={styles}
-                    colors={colors}
-                    rightSlot={
+                    pointerEvents="none"
+                    style={styles.clearableInput}
+                  />
+                </Pressable>
+
+                <View style={styles.inputRightContent}>
+                  <Ionicons
+                    name="calendar-outline"
+                    size={18}
+                    color={colors.textMuted}
+                  />
+
+                  {dateOfBirth ? (
+                    <Pressable
+                      onPress={() => setDateOfBirth("")}
+                      hitSlop={10}
+                      style={styles.clearButton}
+                    >
                       <Ionicons
-                        name="calendar-outline"
+                        name="close-circle"
                         size={18}
                         color={colors.textMuted}
                       />
-                    }
-                  />
+                    </Pressable>
+                  ) : null}
                 </View>
-              </Pressable>
-
-              {showDatePicker ? (
-                <DateTimePicker
-                  value={dateOfBirth ? new Date(dateOfBirth) : new Date()}
-                  mode="date"
-                  display={Platform.OS === "ios" ? "spinner" : "default"}
-                  maximumDate={new Date()}
-                  onChange={handleDateChange}
-                />
-              ) : null}
+              </View>
 
               <AppText style={styles.helperText}>
                 Your date of birth is private and is only used to suggest
@@ -318,6 +345,37 @@ export default function EditProfileScreen() {
             />
           </View>
         </ScrollView>
+        <Modal
+          visible={showDatePicker}
+          transparent
+          animationType="fade"
+          onRequestClose={() => setShowDatePicker(false)}
+        >
+          <View style={styles.datePickerOverlay}>
+            <View style={styles.datePickerCard}>
+              <View style={styles.datePickerHeader}>
+                <Pressable onPress={() => setShowDatePicker(false)}>
+                  <AppText style={styles.datePickerCancel}>Cancel</AppText>
+                </Pressable>
+
+                <AppText style={styles.datePickerTitle}>Date of birth</AppText>
+
+                <Pressable onPress={handleConfirmDate}>
+                  <AppText style={styles.datePickerDone}>Done</AppText>
+                </Pressable>
+              </View>
+
+              <DateTimePicker
+                value={draftDateOfBirth}
+                mode="date"
+                display={Platform.OS === "ios" ? "spinner" : "spinner"}
+                maximumDate={new Date()}
+                onChange={handleDateChange}
+                style={styles.datePicker}
+              />
+            </View>
+          </View>
+        </Modal>
       </KeyboardAvoidingView>
     </AppScreen>
   );
@@ -418,6 +476,56 @@ function createStyles(colors: AppColors) {
       fontSize: 12,
       lineHeight: 17,
       color: colors.error,
+    },
+    dateInputPressable: {
+      width: "100%",
+    },
+
+    datePickerOverlay: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+      paddingHorizontal: spacing.lg,
+      backgroundColor: "rgba(0,0,0,0.35)",
+    },
+
+    datePickerCard: {
+      width: "100%",
+      borderRadius: radius.xl,
+      backgroundColor: colors.surface,
+      overflow: "hidden",
+    },
+
+    datePickerHeader: {
+      minHeight: 52,
+      paddingHorizontal: spacing.lg,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+    },
+
+    datePickerTitle: {
+      fontSize: 15,
+      fontWeight: "700",
+      color: colors.textPrimary,
+    },
+
+    datePickerCancel: {
+      fontSize: 14,
+      fontWeight: "600",
+      color: colors.textSecondary,
+    },
+
+    datePickerDone: {
+      fontSize: 14,
+      fontWeight: "700",
+      color: colors.primaryGreen,
+    },
+
+    datePicker: {
+      alignSelf: "center",
     },
     saveButtonWrap: {
       marginTop: spacing.xl,
