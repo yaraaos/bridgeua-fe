@@ -18,11 +18,26 @@ import { Ionicons } from "@expo/vector-icons";
 import { router, useFocusEffect } from "expo-router";
 import React, { useCallback, useMemo, useState } from "react";
 
-import { Image, Pressable, ScrollView, StyleSheet, View } from "react-native";
+import {
+  Image,
+  Pressable,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  View,
+} from "react-native";
 
 export default function PersonalProfileScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+  const [refreshing, setRefreshing] = useState(false);
+  const handleRefresh = async () => {
+    setRefreshing(true);
+
+    await getMyReviews().then(setMyReviews);
+
+    setRefreshing(false);
+  };
   const profile = useProfileStore((state) => state.profile);
 
   const followedBusinessIds = useFollowingStore(
@@ -167,6 +182,9 @@ export default function PersonalProfileScreen() {
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.content}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+        }
       >
         <View style={styles.appointmentsSection}>
           <View style={styles.sectionHeaderRow}>
