@@ -23,8 +23,33 @@ import {
     Pressable,
     ScrollView,
     StyleSheet,
+    TextInputProps,
     View,
 } from "react-native";
+
+type ClearableInputProps = TextInputProps & {
+  value: string;
+  onClear: () => void;
+  rightSlot?: React.ReactNode;
+};
+
+const COUNTRY_CODES = [
+  { code: "+1", flag: "🇺🇸" },
+  { code: "+34", flag: "🇪🇸" },
+  { code: "+43", flag: "🇦🇹" },
+  { code: "+44", flag: "🇬🇧" },
+  { code: "+49", flag: "🇩🇪" },
+  { code: "+380", flag: "🇺🇦" },
+  { code: "+962", flag: "🇯🇴" },
+];
+
+function getPhoneFlag(value: string) {
+  const normalized = value.replace(/\s/g, "");
+
+  return COUNTRY_CODES.sort((a, b) => b.code.length - a.code.length).find(
+    (item) => normalized.startsWith(item.code),
+  )?.flag;
+}
 
 export default function EditProfileScreen() {
   const { colors } = useAppTheme();
@@ -50,6 +75,7 @@ export default function EditProfileScreen() {
   const [dateOfBirth, setDateOfBirth] = useState(profile.dateOfBirth ?? "");
 
   const { saveProfile, isSaving } = useEditProfile();
+  const phoneFlag = getPhoneFlag(phoneNumber);
 
   const handlePickAvatar = async () => {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -74,6 +100,41 @@ export default function EditProfileScreen() {
     setAvatarUrl(result.assets[0]?.uri);
   };
 
+  const hasChanges =
+    avatarUrl !== profile.avatarUrl ||
+    firstName.trim() !== (profile.firstName ?? "") ||
+    lastName.trim() !== (profile.lastName ?? "") ||
+    username.trim() !== profile.username ||
+    phoneNumber.trim() !== (profile.phoneNumber ?? "") ||
+    dateOfBirth.trim() !== (profile.dateOfBirth ?? "");
+
+  const usernameError =
+    username.trim().length > 0 && !/^[a-zA-Z0-9._]{3,20}$/.test(username.trim())
+      ? "Username must be 3–20 characters and can only use letters, numbers, dots, or underscores."
+      : "";
+
+  const dateOfBirthError =
+    dateOfBirth.trim().length > 0 &&
+    !/^\d{4}-\d{2}-\d{2}$/.test(dateOfBirth.trim())
+      ? "Use format YYYY-MM-DD."
+      : "";
+
+  const phoneError =
+    phoneNumber.trim().length > 0 &&
+    !/^[+0-9\s()-]{6,20}$/.test(phoneNumber.trim())
+      ? "Enter a valid phone number."
+      : "";
+
+  const canSave =
+    hasChanges &&
+    !usernameError &&
+    !dateOfBirthError &&
+    !phoneError &&
+    firstName.trim().length > 0 &&
+    lastName.trim().length > 0 &&
+    username.trim().length > 0 &&
+    !isSaving;
+
   const handleSave = async () => {
     const success = await saveProfile({
       firstName: firstName.trim(),
@@ -84,9 +145,7 @@ export default function EditProfileScreen() {
       avatarUrl,
     });
 
-    if (success) {
-      router.back();
-    }
+    if (success) router.back();
   };
 
   return (
@@ -126,84 +185,145 @@ export default function EditProfileScreen() {
           <View style={styles.form}>
             <View>
               <AppText style={styles.label}>First name</AppText>
-              <AppInput
+              <ClearableInput
                 value={firstName}
                 onChangeText={setFirstName}
+                onClear={() => setFirstName("")}
                 placeholder="Enter first name"
+                maxLength={30}
+                styles={styles}
+                colors={colors}
               />
             </View>
 
             <View>
               <AppText style={styles.label}>Last name</AppText>
-              <AppInput
+              <ClearableInput
                 value={lastName}
                 onChangeText={setLastName}
+                onClear={() => setLastName("")}
                 placeholder="Enter last name"
+                maxLength={30}
+                styles={styles}
+                colors={colors}
               />
             </View>
 
             <View>
               <AppText style={styles.label}>Username</AppText>
-
-              <AppInput
+              <ClearableInput
                 value={username}
                 onChangeText={setUsername}
+                onClear={() => setUsername("")}
                 placeholder="Enter username"
                 autoCapitalize="none"
+                maxLength={20}
+                styles={styles}
+                colors={colors}
               />
+              {usernameError ? (
+                <AppText style={styles.errorText}>{usernameError}</AppText>
+              ) : null}
             </View>
-            <View style={styles.privateSection}>
-              <View>
-                <AppText style={styles.label}>Email</AppText>
-                <AppInput
-                  value={profile.email}
-                  editable={false}
-                  placeholder="Email"
-                />
-                <AppText style={styles.helperText}>
-                  This email is linked to your account and cannot be changed
-                  here.
-                </AppText>
-              </View>
 
-              <View>
-                <AppText style={styles.label}>Phone number</AppText>
-                <AppInput
-                  value={phoneNumber}
-                  onChangeText={setPhoneNumber}
-                  placeholder="Add phone number"
-                  keyboardType="phone-pad"
-                />
-                <AppText style={styles.helperText}>
-                  Your phone number is private and will not be visible to other
-                  users.
-                </AppText>
-              </View>
+            <View>
+              <AppText style={styles.label}>Email</AppText>
+              <AppInput
+                value={profile.email}
+                editable={false}
+                placeholder="Email"
+              />
+              <AppText style={styles.helperText}>
+                This email is linked to your account and cannot be changed here.
+              </AppText>
+            </View>
 
-              <View>
-                <AppText style={styles.label}>Date of birth</AppText>
-                <AppInput
-                  value={dateOfBirth}
-                  onChangeText={setDateOfBirth}
-                  placeholder="YYYY-MM-DD"
-                />
-                <AppText style={styles.helperText}>
-                  Your date of birth is private and is only used to suggest
-                  birthday promotions.
-                </AppText>
-              </View>
+            <View>
+              <AppText style={styles.label}>Phone number</AppText>
+              <ClearableInput
+                value={phoneNumber}
+                onChangeText={setPhoneNumber}
+                onClear={() => setPhoneNumber("")}
+                placeholder="Add phone number"
+                keyboardType="phone-pad"
+                maxLength={20}
+                rightSlot={
+                  phoneFlag ? (
+                    <AppText style={styles.phoneFlag}>{phoneFlag}</AppText>
+                  ) : null
+                }
+                styles={styles}
+                colors={colors}
+              />
+              {phoneError ? (
+                <AppText style={styles.errorText}>{phoneError}</AppText>
+              ) : null}
+              <AppText style={styles.helperText}>
+                Your phone number is private and will not be visible to other
+                users.
+              </AppText>
+            </View>
+
+            <View>
+              <AppText style={styles.label}>Date of birth</AppText>
+              <ClearableInput
+                value={dateOfBirth}
+                onChangeText={setDateOfBirth}
+                onClear={() => setDateOfBirth("")}
+                placeholder="YYYY-MM-DD"
+                keyboardType="numbers-and-punctuation"
+                maxLength={10}
+                styles={styles}
+                colors={colors}
+              />
+              {dateOfBirthError ? (
+                <AppText style={styles.errorText}>{dateOfBirthError}</AppText>
+              ) : null}
+              <AppText style={styles.helperText}>
+                Your date of birth is private and is only used to suggest
+                birthday promotions.
+              </AppText>
             </View>
           </View>
+
           <View style={styles.saveButtonWrap}>
             <AppButton
               title={isSaving ? "Saving..." : "Save changes"}
               onPress={handleSave}
-              disabled={isSaving}
+              disabled={!canSave}
             />
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
     </AppScreen>
+  );
+}
+
+function ClearableInput({
+  value,
+  onClear,
+  rightSlot,
+  styles,
+  colors,
+  ...props
+}: ClearableInputProps & {
+  styles: ReturnType<typeof createStyles>;
+  colors: AppColors;
+}) {
+  return (
+    <View style={styles.inputWrap}>
+      <AppInput {...props} value={value} style={styles.clearableInput} />
+
+      <View style={styles.inputRightContent}>
+        {rightSlot}
+
+        {value.trim().length > 0 ? (
+          <Pressable onPress={onClear} hitSlop={10} style={styles.clearButton}>
+            <Ionicons name="close-circle" size={18} color={colors.textMuted} />
+          </Pressable>
+        ) : null}
+      </View>
+    </View>
   );
 }
 
@@ -263,19 +383,46 @@ function createStyles(colors: AppColors) {
       fontWeight: "700",
       color: colors.textPrimary,
     },
-    privateSection: {
-      gap: spacing.lg,
-    },
-
     helperText: {
       marginTop: spacing.xs,
       fontSize: 12,
       lineHeight: 17,
       color: colors.textSecondary,
     },
+    errorText: {
+      marginTop: spacing.xs,
+      fontSize: 12,
+      lineHeight: 17,
+      color: colors.error,
+    },
     saveButtonWrap: {
       marginTop: spacing.xl,
       marginBottom: spacing.xl,
+    },
+    inputWrap: {
+      position: "relative",
+      justifyContent: "center",
+    },
+    clearableInput: {
+      paddingRight: 72,
+    },
+    inputRightContent: {
+      position: "absolute",
+      right: spacing.md,
+      top: 0,
+      bottom: 0,
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.xs,
+    },
+    clearButton: {
+      width: 22,
+      height: 22,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    phoneFlag: {
+      fontSize: 18,
     },
   });
 }
