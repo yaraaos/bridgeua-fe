@@ -1,4 +1,5 @@
 import { businessDetailsMock } from "@/src/mocks/business-details.mock";
+import { useProfileStore } from "@/src/store/profile.store";
 import { PersonalProfileReview } from "@/src/types/profile";
 import type {
   GetReviewsParams,
@@ -85,11 +86,13 @@ export const getReviews = async ({
 export const submitReview = async (
   payload: SubmitReviewPayload,
 ): Promise<Review> => {
+  const profile = useProfileStore.getState().profile;
+
   const newReview: Review = {
     id: `review-${Date.now()}`,
     businessId: payload.businessId,
-    authorName: "You",
-    authorAvatar: "",
+    authorName: profile.displayName,
+    authorAvatar: profile.avatarUrl,
     rating: payload.rating,
     text: payload.text,
     tags: payload.tags,
@@ -107,7 +110,9 @@ export const submitReview = async (
   return Promise.resolve(newReview);
 };
 export const getMyReviews = async (): Promise<PersonalProfileReview[]> => {
-  const currentUserNames = ["Kateryna", "You"];
+  const profile = useProfileStore.getState().profile;
+
+  const currentUserNames = [profile.displayName];
 
   const mockReviews = businessDetailsMock.flatMap((business) =>
     business.reviews

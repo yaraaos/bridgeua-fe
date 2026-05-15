@@ -59,6 +59,7 @@ export type BusinessAbout = {
 export type BusinessDetailsReview = {
   id: string;
   authorName: string;
+  authorUsername?: string;
   authorAvatar: string;
   rating: number;
   text: string;

@@ -2,10 +2,15 @@ export type ProfileAccountType = "personal" | "business";
 
 export type PersonalProfile = {
   id: string;
-  accountType: "personal";
-  username: string;
   displayName: string;
-  avatarUrl?: string;
+  username: string;
+  avatarUrl: string;
+
+  firstName?: string;
+  lastName?: string;
+  email: string;
+  phoneNumber?: string;
+  dateOfBirth?: string;
 };
 
 export type PersonalProfileStat = {

@@ -5,6 +5,7 @@ import { router } from "expo-router";
 import React, { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
+import { useProfileStore } from "@/src/store/profile.store";
 import { AccountTypeSwitch } from "../../src/components/auth";
 import AppButton from "../../src/components/ui/AppButton/AppButton";
 import AppInput from "../../src/components/ui/AppInput/AppInput";
@@ -20,6 +21,7 @@ import {
 export default function SignUpPersonalScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+  const setProfile = useProfileStore((state) => state.setProfile);
 
   const { submitRegisterPersonal, isLoading, apiError, setApiError } =
     useRegisterPersonal();
@@ -64,6 +66,17 @@ export default function SignUpPersonalScreen() {
     });
 
     if (response) {
+      setProfile({
+        id: `personal-${Date.now()}`,
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        displayName: `${firstName.trim()} ${lastName.trim()}`.trim(),
+        username: email.trim().split("@")[0],
+        email: response.email,
+        avatarUrl: "",
+        phoneNumber: "",
+        dateOfBirth: "",
+      });
       router.push({
         pathname: "/auth/confirm-code",
         params: { email: response.email },

@@ -13,6 +13,7 @@ export type Review = {
   tags?: string[];
   photos?: BusinessReviewPhoto[];
   createdAt: string;
+  authorUsername?: string;
 };
 
 export type GetReviewsParams = {
