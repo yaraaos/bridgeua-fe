@@ -18,6 +18,8 @@ import { useMemo, useState } from "react";
 import {
     Alert,
     Image,
+    KeyboardAvoidingView,
+    Platform,
     Pressable,
     ScrollView,
     StyleSheet,
@@ -89,106 +91,118 @@ export default function EditProfileScreen() {
 
   return (
     <AppScreen withTopInset={false} style={styles.container}>
-      <ScreenHeader
-        title="Edit Profile"
-        titleSubtitle="Update your personal profile"
-        gradientColors={DISCOVERY_GRADIENT}
-      />
-
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.content}
+      <KeyboardAvoidingView
+        style={styles.flex}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
-        <View style={styles.avatarSection}>
-          <Pressable style={styles.avatarWrap} onPress={handlePickAvatar}>
-            <Image source={{ uri: avatarUrl }} style={styles.avatar} />
+        <ScreenHeader
+          title="Edit Profile"
+          titleSubtitle="Update your personal profile"
+          gradientColors={DISCOVERY_GRADIENT}
+        />
 
-            <View style={styles.avatarEditButton}>
-              <Ionicons name="camera-outline" size={18} color={colors.white} />
-            </View>
-          </Pressable>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.content}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="interactive"
+        >
+          <View style={styles.avatarSection}>
+            <Pressable style={styles.avatarWrap} onPress={handlePickAvatar}>
+              <Image source={{ uri: avatarUrl }} style={styles.avatar} />
 
-          <AppText style={styles.avatarHint}>Tap to change photo</AppText>
-        </View>
+              <View style={styles.avatarEditButton}>
+                <Ionicons
+                  name="camera-outline"
+                  size={18}
+                  color={colors.white}
+                />
+              </View>
+            </Pressable>
 
-        <View style={styles.form}>
-          <View>
-            <AppText style={styles.label}>First name</AppText>
-            <AppInput
-              value={firstName}
-              onChangeText={setFirstName}
-              placeholder="Enter first name"
-            />
+            <AppText style={styles.avatarHint}>Tap to change photo</AppText>
           </View>
 
-          <View>
-            <AppText style={styles.label}>Last name</AppText>
-            <AppInput
-              value={lastName}
-              onChangeText={setLastName}
-              placeholder="Enter last name"
-            />
-          </View>
-
-          <View>
-            <AppText style={styles.label}>Username</AppText>
-
-            <AppInput
-              value={username}
-              onChangeText={setUsername}
-              placeholder="Enter username"
-              autoCapitalize="none"
-            />
-          </View>
-          <View style={styles.privateSection}>
+          <View style={styles.form}>
             <View>
-              <AppText style={styles.label}>Email</AppText>
+              <AppText style={styles.label}>First name</AppText>
               <AppInput
-                value={profile.email}
-                editable={false}
-                placeholder="Email"
+                value={firstName}
+                onChangeText={setFirstName}
+                placeholder="Enter first name"
               />
-              <AppText style={styles.helperText}>
-                This email is linked to your account and cannot be changed here.
-              </AppText>
             </View>
 
             <View>
-              <AppText style={styles.label}>Phone number</AppText>
+              <AppText style={styles.label}>Last name</AppText>
               <AppInput
-                value={phoneNumber}
-                onChangeText={setPhoneNumber}
-                placeholder="Add phone number"
-                keyboardType="phone-pad"
+                value={lastName}
+                onChangeText={setLastName}
+                placeholder="Enter last name"
               />
-              <AppText style={styles.helperText}>
-                Your phone number is private and will not be visible to other
-                users.
-              </AppText>
             </View>
 
             <View>
-              <AppText style={styles.label}>Date of birth</AppText>
+              <AppText style={styles.label}>Username</AppText>
+
               <AppInput
-                value={dateOfBirth}
-                onChangeText={setDateOfBirth}
-                placeholder="YYYY-MM-DD"
+                value={username}
+                onChangeText={setUsername}
+                placeholder="Enter username"
+                autoCapitalize="none"
               />
-              <AppText style={styles.helperText}>
-                Your date of birth is private and is only used to suggest
-                birthday promotions.
-              </AppText>
+            </View>
+            <View style={styles.privateSection}>
+              <View>
+                <AppText style={styles.label}>Email</AppText>
+                <AppInput
+                  value={profile.email}
+                  editable={false}
+                  placeholder="Email"
+                />
+                <AppText style={styles.helperText}>
+                  This email is linked to your account and cannot be changed
+                  here.
+                </AppText>
+              </View>
+
+              <View>
+                <AppText style={styles.label}>Phone number</AppText>
+                <AppInput
+                  value={phoneNumber}
+                  onChangeText={setPhoneNumber}
+                  placeholder="Add phone number"
+                  keyboardType="phone-pad"
+                />
+                <AppText style={styles.helperText}>
+                  Your phone number is private and will not be visible to other
+                  users.
+                </AppText>
+              </View>
+
+              <View>
+                <AppText style={styles.label}>Date of birth</AppText>
+                <AppInput
+                  value={dateOfBirth}
+                  onChangeText={setDateOfBirth}
+                  placeholder="YYYY-MM-DD"
+                />
+                <AppText style={styles.helperText}>
+                  Your date of birth is private and is only used to suggest
+                  birthday promotions.
+                </AppText>
+              </View>
             </View>
           </View>
-        </View>
-        <View style={styles.saveButtonWrap}>
-          <AppButton
-            title={isSaving ? "Saving..." : "Save changes"}
-            onPress={handleSave}
-            disabled={isSaving}
-          />
-        </View>
-      </ScrollView>
+          <View style={styles.saveButtonWrap}>
+            <AppButton
+              title={isSaving ? "Saving..." : "Save changes"}
+              onPress={handleSave}
+              disabled={isSaving}
+            />
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </AppScreen>
   );
 }
@@ -198,6 +212,9 @@ function createStyles(colors: AppColors) {
     container: {
       padding: 0,
       backgroundColor: colors.background,
+    },
+    flex: {
+      flex: 1,
     },
     content: {
       paddingHorizontal: spacing.lg,
@@ -258,6 +275,7 @@ function createStyles(colors: AppColors) {
     },
     saveButtonWrap: {
       marginTop: spacing.xl,
+      marginBottom: spacing.xl,
     },
   });
 }
