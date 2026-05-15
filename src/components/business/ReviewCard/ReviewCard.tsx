@@ -173,7 +173,10 @@ export default function ReviewCard({
               size={isPreview ? "sm" : "md"}
             />
 
-            <View style={styles.authorInfo}>
+            <Pressable
+              style={styles.authorInfo}
+              onPress={() => router.push("/profile/personal")}
+            >
               <Text
                 style={[
                   styles.authorName,
@@ -198,7 +201,7 @@ export default function ReviewCard({
                   );
                 })}
               </View>
-            </View>
+            </Pressable>
 
             {!isPreview ? (
               <Text style={styles.reviewDate}>
