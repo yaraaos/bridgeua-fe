@@ -24,7 +24,6 @@ import {
     Alert,
     Image,
     Keyboard,
-    KeyboardAvoidingView,
     Modal,
     Platform,
     Pressable,
@@ -165,127 +164,170 @@ export default function EditProfileScreen() {
 
   return (
     <AppScreen withTopInset={false} style={styles.container}>
-      <KeyboardAvoidingView
-        style={styles.flex}
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
+      <ScreenHeader
+        title="Edit Profile"
+        titleSubtitle="Update your personal profile"
+        gradientColors={DISCOVERY_GRADIENT}
+      />
+
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.content}
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="interactive"
+        automaticallyAdjustKeyboardInsets
+        contentInsetAdjustmentBehavior="always"
       >
-        <ScreenHeader
-          title="Edit Profile"
-          titleSubtitle="Update your personal profile"
-          gradientColors={DISCOVERY_GRADIENT}
-        />
+        <View style={styles.avatarSection}>
+          <Pressable style={styles.avatarWrap} onPress={handlePickAvatar}>
+            <Image source={{ uri: avatarUrl }} style={styles.avatar} />
 
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.content}
-          keyboardShouldPersistTaps="handled"
-          keyboardDismissMode="interactive"
-        >
-          <View style={styles.avatarSection}>
-            <Pressable style={styles.avatarWrap} onPress={handlePickAvatar}>
-              <Image source={{ uri: avatarUrl }} style={styles.avatar} />
+            <View style={styles.avatarEditButton}>
+              <Ionicons name="camera-outline" size={18} color={colors.white} />
+            </View>
+          </Pressable>
 
-              <View style={styles.avatarEditButton}>
-                <Ionicons
-                  name="camera-outline"
-                  size={18}
-                  color={colors.white}
-                />
-              </View>
-            </Pressable>
+          <AppText style={styles.avatarHint}>Tap to change photo</AppText>
+        </View>
 
-            <AppText style={styles.avatarHint}>Tap to change photo</AppText>
+        <View style={styles.form}>
+          <View>
+            <AppText style={styles.label}>First name</AppText>
+            <ClearableInput
+              value={firstName}
+              onChangeText={setFirstName}
+              onClear={() => setFirstName("")}
+              placeholder="Enter first name"
+              maxLength={30}
+              styles={styles}
+              colors={colors}
+            />
           </View>
 
-          <View style={styles.form}>
-            <View>
-              <AppText style={styles.label}>First name</AppText>
-              <ClearableInput
-                value={firstName}
-                onChangeText={setFirstName}
-                onClear={() => setFirstName("")}
-                placeholder="Enter first name"
-                maxLength={30}
-                styles={styles}
-                colors={colors}
-              />
-            </View>
+          <View>
+            <AppText style={styles.label}>Last name</AppText>
+            <ClearableInput
+              value={lastName}
+              onChangeText={setLastName}
+              onClear={() => setLastName("")}
+              placeholder="Enter last name"
+              maxLength={30}
+              styles={styles}
+              colors={colors}
+            />
+          </View>
 
-            <View>
-              <AppText style={styles.label}>Last name</AppText>
-              <ClearableInput
-                value={lastName}
-                onChangeText={setLastName}
-                onClear={() => setLastName("")}
-                placeholder="Enter last name"
-                maxLength={30}
-                styles={styles}
-                colors={colors}
-              />
-            </View>
+          <View>
+            <AppText style={styles.label}>Username</AppText>
+            <ClearableInput
+              value={username}
+              onChangeText={setUsername}
+              onClear={() => setUsername("")}
+              placeholder="Enter username"
+              autoCapitalize="none"
+              maxLength={20}
+              styles={styles}
+              colors={colors}
+            />
+            {usernameError ? (
+              <AppText style={styles.errorText}>{usernameError}</AppText>
+            ) : null}
+          </View>
 
-            <View>
-              <AppText style={styles.label}>Username</AppText>
-              <ClearableInput
-                value={username}
-                onChangeText={setUsername}
-                onClear={() => setUsername("")}
-                placeholder="Enter username"
-                autoCapitalize="none"
-                maxLength={20}
-                styles={styles}
-                colors={colors}
+          <View>
+            <AppText style={styles.label}>Email</AppText>
+            <AppInput
+              value={profile.email}
+              editable={false}
+              placeholder="Email"
+            />
+            <AppText style={styles.helperText}>
+              This email is linked to your account and cannot be changed here.
+            </AppText>
+          </View>
+
+          <View>
+            <AppText style={styles.label}>Phone number</AppText>
+
+            <View style={styles.phoneFieldWrap}>
+              <IntlPhoneField
+                key={phoneInputKey}
+                defaultCountry={defaultPhoneCountry}
+                defaultValue={phoneNumber}
+                flagUndetermined=""
+                onValueUpdate={(value: string) => {
+                  setPhoneNumber(value);
+                }}
+                onValidation={(isValid: boolean) => {
+                  setIsPhoneValid(isValid);
+                }}
+                containerStyle={styles.phoneContainer}
+                textInputStyle={styles.phoneInput}
+                flagTextStyle={styles.phoneFlag}
+                textInputProps={{
+                  placeholder: "Add phone number",
+                  returnKeyType: "done",
+                }}
               />
-              {usernameError ? (
-                <AppText style={styles.errorText}>{usernameError}</AppText>
+
+              {phoneNumber.trim().length > 0 ? (
+                <Pressable
+                  onPress={() => {
+                    setPhoneNumber("");
+                    setIsPhoneValid(false);
+                    setPhoneInputKey((value) => value + 1);
+                  }}
+                  hitSlop={10}
+                  style={styles.phoneClearButton}
+                >
+                  <Ionicons
+                    name="close-circle"
+                    size={18}
+                    color={colors.textMuted}
+                  />
+                </Pressable>
               ) : null}
             </View>
 
-            <View>
-              <AppText style={styles.label}>Email</AppText>
-              <AppInput
-                value={profile.email}
-                editable={false}
-                placeholder="Email"
-              />
-              <AppText style={styles.helperText}>
-                This email is linked to your account and cannot be changed here.
-              </AppText>
-            </View>
+            {phoneError ? (
+              <AppText style={styles.errorText}>{phoneError}</AppText>
+            ) : null}
 
-            <View>
-              <AppText style={styles.label}>Phone number</AppText>
+            <AppText style={styles.helperText}>
+              Your phone number is private and will not be visible to other
+              users.
+            </AppText>
+          </View>
 
-              <View style={styles.phoneFieldWrap}>
-                <IntlPhoneField
-                  key={phoneInputKey}
-                  defaultCountry={defaultPhoneCountry}
-                  defaultValue={phoneNumber}
-                  flagUndetermined=""
-                  onValueUpdate={(value: string) => {
-                    setPhoneNumber(value);
-                  }}
-                  onValidation={(isValid: boolean) => {
-                    setIsPhoneValid(isValid);
-                  }}
-                  containerStyle={styles.phoneContainer}
-                  textInputStyle={styles.phoneInput}
-                  flagTextStyle={styles.phoneFlag}
-                  textInputProps={{
-                    placeholder: "Add phone number",
-                    returnKeyType: "done",
-                  }}
+          <View>
+            <AppText style={styles.label}>Date of birth</AppText>
+
+            <View style={styles.inputWrap}>
+              <Pressable
+                style={styles.dateInputPressable}
+                onPress={handleOpenDatePicker}
+              >
+                <AppInput
+                  value={dateOfBirth}
+                  placeholder="Select date of birth"
+                  editable={false}
+                  pointerEvents="none"
+                  style={styles.clearableInput}
+                />
+              </Pressable>
+
+              <View style={styles.inputRightContent}>
+                <Ionicons
+                  name="calendar-outline"
+                  size={18}
+                  color={colors.textMuted}
                 />
 
-                {phoneNumber.trim().length > 0 ? (
+                {dateOfBirth ? (
                   <Pressable
-                    onPress={() => {
-                      setPhoneNumber("");
-                      setIsPhoneValid(false);
-                      setPhoneInputKey((value) => value + 1);
-                    }}
+                    onPress={() => setDateOfBirth("")}
                     hitSlop={10}
-                    style={styles.phoneClearButton}
+                    style={styles.clearButton}
                   >
                     <Ionicons
                       name="close-circle"
@@ -295,104 +337,54 @@ export default function EditProfileScreen() {
                   </Pressable>
                 ) : null}
               </View>
-
-              {phoneError ? (
-                <AppText style={styles.errorText}>{phoneError}</AppText>
-              ) : null}
-
-              <AppText style={styles.helperText}>
-                Your phone number is private and will not be visible to other
-                users.
-              </AppText>
             </View>
 
-            <View>
-              <AppText style={styles.label}>Date of birth</AppText>
-
-              <View style={styles.inputWrap}>
-                <Pressable
-                  style={styles.dateInputPressable}
-                  onPress={handleOpenDatePicker}
-                >
-                  <AppInput
-                    value={dateOfBirth}
-                    placeholder="Select date of birth"
-                    editable={false}
-                    pointerEvents="none"
-                    style={styles.clearableInput}
-                  />
-                </Pressable>
-
-                <View style={styles.inputRightContent}>
-                  <Ionicons
-                    name="calendar-outline"
-                    size={18}
-                    color={colors.textMuted}
-                  />
-
-                  {dateOfBirth ? (
-                    <Pressable
-                      onPress={() => setDateOfBirth("")}
-                      hitSlop={10}
-                      style={styles.clearButton}
-                    >
-                      <Ionicons
-                        name="close-circle"
-                        size={18}
-                        color={colors.textMuted}
-                      />
-                    </Pressable>
-                  ) : null}
-                </View>
-              </View>
-
-              <AppText style={styles.helperText}>
-                Your date of birth is private and is only used to suggest
-                birthday promotions.
-              </AppText>
-            </View>
+            <AppText style={styles.helperText}>
+              Your date of birth is private and is only used to suggest birthday
+              promotions.
+            </AppText>
           </View>
+        </View>
 
-          <View style={styles.saveButtonWrap}>
-            <AppButton
-              title={isSaving ? "Saving..." : "Save changes"}
-              onPress={handleSave}
-              disabled={!canSave}
+        <View style={styles.saveButtonWrap}>
+          <AppButton
+            title={isSaving ? "Saving..." : "Save changes"}
+            onPress={handleSave}
+            disabled={!canSave}
+          />
+        </View>
+      </ScrollView>
+      <Modal
+        visible={showDatePicker}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowDatePicker(false)}
+      >
+        <View style={styles.datePickerOverlay}>
+          <View style={styles.datePickerCard}>
+            <View style={styles.datePickerHeader}>
+              <Pressable onPress={() => setShowDatePicker(false)}>
+                <AppText style={styles.datePickerCancel}>Cancel</AppText>
+              </Pressable>
+
+              <AppText style={styles.datePickerTitle}>Date of birth</AppText>
+
+              <Pressable onPress={handleConfirmDate}>
+                <AppText style={styles.datePickerDone}>Done</AppText>
+              </Pressable>
+            </View>
+
+            <DateTimePicker
+              value={draftDateOfBirth}
+              mode="date"
+              display={Platform.OS === "ios" ? "spinner" : "spinner"}
+              maximumDate={new Date()}
+              onChange={handleDateChange}
+              style={styles.datePicker}
             />
           </View>
-        </ScrollView>
-        <Modal
-          visible={showDatePicker}
-          transparent
-          animationType="fade"
-          onRequestClose={() => setShowDatePicker(false)}
-        >
-          <View style={styles.datePickerOverlay}>
-            <View style={styles.datePickerCard}>
-              <View style={styles.datePickerHeader}>
-                <Pressable onPress={() => setShowDatePicker(false)}>
-                  <AppText style={styles.datePickerCancel}>Cancel</AppText>
-                </Pressable>
-
-                <AppText style={styles.datePickerTitle}>Date of birth</AppText>
-
-                <Pressable onPress={handleConfirmDate}>
-                  <AppText style={styles.datePickerDone}>Done</AppText>
-                </Pressable>
-              </View>
-
-              <DateTimePicker
-                value={draftDateOfBirth}
-                mode="date"
-                display={Platform.OS === "ios" ? "spinner" : "spinner"}
-                maximumDate={new Date()}
-                onChange={handleDateChange}
-                style={styles.datePicker}
-              />
-            </View>
-          </View>
-        </Modal>
-      </KeyboardAvoidingView>
+        </View>
+      </Modal>
     </AppScreen>
   );
 }
@@ -430,9 +422,6 @@ function createStyles(colors: AppColors) {
     container: {
       padding: 0,
       backgroundColor: colors.background,
-    },
-    flex: {
-      flex: 1,
     },
     content: {
       paddingHorizontal: spacing.lg,
