@@ -15,6 +15,7 @@ import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker, {
     DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
+import { useNavigation, usePreventRemove } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
 import * as Localization from "expo-localization";
 import { router } from "expo-router";
@@ -43,6 +44,8 @@ type ClearableInputProps = TextInputProps & {
 export default function EditProfileScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+
+  const navigation = useNavigation();
 
   const storeProfile = useProfileStore((state) => state.profile);
   const profile = storeProfile ?? personalProfileMock;
@@ -106,6 +109,24 @@ export default function EditProfileScreen() {
     phoneNumber.trim() !== (profile.phoneNumber ?? "") ||
     dateOfBirth.trim() !== (profile.dateOfBirth ?? "");
 
+  usePreventRemove(hasChanges, ({ data }) => {
+    Alert.alert(
+      "Discard changes?",
+      "You have unsaved changes. Are you sure you want to leave?",
+      [
+        {
+          text: "Keep editing",
+          style: "cancel",
+        },
+        {
+          text: "Discard",
+          style: "destructive",
+          onPress: () => navigation.dispatch(data.action),
+        },
+      ],
+    );
+  });
+
   const usernameError =
     username.trim().length > 0 && !/^[a-zA-Z0-9._]{3,20}$/.test(username.trim())
       ? "Username must be 3–20 characters and can only use letters, numbers, dots, or underscores."
@@ -124,6 +145,29 @@ export default function EditProfileScreen() {
     lastName.trim().length > 0 &&
     username.trim().length > 0 &&
     !isSaving;
+
+  const handleBackPress = () => {
+    if (!hasChanges) {
+      router.back();
+      return;
+    }
+
+    Alert.alert(
+      "Discard changes?",
+      "You have unsaved changes. Are you sure you want to leave?",
+      [
+        {
+          text: "Keep editing",
+          style: "cancel",
+        },
+        {
+          text: "Discard",
+          style: "destructive",
+          onPress: () => router.back(),
+        },
+      ],
+    );
+  };
 
   const handleDateChange = (
     event: DateTimePickerEvent,
@@ -168,6 +212,7 @@ export default function EditProfileScreen() {
         title="Edit Profile"
         titleSubtitle="Update your personal profile"
         gradientColors={DISCOVERY_GRADIENT}
+        onPressBack={handleBackPress}
       />
 
       <ScrollView
