@@ -1,6 +1,7 @@
 import AppAvatar from "@/src/components/ui/AppAvatar";
 import type { BusinessDetailsReview } from "@/src/features/businesses/types/business.types";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { useProfileStore } from "@/src/store/profile.store";
 import type { PersonalProfileReview } from "@/src/types/profile";
 import { MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
@@ -45,6 +46,12 @@ export default function ReviewCard({
 
   const profileReview = isProfileReview(review) ? review : null;
   const businessReview = isBusinessReview(review) ? review : null;
+
+  const profile = useProfileStore((state) => state.profile);
+
+  const isOwnReview =
+    businessReview?.authorName === profile.displayName ||
+    businessReview?.authorUsername === profile.username;
 
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -194,7 +201,11 @@ export default function ReviewCard({
 
             <Pressable
               style={styles.authorInfo}
-              onPress={() => router.push("/profile/personal")}
+              disabled={!isOwnReview}
+              onPress={() => {
+                if (!isOwnReview) return;
+                router.push("/profile/personal");
+              }}
             >
               <Text
                 style={[
