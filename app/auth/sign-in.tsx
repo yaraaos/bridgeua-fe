@@ -2,6 +2,8 @@ import { AppColors } from "@/src/constants/colors";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { saveAuthTokens } from "@/src/services/auth/tokens";
 import { useAuthStore } from "@/src/store/auth.store";
+import { useFollowingStore } from "@/src/store/following.store";
+import { useReviewsStore } from "@/src/store/reviews.store";
 import { router } from "expo-router";
 import { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
@@ -23,6 +25,9 @@ export default function SignInScreen() {
 
   const { submitSignIn, isLoading, apiError, setApiError } = useSignIn();
   const setUser = useAuthStore((state) => state.setUser);
+  const resetFollowing = useFollowingStore((state) => state.resetFollowing);
+
+  const clearReviews = useReviewsStore((state) => state.clearReviews);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -41,6 +46,9 @@ export default function SignInScreen() {
     const response = await submitSignIn(values);
 
     if (response) {
+      resetFollowing();
+      clearReviews();
+
       await saveAuthTokens(response.accessToken, response.refreshToken);
 
       setUser(response.user);
