@@ -9,4 +9,8 @@ export type Business = {
   image: string;
   distanceKm: number;
   priceLevel: number;
+  coordinates: {
+    latitude: number;
+    longitude: number;
+  };
 };
