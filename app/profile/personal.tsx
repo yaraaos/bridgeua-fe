@@ -1,5 +1,6 @@
 import FollowButton from "@/src/components/business/FollowButton/FollowButton";
 import ScreenHeader from "@/src/components/common/ScreenHeader/ScreenHeader";
+import AppAvatar from "@/src/components/ui/AppAvatar";
 import AppEmptyState from "@/src/components/ui/AppEmptyState";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
 import AppText from "@/src/components/ui/AppText/AppText";
@@ -8,8 +9,8 @@ import { spacing } from "@/src/constants/spacing";
 import { getMyReviews } from "@/src/features/reviews/services/review.service";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { businessesMock } from "@/src/mocks/businesses.mock";
-import { personalProfileMock } from "@/src/mocks/profile.mock";
 import { useFollowingStore } from "@/src/store/following.store";
+import { useProfileStore } from "@/src/store/profile.store";
 import type {
   PersonalProfileFollowedBusiness,
   PersonalProfileReview,
@@ -18,12 +19,27 @@ import { Ionicons } from "@expo/vector-icons";
 import { router, useFocusEffect } from "expo-router";
 import React, { useCallback, useMemo, useState } from "react";
 
-import { Image, Pressable, ScrollView, StyleSheet, View } from "react-native";
+import {
+  Image,
+  Pressable,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  View,
+} from "react-native";
 
 export default function PersonalProfileScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
-  const profile = personalProfileMock;
+  const [refreshing, setRefreshing] = useState(false);
+  const handleRefresh = async () => {
+    setRefreshing(true);
+
+    await getMyReviews().then(setMyReviews);
+
+    setRefreshing(false);
+  };
+  const profile = useProfileStore((state) => state.profile);
 
   const followedBusinessIds = useFollowingStore(
     (state) => state.followedBusinessIds,
@@ -77,12 +93,12 @@ export default function PersonalProfileScreen() {
         profileContent={
           <View>
             <View style={styles.heroIdentityRow}>
-              <View style={styles.heroAvatarWrap}>
-                <Image
-                  source={{ uri: profile.avatarUrl }}
-                  style={styles.heroAvatar}
-                />
-              </View>
+              <AppAvatar
+                name={profile.displayName}
+                username={profile.username}
+                imageUrl={profile.avatarUrl}
+                size="lg"
+              />
 
               <View style={styles.heroTextWrap}>
                 <AppText style={styles.heroName} numberOfLines={1}>
@@ -167,6 +183,9 @@ export default function PersonalProfileScreen() {
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.content}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+        }
       >
         <View style={styles.appointmentsSection}>
           <View style={styles.sectionHeaderRow}>
@@ -694,18 +713,6 @@ function createStyles(colors: AppColors) {
       fontSize: 13,
       fontWeight: "700",
       color: colors.primaryGreen,
-    },
-    heroAvatarWrap: {
-      width: 96,
-      height: 96,
-      borderRadius: 48,
-      overflow: "hidden",
-      backgroundColor: colors.primaryGreenSoft,
-    },
-
-    heroAvatar: {
-      width: "100%",
-      height: "100%",
     },
     profileSummaryCard: {
       paddingHorizontal: spacing.lg,

@@ -1,6 +1,7 @@
 import { LocationOption } from "@/src/constants/locations";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { Feather, Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 import React, { useState } from "react";
 import {
   Image,
@@ -60,6 +61,7 @@ type Props = {
   rightSlot?: React.ReactNode;
   leftSlot?: React.ReactNode;
   onPressShare?: () => void;
+  onPressBack?: () => void;
 
   profileContent?: React.ReactNode;
 };
@@ -96,6 +98,7 @@ export default function ScreenHeader({
   rightSlot,
   leftSlot,
   onPressShare,
+  onPressBack,
   profileContent,
 }: Props) {
   const { colors, isDark } = useAppTheme();
@@ -314,7 +317,7 @@ export default function ScreenHeader({
         ) : onBack ? (
           <Pressable
             style={styles.backButton}
-            onPress={onBack}
+            onPress={onPressBack ?? (() => router.back())}
             hitSlop={12}
             accessibilityRole="button"
             accessibilityLabel="Go back"

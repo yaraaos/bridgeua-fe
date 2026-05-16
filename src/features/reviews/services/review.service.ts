@@ -1,4 +1,6 @@
 import { businessDetailsMock } from "@/src/mocks/business-details.mock";
+import { useProfileStore } from "@/src/store/profile.store";
+import { useReviewsStore } from "@/src/store/reviews.store";
 import { PersonalProfileReview } from "@/src/types/profile";
 import type {
   GetReviewsParams,
@@ -6,8 +8,6 @@ import type {
   Review,
   SubmitReviewPayload,
 } from "../types/review.types";
-
-let submittedReviewsMock: Review[] = [];
 
 const EMPTY_BREAKDOWN = ([5, 4, 3, 2, 1] as const).map((rating) => ({
   rating,
@@ -42,9 +42,9 @@ export const getReviews = async ({
   }));
 
   let reviews: Review[] = [
-    ...submittedReviewsMock.filter(
-      (review) => review.businessId === businessId,
-    ),
+    ...useReviewsStore
+      .getState()
+      .submittedReviews.filter((review) => review.businessId === businessId),
     ...mockReviews,
   ];
 
@@ -85,11 +85,13 @@ export const getReviews = async ({
 export const submitReview = async (
   payload: SubmitReviewPayload,
 ): Promise<Review> => {
+  const profile = useProfileStore.getState().profile;
+
   const newReview: Review = {
     id: `review-${Date.now()}`,
     businessId: payload.businessId,
-    authorName: "You",
-    authorAvatar: "",
+    authorName: profile.displayName,
+    authorAvatar: profile.avatarUrl,
     rating: payload.rating,
     text: payload.text,
     tags: payload.tags,
@@ -102,12 +104,14 @@ export const submitReview = async (
 
   console.log("API POST /reviews", payload);
 
-  submittedReviewsMock = [newReview, ...submittedReviewsMock];
+  useReviewsStore.getState().addReview(newReview);
 
   return Promise.resolve(newReview);
 };
 export const getMyReviews = async (): Promise<PersonalProfileReview[]> => {
-  const currentUserNames = ["Kateryna", "You"];
+  const profile = useProfileStore.getState().profile;
+
+  const currentUserNames = [profile.displayName];
 
   const mockReviews = businessDetailsMock.flatMap((business) =>
     business.reviews
@@ -124,22 +128,24 @@ export const getMyReviews = async (): Promise<PersonalProfileReview[]> => {
       })),
   );
 
-  const submittedReviews = submittedReviewsMock.map((review) => {
-    const business = businessDetailsMock.find(
-      (item) => item.id === review.businessId,
-    );
+  const submittedReviews = useReviewsStore
+    .getState()
+    .submittedReviews.map((review) => {
+      const business = businessDetailsMock.find(
+        (item) => item.id === review.businessId,
+      );
 
-    return {
-      id: review.id,
-      businessId: review.businessId,
-      businessName: business?.name ?? "Business",
-      businessImageUrl: business?.images[0]?.url ?? "",
-      rating: review.rating,
-      text: review.text,
-      createdAt: review.createdAt,
-      photos: review.photos,
-    };
-  });
+      return {
+        id: review.id,
+        businessId: review.businessId,
+        businessName: business?.name ?? "Business",
+        businessImageUrl: business?.images[0]?.url ?? "",
+        rating: review.rating,
+        text: review.text,
+        createdAt: review.createdAt,
+        photos: review.photos,
+      };
+    });
 
   return Promise.resolve([...submittedReviews, ...mockReviews]);
 };
