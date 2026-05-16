@@ -1,9 +1,20 @@
 import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { useNotificationsStore } from "@/src/store/notifications.store";
 import { Feather } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
+import { StyleSheet, View } from "react-native";
 
 export default function TabsLayout() {
   const { colors } = useAppTheme();
+
+  const unreadCount = useNotificationsStore(
+    (state) =>
+      state.notifications.filter(
+        (notification) =>
+          notification.recipientAccountType === state.activeAccountType &&
+          !notification.isRead,
+      ).length,
+  );
 
   return (
     <Tabs
@@ -52,7 +63,21 @@ export default function TabsLayout() {
         options={{
           title: "Alerts",
           tabBarIcon: ({ color, size }) => (
-            <Feather name="bell" size={size} color={color} />
+            <View>
+              <Feather name="bell" size={size} color={color} />
+
+              {unreadCount > 0 ? (
+                <View
+                  style={[
+                    styles.unreadDot,
+                    {
+                      backgroundColor: colors.accentOrange,
+                      borderColor: colors.surface,
+                    },
+                  ]}
+                />
+              ) : null}
+            </View>
           ),
         }}
       />
@@ -68,3 +93,15 @@ export default function TabsLayout() {
     </Tabs>
   );
 }
+
+const styles = StyleSheet.create({
+  unreadDot: {
+    position: "absolute",
+    top: -2,
+    right: -4,
+    width: 9,
+    height: 9,
+    borderRadius: 5,
+    borderWidth: 1.5,
+  },
+});
