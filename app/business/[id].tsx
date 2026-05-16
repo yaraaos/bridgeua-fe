@@ -26,6 +26,7 @@ import {
   ActivityIndicator,
   Animated,
   ScrollView,
+  Share,
   StyleSheet,
   Text,
   View,
@@ -144,6 +145,16 @@ export default function BusinessDetailsScreen() {
 
   const allReviewPhotos = reviews.flatMap((review) => review.photos ?? []);
 
+  const handleShareBusiness = async () => {
+    try {
+      await Share.share({
+        message: `Check out ${business.name} on BridgeUA\nhttps://bridgeua.app/business/${business.id}`,
+      });
+    } catch (error) {
+      console.error("Share failed", error);
+    }
+  };
+
   const openImageViewer = (
     index: number,
     options?: {
@@ -180,7 +191,7 @@ export default function BusinessDetailsScreen() {
         isOpen={business.isOpen}
         closesAt={business.closesAt}
         gradientColors={DISCOVERY_GRADIENT}
-        onPressShare={() => console.log("Share business", business.id)}
+        onPressShare={handleShareBusiness}
         rightSlot={
           <FollowButton businessId={business.id} size="icon" variant="soft" />
         }
