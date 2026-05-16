@@ -10,6 +10,7 @@ import {
   type AppNotification,
   type NotificationTab,
 } from "@/src/features/notifications";
+import { getNotificationNavigation } from "@/src/features/notifications/utils/notification-navigation";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { router } from "expo-router";
 import { useState } from "react";
@@ -103,35 +104,11 @@ export default function NotificationsScreen() {
   const handlePressNotification = (item: AppNotification) => {
     markOne(item.id);
 
-    if (item.targetType === "business" && item.targetId) {
-      router.push(`/business/${item.targetId}`);
-      return;
-    }
+    const navigation = getNotificationNavigation(item);
 
-    if (item.targetType === "review" && item.targetId) {
-      router.push({
-        pathname: "/business/[id]",
-        params: {
-          id: item.targetId,
-          tab: "reviews",
-        },
-      });
-      return;
-    }
+    if (!navigation) return;
 
-    if (item.targetType === "promotion" && item.targetId) {
-      router.push(`/promotions/${item.targetId}`);
-      return;
-    }
-
-    if (item.targetType === "profile") {
-      router.push("/profile/personal");
-      return;
-    }
-
-    if (item.targetType === "settings") {
-      router.push("/settings");
-    }
+    router.push(navigation as never);
   };
 
   return (
