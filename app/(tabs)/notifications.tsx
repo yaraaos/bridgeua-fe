@@ -81,10 +81,13 @@ export default function NotificationsScreen() {
 
   const { markOne, markAll } = useMarkAsRead();
 
-  const sections = [
-    { title: "New", data: newNotifications },
-    { title: "Earlier", data: earlierNotifications },
-  ].filter((section) => section.data.length > 0);
+  const sections =
+    activeTab === "unread"
+      ? [{ title: "", data: notifications }]
+      : [
+          { title: "New", data: newNotifications },
+          { title: "Earlier", data: earlierNotifications },
+        ].filter((section) => section.data.length > 0);
 
   const emptyState = EMPTY_STATE_BY_TAB[activeTab];
 
@@ -137,13 +140,16 @@ export default function NotificationsScreen() {
                 onChange={setActiveTab}
               />
             </View>
-
-            <Text style={styles.markAllText} onPress={markAll}>
-              Mark all as read
-            </Text>
           </>
         }
       />
+      {activeTab === "unread" && notifications.length > 0 ? (
+        <View style={styles.unreadActionsRow}>
+          <Text style={styles.markAllText} onPress={markAll}>
+            Mark all as read
+          </Text>
+        </View>
+      ) : null}
       <SectionList
         sections={sections}
         keyExtractor={(item) => item.id}
@@ -153,11 +159,13 @@ export default function NotificationsScreen() {
           styles.listContent,
           notifications.length === 0 && styles.emptyContent,
         ]}
-        renderSectionHeader={({ section }) => (
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>{section.title}</Text>
-          </View>
-        )}
+        renderSectionHeader={({ section }) =>
+          section.title ? (
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>{section.title}</Text>
+            </View>
+          ) : null
+        }
         renderItem={({ item }) => (
           <View style={styles.itemWrap}>
             <NotificationItem item={item} onPress={handlePressNotification} />
@@ -186,6 +194,12 @@ function createStyles(colors: AppColors) {
       fontSize: 12,
       fontWeight: "700",
       color: colors.primaryGreen,
+    },
+    unreadActionsRow: {
+      paddingHorizontal: spacing.lg,
+      paddingTop: spacing.sm,
+      paddingBottom: spacing.sm,
+      alignItems: "flex-end",
     },
 
     tabsRow: {
