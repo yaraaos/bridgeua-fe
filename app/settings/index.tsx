@@ -1,3 +1,10 @@
+import ScreenHeader from "@/src/components/common/ScreenHeader/ScreenHeader";
+import { AppColors } from "@/src/constants/colors";
+import { radius } from "@/src/constants/radius";
+import { spacing } from "@/src/constants/spacing";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { useAppStore } from "@/src/store/app.store";
+import { useAuthStore } from "@/src/store/auth.store";
 import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import {
@@ -8,12 +15,6 @@ import {
   Text,
   View,
 } from "react-native";
-import ScreenHeader from "@/src/components/common/ScreenHeader/ScreenHeader";
-import { AppColors } from "@/src/constants/colors";
-import { radius } from "@/src/constants/radius";
-import { spacing } from "@/src/constants/spacing";
-import { useAppTheme } from "@/src/hooks/useAppTheme";
-import { useAppStore } from "@/src/store/app.store";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -88,6 +89,7 @@ export default function SettingsScreen() {
 
   const router = useRouter();
   const setThemeMode = useAppStore((s) => s.setThemeMode);
+  const clearUser = useAuthStore((state) => state.clearUser);
 
   return (
     <View style={styles.safeArea}>
@@ -161,7 +163,10 @@ export default function SettingsScreen() {
               <Switch
                 value={isDark}
                 onValueChange={(val) => setThemeMode(val ? "dark" : "light")}
-                trackColor={{ false: colors.textMuted, true: colors.primaryGreen }}
+                trackColor={{
+                  false: colors.textMuted,
+                  true: colors.primaryGreen,
+                }}
                 thumbColor={colors.white}
                 ios_backgroundColor={colors.textMuted}
               />
@@ -206,7 +211,10 @@ export default function SettingsScreen() {
             styles.logoutBtn,
             pressed && styles.logoutPressed,
           ]}
-          onPress={() => {}}
+          onPress={async () => {
+            await clearUser();
+            router.replace("/auth/sign-in");
+          }}
         >
           <Feather name="log-out" size={18} color={colors.accentOrange} />
           <Text style={styles.logoutText}>Log Out</Text>

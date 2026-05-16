@@ -1,4 +1,6 @@
+import * as SecureStore from "expo-secure-store";
 import { create } from "zustand";
+import { createJSONStorage, persist } from "zustand/middleware";
 
 type FollowingState = {
   followedBusinessIds: string[];
@@ -9,39 +11,53 @@ type FollowingState = {
   resetFollowing: () => void;
 };
 
-export const useFollowingStore = create<FollowingState>((set, get) => ({
-  followedBusinessIds: [],
+export const useFollowingStore = create<FollowingState>()(
+  persist(
+    (set, get) => ({
+      followedBusinessIds: [],
 
-  followBusiness: (businessId) =>
-    set((state) => {
-      if (state.followedBusinessIds.includes(businessId)) {
-        return state;
-      }
+      followBusiness: (businessId) =>
+        set((state) => {
+          if (state.followedBusinessIds.includes(businessId)) {
+            return state;
+          }
 
-      return {
-        followedBusinessIds: [...state.followedBusinessIds, businessId],
-      };
+          return {
+            followedBusinessIds: [...state.followedBusinessIds, businessId],
+          };
+        }),
+
+      unfollowBusiness: (businessId) =>
+        set((state) => ({
+          followedBusinessIds: state.followedBusinessIds.filter(
+            (id) => id !== businessId,
+          ),
+        })),
+
+      toggleFollowBusiness: (businessId) =>
+        set((state) => {
+          const alreadyFollowing =
+            state.followedBusinessIds.includes(businessId);
+
+          return {
+            followedBusinessIds: alreadyFollowing
+              ? state.followedBusinessIds.filter((id) => id !== businessId)
+              : [...state.followedBusinessIds, businessId],
+          };
+        }),
+
+      isFollowing: (businessId) =>
+        get().followedBusinessIds.includes(businessId),
+
+      resetFollowing: () => set({ followedBusinessIds: [] }),
     }),
-
-  unfollowBusiness: (businessId) =>
-    set((state) => ({
-      followedBusinessIds: state.followedBusinessIds.filter(
-        (id) => id !== businessId
-      ),
-    })),
-
-  toggleFollowBusiness: (businessId) =>
-    set((state) => {
-      const alreadyFollowing = state.followedBusinessIds.includes(businessId);
-
-      return {
-        followedBusinessIds: alreadyFollowing
-          ? state.followedBusinessIds.filter((id) => id !== businessId)
-          : [...state.followedBusinessIds, businessId],
-      };
-    }),
-
-  isFollowing: (businessId) => get().followedBusinessIds.includes(businessId),
-
-  resetFollowing: () => set({ followedBusinessIds: [] }),
-}));
+    {
+      name: "following-storage",
+      storage: createJSONStorage(() => ({
+        getItem: SecureStore.getItemAsync,
+        setItem: SecureStore.setItemAsync,
+        removeItem: SecureStore.deleteItemAsync,
+      })),
+    },
+  ),
+);
