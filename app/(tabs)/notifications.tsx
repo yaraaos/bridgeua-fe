@@ -144,7 +144,7 @@ export default function NotificationsScreen() {
         }
       />
       {activeTab === "unread" && notifications.length > 0 ? (
-        <View style={styles.unreadActionsRow}>
+        <View style={styles.unreadSectionHeader}>
           <Text style={styles.markAllText} onPress={markAll}>
             Mark all as read
           </Text>
@@ -190,16 +190,11 @@ function createStyles(colors: AppColors) {
     },
 
     markAllText: {
-      marginTop: 4,
-      fontSize: 12,
-      fontWeight: "700",
+      fontSize: 13,
+      lineHeight: 16,
+      fontWeight: "800",
       color: colors.primaryGreen,
-    },
-    unreadActionsRow: {
       paddingHorizontal: spacing.lg,
-      paddingTop: spacing.sm,
-      paddingBottom: spacing.sm,
-      alignItems: "flex-end",
     },
 
     tabsRow: {
@@ -234,15 +229,21 @@ function createStyles(colors: AppColors) {
       paddingBottom: spacing.sm,
       backgroundColor: colors.background,
     },
+    unreadSectionHeader: {
+      paddingTop: spacing.md,
+      paddingBottom: spacing.sm,
+      backgroundColor: colors.background,
+      alignItems: "flex-end",
+    },
 
     sectionTitle: {
       fontSize: 13,
+      lineHeight: 16,
       fontWeight: "800",
       color: colors.textSecondary,
       textTransform: "uppercase",
       letterSpacing: 0.4,
     },
-
     itemWrap: {
       marginBottom: spacing.sm,
     },
