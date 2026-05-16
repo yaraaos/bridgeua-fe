@@ -18,10 +18,6 @@ export function createStyles(colors: AppColors) {
       borderColor: colors.border,
     },
 
-    cardRead: {
-      opacity: 0.78,
-    },
-
     cardPressed: {
       backgroundColor: colors.background,
     },
@@ -66,10 +62,9 @@ export function createStyles(colors: AppColors) {
       fontWeight: "800",
       color: colors.textPrimary,
     },
-
     titleRead: {
       fontWeight: "700",
-      color: colors.textSecondary,
+      color: colors.textPrimary,
     },
 
     time: {

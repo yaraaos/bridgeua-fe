@@ -55,11 +55,7 @@ export default function NotificationItem({ item, onPress }: Props) {
   return (
     <Pressable
       onPress={() => onPress?.(item)}
-      style={({ pressed }) => [
-        styles.card,
-        item.isRead && styles.cardRead,
-        pressed && styles.cardPressed,
-      ]}
+      style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
     >
       <View style={styles.iconWrap}>
         <Feather name={iconName} size={19} color={colors.primaryGreen} />

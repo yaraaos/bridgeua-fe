@@ -83,7 +83,9 @@ export default function NotificationsScreen() {
 
   const sections =
     activeTab === "unread"
-      ? [{ title: "", data: notifications }]
+      ? notifications.length > 0
+        ? [{ title: "", data: notifications }]
+        : []
       : [
           { title: "New", data: newNotifications },
           { title: "Earlier", data: earlierNotifications },
