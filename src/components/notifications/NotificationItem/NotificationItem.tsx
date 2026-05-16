@@ -2,8 +2,8 @@ import { Feather } from "@expo/vector-icons";
 import { Image, Pressable, Text, View } from "react-native";
 
 import type {
-  AppNotification,
-  NotificationType,
+    AppNotification,
+    NotificationType,
 } from "@/src/features/notifications/types/notification.types";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { createStyles } from "./NotificationItem.styles";
@@ -13,7 +13,10 @@ type Props = {
   onPress?: (item: AppNotification) => void;
 };
 
-const NOTIFICATION_ICON_MAP: Record<NotificationType, keyof typeof Feather.glyphMap> = {
+const NOTIFICATION_ICON_MAP: Record<
+  NotificationType,
+  keyof typeof Feather.glyphMap
+> = {
   birthday: "gift",
   business_update: "edit-3",
   new_business: "map-pin",
@@ -72,8 +75,6 @@ export default function NotificationItem({ item, onPress }: Props) {
           >
             {item.title}
           </Text>
-
-          <Text style={styles.time}>{formatNotificationTime(item.createdAt)}</Text>
         </View>
 
         <Text
@@ -87,6 +88,8 @@ export default function NotificationItem({ item, onPress }: Props) {
       {!!item.imageUrl ? (
         <Image source={{ uri: item.imageUrl }} style={styles.thumbnail} />
       ) : null}
+
+      <Text style={styles.time}>{formatNotificationTime(item.createdAt)}</Text>
     </Pressable>
   );
 }

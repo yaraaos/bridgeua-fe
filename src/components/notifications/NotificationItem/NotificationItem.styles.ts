@@ -55,7 +55,7 @@ export function createStyles(colors: AppColors) {
     titleRow: {
       flexDirection: "row",
       alignItems: "center",
-      justifyContent: "space-between",
+      justifyContent: "flex-start",
       gap: spacing.sm,
     },
 
@@ -75,6 +75,7 @@ export function createStyles(colors: AppColors) {
     time: {
       fontSize: 11,
       fontWeight: "600",
+      textAlign: "right",
       color: colors.textMuted,
     },
 
