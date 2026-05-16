@@ -3,6 +3,9 @@ import { create } from "zustand";
 import type { AuthUser } from "../features/auth/types/auth.types";
 import { getAuthSession } from "../services/auth/session";
 import { clearAuthTokens } from "../services/auth/tokens";
+import { useFollowingStore } from "./following.store";
+import { useProfileStore } from "./profile.store";
+import { useReviewsStore } from "./reviews.store";
 
 type AuthState = {
   user: AuthUser | null;
@@ -28,6 +31,10 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   clearUser: async () => {
     await clearAuthTokens();
+
+    useFollowingStore.getState().resetFollowing();
+    useReviewsStore.getState().clearReviews();
+    useProfileStore.getState().clearProfile();
 
     set({
       user: null,
