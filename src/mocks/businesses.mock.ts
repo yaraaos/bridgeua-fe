@@ -12,6 +12,7 @@ export const businessesMock: Business[] = [
     distanceKm: 2,
     priceLevel: 3,
     image: "https://picsum.photos/200/200?1",
+    coordinates: { latitude: 34.0736, longitude: -118.4004 },
   },
   {
     id: "2",
@@ -24,6 +25,7 @@ export const businessesMock: Business[] = [
     distanceKm: 4,
     priceLevel: 2,
     image: "https://picsum.photos/200/200?2",
+    coordinates: { latitude: 34.0696, longitude: -118.4053 },
   },
   {
     id: "3",
@@ -36,6 +38,7 @@ export const businessesMock: Business[] = [
     distanceKm: 6,
     priceLevel: 2,
     image: "https://picsum.photos/200/200?3",
+    coordinates: { latitude: 34.0195, longitude: -118.4912 },
   },
   {
     id: "4",
@@ -48,6 +51,7 @@ export const businessesMock: Business[] = [
     distanceKm: 9,
     priceLevel: 4,
     image: "https://picsum.photos/200/200?4",
+    coordinates: { latitude: 34.0407, longitude: -118.2468 },
   },
   {
     id: "5",
@@ -60,6 +64,7 @@ export const businessesMock: Business[] = [
     distanceKm: 3,
     priceLevel: 2,
     image: "https://picsum.photos/200/200?5",
+    coordinates: { latitude: 33.9850, longitude: -118.4695 },
   },
   {
     id: "6",
@@ -72,6 +77,7 @@ export const businessesMock: Business[] = [
     distanceKm: 7,
     priceLevel: 3,
     image: "https://picsum.photos/200/200?6",
+    coordinates: { latitude: 34.0900, longitude: -118.3617 },
   },
   {
     id: "7",
@@ -84,6 +90,7 @@ export const businessesMock: Business[] = [
     distanceKm: 5,
     priceLevel: 4,
     image: "https://picsum.photos/200/200?7",
+    coordinates: { latitude: 34.0762, longitude: -118.3989 },
   },
   {
     id: "8",
@@ -96,6 +103,7 @@ export const businessesMock: Business[] = [
     distanceKm: 8,
     priceLevel: 2,
     image: "https://picsum.photos/200/200?8",
+    coordinates: { latitude: 34.0928, longitude: -118.3287 },
   },
   {
     id: "9",
@@ -108,6 +116,7 @@ export const businessesMock: Business[] = [
     distanceKm: 12,
     priceLevel: 3,
     image: "https://picsum.photos/200/200?9",
+    coordinates: { latitude: 34.1478, longitude: -118.1445 },
   },
   {
     id: "10",
@@ -120,6 +129,7 @@ export const businessesMock: Business[] = [
     distanceKm: 15,
     priceLevel: 3,
     image: "https://picsum.photos/200/200?10",
+    coordinates: { latitude: 34.1425, longitude: -118.2551 },
   },
   {
     id: "11",
@@ -132,6 +142,7 @@ export const businessesMock: Business[] = [
     distanceKm: 11,
     priceLevel: 1,
     image: "https://picsum.photos/200/200?11",
+    coordinates: { latitude: 34.0259, longitude: -118.4810 },
   },
   {
     id: "12",
@@ -144,5 +155,6 @@ export const businessesMock: Business[] = [
     distanceKm: 10,
     priceLevel: 2,
     image: "https://picsum.photos/200/200?12",
+    coordinates: { latitude: 34.0479, longitude: -118.2519 },
   },
 ];
