@@ -127,21 +127,23 @@ export default function NotificationsScreen() {
       <ScreenHeader
         title="Notifications"
         titleSubtitle="Stay updated with BridgeUA"
-        rightSlot={
-          <Text style={styles.markAllText} onPress={markAll}>
-            Mark all as read
-          </Text>
+        headerInnerStyle={styles.headerInner}
+        bottomSlot={
+          <>
+            <View style={styles.tabsPillsWrap}>
+              <AppTabsPills
+                tabs={visibleTabs}
+                activeTab={activeTab}
+                onChange={setActiveTab}
+              />
+            </View>
+
+            <Text style={styles.markAllText} onPress={markAll}>
+              Mark all as read
+            </Text>
+          </>
         }
       />
-
-      <View style={styles.tabsWrap}>
-        <AppTabsPills
-          tabs={visibleTabs}
-          activeTab={activeTab}
-          onChange={setActiveTab}
-        />
-      </View>
-
       <SectionList
         sections={sections}
         keyExtractor={(item) => item.id}
@@ -186,11 +188,21 @@ function createStyles(colors: AppColors) {
       color: colors.primaryGreen,
     },
 
-    tabsWrap: {
+    tabsRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      gap: spacing.md,
       paddingHorizontal: spacing.lg,
       paddingTop: spacing.lg,
       paddingBottom: spacing.sm,
-      backgroundColor: colors.background,
+    },
+
+    tabsPillsWrap: {
+      flex: 1,
+    },
+    headerInner: {
+      height: 154,
     },
 
     listContent: {

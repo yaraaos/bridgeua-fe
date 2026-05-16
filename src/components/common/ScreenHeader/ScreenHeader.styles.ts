@@ -57,6 +57,13 @@ export function createStyles(colors: AppColors) {
       alignItems: "center",
       gap: 6,
     },
+    bottomSlotRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6,
+      marginTop: 15,
+      backgroundColor: "transparent",
+    },
     searchInputWrap: {
       flex: 1,
     },
