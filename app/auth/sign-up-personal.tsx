@@ -17,11 +17,15 @@ import {
   SignUpPersonalFormErrors,
   validateSignUpPersonalForm,
 } from "../../src/features/auth/validation/signUpPersonal.validation";
+import { useNotificationsStore } from "@/src/store/notifications.store";
 
 export default function SignUpPersonalScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
   const setProfile = useProfileStore((state) => state.setProfile);
+  const setNotificationsAccountType = useNotificationsStore(
+  (state) => state.setActiveAccountType,
+);
 
   const { submitRegisterPersonal, isLoading, apiError, setApiError } =
     useRegisterPersonal();
@@ -66,6 +70,7 @@ export default function SignUpPersonalScreen() {
     });
 
     if (response) {
+      setNotificationsAccountType("personal");
       setProfile({
         id: `personal-${Date.now()}`,
         firstName: firstName.trim(),

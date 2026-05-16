@@ -5,6 +5,7 @@ import { router } from "expo-router";
 import React, { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
+import { useNotificationsStore } from "@/src/store/notifications.store";
 import { AccountTypeSwitch } from "../../src/components/auth";
 import AppButton from "../../src/components/ui/AppButton/AppButton";
 import AppInput from "../../src/components/ui/AppInput/AppInput";
@@ -49,6 +50,10 @@ export default function SignUpBusinessScreen() {
     setApiError(null);
   };
 
+  const setNotificationsAccountType = useNotificationsStore(
+    (state) => state.setActiveAccountType,
+  );
+
   const handleSubmit = async () => {
     if (isLoading) return;
     const values = {
@@ -77,6 +82,7 @@ export default function SignUpBusinessScreen() {
     });
 
     if (response) {
+      setNotificationsAccountType("business");
       router.push({
         pathname: "/auth/confirm-code",
         params: { email: response.email },
