@@ -1,6 +1,6 @@
 import { useAppTheme } from "@/src/hooks/useAppTheme";
-import { getAuthSession } from "@/src/services/auth/session";
 import { getOnboardingSeen } from "@/src/services/storage/onboarding";
+import { useAuthStore } from "@/src/store/auth.store";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { useEffect, useRef } from "react";
@@ -24,18 +24,23 @@ export default function SplashScreen() {
   const rightX = useRef(new Animated.Value(SCREEN_WIDTH)).current;
   const textOpacity = useRef(new Animated.Value(0)).current;
   const textY = useRef(new Animated.Value(8)).current;
+  const hydrate = useAuthStore((state) => state.hydrate);
 
   useEffect(() => {
     let isMounted = true;
 
     async function resolveInitialRoute() {
-      const [session, onboardingSeen] = await Promise.all([
-        getAuthSession(),
-        getOnboardingSeen(),
-      ]);
+      await hydrate();
 
-      if (session) return "/(tabs)/home";
-      if (onboardingSeen) return "/auth/sign-in";
+      const onboardingSeen = await getOnboardingSeen();
+
+      if (useAuthStore.getState().isAuthenticated) {
+        return "/(tabs)/home";
+      }
+
+      if (onboardingSeen) {
+        return "/auth/sign-in";
+      }
 
       return "/onboarding";
     }
@@ -84,7 +89,7 @@ export default function SplashScreen() {
     return () => {
       isMounted = false;
     };
-  }, [leftX, rightX, textOpacity, textY]);
+  }, [hydrate, leftX, rightX, textOpacity, textY]);
 
   return (
     <AnimatedLinearGradient
