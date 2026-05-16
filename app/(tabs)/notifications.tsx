@@ -15,7 +15,19 @@ import { router } from "expo-router";
 import { useState } from "react";
 import { SectionList, StyleSheet, Text, View } from "react-native";
 
-const NOTIFICATION_TABS: { label: string; value: NotificationTab }[] = [
+const PERSONAL_NOTIFICATION_TABS: {
+  label: string;
+  value: NotificationTab;
+}[] = [
+  { label: "All", value: "all" },
+  { label: "Unread", value: "unread" },
+  { label: "Updates", value: "updates" },
+];
+
+const BUSINESS_NOTIFICATION_TABS: {
+  label: string;
+  value: NotificationTab;
+}[] = [
   { label: "All", value: "all" },
   { label: "Unread", value: "unread" },
   { label: "Activity", value: "activity" },
@@ -55,8 +67,17 @@ export default function NotificationsScreen() {
 
   const [activeTab, setActiveTab] = useState<NotificationTab>("all");
 
-  const { newNotifications, earlierNotifications, notifications } =
-    useNotifications(activeTab);
+  const {
+    newNotifications,
+    earlierNotifications,
+    notifications,
+    activeAccountType,
+  } = useNotifications(activeTab);
+
+  const visibleTabs =
+    activeAccountType === "personal"
+      ? PERSONAL_NOTIFICATION_TABS
+      : BUSINESS_NOTIFICATION_TABS;
 
   const { markOne, markAll } = useMarkAsRead();
 
@@ -115,7 +136,7 @@ export default function NotificationsScreen() {
 
       <View style={styles.tabsWrap}>
         <AppTabsPills
-          tabs={NOTIFICATION_TABS}
+          tabs={visibleTabs}
           activeTab={activeTab}
           onChange={setActiveTab}
         />

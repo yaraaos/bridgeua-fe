@@ -1,10 +1,10 @@
 import { create } from "zustand";
 
-import { notificationsMock } from "@/src/mocks/notifications.mock";
 import type {
-  AppNotification,
-  NotificationAccountType,
+    AppNotification,
+    NotificationAccountType,
 } from "@/src/features/notifications/types/notification.types";
+import { notificationsMock } from "@/src/mocks/notifications.mock";
 
 type NotificationsState = {
   notifications: AppNotification[];
@@ -18,7 +18,7 @@ type NotificationsState = {
 
 export const useNotificationsStore = create<NotificationsState>((set) => ({
   notifications: notificationsMock,
-  activeAccountType: "business",
+  activeAccountType: "personal",
 
   setActiveAccountType: (accountType) =>
     set({
