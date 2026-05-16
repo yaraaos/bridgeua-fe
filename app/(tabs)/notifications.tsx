@@ -13,7 +13,13 @@ import {
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { router } from "expo-router";
 import { useState } from "react";
-import { SectionList, StyleSheet, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  SectionList,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 
 const PERSONAL_NOTIFICATION_TABS: {
   label: string;
@@ -72,6 +78,7 @@ export default function NotificationsScreen() {
     earlierNotifications,
     notifications,
     activeAccountType,
+    isLoading,
   } = useNotifications(activeTab);
 
   const visibleTabs =
@@ -152,34 +159,40 @@ export default function NotificationsScreen() {
           </Text>
         </View>
       ) : null}
-      <SectionList
-        sections={sections}
-        keyExtractor={(item) => item.id}
-        stickySectionHeadersEnabled
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={[
-          styles.listContent,
-          notifications.length === 0 && styles.emptyContent,
-        ]}
-        renderSectionHeader={({ section }) =>
-          section.title ? (
-            <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>{section.title}</Text>
+      {isLoading ? (
+        <View style={styles.loaderWrap}>
+          <ActivityIndicator size="small" color={colors.primaryGreen} />
+        </View>
+      ) : (
+        <SectionList
+          sections={sections}
+          keyExtractor={(item) => item.id}
+          stickySectionHeadersEnabled
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={[
+            styles.listContent,
+            notifications.length === 0 && styles.emptyContent,
+          ]}
+          renderSectionHeader={({ section }) =>
+            section.title ? (
+              <View style={styles.sectionHeader}>
+                <Text style={styles.sectionTitle}>{section.title}</Text>
+              </View>
+            ) : null
+          }
+          renderItem={({ item }) => (
+            <View style={styles.itemWrap}>
+              <NotificationItem item={item} onPress={handlePressNotification} />
             </View>
-          ) : null
-        }
-        renderItem={({ item }) => (
-          <View style={styles.itemWrap}>
-            <NotificationItem item={item} onPress={handlePressNotification} />
-          </View>
-        )}
-        ListEmptyComponent={
-          <AppEmptyState
-            title={emptyState.title}
-            description={emptyState.description}
-          />
-        }
-      />
+          )}
+          ListEmptyComponent={
+            <AppEmptyState
+              title={emptyState.title}
+              description={emptyState.description}
+            />
+          }
+        />
+      )}
     </View>
   );
 }
@@ -189,6 +202,12 @@ function createStyles(colors: AppColors) {
     container: {
       flex: 1,
       backgroundColor: colors.background,
+    },
+
+    loaderWrap: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
     },
 
     markAllText: {

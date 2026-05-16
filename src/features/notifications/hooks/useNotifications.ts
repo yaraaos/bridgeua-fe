@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { useNotificationsStore } from "@/src/store/notifications.store";
 import type {
@@ -48,6 +48,16 @@ export function useNotifications(activeTab: NotificationTab) {
   const activeAccountType = useNotificationsStore(
     (state) => state.activeAccountType,
   );
+  const [isLoading, setIsLoading] = useState(true);
+  useEffect(() => {
+    setIsLoading(true);
+
+    const timeout = setTimeout(() => {
+      setIsLoading(false);
+    }, 400);
+
+    return () => clearTimeout(timeout);
+  }, [activeAccountType, activeTab]);
 
   return useMemo(() => {
     const accountNotifications = notifications
@@ -86,6 +96,7 @@ export function useNotifications(activeTab: NotificationTab) {
       earlierNotifications,
       unreadCount,
       activeAccountType,
+      isLoading,
     };
-  }, [activeAccountType, activeTab, notifications]);
+  }, [activeAccountType, activeTab, notifications, isLoading]);
 }
