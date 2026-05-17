@@ -36,7 +36,7 @@ export function createStyles(colors: AppColors) {
     },
 
     viewAllText: {
-      fontSize: 14,
+      fontSize: 13,
       fontWeight: "700",
       color: colors.primaryGreen,
     },
