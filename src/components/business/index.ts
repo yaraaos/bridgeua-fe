@@ -9,11 +9,13 @@ export { default as BusinessInfoRow } from "./BusinessInfoRow";
 export { default as BusinessLanguagesSection } from "./BusinessLanguagesSection";
 export { default as BusinessOverviewCard } from "./BusinessOverviewCard";
 export { default as BusinessRatingSummary } from "./BusinessRatingsSummary";
+export { default as BusinessRecommendedByPreview } from "./BusinessRecommendedByPreview";
 export { default as BusinessRecommendedBySection } from "./BusinessRecommendsSection";
 export { default as BusinessReviewsList } from "./BusinessReviewsList";
 export { default as BusinessServicesList } from "./BusinessServicesList";
 export { default as BusinessSocialLinksSection } from "./BusinessSocialLinksSection";
 export { default as BusinessTopReviews } from "./BusinessTopReviews";
 export { default as FollowButton } from "./FollowButton/FollowButton";
+export { default as RecommendedByCard } from "./RecommendedByCard";
 export { default as ReviewCard } from "./ReviewCard";
 

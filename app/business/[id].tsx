@@ -5,6 +5,7 @@ import {
   BusinessHeroGallery,
   BusinessOverviewCard,
   BusinessRatingSummary,
+  BusinessRecommendedByPreview,
   BusinessReviewsList,
   BusinessServicesList,
   BusinessTopReviews,
@@ -18,6 +19,7 @@ import { AppColors } from "@/src/constants/colors";
 import { DISCOVERY_GRADIENT } from "@/src/constants/gradients";
 import { spacing } from "@/src/constants/spacing";
 import { useBusinessDetails } from "@/src/features/businesses/hooks/useBusiness";
+import type { BusinessRecommendation } from "@/src/features/businesses/types/business.types";
 import { useReviews } from "@/src/features/reviews/hooks/useReviews";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { router, useLocalSearchParams } from "expo-router";
@@ -240,6 +242,23 @@ export default function BusinessDetailsScreen() {
             <>
               <BusinessOverviewCard business={business} />
               <BusinessBookingCard businessId={business.id} />
+              <BusinessRecommendedByPreview
+                recommendations={business.about.recommendedBy}
+                onPressViewAll={() =>
+                  router.push({
+                    pathname: "/business/recommended-by",
+                    params: { businessId: business.id },
+                  })
+                }
+                onPressRecommendation={(
+                  recommendation: BusinessRecommendation,
+                ) =>
+                  router.push({
+                    pathname: "/business/[id]",
+                    params: { id: recommendation.businessId },
+                  })
+                }
+              />
               <BusinessTopReviews
                 reviews={business.topReviews}
                 reviewCount={business.reviewCount}
