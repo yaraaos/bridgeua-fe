@@ -9,14 +9,17 @@ export default function TabsLayout() {
   const { colors } = useAppTheme();
   const insets = useSafeAreaInsets();
 
-  const unreadCount = useNotificationsStore(
-    (state) =>
-      state.notifications.filter(
-        (notification) =>
-          notification.recipientAccountType === state.activeAccountType &&
-          !notification.isRead,
-      ).length,
-  );
+  const unreadCount = useNotificationsStore((state) => {
+    const activeReadIds =
+      state.readNotificationIds[state.activeAccountType] ?? [];
+
+    return state.notifications.filter(
+      (notification) =>
+        notification.recipientAccountType === state.activeAccountType &&
+        !notification.isRead &&
+        !activeReadIds.includes(notification.id),
+    ).length;
+  });
 
   return (
     <Tabs
