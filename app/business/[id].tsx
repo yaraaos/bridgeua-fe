@@ -242,18 +242,6 @@ export default function BusinessDetailsScreen() {
             <>
               <BusinessOverviewCard business={business} />
               <BusinessBookingCard businessId={business.id} />
-              <BusinessTopReviews
-                reviews={business.topReviews}
-                reviewCount={business.reviewCount}
-                onPressViewAll={() => {
-                  setFocusedReviewId(null);
-                  handleChangeTab("reviews");
-                }}
-                onPressReviewMore={(reviewId) => {
-                  setFocusedReviewId(reviewId);
-                  handleChangeTab("reviews");
-                }}
-              />
               <BusinessRecommendedByPreview
                 recommendations={business.about.recommendedBy}
                 onPressViewAll={() =>
@@ -270,6 +258,18 @@ export default function BusinessDetailsScreen() {
                     params: { id: recommendation.businessId },
                   })
                 }
+              />
+              <BusinessTopReviews
+                reviews={business.topReviews}
+                reviewCount={business.reviewCount}
+                onPressViewAll={() => {
+                  setFocusedReviewId(null);
+                  handleChangeTab("reviews");
+                }}
+                onPressReviewMore={(reviewId) => {
+                  setFocusedReviewId(reviewId);
+                  handleChangeTab("reviews");
+                }}
               />
             </>
           ) : null}

@@ -109,7 +109,8 @@ export const businessDetailsMock: BusinessDetails[] = [
           businessLocation: "Los Angeles / California",
           businessImageUrl:
             "https://images.unsplash.com/photo-1604654894610-df63bc536371?w=300",
-          recommendationsCount: 14,
+          recommendedByCount: 5,
+          recommendedByPreview: ["ToryProNails", "Best deal"],
         },
         {
           id: "recommended-by-2",
@@ -119,7 +120,8 @@ export const businessDetailsMock: BusinessDetails[] = [
           businessLocation: "Beverly Hills / California",
           businessImageUrl:
             "https://images.unsplash.com/photo-1604719312566-8912e9227c6a?w=300",
-          recommendationsCount: 9,
+          recommendedByCount: 5,
+          recommendedByPreview: ["ToryProNails", "Best deal"],
         },
         {
           id: "recommended-by-3",
@@ -129,7 +131,8 @@ export const businessDetailsMock: BusinessDetails[] = [
           businessLocation: "Santa Monica / California",
           businessImageUrl:
             "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=300",
-          recommendationsCount: 21,
+          recommendedByCount: 5,
+          recommendedByPreview: ["ToryProNails", "Best deal"],
         },
         {
           id: "rec-4",
@@ -139,7 +142,8 @@ export const businessDetailsMock: BusinessDetails[] = [
           businessLocation: "Brooklyn, NY",
           businessImageUrl:
             "https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?q=80&w=800",
-          recommendationsCount: 18,
+          recommendedByCount: 5,
+          recommendedByPreview: ["ToryProNails", "Best deal"],
         },
       ],
     },

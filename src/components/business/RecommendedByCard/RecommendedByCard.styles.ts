@@ -41,5 +41,14 @@ export function createStyles(colors: AppColors) {
       fontWeight: "600",
       lineHeight: 16,
     },
+
+    recommendedCount: {
+      flexShrink: 0,
+      marginLeft: 4,
+      fontSize: 12,
+      color: colors.primaryGreen,
+      fontWeight: "700",
+      lineHeight: 16,
+    },
   });
 }

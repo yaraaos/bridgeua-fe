@@ -43,9 +43,21 @@ export default function RecommendedByCard({
         </Text>
 
         <View style={styles.recommendedRow}>
-          <Text style={styles.recommendedLabel} numberOfLines={1}>
-            Recommended this business
-          </Text>
+          {!!recommendation.recommendedByPreview?.length ? (
+            <Text style={styles.recommendedLabel} numberOfLines={1}>
+              Recommended by {recommendation.recommendedByPreview[0]}
+            </Text>
+          ) : (
+            <Text style={styles.recommendedLabel} numberOfLines={1}>
+              Recommended by community
+            </Text>
+          )}
+
+          {(recommendation.recommendedByCount ?? 0) > 0 ? (
+            <Text style={styles.recommendedCount} numberOfLines={1}>
+              +{recommendation.recommendedByCount}
+            </Text>
+          ) : null}
         </View>
       </View>
 
