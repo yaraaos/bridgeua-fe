@@ -1,14 +1,18 @@
 import type {
-    ConfirmCodePayload,
-    ConfirmCodeResponse,
-    RegisterBusinessPayload,
-    RegisterBusinessResponse,
-    RegisterPersonalPayload,
-    RegisterResponse,
-    ResendCodePayload,
-    ResendCodeResponse,
-    SignInPayload,
-    SignInResponse,
+  ConfirmCodePayload,
+  ConfirmCodeResponse,
+  ForgotPasswordPayload,
+  ForgotPasswordResponse,
+  RegisterBusinessPayload,
+  RegisterBusinessResponse,
+  RegisterPersonalPayload,
+  RegisterResponse,
+  ResendCodePayload,
+  ResendCodeResponse,
+  ResetPasswordPayload,
+  ResetPasswordResponse,
+  SignInPayload,
+  SignInResponse,
 } from "../types/auth.types";
 
 export async function signIn(payload: SignInPayload): Promise<SignInResponse> {
@@ -82,6 +86,28 @@ export async function confirmCode(
 export async function resendCode(
   payload: ResendCodePayload,
 ): Promise<ResendCodeResponse> {
+  // TODO: Replace with real BE request when endpoint is ready.
+  await new Promise((resolve) => setTimeout(resolve, 800));
+
+  return {
+    success: true,
+  };
+}
+
+export async function forgotPassword(
+  payload: ForgotPasswordPayload,
+): Promise<ForgotPasswordResponse> {
+  // TODO: Replace with real BE request when endpoint is ready.
+  await new Promise((resolve) => setTimeout(resolve, 800));
+
+  return {
+    success: true,
+  };
+}
+
+export async function resetPassword(
+  payload: ResetPasswordPayload,
+): Promise<ResetPasswordResponse> {
   // TODO: Replace with real BE request when endpoint is ready.
   await new Promise((resolve) => setTimeout(resolve, 800));
 

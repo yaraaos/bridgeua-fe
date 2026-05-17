@@ -8,6 +8,11 @@ import AppButton from "../../src/components/ui/AppButton/AppButton";
 import AppLoader from "../../src/components/ui/AppLoader/AppLoader";
 import AppPasswordInput from "../../src/components/ui/AppPasswordInput/AppPasswordInput";
 import AppScreen from "../../src/components/ui/AppScreen/AppScreen";
+import { useResetPassword } from "../../src/features/auth/hooks/useResetPassword";
+import {
+  ResetPasswordFormErrors,
+  validateResetPasswordForm,
+} from "../../src/features/auth/validation/resetPassword.validation";
 
 export default function ResetPasswordScreen() {
   const { colors } = useAppTheme();
@@ -16,32 +21,29 @@ export default function ResetPasswordScreen() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const { submitResetPassword, isLoading, apiError, setApiError } =
+    useResetPassword();
+
+  const [errors, setErrors] = useState<ResetPasswordFormErrors>({});
 
   const handleSubmit = async () => {
-    if (isLoading) return;
-    if (!password.trim() || !confirmPassword.trim()) {
-      setError("All fields are required");
+    const values = {
+      password,
+      confirmPassword,
+    };
+
+    const validationErrors = validateResetPasswordForm(values);
+
+    setErrors(validationErrors);
+    setApiError(null);
+
+    if (Object.keys(validationErrors).length > 0) {
       return;
     }
 
-    if (password.length < 6) {
-      setError("Password must be at least 6 characters");
-      return;
-    }
+    const response = await submitResetPassword(values);
 
-    if (password !== confirmPassword) {
-      setError("Passwords do not match");
-      return;
-    }
-
-    setError("");
-    setIsLoading(true);
-
-    setTimeout(() => {
-      setIsLoading(false);
-
+    if (response) {
       router.push({
         pathname: "/auth/success",
         params: {
@@ -51,7 +53,7 @@ export default function ResetPasswordScreen() {
           ctaRoute: "/auth/sign-in",
         },
       });
-    }, 1000);
+    }
   };
 
   return (
@@ -71,9 +73,14 @@ export default function ResetPasswordScreen() {
             value={password}
             onChangeText={(value) => {
               setPassword(value);
-              setError("");
+              setErrors((current) => ({
+                ...current,
+                password: undefined,
+              }));
+
+              setApiError(null);
             }}
-            error={!!error}
+            error={Boolean(errors.password)}
             disabled={isLoading}
           />
         </View>
@@ -84,14 +91,27 @@ export default function ResetPasswordScreen() {
             value={confirmPassword}
             onChangeText={(value) => {
               setConfirmPassword(value);
-              setError("");
+              setErrors((current) => ({
+                ...current,
+                confirmPassword: undefined,
+              }));
+
+              setApiError(null);
             }}
-            error={!!error}
+            error={Boolean(errors.confirmPassword)}
             disabled={isLoading}
           />
         </View>
 
-        {error ? <Text style={styles.errorText}>{error}</Text> : null}
+        {errors.password ? (
+          <Text style={styles.errorText}>{errors.password}</Text>
+        ) : null}
+
+        {errors.confirmPassword ? (
+          <Text style={styles.errorText}>{errors.confirmPassword}</Text>
+        ) : null}
+
+        {apiError ? <Text style={styles.errorText}>{apiError}</Text> : null}
 
         {isLoading ? (
           <AppLoader />
