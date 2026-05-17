@@ -42,9 +42,15 @@ export default function ResetPasswordScreen() {
     setTimeout(() => {
       setIsLoading(false);
 
-      alert("Password successfully changed");
-
-      router.replace("/auth/sign-in");
+      router.push({
+        pathname: "/auth/success",
+        params: {
+          title: "Password changed",
+          subtitle: "Your password has been updated successfully",
+          ctaLabel: "Back to login",
+          ctaRoute: "/auth/sign-in",
+        },
+      });
     }, 1000);
   };
 
