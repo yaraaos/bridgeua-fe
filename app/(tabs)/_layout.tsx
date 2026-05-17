@@ -2,10 +2,12 @@ import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { useNotificationsStore } from "@/src/store/notifications.store";
 import { Feather } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
-import { StyleSheet, View } from "react-native";
+import { Platform, StyleSheet, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function TabsLayout() {
   const { colors } = useAppTheme();
+  const insets = useSafeAreaInsets();
 
   const unreadCount = useNotificationsStore(
     (state) =>
@@ -23,7 +25,7 @@ export default function TabsLayout() {
         tabBarActiveTintColor: colors.primaryGreen,
         tabBarInactiveTintColor: colors.textMuted,
         tabBarStyle: {
-          height: 84,
+          height: Platform.OS === "android" ? 60 + insets.bottom : 84,
           paddingTop: 8,
           borderTopWidth: 1,
           borderTopColor: colors.border,
