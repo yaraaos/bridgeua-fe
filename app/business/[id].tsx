@@ -356,6 +356,7 @@ function createStyles(colors: AppColors) {
       backgroundColor: colors.background,
       paddingBottom: spacing.sm,
       zIndex: 10,
+      marginBottom: -8,
     },
     scrollContent: {
       paddingBottom: spacing.xl,
