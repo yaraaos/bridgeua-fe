@@ -131,6 +131,16 @@ export const businessDetailsMock: BusinessDetails[] = [
             "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=300",
           recommendationsCount: 21,
         },
+        {
+          id: "rec-4",
+          businessId: "business-4",
+          businessName: "Dnipro Wellness Studio",
+          businessCategory: "Wellness",
+          businessLocation: "Brooklyn, NY",
+          businessImageUrl:
+            "https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?q=80&w=800",
+          recommendationsCount: 18,
+        },
       ],
     },
 

@@ -1,0 +1,54 @@
+import AppAvatar from "@/src/components/ui/AppAvatar";
+import type { BusinessRecommendation } from "@/src/features/businesses/types/business.types";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { Ionicons } from "@expo/vector-icons";
+import { Pressable, Text, View } from "react-native";
+import { createStyles } from "./RecommendedByCard.styles";
+
+
+type Props = {
+  recommendation: BusinessRecommendation;
+  isBordered?: boolean;
+  onPress?: (recommendation: BusinessRecommendation) => void;
+};
+
+export default function RecommendedByCard({
+  recommendation,
+  isBordered = false,
+  onPress,
+}: Props) {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
+  return (
+    <Pressable
+      style={[styles.container, isBordered ? styles.bordered : null]}
+      onPress={() => onPress?.(recommendation)}
+    >
+      <AppAvatar
+        imageUrl={recommendation.businessImageUrl}
+        name={recommendation.businessName}
+        size="md"
+      />
+
+      <View style={styles.content}>
+        <Text style={styles.name} numberOfLines={1}>
+          {recommendation.businessName}
+        </Text>
+
+        <Text style={styles.meta} numberOfLines={1}>
+          {recommendation.businessCategory}
+          {recommendation.businessLocation
+            ? ` • ${recommendation.businessLocation}`
+            : ""}
+        </Text>
+
+        <Text style={styles.count}>
+          {recommendation.recommendationsCount ?? 0} recommendations made
+        </Text>
+      </View>
+
+      <Ionicons name="chevron-forward" size={18} color={colors.textMuted} />
+    </Pressable>
+  );
+}
