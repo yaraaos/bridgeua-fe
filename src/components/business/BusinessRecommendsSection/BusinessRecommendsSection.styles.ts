@@ -5,70 +5,48 @@ import { StyleSheet } from "react-native";
 
 export function createStyles(colors: AppColors) {
   return StyleSheet.create({
-    card: {
+    container: {
       marginHorizontal: spacing.lg,
-      marginTop: spacing.md,
+      marginTop: spacing.lg,
       padding: spacing.lg,
       borderRadius: radius.xl,
       backgroundColor: colors.surface,
       borderWidth: 1,
       borderColor: colors.border,
     },
+
+    headerRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      gap: spacing.md,
+    },
+
     title: {
+      flex: 1,
       fontSize: 18,
       fontWeight: "700",
       color: colors.textPrimary,
     },
-    list: {
-      gap: spacing.md,
-    },
-    item: {
+
+    viewAllButton: {
       flexDirection: "row",
       alignItems: "center",
-      gap: spacing.md,
+      gap: 2,
     },
-    avatar: {
-      width: 42,
-      height: 42,
-      borderRadius: radius.pill,
-      backgroundColor: colors.primaryGreenSoft,
-    },
-    avatarFallback: {
-      width: 42,
-      height: 42,
-      borderRadius: radius.pill,
-      backgroundColor: colors.primaryGreenSoft,
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    avatarFallbackText: {
-      fontSize: 16,
-      fontWeight: "700",
-      color: colors.primaryGreen,
-    },
-    textWrap: {
-      flex: 1,
-    },
-    name: {
-      fontSize: 15,
-      fontWeight: "700",
-      color: colors.textPrimary,
-    },
-    subtitle: {
-      marginTop: spacing.xs,
+
+    viewAllText: {
       fontSize: 13,
-      color: colors.textSecondary,
-    },
-    headerRow: {
-      flexDirection: "row",
-      alignItems: "baseline",
-      justifyContent: "space-between",
-      marginBottom: spacing.md,
-    },
-    seeAllText: {
-      fontSize: 14,
       fontWeight: "700",
       color: colors.primaryGreen,
+    },
+
+    viewAllIcon: {
+      color: colors.primaryGreen,
+    },
+
+    list: {
+      marginTop: spacing.md,
     },
   });
 }

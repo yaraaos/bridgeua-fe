@@ -1,0 +1,94 @@
+import { RecommendedByCard } from "@/src/components/business";
+import ScreenHeader from "@/src/components/common/ScreenHeader/ScreenHeader";
+import AppEmptyState from "@/src/components/ui/AppEmptyState";
+import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
+import type { AppColors } from "@/src/constants/colors";
+import { spacing } from "@/src/constants/spacing";
+import { useBusinessDetails } from "@/src/features/businesses/hooks/useBusiness";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { router, useLocalSearchParams } from "expo-router";
+import { ActivityIndicator, ScrollView, StyleSheet, View } from "react-native";
+
+export default function RecommendsScreen() {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
+  const { businessId } = useLocalSearchParams<{ businessId?: string }>();
+  const { business, isLoading } = useBusinessDetails(businessId);
+
+  const recommends = business?.about?.recommendedBy ?? [];
+
+  return (
+    <AppScreen withTopInset={false} style={styles.container}>
+      <ScreenHeader
+        title="Recommends"
+        titleSubtitle="Businesses this place recommends"
+      />
+
+      {isLoading ? (
+        <View style={styles.center}>
+          <ActivityIndicator />
+        </View>
+      ) : recommends.length < 1 ? (
+        <View style={styles.emptyWrap}>
+          <AppEmptyState
+            title="No recommendations yet"
+            description="Businesses recommended by this place will appear here."
+          />
+        </View>
+      ) : (
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContent}
+        >
+          <View style={styles.card}>
+            {recommends.map((recommendation, index) => (
+              <RecommendedByCard
+                key={recommendation.id}
+                recommendation={recommendation}
+                isBordered={index !== 0}
+                onPress={() =>
+                  router.push({
+                    pathname: "/business/[id]",
+                    params: { id: recommendation.businessId },
+                  })
+                }
+              />
+            ))}
+          </View>
+        </ScrollView>
+      )}
+    </AppScreen>
+  );
+}
+
+function createStyles(colors: AppColors) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      padding: 0,
+      backgroundColor: colors.background,
+    },
+    center: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    emptyWrap: {
+      flex: 1,
+      justifyContent: "center",
+      paddingHorizontal: spacing.lg,
+    },
+    scrollContent: {
+      padding: spacing.lg,
+      paddingBottom: spacing.xl,
+    },
+    card: {
+      paddingHorizontal: spacing.lg,
+      borderRadius: 20,
+      backgroundColor: colors.surface,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+  });
+}

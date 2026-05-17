@@ -325,7 +325,7 @@ export default function BusinessDetailsScreen() {
 
           {activeTab === "about" ? (
             <BusinessAboutSection
-              businessName={business.name}
+              businessId={business.id}
               about={business.about}
             />
           ) : null}
