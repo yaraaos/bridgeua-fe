@@ -10,7 +10,7 @@ export function createStyles(colors: AppColors) {
     },
     containerPreview: {
       width: 200,
-      height: 150,
+      minHeight: 150,
       padding: spacing.md,
       borderTopWidth: 0,
       borderWidth: 1,
@@ -57,13 +57,17 @@ export function createStyles(colors: AppColors) {
       lineHeight: 17,
     },
     moreButton: {
-      marginTop: spacing.xs,
+      marginTop: "auto",
+      paddingTop: spacing.sm,
       alignSelf: "flex-end",
     },
     moreText: {
       fontSize: 12,
       fontWeight: "700",
       color: colors.primaryGreen,
+    },
+    previewContent: {
+      flex: 1,
     },
     photosRow: {
       marginTop: spacing.md,
