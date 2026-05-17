@@ -2,8 +2,7 @@ import { RecommendedByCard } from "@/src/components/business";
 import ScreenHeader from "@/src/components/common/ScreenHeader/ScreenHeader";
 import AppEmptyState from "@/src/components/ui/AppEmptyState";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
-import { AppColors } from "@/src/constants/colors";
-import { DISCOVERY_GRADIENT } from "@/src/constants/gradients";
+import type { AppColors } from "@/src/constants/colors";
 import { spacing } from "@/src/constants/spacing";
 import { useBusinessDetails } from "@/src/features/businesses/hooks/useBusiness";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
@@ -22,43 +21,46 @@ export default function RecommendedByScreen() {
   return (
     <AppScreen withTopInset={false} style={styles.container}>
       <ScreenHeader
-        variant="business"
         title="Recommended by"
-        gradientColors={DISCOVERY_GRADIENT}
+        titleSubtitle="Businesses that trust and recommend this place"
       />
 
       {isLoading ? (
         <View style={styles.center}>
           <ActivityIndicator />
         </View>
-      ) : recommendations.length < 1 ? (
-        <View style={styles.emptyWrap}>
-          <AppEmptyState
-            title="No recommendations yet"
-            description="Businesses that recommend this place will appear here."
-          />
-        </View>
       ) : (
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.scrollContent}
-        >
-          <View style={styles.card}>
-            {recommendations.map((recommendation, index) => (
-              <RecommendedByCard
-                key={recommendation.id}
-                recommendation={recommendation}
-                isBordered={index !== 0}
-                onPress={() =>
-                  router.push({
-                    pathname: "/business/[id]",
-                    params: { id: recommendation.businessId },
-                  })
-                }
+        <>
+          {recommendations.length < 1 ? (
+            <View style={styles.emptyWrap}>
+              <AppEmptyState
+                title="No recommendations yet"
+                description="Businesses that recommend this place will appear here."
               />
-            ))}
-          </View>
-        </ScrollView>
+            </View>
+          ) : (
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={styles.scrollContent}
+            >
+              <View style={styles.card}>
+                {recommendations.map((recommendation, index) => (
+                  <RecommendedByCard
+                    key={recommendation.id}
+                    recommendation={recommendation}
+                    isBordered={index !== 0}
+                    onPress={() =>
+                      router.push({
+                        pathname: "/business/[id]",
+                        params: { id: recommendation.businessId },
+                      })
+                    }
+                  />
+                ))}
+              </View>
+            </ScrollView>
+          )}
+        </>
       )}
     </AppScreen>
   );

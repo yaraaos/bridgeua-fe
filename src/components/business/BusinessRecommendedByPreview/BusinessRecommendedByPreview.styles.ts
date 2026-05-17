@@ -26,9 +26,17 @@ export function createStyles(colors: AppColors) {
       fontWeight: "700",
       color: colors.textPrimary,
     },
+    viewAllButton: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.xs,
+    },
     viewAllText: {
-      fontSize: 14,
+      fontSize: 13,
       fontWeight: "700",
+      color: colors.primaryGreen,
+    },
+    viewAllIcon: {
       color: colors.primaryGreen,
     },
     actions: {

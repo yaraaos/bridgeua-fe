@@ -5,7 +5,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { Pressable, Text, View } from "react-native";
 import { createStyles } from "./RecommendedByCard.styles";
 
-
 type Props = {
   recommendation: BusinessRecommendation;
   isBordered?: boolean;
@@ -43,9 +42,11 @@ export default function RecommendedByCard({
             : ""}
         </Text>
 
-        <Text style={styles.count}>
-          {recommendation.recommendationsCount ?? 0} recommendations made
-        </Text>
+        <View style={styles.recommendedRow}>
+          <Text style={styles.recommendedLabel} numberOfLines={1}>
+            Recommended this business
+          </Text>
+        </View>
       </View>
 
       <Ionicons name="chevron-forward" size={18} color={colors.textMuted} />

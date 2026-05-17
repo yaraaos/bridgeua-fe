@@ -27,11 +27,19 @@ export function createStyles(colors: AppColors) {
       fontSize: 13,
       color: colors.textSecondary,
     },
-    count: {
-      marginTop: spacing.xs,
-      fontSize: 13,
-      fontWeight: "600",
+    recommendedRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      alignSelf: "flex-start",
+      maxWidth: "100%",
+    },
+
+    recommendedLabel: {
+      flexShrink: 1,
+      fontSize: 12,
       color: colors.primaryGreen,
+      fontWeight: "600",
+      lineHeight: 16,
     },
   });
 }

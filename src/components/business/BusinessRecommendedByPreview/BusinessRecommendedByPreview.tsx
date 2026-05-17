@@ -1,5 +1,6 @@
 import type { BusinessRecommendation } from "@/src/features/businesses/types/business.types";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { Ionicons } from "@expo/vector-icons";
 import { Pressable, Text, View } from "react-native";
 import RecommendedByCard from "../RecommendedByCard";
 import { createStyles } from "./BusinessRecommendedByPreview.styles";
@@ -33,8 +34,13 @@ export default function BusinessRecommendedByPreview({
         <Text style={styles.title}>Recommended by</Text>
 
         {shouldShowViewAll ? (
-          <Pressable onPress={onPressViewAll} hitSlop={8}>
-            <Text style={styles.viewAllText}>View all &gt;</Text>
+          <Pressable style={styles.viewAllButton} onPress={onPressViewAll}>
+            <Text style={styles.viewAllText}>View all</Text>
+            <Ionicons
+              name="chevron-forward"
+              size={14}
+              style={styles.viewAllIcon}
+            />
           </Pressable>
         ) : null}
       </View>
