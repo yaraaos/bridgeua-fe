@@ -46,17 +46,21 @@ export default function PersonalProfileScreen() {
   );
 
   const [myReviews, setMyReviews] = useState<PersonalProfileReview[]>([]);
+  const [previewFollowedBusinesses, setPreviewFollowedBusinesses] = useState<
+    PersonalProfileFollowedBusiness[]
+  >([]);
 
   useFocusEffect(
     useCallback(() => {
       getMyReviews().then(setMyReviews);
-    }, []),
-  );
 
-  const followedBusinesses = useMemo(
-    () =>
-      businessesMock
-        .filter((business) => followedBusinessIds.includes(String(business.id)))
+      const currentFollowedBusinessIds =
+        useFollowingStore.getState().followedBusinessIds;
+
+      const mappedBusinesses = businessesMock
+        .filter((business) =>
+          currentFollowedBusinessIds.includes(String(business.id)),
+        )
         .map((business) => ({
           id: String(business.id),
           name: business.name,
@@ -64,8 +68,10 @@ export default function PersonalProfileScreen() {
           rating: business.rating,
           category: business.category,
           location: business.location,
-        })),
-    [followedBusinessIds],
+        }));
+
+      setPreviewFollowedBusinesses(mappedBusinesses);
+    }, []),
   );
 
   const profileStats = useMemo(
@@ -73,7 +79,7 @@ export default function PersonalProfileScreen() {
       {
         id: "following" as const,
         label: "Following",
-        value: followedBusinesses.length,
+        value: previewFollowedBusinesses.length,
       },
       {
         id: "reviews" as const,
@@ -81,7 +87,7 @@ export default function PersonalProfileScreen() {
         value: myReviews.length,
       },
     ],
-    [followedBusinesses.length, myReviews.length],
+    [previewFollowedBusinesses.length, myReviews.length],
   );
 
   return (
@@ -221,7 +227,7 @@ export default function PersonalProfileScreen() {
           </Pressable>
         </View>
 
-        {followedBusinesses.length === 0 ? (
+        {previewFollowedBusinesses.length === 0 ? (
           <View style={styles.emptyStateWrap}>
             <AppEmptyState
               title="No followed businesses yet"
@@ -234,7 +240,7 @@ export default function PersonalProfileScreen() {
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.followedList}
           >
-            {followedBusinesses.map((business) => (
+            {previewFollowedBusinesses.map((business) => (
               <FollowedBusinessCard key={business.id} business={business} />
             ))}
           </ScrollView>
