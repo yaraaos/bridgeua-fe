@@ -150,6 +150,13 @@ export default function HomeScreen() {
     }));
   };
 
+  const activeFilterCount =
+    (sort !== "relevance" ? 1 : 0) +
+    cuisines.length +
+    (rating ? 1 : 0) +
+    (distance ? 1 : 0) +
+    (distance === "custom" && customDistance ? 1 : 0);
+
   const header = (
     <ScreenHeader
       title="Discover"
@@ -165,6 +172,7 @@ export default function HomeScreen() {
       actions={["map", "filter"]}
       onPressMap={handleMapPress}
       onPressFilter={handleFilterPress}
+      activeFilterCount={activeFilterCount}
     />
   );
 
