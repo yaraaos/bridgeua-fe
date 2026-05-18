@@ -48,7 +48,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="following"
         options={{
-          title: "Following",
+          title: "Promos",
           tabBarIcon: ({ color, size }) => (
             <Feather name="heart" size={size} color={color} />
           ),

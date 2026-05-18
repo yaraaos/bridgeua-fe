@@ -131,8 +131,8 @@ export default function FollowingScreen() {
     return (
       <AppScreen withTopInset={false} style={styles.container}>
         <ScreenHeader
-          title="Following"
-          titleSubtitle="Businesses you follow"
+          title="News & Promos"
+          titleSubtitle="Updates from followed businesses"
           subtitleLabel="Location"
           subtitleValue={selectedLocationLabel}
           showSubtitleChevron
@@ -170,8 +170,8 @@ export default function FollowingScreen() {
   return (
     <AppScreen withTopInset={false} style={styles.container}>
       <ScreenHeader
-        title="Following"
-        titleSubtitle="Businesses you follow"
+        title="News & Promos"
+        titleSubtitle="Updates from followed businesses"
         subtitleLabel="Location"
         subtitleValue={selectedLocationLabel}
         showSubtitleChevron
