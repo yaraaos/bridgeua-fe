@@ -1,7 +1,7 @@
 import type {
-    DistanceOption,
-    RatingOption,
-    SortOption,
+  DistanceOption,
+  RatingOption,
+  SortOption,
 } from "@/src/store/filter.store";
 
 export type FilterOption<T extends string> = {
@@ -30,4 +30,14 @@ export const DISTANCE_OPTIONS: FilterOption<DistanceOption>[] = [
   { label: "5 km", value: "5" },
   { label: "10 km", value: "10" },
   { label: "25 km", value: "25" },
+];
+
+export const CUISINE_OPTIONS = [
+  { label: "American", value: "American" },
+  { label: "Chinese", value: "Chinese" },
+  { label: "Italian", value: "Italian" },
+  { label: "Japanese", value: "Japanese" },
+  { label: "Mediterranean", value: "Mediterranean" },
+  { label: "Mexican", value: "Mexican" },
+  { label: "Vegan", value: "Vegan" },
 ];

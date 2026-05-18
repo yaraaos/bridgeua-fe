@@ -22,5 +22,18 @@ export function createStyles(colors: AppColors) {
       color: colors.textSecondary,
       textAlign: "center",
     },
+    actionButton: {
+      marginTop: 18,
+      paddingHorizontal: 18,
+      paddingVertical: 10,
+      borderRadius: 999,
+      backgroundColor: colors.accentOrangeSoft,
+    },
+
+    actionText: {
+      fontSize: 14,
+      fontWeight: "700",
+      color: colors.accentOrange,
+    },
   });
 }

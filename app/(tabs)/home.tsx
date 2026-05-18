@@ -3,6 +3,7 @@ import ScreenHeader from "@/src/components/common/ScreenHeader/ScreenHeader";
 import CategoryScroller from "@/src/components/home/CategoryScroller/CategoryScroller";
 import HomePromotionBanner from "@/src/components/home/HomePromotionBanner";
 import HomePromotionModal from "@/src/components/home/HomePromotionModal/HomePromotionModal";
+import AppEmptyState from "@/src/components/ui/AppEmptyState";
 import AppLoader from "@/src/components/ui/AppLoader/AppLoader";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
 import { HOME_CATEGORIES } from "@/src/constants/categories";
@@ -150,6 +151,13 @@ export default function HomeScreen() {
     }));
   };
 
+  const activeFilterCount =
+    (sort !== "relevance" ? 1 : 0) +
+    cuisines.length +
+    (rating ? 1 : 0) +
+    (distance ? 1 : 0) +
+    (distance === "custom" && customDistance ? 1 : 0);
+
   const header = (
     <ScreenHeader
       title="Discover"
@@ -165,6 +173,7 @@ export default function HomeScreen() {
       actions={["map", "filter"]}
       onPressMap={handleMapPress}
       onPressFilter={handleFilterPress}
+      activeFilterCount={activeFilterCount}
     />
   );
 
@@ -217,18 +226,31 @@ export default function HomeScreen() {
           <View style={styles.stickyCategoryWrap}>{categoryBar}</View>
 
           <View style={styles.listContent}>
-            {filteredBusinesses.map((item) => (
-              <BusinessCard
-                key={String(item.id)}
-                business={item}
-                onPress={() =>
-                  router.push({
-                    pathname: "/business/[id]",
-                    params: { id: String(item.id) },
-                  })
-                }
-              />
-            ))}
+            {filteredBusinesses.length === 0 ? (
+              <View style={styles.emptyStateWrap}>
+                <AppEmptyState
+                  title="No businesses found"
+                  description="Try adjusting or clearing some filters to discover more places."
+                  actionLabel="Clear filters"
+                  onPressAction={() =>
+                    useFilterStore.getState().reset("discovery")
+                  }
+                />
+              </View>
+            ) : (
+              filteredBusinesses.map((item) => (
+                <BusinessCard
+                  key={String(item.id)}
+                  business={item}
+                  onPress={() =>
+                    router.push({
+                      pathname: "/business/[id]",
+                      params: { id: String(item.id) },
+                    })
+                  }
+                />
+              ))
+            )}
           </View>
         </Animated.ScrollView>
       </View>
@@ -271,5 +293,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 8,
     paddingBottom: 4,
+  },
+  emptyStateWrap: {
+    paddingTop: 48,
+    paddingBottom: 32,
   },
 });

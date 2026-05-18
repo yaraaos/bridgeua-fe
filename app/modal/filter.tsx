@@ -1,22 +1,24 @@
-//app/modal/filter.tsx
+// app/modal/filter.tsx
 
-import type {
-    DistanceOption,
-    RatingOption,
-    SortOption,
-} from "@/src/store/filter.store";
+import ActiveFiltersSummary from "@/src/components/filters/ActiveFiltersSummary";
+import { AppColors } from "@/src/constants/colors";
+import { CUISINE_OPTIONS, SORT_OPTIONS } from "@/src/constants/filters";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { useFilterStore } from "@/src/store/filter.store";
 import { Feather } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
-    Animated,
-    Dimensions,
-    Easing,
-    Pressable,
-    StyleSheet,
-    Text,
-    TouchableWithoutFeedback,
-    View,
+  Animated,
+  Dimensions,
+  Easing,
+  PanResponder,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableWithoutFeedback,
+  View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import DistanceSelector from "../../src/components/filters/DistanceSelector/DistanceSelector";
@@ -24,66 +26,37 @@ import FilterOptionList from "../../src/components/filters/FilterOptionList/Filt
 import FilterSidebar from "../../src/components/filters/FilterSidebar/FilterSidebar";
 import RatingSelector from "../../src/components/filters/RatingSelector/RatingSelector";
 import AppButton from "../../src/components/ui/AppButton/AppButton";
-import { AppColors } from "@/src/constants/colors";
-import { useAppTheme } from "@/src/hooks/useAppTheme";
-import { useFilterStore } from "@/src/store/filter.store";
 
 type FilterTab = "sort" | "cuisines" | "ratings" | "distance";
 
-export const SORT_OPTIONS: { label: string; value: SortOption }[] = [
-  { label: "Relevance (Default)", value: "relevance" },
-  { label: "Distance", value: "distance" },
-  { label: "Rating", value: "rating" },
-  { label: "Cost: Low to High", value: "price_low" },
-  { label: "Cost: High to Low", value: "price_high" },
-];
-
-export const RATING_OPTIONS: { label: string; value: RatingOption }[] = [
-  { label: "Any rating", value: "" },
-  { label: "4+ stars", value: "4" },
-  { label: "3+ stars", value: "3" },
-  { label: "2+ stars", value: "2" },
-  { label: "1+ stars", value: "1" },
-];
-
-export const DISTANCE_OPTIONS: { label: string; value: DistanceOption }[] = [
-  { label: "Any distance", value: "" },
-  { label: "1 km", value: "1" },
-  { label: "5 km", value: "5" },
-  { label: "10 km", value: "10" },
-  { label: "25 km", value: "25" },
-  { label: "Custom", value: "custom" },
-];
-
-const CUISINE_OPTIONS = [
-  "American",
-  "Chinese",
-  "Italian",
-  "Japanese",
-  "Mediterranean",
-  "Mexican",
-  "Vegan",
-];
+const SCREEN_HEIGHT = Dimensions.get("window").height;
+const HALF_HEIGHT = SCREEN_HEIGHT * 0.72;
+const FULL_HEIGHT = SCREEN_HEIGHT * 0.92;
+const EXPAND_THRESHOLD = 30;
+const COLLAPSE_THRESHOLD = 40;
 
 export default function FilterModalScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
-
   const insets = useSafeAreaInsets();
-  const SCREEN_HEIGHT = Dimensions.get("window").height;
+
   const [activeTab, setActiveTab] = useState<FilterTab>("sort");
   const [isClosing, setIsClosing] = useState(false);
+
+  // useNativeDriver: true — transform only
   const backdropOpacity = useRef(new Animated.Value(0)).current;
   const sheetTranslateY = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
-  const params = useLocalSearchParams<{ scope?: string }>();
 
+  // useNativeDriver: false — height (JS thread only)
+  const sheetHeight = useRef(new Animated.Value(HALF_HEIGHT)).current;
+
+  const params = useLocalSearchParams<{ scope?: string }>();
   const scope = params.scope === "following" ? "following" : "discovery";
+
   const filters = useFilterStore((state) =>
     scope === "following" ? state.followingFilters : state.discoveryFilters,
   );
-
   const { sort, cuisines, rating, distance, customDistance } = filters;
-
   const {
     setSort,
     toggleCuisine,
@@ -93,8 +66,8 @@ export default function FilterModalScreen() {
     reset,
   } = useFilterStore();
 
+  // ─── Open animation ───────────────────────────────────────────────────
   useEffect(() => {
-    //opening modal animation
     Animated.parallel([
       Animated.timing(backdropOpacity, {
         toValue: 1,
@@ -111,10 +84,10 @@ export default function FilterModalScreen() {
     ]).start();
   }, [backdropOpacity, sheetTranslateY]);
 
+  // ─── Close ───────────────────────────────────────────────────
   const handleClose = () => {
     if (isClosing) return;
     setIsClosing(true);
-
     Animated.parallel([
       Animated.timing(backdropOpacity, {
         toValue: 0,
@@ -129,12 +102,57 @@ export default function FilterModalScreen() {
         useNativeDriver: true,
       }),
     ]).start(({ finished }) => {
-      if (finished) {
-        router.back();
-      }
+      if (finished) router.back();
     });
   };
 
+  // ─── Expand / Collapse ───────────────────────────────────────────────────
+  const isExpandedRef = useRef(false);
+
+  const expandSheet = () => {
+    isExpandedRef.current = true;
+    Animated.spring(sheetHeight, {
+      toValue: FULL_HEIGHT,
+      useNativeDriver: false,
+      bounciness: 4,
+      speed: 14,
+    }).start();
+  };
+
+  const collapseSheet = () => {
+    isExpandedRef.current = false;
+    Animated.spring(sheetHeight, {
+      toValue: HALF_HEIGHT,
+      useNativeDriver: false,
+      bounciness: 4,
+      speed: 14,
+    }).start();
+  };
+
+  // ─── PanResponder (handle + header only) ─────────────────────────────────
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: (_, { dy }) => Math.abs(dy) > 5,
+      onPanResponderRelease: (_, { dy }) => {
+        if (dy < -EXPAND_THRESHOLD && !isExpandedRef.current) {
+          expandSheet();
+          return;
+        }
+
+        if (dy > COLLAPSE_THRESHOLD && isExpandedRef.current) {
+          collapseSheet();
+          return;
+        }
+
+        if (dy > COLLAPSE_THRESHOLD && !isExpandedRef.current) {
+          handleClose();
+        }
+      },
+    }),
+  ).current;
+
+  // ─── Sidebar items ───────────────────────────────────────────────────
   const sidebarItems = useMemo(
     () => [
       { key: "sort" as FilterTab, label: "Sort" },
@@ -145,6 +163,7 @@ export default function FilterModalScreen() {
     [],
   );
 
+  // ─── Right panel ───────────────────────────────────────────────────
   const renderRightPanel = () => {
     if (activeTab === "sort") {
       return (
@@ -157,19 +176,17 @@ export default function FilterModalScreen() {
         />
       );
     }
-
     if (activeTab === "cuisines") {
       return (
         <FilterOptionList
           title="FILTER BY CUISINE"
           type="checkbox"
-          options={CUISINE_OPTIONS}
+          options={CUISINE_OPTIONS.map((option) => option.value)}
           selectedValues={cuisines}
           onToggle={(value) => toggleCuisine(scope, value)}
         />
       );
     }
-
     if (activeTab === "ratings") {
       return (
         <RatingSelector
@@ -178,7 +195,6 @@ export default function FilterModalScreen() {
         />
       );
     }
-
     return (
       <DistanceSelector
         value={distance}
@@ -189,67 +205,87 @@ export default function FilterModalScreen() {
     );
   };
 
+  const FOOTER_HEIGHT = 70 + insets.bottom;
+
   return (
     <View style={styles.root}>
+      {/* Backdrop — native driver ✓ */}
       <TouchableWithoutFeedback onPress={handleClose}>
         <Animated.View
-          style={[
-            styles.backdrop,
-            {
-              opacity: backdropOpacity,
-            },
-          ]}
+          style={[styles.backdrop, { opacity: backdropOpacity }]}
         />
       </TouchableWithoutFeedback>
 
+      {/* Outer: translateY only — native driver ✓ */}
       <Animated.View
         style={[
-          styles.sheet,
-          {
-            transform: [{ translateY: sheetTranslateY }],
-          },
+          styles.sheetContainer,
+          { transform: [{ translateY: sheetTranslateY }] },
         ]}
       >
-        <View style={styles.handle} />
-
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>Filter</Text>
-
-          <Pressable onPress={handleClose} style={styles.closeButton}>
-            <Feather name="x" size={18} color={colors.textMuted} />
-          </Pressable>
-        </View>
-
-        <View style={styles.content}>
-          <FilterSidebar
-            items={sidebarItems}
-            activeKey={activeTab}
-            onChange={(key) => setActiveTab(key)}
-          />
-
-          <View style={styles.rightPanel}>{renderRightPanel()}</View>
-        </View>
-
-        <View
-          style={[
-            styles.footer,
-            {
-              paddingBottom: 14 + insets.bottom,
-            },
-          ]}
-        >
-          <Pressable onPress={() => reset(scope)}>
-            <Text style={styles.clearText}>Clear Filters</Text>
-          </Pressable>
-
-          <View style={styles.applyWrap}>
-            <AppButton
-              title="Apply"
-              variant="secondary"
-              onPress={handleClose}
-            />
+        {/* Inner: height only — JS driver ✓ */}
+        <Animated.View style={[styles.sheet, { height: sheetHeight }]}>
+          {/* Drag target: handle + header */}
+          <View {...panResponder.panHandlers}>
+            <View style={styles.handleWrap}>
+              <View style={styles.handle} />
+            </View>
+            <View style={styles.header}>
+              <Text style={styles.headerTitle}>Filter</Text>
+              <Pressable onPress={handleClose} style={styles.closeButton}>
+                <Feather name="x" size={18} color={colors.textMuted} />
+              </Pressable>
+            </View>
           </View>
-        </View>
+
+          {/* Scrollable content — padded so it never hides behind footer */}
+          <View style={[styles.content, { paddingBottom: FOOTER_HEIGHT }]}>
+            <FilterSidebar
+              items={sidebarItems}
+              activeKey={activeTab}
+              onChange={(key) => setActiveTab(key)}
+            />
+            <View style={styles.rightPanel}>
+              <ScrollView
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={styles.rightPanelScrollContent}
+              >
+                {renderRightPanel()}
+              </ScrollView>
+            </View>
+          </View>
+
+          <View style={[styles.footer, { paddingBottom: 14 + insets.bottom }]}>
+            <ActiveFiltersSummary
+              sort={sort}
+              cuisines={cuisines}
+              rating={rating}
+              distance={distance}
+              customDistance={customDistance}
+              onClearSort={() => setSort(scope, "relevance")}
+              onRemoveCuisine={(value) => toggleCuisine(scope, value)}
+              onClearRating={() => setRating(scope, "")}
+              onClearDistance={() => {
+                setDistance(scope, "");
+                setCustomDistance(scope, "");
+              }}
+            />
+            <View style={styles.footerDivider} />
+            <View style={styles.footerActions}>
+              <Pressable onPress={() => reset(scope)}>
+                <Text style={styles.clearText}>Clear Filters</Text>
+              </Pressable>
+
+              <View style={styles.applyWrap}>
+                <AppButton
+                  title="Apply"
+                  variant="secondary"
+                  onPress={handleClose}
+                />
+              </View>
+            </View>
+          </View>
+        </Animated.View>
       </Animated.View>
     </View>
   );
@@ -259,31 +295,39 @@ function createStyles(colors: AppColors) {
   return StyleSheet.create({
     root: {
       flex: 1,
-      justifyContent: "flex-end",
       backgroundColor: "transparent",
     },
     backdrop: {
       ...StyleSheet.absoluteFillObject,
       backgroundColor: "rgba(0, 0, 0, 0.68)",
     },
+    // Outer wrapper — sits at the bottom, only moves on Y axis
+    sheetContainer: {
+      position: "absolute",
+      bottom: 0,
+      left: 0,
+      right: 0,
+    },
+    // Inner wrapper — changes height for snap points
     sheet: {
-      height: "72%",
       backgroundColor: colors.surface,
       borderTopLeftRadius: 28,
       borderTopRightRadius: 28,
       overflow: "hidden",
     },
+    handleWrap: {
+      alignItems: "center",
+      paddingTop: 10,
+      paddingBottom: 6,
+    },
     handle: {
-      alignSelf: "center",
       width: 46,
       height: 5,
       borderRadius: 999,
       backgroundColor: colors.border,
-      marginTop: 10,
-      marginBottom: 6,
     },
     header: {
-      minHeight: 64,
+      minHeight: 52,
       paddingHorizontal: 24,
       paddingBottom: 12,
       flexDirection: "row",
@@ -311,19 +355,33 @@ function createStyles(colors: AppColors) {
     },
     rightPanel: {
       flex: 1,
+    },
+    rightPanelScrollContent: {
       paddingHorizontal: 16,
       paddingTop: 16,
+      paddingBottom: 16,
     },
     footer: {
+      position: "absolute",
+      bottom: 0,
+      left: 0,
+      right: 0,
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
+      backgroundColor: colors.surface,
+    },
+    footerActions: {
       minHeight: 70,
       paddingHorizontal: 24,
       paddingTop: 14,
-      borderTopWidth: 1,
-      borderTopColor: colors.border,
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "space-between",
       gap: 16,
+    },
+    footerDivider: {
+      height: 2,
+      backgroundColor: colors.border,
     },
     clearText: {
       fontSize: 15,
