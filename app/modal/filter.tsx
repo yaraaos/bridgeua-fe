@@ -1,22 +1,21 @@
 //app/modal/filter.tsx
 
-import type {
-    DistanceOption,
-    RatingOption,
-    SortOption,
-} from "@/src/store/filter.store";
+import { AppColors } from "@/src/constants/colors";
+import { SORT_OPTIONS } from "@/src/constants/filters";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { useFilterStore } from "@/src/store/filter.store";
 import { Feather } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
-    Animated,
-    Dimensions,
-    Easing,
-    Pressable,
-    StyleSheet,
-    Text,
-    TouchableWithoutFeedback,
-    View,
+  Animated,
+  Dimensions,
+  Easing,
+  Pressable,
+  StyleSheet,
+  Text,
+  TouchableWithoutFeedback,
+  View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import DistanceSelector from "../../src/components/filters/DistanceSelector/DistanceSelector";
@@ -24,36 +23,8 @@ import FilterOptionList from "../../src/components/filters/FilterOptionList/Filt
 import FilterSidebar from "../../src/components/filters/FilterSidebar/FilterSidebar";
 import RatingSelector from "../../src/components/filters/RatingSelector/RatingSelector";
 import AppButton from "../../src/components/ui/AppButton/AppButton";
-import { AppColors } from "@/src/constants/colors";
-import { useAppTheme } from "@/src/hooks/useAppTheme";
-import { useFilterStore } from "@/src/store/filter.store";
 
 type FilterTab = "sort" | "cuisines" | "ratings" | "distance";
-
-export const SORT_OPTIONS: { label: string; value: SortOption }[] = [
-  { label: "Relevance (Default)", value: "relevance" },
-  { label: "Distance", value: "distance" },
-  { label: "Rating", value: "rating" },
-  { label: "Cost: Low to High", value: "price_low" },
-  { label: "Cost: High to Low", value: "price_high" },
-];
-
-export const RATING_OPTIONS: { label: string; value: RatingOption }[] = [
-  { label: "Any rating", value: "" },
-  { label: "4+ stars", value: "4" },
-  { label: "3+ stars", value: "3" },
-  { label: "2+ stars", value: "2" },
-  { label: "1+ stars", value: "1" },
-];
-
-export const DISTANCE_OPTIONS: { label: string; value: DistanceOption }[] = [
-  { label: "Any distance", value: "" },
-  { label: "1 km", value: "1" },
-  { label: "5 km", value: "5" },
-  { label: "10 km", value: "10" },
-  { label: "25 km", value: "25" },
-  { label: "Custom", value: "custom" },
-];
 
 const CUISINE_OPTIONS = [
   "American",
