@@ -3,7 +3,16 @@ import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { Business } from "@/src/types/business";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import React from "react";
-import { Alert, Image, Linking, Platform, Pressable, Text, View } from "react-native";
+import {
+  Alert,
+  Image,
+  Linking,
+  Platform,
+  Pressable,
+  Share,
+  Text,
+  View,
+} from "react-native";
 import { createStyles } from "./MapBusinessCallout.styles";
 
 type Props = {
@@ -21,24 +30,33 @@ export default function MapBusinessCallout({
   const styles = createStyles(colors);
 
   const { latitude, longitude } = business.coordinates;
+  const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`;
 
   const handleGetDirections = async () => {
-    const httpsUrl = `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`;
-
     const nativeUrl = Platform.select({
       ios: `maps://?daddr=${latitude},${longitude}&dirflg=d`,
       android: `google.navigation:q=${latitude},${longitude}`,
-      default: httpsUrl,
+      default: directionsUrl,
     }) as string;
 
     try {
       const supported = await Linking.canOpenURL(nativeUrl);
-      await Linking.openURL(supported ? nativeUrl : httpsUrl);
+      await Linking.openURL(supported ? nativeUrl : directionsUrl);
     } catch {
       Alert.alert(
         "Unable to open maps",
         "Could not launch your default maps app.",
       );
+    }
+  };
+
+  const handleShare = async () => {
+    try {
+      await Share.share({
+        message: `Check out ${business.name} on BridgeUA\n${directionsUrl}`,
+      });
+    } catch (error) {
+      console.error("Share failed", error);
     }
   };
 
@@ -98,6 +116,15 @@ export default function MapBusinessCallout({
           <Feather name="navigation" size={16} color={colors.white} />
 
           <Text style={styles.directionsLabel}>Get directions</Text>
+        </Pressable>
+
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Share"
+          style={styles.shareButton}
+          onPress={handleShare}
+        >
+          <Feather name="share-2" size={18} color={colors.white} />
         </Pressable>
 
         <FollowButton

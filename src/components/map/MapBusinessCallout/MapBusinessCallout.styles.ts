@@ -108,5 +108,13 @@ export function createStyles(colors: AppColors) {
       fontSize: 14,
       fontWeight: "700",
     },
+    shareButton: {
+      width: 36,
+      height: 36,
+      borderRadius: 10,
+      backgroundColor: colors.primaryGreen,
+      alignItems: "center",
+      justifyContent: "center",
+    },
   });
 }

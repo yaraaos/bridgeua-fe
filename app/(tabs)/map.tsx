@@ -19,9 +19,9 @@ import { useFilterStore } from "@/src/store/filter.store";
 import { useFollowingStore } from "@/src/store/following.store";
 import { Business } from "@/src/types/business";
 import { router } from "expo-router";
-import React, { useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Alert, StyleSheet, View } from "react-native";
-import MapView, { Marker, Region } from "react-native-maps";
+import MapView, { Marker, MapMarkerProps, Region } from "react-native-maps";
 
 const DEFAULT_REGION: Region = {
   latitude: 34.0549,
@@ -31,6 +31,43 @@ const DEFAULT_REGION: Region = {
 };
 
 const FOCUSED_DELTA = 0.05;
+
+type BusinessMarkerProps = {
+  business: Business;
+  isFollowed: boolean;
+  onPress: NonNullable<MapMarkerProps["onPress"]>;
+};
+
+function BusinessMarker({ business, isFollowed, onPress }: BusinessMarkerProps) {
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [followChangePending, setFollowChangePending] = useState(false);
+  const isFirstFollowEffect = useRef(true);
+
+  useEffect(() => {
+    if (isFirstFollowEffect.current) {
+      isFirstFollowEffect.current = false;
+      return;
+    }
+    setFollowChangePending(true);
+    const timer = setTimeout(() => setFollowChangePending(false), 120);
+    return () => clearTimeout(timer);
+  }, [isFollowed]);
+
+  return (
+    <Marker
+      coordinate={business.coordinates}
+      onPress={onPress}
+      anchor={{ x: 0.5, y: MAP_MARKER_ANCHOR_Y }}
+      tracksViewChanges={!imageLoaded || followChangePending}
+    >
+      <MapMarkerPin
+        imageUrl={business.image}
+        isFollowed={isFollowed}
+        onImageLoad={() => setImageLoaded(true)}
+      />
+    </Marker>
+  );
+}
 
 export default function MapScreen() {
   const mapRef = useRef<MapView | null>(null);
@@ -88,19 +125,6 @@ export default function MapScreen() {
   const [selectedBusinessId, setSelectedBusinessId] = useState<string | null>(
     null,
   );
-
-  const [loadedMarkerIds, setLoadedMarkerIds] = useState<Set<string>>(
-    () => new Set(),
-  );
-
-  const handleMarkerImageLoad = (markerKey: string) => {
-    setLoadedMarkerIds((prev) => {
-      if (prev.has(markerKey)) return prev;
-      const next = new Set(prev);
-      next.add(markerKey);
-      return next;
-    });
-  };
 
   const selectedBusiness: Business | undefined = useMemo(
     () => filteredBusinesses.find((business) => business.id === selectedBusinessId),
@@ -210,14 +234,6 @@ export default function MapScreen() {
     <AppScreen withTopInset={false} style={styles.container}>
       {header}
 
-      <View style={styles.categoryWrap}>
-        <CategoryScroller
-          categories={HOME_CATEGORIES}
-          selectedCategory={selectedCategory}
-          onSelectCategory={handleSelectCategory}
-        />
-      </View>
-
       <View style={styles.mapWrap}>
         {isLoading ? (
           <View style={styles.loaderWrap}>
@@ -236,30 +252,30 @@ export default function MapScreen() {
               const isFollowed = followedBusinessIds.includes(
                 String(business.id),
               );
-              const markerKey = `${business.id}-${isFollowed ? "followed" : "unfollowed"}`;
-              const isLoaded = loadedMarkerIds.has(markerKey);
 
               return (
-                <Marker
-                  key={markerKey}
-                  coordinate={business.coordinates}
+                <BusinessMarker
+                  key={business.id}
+                  business={business}
+                  isFollowed={isFollowed}
                   onPress={(event) => {
                     event.stopPropagation();
                     handleMarkerPress(business);
                   }}
-                  anchor={{ x: 0.5, y: MAP_MARKER_ANCHOR_Y }}
-                  tracksViewChanges={!isLoaded}
-                >
-                  <MapMarkerPin
-                    imageUrl={business.image}
-                    isFollowed={isFollowed}
-                    onImageLoad={() => handleMarkerImageLoad(markerKey)}
-                  />
-                </Marker>
+                />
               );
             })}
           </MapView>
         )}
+
+        <View style={styles.categoryWrap} pointerEvents="box-none">
+          <CategoryScroller
+            categories={HOME_CATEGORIES}
+            selectedCategory={selectedCategory}
+            onSelectCategory={handleSelectCategory}
+            overlay
+          />
+        </View>
 
         {selectedBusiness ? (
           <View
@@ -283,7 +299,11 @@ const styles = StyleSheet.create({
     padding: 0,
   },
   categoryWrap: {
-    backgroundColor: "#F7F7F5",
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: "transparent",
   },
   mapWrap: {
     flex: 1,
