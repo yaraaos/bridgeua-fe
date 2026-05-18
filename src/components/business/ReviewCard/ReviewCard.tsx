@@ -195,7 +195,11 @@ export default function ReviewCard({
                 <AppAvatar
                   name={businessReview.authorUsername}
                   username={businessReview.authorUsername}
-                  imageUrl={businessReview.authorAvatar}
+                  imageUrl={
+                    isOwnReview
+                      ? profile.avatarUrl
+                      : businessReview.authorAvatar
+                  }
                   size={isPreview ? "sm" : "md"}
                 />
               </Pressable>
