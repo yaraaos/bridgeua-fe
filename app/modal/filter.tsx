@@ -1,7 +1,8 @@
 // app/modal/filter.tsx
 
+import ActiveFiltersSummary from "@/src/components/filters/ActiveFiltersSummary";
 import { AppColors } from "@/src/constants/colors";
-import { SORT_OPTIONS } from "@/src/constants/filters";
+import { CUISINE_OPTIONS, SORT_OPTIONS } from "@/src/constants/filters";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { useFilterStore } from "@/src/store/filter.store";
 import { Feather } from "@expo/vector-icons";
@@ -27,16 +28,6 @@ import RatingSelector from "../../src/components/filters/RatingSelector/RatingSe
 import AppButton from "../../src/components/ui/AppButton/AppButton";
 
 type FilterTab = "sort" | "cuisines" | "ratings" | "distance";
-
-const CUISINE_OPTIONS = [
-  "American",
-  "Chinese",
-  "Italian",
-  "Japanese",
-  "Mediterranean",
-  "Mexican",
-  "Vegan",
-];
 
 const SCREEN_HEIGHT = Dimensions.get("window").height;
 const HALF_HEIGHT = SCREEN_HEIGHT * 0.72;
@@ -182,7 +173,7 @@ export default function FilterModalScreen() {
         <FilterOptionList
           title="FILTER BY CUISINE"
           type="checkbox"
-          options={CUISINE_OPTIONS}
+          options={CUISINE_OPTIONS.map((option) => option.value)}
           selectedValues={cuisines}
           onToggle={(value) => toggleCuisine(scope, value)}
         />
@@ -256,22 +247,34 @@ export default function FilterModalScreen() {
             </View>
           </View>
 
-          {/* Footer — absolutely pinned, never moves */}
-          <View
-            style={[
-              styles.footer,
-              { paddingBottom: 14 + insets.bottom, height: FOOTER_HEIGHT },
-            ]}
-          >
-            <Pressable onPress={() => reset(scope)}>
-              <Text style={styles.clearText}>Clear Filters</Text>
-            </Pressable>
-            <View style={styles.applyWrap}>
-              <AppButton
-                title="Apply"
-                variant="secondary"
-                onPress={handleClose}
-              />
+          <View style={[styles.footer, { paddingBottom: 14 + insets.bottom }]}>
+            <ActiveFiltersSummary
+              sort={sort}
+              cuisines={cuisines}
+              rating={rating}
+              distance={distance}
+              customDistance={customDistance}
+              onClearSort={() => setSort(scope, "relevance")}
+              onRemoveCuisine={(value) => toggleCuisine(scope, value)}
+              onClearRating={() => setRating(scope, "")}
+              onClearDistance={() => {
+                setDistance(scope, "");
+                setCustomDistance(scope, "");
+              }}
+            />
+            <View style={styles.footerDivider} />
+            <View style={styles.footerActions}>
+              <Pressable onPress={() => reset(scope)}>
+                <Text style={styles.clearText}>Clear Filters</Text>
+              </Pressable>
+
+              <View style={styles.applyWrap}>
+                <AppButton
+                  title="Apply"
+                  variant="secondary"
+                  onPress={handleClose}
+                />
+              </View>
             </View>
           </View>
         </Animated.View>
@@ -355,15 +358,22 @@ function createStyles(colors: AppColors) {
       bottom: 0,
       left: 0,
       right: 0,
-      paddingHorizontal: 24,
-      paddingTop: 14,
       borderTopWidth: 1,
       borderTopColor: colors.border,
       backgroundColor: colors.surface,
+    },
+    footerActions: {
+      minHeight: 70,
+      paddingHorizontal: 24,
+      paddingTop: 14,
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "space-between",
       gap: 16,
+    },
+    footerDivider: {
+      height: 2,
+      backgroundColor: colors.border,
     },
     clearText: {
       fontSize: 15,
