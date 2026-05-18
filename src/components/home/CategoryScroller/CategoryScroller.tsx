@@ -7,22 +7,27 @@ type Props = {
   categories: string[];
   selectedCategory: string;
   onSelectCategory: (category: string) => void;
+  overlay?: boolean;
 };
 
 export default function CategoryScroller({
   categories,
   selectedCategory,
   onSelectCategory,
+  overlay = false,
 }: Props) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
 
   return (
-    <View style={styles.wrapper}>
+    <View style={[styles.wrapper, overlay && styles.wrapperOverlay]}>
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.content}
+        contentContainerStyle={[
+          styles.content,
+          overlay && styles.contentOverlay,
+        ]}
       >
         {categories.map((category) => {
           const isActive = category === selectedCategory;

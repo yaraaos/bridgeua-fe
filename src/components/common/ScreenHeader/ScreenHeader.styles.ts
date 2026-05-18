@@ -5,6 +5,12 @@ import { StyleSheet } from "react-native";
 
 export function createStyles(colors: AppColors) {
   return StyleSheet.create({
+    backButton: {
+      flex: 1,
+      alignSelf: "flex-start",
+      marginLeft: -4,
+      paddingTop: 4,
+    },
     topRow: {
       flexDirection: "row",
       alignItems: "flex-start",
@@ -14,7 +20,7 @@ export function createStyles(colors: AppColors) {
     },
     leftBlock: {
       flex: 1,
-      paddingTop: 18,
+      paddingTop: 8,
       gap: 6,
     },
     subtitleLabel: {
@@ -51,6 +57,13 @@ export function createStyles(colors: AppColors) {
       alignItems: "center",
       gap: 6,
     },
+    bottomSlotRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6,
+      marginTop: 15,
+      backgroundColor: "transparent",
+    },
     searchInputWrap: {
       flex: 1,
     },
@@ -61,6 +74,64 @@ export function createStyles(colors: AppColors) {
       backgroundColor: colors.accentOrange,
       alignItems: "center",
       justifyContent: "center",
+    },
+
+    profileHeaderTitle: {
+      fontSize: 34,
+      lineHeight: 38,
+      fontWeight: "800",
+      color: colors.textPrimary,
+    },
+    profileHeaderInner: {
+      height: 154,
+      justifyContent: "center",
+    },
+
+    profileHeaderRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      gap: spacing.md,
+    },
+
+    profileHeaderContent: {
+      flex: 1,
+    },
+
+    profileContent: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.md,
+    },
+    filterIconWrap: {
+      width: 20,
+      height: 20,
+      alignItems: "center",
+      justifyContent: "center",
+      overflow: "visible",
+    },
+
+    filterBadge: {
+      position: "absolute",
+      top: -11,
+      right: -13,
+      minWidth: 16,
+      height: 16,
+      borderRadius: 8,
+      paddingHorizontal: 4,
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: colors.accentOrange,
+      borderWidth: 1,
+      borderColor: colors.white,
+      zIndex: 10,
+    },
+
+    filterBadgeText: {
+      color: colors.white,
+      fontSize: 11,
+      fontWeight: "700",
+      lineHeight: 13,
     },
 
     businessContent: {

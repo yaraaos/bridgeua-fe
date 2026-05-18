@@ -1,8 +1,16 @@
 import { LocationOption } from "@/src/constants/locations";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { Feather, Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 import React, { useState } from "react";
-import { Image, Pressable, Text, View } from "react-native";
+import {
+  Image,
+  Pressable,
+  StyleProp,
+  Text,
+  View,
+  ViewStyle,
+} from "react-native";
 import AppInput from "../../ui/AppInput/AppInput";
 import RatingStars from "../../ui/AppRatingStars";
 import GradientHeader from "../../ui/GradientHeader/GradientHeader";
@@ -12,10 +20,12 @@ import { createStyles } from "./ScreenHeader.styles";
 type ActionType = "map" | "filter";
 
 type Props = {
-  variant?: "default" | "business";
+  variant?: "default" | "business" | "profile";
 
   title: string;
   titleSubtitle?: string;
+
+  onBack?: () => void;
 
   subtitleLabel?: string;
   subtitleValue?: string;
@@ -27,6 +37,8 @@ type Props = {
   searchValue?: string;
   onSearchChangeText?: (text: string) => void;
 
+  activeFilterCount?: number;
+
   actions?: ActionType[];
   onPressMap?: () => void;
   onPressFilter?: () => void;
@@ -37,6 +49,8 @@ type Props = {
   onSelectLocationOption?: (option: LocationOption) => void;
   onRequestNearby?: () => void;
 
+  headerInnerStyle?: StyleProp<ViewStyle>;
+
   imageUrl?: string;
   rating?: number;
   reviewCount?: number;
@@ -45,13 +59,19 @@ type Props = {
   isOpen?: boolean;
   closesAt?: string;
   rightSlot?: React.ReactNode;
+  leftSlot?: React.ReactNode;
   onPressShare?: () => void;
+  onPressBack?: () => void;
+
+  profileContent?: React.ReactNode;
+  bottomSlot?: React.ReactNode;
 };
 
 export default function ScreenHeader({
   variant = "default",
   title,
   titleSubtitle,
+  onBack,
   subtitleLabel,
   subtitleValue,
   onSubtitlePress,
@@ -61,12 +81,14 @@ export default function ScreenHeader({
   searchValue,
   onSearchChangeText,
   actions = [],
+  activeFilterCount = 0,
   onPressMap,
   onPressFilter,
   gradientColors,
   locationOptions,
   onSelectLocationOption,
   onRequestNearby,
+  headerInnerStyle,
   imageUrl,
   rating,
   reviewCount,
@@ -75,7 +97,11 @@ export default function ScreenHeader({
   isOpen,
   closesAt,
   rightSlot,
+  leftSlot,
   onPressShare,
+  onPressBack,
+  profileContent,
+  bottomSlot,
 }: Props) {
   const { colors, isDark } = useAppTheme();
   const styles = createStyles(colors);
@@ -96,7 +122,17 @@ export default function ScreenHeader({
       return <Feather name="map" size={16} color={colors.white} />;
     }
 
-    return <Ionicons name="options-outline" size={16} color={colors.white} />;
+    return (
+      <View style={styles.filterIconWrap}>
+        <Ionicons name="options-outline" size={16} color={colors.white} />
+
+        {activeFilterCount > 0 ? (
+          <View style={styles.filterBadge}>
+            <Text style={styles.filterBadgeText}>{activeFilterCount}</Text>
+          </View>
+        ) : null}
+      </View>
+    );
   };
 
   const handleActionPress = (action: ActionType) => {
@@ -215,10 +251,23 @@ export default function ScreenHeader({
     );
   }
 
+  if (variant === "profile") {
+    return (
+      <GradientHeader
+        colors={headerGradientColors}
+        innerStyle={styles.profileHeaderInner}
+      >
+        <View style={styles.profileHeaderContent}>{profileContent}</View>
+      </GradientHeader>
+    );
+  }
+
   return (
-    <GradientHeader colors={headerGradientColors}>
+    <GradientHeader colors={headerGradientColors} innerStyle={headerInnerStyle}>
       <View style={styles.topRow}>
-        {showLocationSelector ? (
+        {leftSlot ? (
+          <View style={styles.leftBlock}>{leftSlot}</View>
+        ) : showLocationSelector ? (
           <View style={styles.leftBlock}>
             <LocationSelector
               subtitleLabel={subtitleLabel}
@@ -267,6 +316,20 @@ export default function ScreenHeader({
               )}
             </View>
           )
+        ) : onBack ? (
+          <Pressable
+            style={styles.backButton}
+            onPress={onPressBack ?? (() => router.back())}
+            hitSlop={12}
+            accessibilityRole="button"
+            accessibilityLabel="Go back"
+          >
+            <Ionicons
+              name="chevron-back"
+              size={28}
+              color={colors.textPrimary}
+            />
+          </Pressable>
         ) : (
           <View style={styles.leftBlock} />
         )}
@@ -277,10 +340,15 @@ export default function ScreenHeader({
           {!!titleSubtitle && (
             <Text style={styles.titleSubtitle}>{titleSubtitle}</Text>
           )}
+          {rightSlot ? <View>{rightSlot}</View> : null}
         </View>
       </View>
 
-      {showSearch && (
+      {bottomSlot ? (
+        <View style={styles.bottomSlotRow}>{bottomSlot}</View>
+      ) : null}
+
+      {!bottomSlot && showSearch && (
         <View style={styles.searchRow}>
           <View style={styles.searchInputWrap}>
             <AppInput

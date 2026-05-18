@@ -1,12 +1,13 @@
 import { businessDetailsMock } from "@/src/mocks/business-details.mock";
+import { useProfileStore } from "@/src/store/profile.store";
+import { useReviewsStore } from "@/src/store/reviews.store";
+import { PersonalProfileReview } from "@/src/types/profile";
 import type {
   GetReviewsParams,
   GetReviewsResponse,
   Review,
   SubmitReviewPayload,
 } from "../types/review.types";
-
-let submittedReviewsMock: Review[] = [];
 
 const EMPTY_BREAKDOWN = ([5, 4, 3, 2, 1] as const).map((rating) => ({
   rating,
@@ -41,9 +42,9 @@ export const getReviews = async ({
   }));
 
   let reviews: Review[] = [
-    ...submittedReviewsMock.filter(
-      (review) => review.businessId === businessId,
-    ),
+    ...useReviewsStore
+      .getState()
+      .submittedReviews.filter((review) => review.businessId === businessId),
     ...mockReviews,
   ];
 
@@ -60,9 +61,8 @@ export const getReviews = async ({
 
   const breakdown = ([5, 4, 3, 2, 1] as const).map((ratingValue) => ({
     rating: ratingValue,
-    count: reviews.filter(
-      (review) => Math.round(review.rating) === ratingValue,
-    ).length,
+    count: reviews.filter((review) => Math.round(review.rating) === ratingValue)
+      .length,
   }));
 
   const start = (page - 1) * limit;
@@ -85,11 +85,14 @@ export const getReviews = async ({
 export const submitReview = async (
   payload: SubmitReviewPayload,
 ): Promise<Review> => {
+  const profile = useProfileStore.getState().profile;
+
   const newReview: Review = {
     id: `review-${Date.now()}`,
     businessId: payload.businessId,
-    authorName: "You",
-    authorAvatar: "",
+    authorName: profile.username,
+    authorUsername: profile.username,
+    authorAvatar: profile.avatarUrl,
     rating: payload.rating,
     text: payload.text,
     tags: payload.tags,
@@ -102,7 +105,48 @@ export const submitReview = async (
 
   console.log("API POST /reviews", payload);
 
-  submittedReviewsMock = [newReview, ...submittedReviewsMock];
+  useReviewsStore.getState().addReview(newReview);
 
   return Promise.resolve(newReview);
+};
+export const getMyReviews = async (): Promise<PersonalProfileReview[]> => {
+  const profile = useProfileStore.getState().profile;
+
+  const currentUserNames = [profile.displayName];
+
+  const mockReviews = businessDetailsMock.flatMap((business) =>
+    business.reviews
+      .filter((review) => currentUserNames.includes(review.authorName))
+      .map((review) => ({
+        id: review.id,
+        businessId: business.id,
+        businessName: business.name,
+        businessImageUrl: business.images[0]?.url ?? "",
+        rating: review.rating,
+        text: review.text,
+        createdAt: review.createdAt,
+        photos: review.photos,
+      })),
+  );
+
+  const submittedReviews = useReviewsStore
+    .getState()
+    .submittedReviews.map((review) => {
+      const business = businessDetailsMock.find(
+        (item) => item.id === review.businessId,
+      );
+
+      return {
+        id: review.id,
+        businessId: review.businessId,
+        businessName: business?.name ?? "Business",
+        businessImageUrl: business?.images[0]?.url ?? "",
+        rating: review.rating,
+        text: review.text,
+        createdAt: review.createdAt,
+        photos: review.photos,
+      };
+    });
+
+  return Promise.resolve([...submittedReviews, ...mockReviews]);
 };

@@ -12,10 +12,18 @@ import {
 } from "@/src/constants/locations";
 import { useFollowingFeed } from "@/src/features/following";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { useFollowingStore } from "@/src/store";
+import { useFilterStore } from "@/src/store/filter.store";
 import { useFollowingLocationStore } from "@/src/store/following-location.store";
-import { router } from "expo-router";
-import React from "react";
-import { Alert, FlatList, StyleSheet, View } from "react-native";
+import { router, useFocusEffect } from "expo-router";
+import React, { useCallback, useMemo, useState } from "react";
+import {
+  Alert,
+  FlatList,
+  RefreshControl,
+  StyleSheet,
+  View,
+} from "react-native";
 
 export default function FollowingScreen() {
   const { colors } = useAppTheme();
@@ -34,6 +42,22 @@ export default function FollowingScreen() {
       value: option.value,
     });
   };
+
+  const { sort, cuisines, rating, distance, customDistance } = useFilterStore(
+    (state) => state.followingFilters,
+  );
+
+  const activeFilterCount = useMemo(() => {
+    let count = 0;
+
+    if (sort && sort !== "relevance") count += 1;
+    if (cuisines.length > 0) count += cuisines.length;
+    if (rating) count += 1;
+    if (distance) count += 1;
+    if (distance === "custom" && customDistance) count += 1;
+
+    return count;
+  }, [sort, cuisines, rating, distance, customDistance]);
 
   const handleRequestNearby = () => {
     Alert.alert(
@@ -60,6 +84,26 @@ export default function FollowingScreen() {
       ],
     );
   };
+  const [visibleBusinessIds, setVisibleBusinessIds] = useState<string[]>([]);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const syncVisibleBusinessIds = useCallback(() => {
+    const ids = useFollowingStore.getState().followedBusinessIds.map(String);
+
+    setVisibleBusinessIds(ids);
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      syncVisibleBusinessIds();
+    }, [syncVisibleBusinessIds]),
+  );
+
+  const handleRefresh = () => {
+    setRefreshing(true);
+    syncVisibleBusinessIds();
+    setRefreshing(false);
+  };
 
   const {
     activeTab,
@@ -70,10 +114,10 @@ export default function FollowingScreen() {
     isLoading,
     isEmpty,
     hasFollowedBusinesses,
-  } = useFollowingFeed();
+  } = useFollowingFeed({ visibleBusinessIds });
 
   const handleMapPress = () => {
-    console.log("Following map is not implemented yet");
+    router.push("/(tabs)/map");
   };
 
   const handleFilterPress = () => {
@@ -87,8 +131,8 @@ export default function FollowingScreen() {
     return (
       <AppScreen withTopInset={false} style={styles.container}>
         <ScreenHeader
-          title="Following"
-          titleSubtitle="Businesses you follow"
+          title="News & Promos"
+          titleSubtitle="Updates from followed businesses"
           subtitleLabel="Location"
           subtitleValue={selectedLocationLabel}
           showSubtitleChevron
@@ -102,6 +146,7 @@ export default function FollowingScreen() {
           onPressMap={handleMapPress}
           onPressFilter={handleFilterPress}
           gradientColors={DISCOVERY_GRADIENT}
+          activeFilterCount={activeFilterCount}
         />
 
         <View style={styles.switchWrap}>
@@ -125,8 +170,8 @@ export default function FollowingScreen() {
   return (
     <AppScreen withTopInset={false} style={styles.container}>
       <ScreenHeader
-        title="Following"
-        titleSubtitle="Businesses you follow"
+        title="News & Promos"
+        titleSubtitle="Updates from followed businesses"
         subtitleLabel="Location"
         subtitleValue={selectedLocationLabel}
         showSubtitleChevron
@@ -141,6 +186,7 @@ export default function FollowingScreen() {
         onPressMap={handleMapPress}
         onPressFilter={handleFilterPress}
         gradientColors={DISCOVERY_GRADIENT}
+        activeFilterCount={activeFilterCount}
       />
 
       <View style={styles.switchWrap}>
@@ -176,6 +222,9 @@ export default function FollowingScreen() {
           keyExtractor={(item) => item.id}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.listContent}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+          }
           renderItem={({ item }) => <FollowingFeedCard item={item} />}
         />
       )}
@@ -200,8 +249,8 @@ function createStyles(colors: AppColors) {
     },
     listContent: {
       paddingHorizontal: 16,
-      paddingTop: 8,
       paddingBottom: 24,
+      paddingTop: 4,
     },
   });
 }

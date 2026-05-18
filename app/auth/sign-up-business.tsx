@@ -5,6 +5,7 @@ import { router } from "expo-router";
 import React, { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
+import { useNotificationsStore } from "@/src/store/notifications.store";
 import { AccountTypeSwitch } from "../../src/components/auth";
 import AppButton from "../../src/components/ui/AppButton/AppButton";
 import AppInput from "../../src/components/ui/AppInput/AppInput";
@@ -49,7 +50,12 @@ export default function SignUpBusinessScreen() {
     setApiError(null);
   };
 
+  const setNotificationsAccountType = useNotificationsStore(
+    (state) => state.setActiveAccountType,
+  );
+
   const handleSubmit = async () => {
+    if (isLoading) return;
     const values = {
       businessName,
       ownerName,
@@ -76,6 +82,7 @@ export default function SignUpBusinessScreen() {
     });
 
     if (response) {
+      setNotificationsAccountType("business");
       router.push({
         pathname: "/auth/confirm-code",
         params: { email: response.email },
@@ -203,12 +210,6 @@ export default function SignUpBusinessScreen() {
               disabled={isLoading}
               error={Boolean(errors.password)}
             />
-            <Feather
-              name="eye-off"
-              size={16}
-              color={colors.textMuted}
-              style={styles.eyeIcon}
-            />
             {errors.password ? (
               <Text style={styles.errorText}>{errors.password}</Text>
             ) : null}
@@ -224,12 +225,6 @@ export default function SignUpBusinessScreen() {
               }}
               disabled={isLoading}
               error={Boolean(errors.confirmPassword)}
-            />
-            <Feather
-              name="eye-off"
-              size={16}
-              color={colors.textMuted}
-              style={styles.eyeIcon}
             />
             {errors.confirmPassword ? (
               <Text style={styles.errorText}>{errors.confirmPassword}</Text>
@@ -361,12 +356,6 @@ function createStyles(colors: AppColors) {
 
     categoryChipTextActive: {
       color: colors.primaryGreenDark,
-    },
-
-    eyeIcon: {
-      position: "absolute",
-      right: 14,
-      top: 17,
     },
 
     checkboxRow: {

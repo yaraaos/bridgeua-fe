@@ -5,6 +5,7 @@ import { router } from "expo-router";
 import React, { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
+import { useProfileStore } from "@/src/store/profile.store";
 import { AccountTypeSwitch } from "../../src/components/auth";
 import AppButton from "../../src/components/ui/AppButton/AppButton";
 import AppInput from "../../src/components/ui/AppInput/AppInput";
@@ -16,10 +17,15 @@ import {
   SignUpPersonalFormErrors,
   validateSignUpPersonalForm,
 } from "../../src/features/auth/validation/signUpPersonal.validation";
+import { useNotificationsStore } from "@/src/store/notifications.store";
 
 export default function SignUpPersonalScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+  const setProfile = useProfileStore((state) => state.setProfile);
+  const setNotificationsAccountType = useNotificationsStore(
+  (state) => state.setActiveAccountType,
+);
 
   const { submitRegisterPersonal, isLoading, apiError, setApiError } =
     useRegisterPersonal();
@@ -39,6 +45,7 @@ export default function SignUpPersonalScreen() {
   };
 
   const handleSubmit = async () => {
+    if (isLoading) return;
     const values = {
       firstName,
       lastName,
@@ -63,6 +70,18 @@ export default function SignUpPersonalScreen() {
     });
 
     if (response) {
+      setNotificationsAccountType("personal");
+      setProfile({
+        id: `personal-${Date.now()}`,
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        displayName: `${firstName.trim()} ${lastName.trim()}`.trim(),
+        username: email.trim().split("@")[0],
+        email: response.email,
+        avatarUrl: "",
+        phoneNumber: "",
+        dateOfBirth: "",
+      });
       router.push({
         pathname: "/auth/confirm-code",
         params: { email: response.email },
@@ -71,7 +90,7 @@ export default function SignUpPersonalScreen() {
   };
 
   return (
-    <AppScreen style={styles.container}>
+    <AppScreen scroll style={styles.container}>
       <View style={styles.content}>
         <View style={styles.headerBlock}>
           <Text style={styles.title}>Create your account</Text>
@@ -157,12 +176,6 @@ export default function SignUpPersonalScreen() {
               disabled={isLoading}
               error={Boolean(errors.password)}
             />
-            <Feather
-              name="eye-off"
-              size={16}
-              color={colors.textMuted}
-              style={styles.eyeIcon}
-            />
             {errors.password ? (
               <Text style={styles.errorText}>{errors.password}</Text>
             ) : null}
@@ -178,12 +191,6 @@ export default function SignUpPersonalScreen() {
               }}
               disabled={isLoading}
               error={Boolean(errors.confirmPassword)}
-            />
-            <Feather
-              name="eye-off"
-              size={16}
-              color={colors.textMuted}
-              style={styles.eyeIcon}
             />
             {errors.confirmPassword ? (
               <Text style={styles.errorText}>{errors.confirmPassword}</Text>
@@ -275,12 +282,6 @@ function createStyles(colors: AppColors) {
 
     form: {
       gap: 12,
-    },
-
-    eyeIcon: {
-      position: "absolute",
-      right: 14,
-      top: 17,
     },
 
     checkboxRow: {

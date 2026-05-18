@@ -65,7 +65,7 @@ export default function WriteReviewScreen() {
     return "Tap to rate";
   }, [rating]);
 
-  const canSubmit = rating > 0 && review.trim().length >= 10;
+  const canSubmit = rating > 0;
   const { submit, isSubmitting } = useSubmitReview();
 
   const toggleTag = (tag: string) => {
@@ -151,14 +151,7 @@ export default function WriteReviewScreen() {
     Alert.alert("Review submitted", "Thank you!", [
       {
         text: "Done",
-        onPress: () =>
-          router.replace({
-            pathname: "/business/[id]",
-            params: {
-              id: business.id,
-              tab: "reviews",
-            },
-          }),
+        onPress: () => router.back(),
       },
     ]);
   };
@@ -273,7 +266,7 @@ export default function WriteReviewScreen() {
               }}
               multiline
               textAlignVertical="top"
-              placeholder="Share about your experience (min 10 characters)..."
+              placeholder="Share about your experience"
               placeholderTextColor={colors.textMuted}
               style={styles.textArea}
             />

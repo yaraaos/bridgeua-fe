@@ -8,7 +8,6 @@ export function createStyles(colors: AppColors) {
       overflow: "hidden",
       alignItems: "center",
       justifyContent: "center",
-      backgroundColor: colors.primaryGreenSoft,
     },
     sm: {
       width: 32,
@@ -21,8 +20,8 @@ export function createStyles(colors: AppColors) {
       borderRadius: radius.pill,
     },
     lg: {
-      width: 56,
-      height: 56,
+      width: 96,
+      height: 96,
       borderRadius: radius.pill,
     },
     image: {
@@ -31,7 +30,7 @@ export function createStyles(colors: AppColors) {
     },
     initial: {
       fontWeight: "700",
-      color: colors.primaryGreen,
+      color: colors.white,
     },
     smText: {
       fontSize: 13,
@@ -40,7 +39,7 @@ export function createStyles(colors: AppColors) {
       fontSize: 16,
     },
     lgText: {
-      fontSize: 20,
+      fontSize: 50,
     },
   });
 }

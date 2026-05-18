@@ -1,5 +1,10 @@
 import { AppColors } from "@/src/constants/colors";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { saveAuthTokens } from "@/src/services/auth/tokens";
+import { useAuthStore } from "@/src/store/auth.store";
+import { useFollowingStore } from "@/src/store/following.store";
+import { useProfileStore } from "@/src/store/profile.store";
+import { useReviewsStore } from "@/src/store/reviews.store";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
@@ -35,6 +40,11 @@ export default function ConfirmCodeScreen() {
   const { submitConfirmCode, isLoading, apiError, setApiError } =
     useConfirmCode();
   const { submitResendCode, isLoading: isResending } = useResendCode();
+  const setUser = useAuthStore((state) => state.setUser);
+  const profile = useProfileStore((state) => state.profile);
+  const resetFollowing = useFollowingStore((state) => state.resetFollowing);
+
+  const clearReviews = useReviewsStore((state) => state.clearReviews);
 
   const [code, setCode] = useState("");
   const [timer, setTimer] = useState(RESEND_SECONDS);
@@ -60,6 +70,7 @@ export default function ConfirmCodeScreen() {
   };
 
   const handleSubmit = async () => {
+    if (isLoading) return;
     if (code.length !== OTP_LENGTH) {
       setLocalError("Enter the 4-digit code");
       return;
@@ -68,12 +79,23 @@ export default function ConfirmCodeScreen() {
     const response = await submitConfirmCode({ email, code });
 
     if (response?.verified) {
-      router.replace("/auth/success");
+      resetFollowing();
+      clearReviews();
+
+      await saveAuthTokens("mock-access-token", "mock-refresh-token");
+
+      setUser({
+        id: profile.id,
+        email: profile.email,
+        name: profile.displayName,
+      });
+
+      router.replace("/(tabs)/home");
     }
   };
 
   const handleResend = async () => {
-    if (!canResend) return;
+    if (!canResend || isResending) return;
 
     const response = await submitResendCode({ email });
 

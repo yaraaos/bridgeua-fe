@@ -27,8 +27,11 @@ export default function AppScreen({
     return (
       <SafeAreaView style={styles.safe} edges={edges}>
         <ScrollView
-          contentContainerStyle={[styles.content, style]}
+          contentContainerStyle={[styles.content, styles.scrollContent, style]}
           showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="interactive"
+          automaticallyAdjustKeyboardInsets
         >
           {children}
         </ScrollView>

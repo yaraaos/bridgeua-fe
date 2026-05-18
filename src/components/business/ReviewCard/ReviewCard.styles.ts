@@ -10,7 +10,7 @@ export function createStyles(colors: AppColors) {
     },
     containerPreview: {
       width: 200,
-      height: 150,
+      minHeight: 150,
       padding: spacing.md,
       borderTopWidth: 0,
       borderWidth: 1,
@@ -57,13 +57,17 @@ export function createStyles(colors: AppColors) {
       lineHeight: 17,
     },
     moreButton: {
-      marginTop: spacing.xs,
+      marginTop: "auto",
+      paddingTop: spacing.sm,
       alignSelf: "flex-end",
     },
     moreText: {
       fontSize: 12,
       fontWeight: "700",
       color: colors.primaryGreen,
+    },
+    previewContent: {
+      flex: 1,
     },
     photosRow: {
       marginTop: spacing.md,
@@ -122,6 +126,75 @@ export function createStyles(colors: AppColors) {
     },
     tagText: {
       fontSize: 11,
+      fontWeight: "700",
+      color: colors.primaryGreen,
+    },
+
+    profileBusinessImageWrap: {
+      width: 44,
+      height: 44,
+      borderRadius: 12,
+      overflow: "hidden",
+      backgroundColor: colors.primaryGreenSoft,
+    },
+
+    profileBusinessImage: {
+      width: "100%",
+      height: "100%",
+    },
+
+    profileBusinessInfo: {
+      flex: 1,
+    },
+
+    profileBusinessName: {
+      fontSize: 15,
+      fontWeight: "700",
+      color: colors.textPrimary,
+    },
+    reviewContent: {
+      flex: 1,
+    },
+
+    reviewCard: {
+      flexDirection: "row",
+      alignItems: "flex-start",
+      gap: spacing.md,
+      paddingVertical: spacing.md,
+    },
+
+    profileHeader: {
+      flexDirection: "row",
+      alignItems: "flex-start",
+      justifyContent: "space-between",
+      gap: 12,
+    },
+
+    profileReviewDate: {
+      marginTop: 2,
+      fontSize: 11,
+      color: colors.textSecondary,
+    },
+
+    reviewDateWrap: {
+      alignItems: "flex-end",
+    },
+
+    reviewPhotosScroll: {
+      marginTop: spacing.sm,
+    },
+
+    reviewPhotoPreview: {
+      width: 74,
+      height: 74,
+      borderRadius: radius.md,
+      marginRight: spacing.sm,
+      backgroundColor: colors.primaryGreenSoft,
+    },
+
+    reviewReadMore: {
+      marginTop: spacing.xs,
+      fontSize: 12,
       fontWeight: "700",
       color: colors.primaryGreen,
     },

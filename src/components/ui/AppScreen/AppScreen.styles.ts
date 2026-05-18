@@ -11,5 +11,8 @@ export function createStyles(colors: AppColors) {
       flexGrow: 1,
       padding: 16,
     },
+    scrollContent: {
+      paddingBottom: 96,
+    },
   });
 }

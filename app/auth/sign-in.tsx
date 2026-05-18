@@ -1,5 +1,9 @@
 import { AppColors } from "@/src/constants/colors";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { saveAuthTokens } from "@/src/services/auth/tokens";
+import { useAuthStore } from "@/src/store/auth.store";
+import { useFollowingStore } from "@/src/store/following.store";
+import { useReviewsStore } from "@/src/store/reviews.store";
 import { router } from "expo-router";
 import { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
@@ -20,12 +24,17 @@ export default function SignInScreen() {
   const styles = createStyles(colors);
 
   const { submitSignIn, isLoading, apiError, setApiError } = useSignIn();
+  const setUser = useAuthStore((state) => state.setUser);
+  const resetFollowing = useFollowingStore((state) => state.resetFollowing);
+
+  const clearReviews = useReviewsStore((state) => state.clearReviews);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState<SignInFormErrors>({});
 
   const handleSubmit = async () => {
+    if (isLoading) return;
     const values = { email, password };
     const validationErrors = validateSignInForm(values);
 
@@ -37,12 +46,19 @@ export default function SignInScreen() {
     const response = await submitSignIn(values);
 
     if (response) {
+      resetFollowing();
+      clearReviews();
+
+      await saveAuthTokens(response.accessToken, response.refreshToken);
+
+      setUser(response.user);
+
       router.replace("/(tabs)/home");
     }
   };
 
   return (
-    <AppScreen style={styles.container}>
+    <AppScreen scroll style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Welcome!</Text>
       </View>

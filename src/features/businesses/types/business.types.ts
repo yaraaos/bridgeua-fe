@@ -41,7 +41,8 @@ export type BusinessRecommendation = {
   businessCategory: string;
   businessLocation?: string;
   businessImageUrl?: string;
-  recommendationsCount?: number;
+  recommendedByPreview?: string[];
+  recommendedByCount?: number;
 };
 
 export type BusinessAbout = {
@@ -59,6 +60,7 @@ export type BusinessAbout = {
 export type BusinessDetailsReview = {
   id: string;
   authorName: string;
+  authorUsername?: string;
   authorAvatar: string;
   rating: number;
   text: string;
