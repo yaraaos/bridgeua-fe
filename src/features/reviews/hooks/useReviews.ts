@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useFocusEffect } from "expo-router";
+import { useCallback, useEffect, useState } from "react";
 import { getReviews } from "../services/review.service";
 import type { Review, ReviewsSummary } from "../types/review.types";
 
@@ -17,48 +18,57 @@ export const useReviews = ({ businessId, rating, limit = 1000 }: Params) => {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(false);
 
-  const loadReviews = async (nextPage = 1) => {
-    if (!businessId) {
-      setReviews([]);
-      setSummary(null);
-      setReviewCount(0);
-      setHasMore(false);
-      setIsLoading(false);
-      return;
-    }
-
-    const isFirstPage = nextPage === 1;
-
-    try {
-      if (isFirstPage) {
-        setIsLoading(true);
-      } else {
-        setIsLoadingMore(true);
+  const loadReviews = useCallback(
+    async (nextPage = 1) => {
+      if (!businessId) {
+        setReviews([]);
+        setSummary(null);
+        setReviewCount(0);
+        setHasMore(false);
+        setIsLoading(false);
+        return;
       }
 
-      const response = await getReviews({
-        businessId,
-        page: nextPage,
-        limit,
-        rating,
-      });
+      const isFirstPage = nextPage === 1;
 
-      setReviews((current) =>
-        isFirstPage ? response.data : [...current, ...response.data],
-      );
-      setSummary(response.summary);
-      setReviewCount(response.total);
-      setPage(response.page);
-      setHasMore(response.page < response.totalPages);
-    } finally {
-      setIsLoading(false);
-      setIsLoadingMore(false);
-    }
-  };
+      try {
+        if (isFirstPage) {
+          setIsLoading(true);
+        } else {
+          setIsLoadingMore(true);
+        }
+
+        const response = await getReviews({
+          businessId,
+          page: nextPage,
+          limit,
+          rating,
+        });
+
+        setReviews((current) =>
+          isFirstPage ? response.data : [...current, ...response.data],
+        );
+        setSummary(response.summary);
+        setReviewCount(response.total);
+        setPage(response.page);
+        setHasMore(response.page < response.totalPages);
+      } finally {
+        setIsLoading(false);
+        setIsLoadingMore(false);
+      }
+    },
+    [businessId, limit, rating],
+  );
 
   useEffect(() => {
     loadReviews(1);
-  }, [businessId, rating]);
+  }, [loadReviews]);
+
+  useFocusEffect(
+    useCallback(() => {
+      loadReviews(1);
+    }, [loadReviews]),
+  );
 
   return {
     reviews,
