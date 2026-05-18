@@ -1,5 +1,5 @@
-import { AppColors } from "@/src/constants/colors";
-import { StyleSheet } from "react-native";
+import {AppColors} from "@/src/constants/colors";
+import {StyleSheet} from "react-native";
 
 export function createStyles(colors: AppColors) {
   return StyleSheet.create({
@@ -9,9 +9,17 @@ export function createStyles(colors: AppColors) {
       paddingBottom: 8,
       backgroundColor: colors.background,
     },
+    wrapperOverlay: {
+      paddingHorizontal: 0,
+      backgroundColor: "transparent",
+    },
     content: {
-      paddingRight: 16,
+      paddingLeft: 12,
+      paddingRight: 12,
       gap: 8,
+    },
+    contentOverlay: {
+      paddingHorizontal: 0,
     },
     chip: {
       minHeight: 32,
@@ -22,7 +30,7 @@ export function createStyles(colors: AppColors) {
       justifyContent: "center",
     },
     chipActive: {
-      backgroundColor: colors.primaryGreen,
+      backgroundColor: colors.accentOrange,
     },
     chipText: {
       fontSize: 12,
