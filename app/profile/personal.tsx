@@ -41,10 +41,6 @@ export default function PersonalProfileScreen() {
   };
   const profile = useProfileStore((state) => state.profile);
 
-  const followedBusinessIds = useFollowingStore(
-    (state) => state.followedBusinessIds,
-  );
-
   const [myReviews, setMyReviews] = useState<PersonalProfileReview[]>([]);
   const [previewFollowedBusinesses, setPreviewFollowedBusinesses] = useState<
     PersonalProfileFollowedBusiness[]
