@@ -137,8 +137,16 @@ export default function FilterModalScreen() {
       onPanResponderRelease: (_, { dy }) => {
         if (dy < -EXPAND_THRESHOLD && !isExpandedRef.current) {
           expandSheet();
-        } else if (dy > COLLAPSE_THRESHOLD && isExpandedRef.current) {
+          return;
+        }
+
+        if (dy > COLLAPSE_THRESHOLD && isExpandedRef.current) {
           collapseSheet();
+          return;
+        }
+
+        if (dy > COLLAPSE_THRESHOLD && !isExpandedRef.current) {
+          handleClose();
         }
       },
     }),
