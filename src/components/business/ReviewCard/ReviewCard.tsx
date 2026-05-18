@@ -50,7 +50,7 @@ export default function ReviewCard({
   const profile = useProfileStore((state) => state.profile);
 
   const isOwnReview =
-    businessReview?.authorName === profile.displayName ||
+    businessReview?.authorUsername === profile.username ||
     businessReview?.authorUsername === profile.username;
 
   const [isExpanded, setIsExpanded] = useState(false);
@@ -193,7 +193,7 @@ export default function ReviewCard({
                 }}
               >
                 <AppAvatar
-                  name={businessReview.authorName}
+                  name={businessReview.authorUsername}
                   username={businessReview.authorUsername}
                   imageUrl={businessReview.authorAvatar}
                   size={isPreview ? "sm" : "md"}
@@ -215,7 +215,7 @@ export default function ReviewCard({
                   ]}
                   numberOfLines={1}
                 >
-                  {businessReview.authorName}
+                  @{businessReview.authorUsername}
                 </Text>
 
                 <View style={styles.starsRow}>

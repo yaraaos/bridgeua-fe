@@ -96,7 +96,7 @@ export default function PersonalProfileScreen() {
           <View>
             <View style={styles.heroIdentityRow}>
               <AppAvatar
-                name={profile.displayName}
+                name={profile.username}
                 username={profile.username}
                 imageUrl={profile.avatarUrl}
                 size="lg"
@@ -104,10 +104,6 @@ export default function PersonalProfileScreen() {
 
               <View style={styles.heroTextWrap}>
                 <AppText style={styles.heroName} numberOfLines={1}>
-                  {profile.displayName}
-                </AppText>
-
-                <AppText style={styles.heroUsername} numberOfLines={1}>
                   @{profile.username}
                 </AppText>
               </View>
@@ -444,6 +440,7 @@ function createStyles(colors: AppColors) {
       height: 36,
       borderRadius: 10,
       alignItems: "center",
+      marginTop: 4, //to make the stngs btn look visually on the same leve as the top of the profile pic
       justifyContent: "center",
       backgroundColor: colors.accentOrange,
       alignSelf: "flex-start",

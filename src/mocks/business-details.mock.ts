@@ -231,6 +231,7 @@ export const businessDetailsMock: BusinessDetails[] = [
       {
         id: "review-1",
         authorName: "Kateryna",
+        authorUsername: "kate678",
         authorAvatar:
           "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300",
         rating: 4,
@@ -240,6 +241,7 @@ export const businessDetailsMock: BusinessDetails[] = [
       {
         id: "review-2",
         authorName: "Kristina",
+        authorUsername: "kris33",
         authorAvatar:
           "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300",
         rating: 5,
@@ -249,6 +251,7 @@ export const businessDetailsMock: BusinessDetails[] = [
       {
         id: "review-3",
         authorName: "Anna",
+        authorUsername: "anna.love",
         authorAvatar:
           "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=300",
         rating: 5,
@@ -262,6 +265,7 @@ export const businessDetailsMock: BusinessDetails[] = [
       {
         id: "review-1",
         authorName: "Kateryna",
+        authorUsername: "kate678",
         authorAvatar:
           "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300",
         rating: 4,
@@ -282,6 +286,7 @@ export const businessDetailsMock: BusinessDetails[] = [
       {
         id: "review-2",
         authorName: "Kristina",
+        authorUsername: "kris33",
         authorAvatar:
           "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300",
         rating: 5,
@@ -291,6 +296,7 @@ export const businessDetailsMock: BusinessDetails[] = [
       {
         id: "review-3",
         authorName: "Anna",
+        authorUsername: "anna.love",
         authorAvatar:
           "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=300",
         rating: 5,
