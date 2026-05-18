@@ -1,4 +1,4 @@
-//app/modal/filter.tsx
+// app/modal/filter.tsx
 
 import { AppColors } from "@/src/constants/colors";
 import { SORT_OPTIONS } from "@/src/constants/filters";
@@ -11,7 +11,9 @@ import {
   Animated,
   Dimensions,
   Easing,
+  PanResponder,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableWithoutFeedback,
@@ -36,25 +38,34 @@ const CUISINE_OPTIONS = [
   "Vegan",
 ];
 
+const SCREEN_HEIGHT = Dimensions.get("window").height;
+const HALF_HEIGHT = SCREEN_HEIGHT * 0.72;
+const FULL_HEIGHT = SCREEN_HEIGHT * 0.92;
+const EXPAND_THRESHOLD = 30;
+const COLLAPSE_THRESHOLD = 40;
+
 export default function FilterModalScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
-
   const insets = useSafeAreaInsets();
-  const SCREEN_HEIGHT = Dimensions.get("window").height;
+
   const [activeTab, setActiveTab] = useState<FilterTab>("sort");
   const [isClosing, setIsClosing] = useState(false);
+
+  // useNativeDriver: true — transform only
   const backdropOpacity = useRef(new Animated.Value(0)).current;
   const sheetTranslateY = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
-  const params = useLocalSearchParams<{ scope?: string }>();
 
+  // useNativeDriver: false — height (JS thread only)
+  const sheetHeight = useRef(new Animated.Value(HALF_HEIGHT)).current;
+
+  const params = useLocalSearchParams<{ scope?: string }>();
   const scope = params.scope === "following" ? "following" : "discovery";
+
   const filters = useFilterStore((state) =>
     scope === "following" ? state.followingFilters : state.discoveryFilters,
   );
-
   const { sort, cuisines, rating, distance, customDistance } = filters;
-
   const {
     setSort,
     toggleCuisine,
@@ -64,8 +75,8 @@ export default function FilterModalScreen() {
     reset,
   } = useFilterStore();
 
+  // ─── Open animation ───────────────────────────────────────────────────
   useEffect(() => {
-    //opening modal animation
     Animated.parallel([
       Animated.timing(backdropOpacity, {
         toValue: 1,
@@ -82,10 +93,10 @@ export default function FilterModalScreen() {
     ]).start();
   }, [backdropOpacity, sheetTranslateY]);
 
+  // ─── Close ───────────────────────────────────────────────────
   const handleClose = () => {
     if (isClosing) return;
     setIsClosing(true);
-
     Animated.parallel([
       Animated.timing(backdropOpacity, {
         toValue: 0,
@@ -100,12 +111,49 @@ export default function FilterModalScreen() {
         useNativeDriver: true,
       }),
     ]).start(({ finished }) => {
-      if (finished) {
-        router.back();
-      }
+      if (finished) router.back();
     });
   };
 
+  // ─── Expand / Collapse ───────────────────────────────────────────────────
+  const isExpandedRef = useRef(false);
+
+  const expandSheet = () => {
+    isExpandedRef.current = true;
+    Animated.spring(sheetHeight, {
+      toValue: FULL_HEIGHT,
+      useNativeDriver: false,
+      bounciness: 4,
+      speed: 14,
+    }).start();
+  };
+
+  const collapseSheet = () => {
+    isExpandedRef.current = false;
+    Animated.spring(sheetHeight, {
+      toValue: HALF_HEIGHT,
+      useNativeDriver: false,
+      bounciness: 4,
+      speed: 14,
+    }).start();
+  };
+
+  // ─── PanResponder (handle + header only) ─────────────────────────────────
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: (_, { dy }) => Math.abs(dy) > 5,
+      onPanResponderRelease: (_, { dy }) => {
+        if (dy < -EXPAND_THRESHOLD && !isExpandedRef.current) {
+          expandSheet();
+        } else if (dy > COLLAPSE_THRESHOLD && isExpandedRef.current) {
+          collapseSheet();
+        }
+      },
+    }),
+  ).current;
+
+  // ─── Sidebar items ───────────────────────────────────────────────────
   const sidebarItems = useMemo(
     () => [
       { key: "sort" as FilterTab, label: "Sort" },
@@ -116,6 +164,7 @@ export default function FilterModalScreen() {
     [],
   );
 
+  // ─── Right panel ───────────────────────────────────────────────────
   const renderRightPanel = () => {
     if (activeTab === "sort") {
       return (
@@ -128,7 +177,6 @@ export default function FilterModalScreen() {
         />
       );
     }
-
     if (activeTab === "cuisines") {
       return (
         <FilterOptionList
@@ -140,7 +188,6 @@ export default function FilterModalScreen() {
         />
       );
     }
-
     if (activeTab === "ratings") {
       return (
         <RatingSelector
@@ -149,7 +196,6 @@ export default function FilterModalScreen() {
         />
       );
     }
-
     return (
       <DistanceSelector
         value={distance}
@@ -160,67 +206,75 @@ export default function FilterModalScreen() {
     );
   };
 
+  const FOOTER_HEIGHT = 70 + insets.bottom;
+
   return (
     <View style={styles.root}>
+      {/* Backdrop — native driver ✓ */}
       <TouchableWithoutFeedback onPress={handleClose}>
         <Animated.View
-          style={[
-            styles.backdrop,
-            {
-              opacity: backdropOpacity,
-            },
-          ]}
+          style={[styles.backdrop, { opacity: backdropOpacity }]}
         />
       </TouchableWithoutFeedback>
 
+      {/* Outer: translateY only — native driver ✓ */}
       <Animated.View
         style={[
-          styles.sheet,
-          {
-            transform: [{ translateY: sheetTranslateY }],
-          },
+          styles.sheetContainer,
+          { transform: [{ translateY: sheetTranslateY }] },
         ]}
       >
-        <View style={styles.handle} />
-
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>Filter</Text>
-
-          <Pressable onPress={handleClose} style={styles.closeButton}>
-            <Feather name="x" size={18} color={colors.textMuted} />
-          </Pressable>
-        </View>
-
-        <View style={styles.content}>
-          <FilterSidebar
-            items={sidebarItems}
-            activeKey={activeTab}
-            onChange={(key) => setActiveTab(key)}
-          />
-
-          <View style={styles.rightPanel}>{renderRightPanel()}</View>
-        </View>
-
-        <View
-          style={[
-            styles.footer,
-            {
-              paddingBottom: 14 + insets.bottom,
-            },
-          ]}
-        >
-          <Pressable onPress={() => reset(scope)}>
-            <Text style={styles.clearText}>Clear Filters</Text>
-          </Pressable>
-
-          <View style={styles.applyWrap}>
-            <AppButton
-              title="Apply"
-              variant="secondary"
-              onPress={handleClose}
-            />
+        {/* Inner: height only — JS driver ✓ */}
+        <Animated.View style={[styles.sheet, { height: sheetHeight }]}>
+          {/* Drag target: handle + header */}
+          <View {...panResponder.panHandlers}>
+            <View style={styles.handleWrap}>
+              <View style={styles.handle} />
+            </View>
+            <View style={styles.header}>
+              <Text style={styles.headerTitle}>Filter</Text>
+              <Pressable onPress={handleClose} style={styles.closeButton}>
+                <Feather name="x" size={18} color={colors.textMuted} />
+              </Pressable>
+            </View>
           </View>
-        </View>
+
+          {/* Scrollable content — padded so it never hides behind footer */}
+          <View style={[styles.content, { paddingBottom: FOOTER_HEIGHT }]}>
+            <FilterSidebar
+              items={sidebarItems}
+              activeKey={activeTab}
+              onChange={(key) => setActiveTab(key)}
+            />
+            <View style={styles.rightPanel}>
+              <ScrollView
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={styles.rightPanelScrollContent}
+              >
+                {renderRightPanel()}
+              </ScrollView>
+            </View>
+          </View>
+
+          {/* Footer — absolutely pinned, never moves */}
+          <View
+            style={[
+              styles.footer,
+              { paddingBottom: 14 + insets.bottom, height: FOOTER_HEIGHT },
+            ]}
+          >
+            <Pressable onPress={() => reset(scope)}>
+              <Text style={styles.clearText}>Clear Filters</Text>
+            </Pressable>
+            <View style={styles.applyWrap}>
+              <AppButton
+                title="Apply"
+                variant="secondary"
+                onPress={handleClose}
+              />
+            </View>
+          </View>
+        </Animated.View>
       </Animated.View>
     </View>
   );
@@ -230,31 +284,39 @@ function createStyles(colors: AppColors) {
   return StyleSheet.create({
     root: {
       flex: 1,
-      justifyContent: "flex-end",
       backgroundColor: "transparent",
     },
     backdrop: {
       ...StyleSheet.absoluteFillObject,
       backgroundColor: "rgba(0, 0, 0, 0.68)",
     },
+    // Outer wrapper — sits at the bottom, only moves on Y axis
+    sheetContainer: {
+      position: "absolute",
+      bottom: 0,
+      left: 0,
+      right: 0,
+    },
+    // Inner wrapper — changes height for snap points
     sheet: {
-      height: "72%",
       backgroundColor: colors.surface,
       borderTopLeftRadius: 28,
       borderTopRightRadius: 28,
       overflow: "hidden",
     },
+    handleWrap: {
+      alignItems: "center",
+      paddingTop: 10,
+      paddingBottom: 6,
+    },
     handle: {
-      alignSelf: "center",
       width: 46,
       height: 5,
       borderRadius: 999,
       backgroundColor: colors.border,
-      marginTop: 10,
-      marginBottom: 6,
     },
     header: {
-      minHeight: 64,
+      minHeight: 52,
       paddingHorizontal: 24,
       paddingBottom: 12,
       flexDirection: "row",
@@ -282,15 +344,22 @@ function createStyles(colors: AppColors) {
     },
     rightPanel: {
       flex: 1,
+    },
+    rightPanelScrollContent: {
       paddingHorizontal: 16,
       paddingTop: 16,
+      paddingBottom: 16,
     },
     footer: {
-      minHeight: 70,
+      position: "absolute",
+      bottom: 0,
+      left: 0,
+      right: 0,
       paddingHorizontal: 24,
       paddingTop: 14,
       borderTopWidth: 1,
       borderTopColor: colors.border,
+      backgroundColor: colors.surface,
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "space-between",
