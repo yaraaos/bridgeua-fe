@@ -11,7 +11,7 @@ export function createStyles(colors: AppColors) {
 
     container: {
       minHeight: 52,
-      borderRadius: radius.lg,
+      borderRadius: radius.md,
       borderWidth: 1,
       borderColor: colors.border,
       backgroundColor: colors.surface,

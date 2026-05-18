@@ -9,14 +9,17 @@ export default function TabsLayout() {
   const { colors } = useAppTheme();
   const insets = useSafeAreaInsets();
 
-  const unreadCount = useNotificationsStore(
-    (state) =>
-      state.notifications.filter(
-        (notification) =>
-          notification.recipientAccountType === state.activeAccountType &&
-          !notification.isRead,
-      ).length,
-  );
+  const unreadCount = useNotificationsStore((state) => {
+    const activeReadIds =
+      state.readNotificationIds[state.activeAccountType] ?? [];
+
+    return state.notifications.filter(
+      (notification) =>
+        notification.recipientAccountType === state.activeAccountType &&
+        !notification.isRead &&
+        !activeReadIds.includes(notification.id),
+    ).length;
+  });
 
   return (
     <Tabs
@@ -45,7 +48,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="following"
         options={{
-          title: "Following",
+          title: "Promos",
           tabBarIcon: ({ color, size }) => (
             <Feather name="heart" size={size} color={color} />
           ),

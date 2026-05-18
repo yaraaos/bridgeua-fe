@@ -90,7 +90,8 @@ export const submitReview = async (
   const newReview: Review = {
     id: `review-${Date.now()}`,
     businessId: payload.businessId,
-    authorName: profile.displayName,
+    authorName: profile.username,
+    authorUsername: profile.username,
     authorAvatar: profile.avatarUrl,
     rating: payload.rating,
     text: payload.text,

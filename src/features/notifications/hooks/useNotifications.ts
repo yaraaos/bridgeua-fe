@@ -2,8 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 
 import { useNotificationsStore } from "@/src/store/notifications.store";
 import type {
-    AppNotification,
-    NotificationTab,
+  AppNotification,
+  NotificationTab,
 } from "../types/notification.types";
 
 function isPromotionNotification(notification: AppNotification) {
@@ -48,7 +48,12 @@ export function useNotifications(activeTab: NotificationTab) {
   const activeAccountType = useNotificationsStore(
     (state) => state.activeAccountType,
   );
+  const readNotificationIds = useNotificationsStore(
+    (state) => state.readNotificationIds,
+  );
+
   const [isLoading, setIsLoading] = useState(true);
+
   useEffect(() => {
     setIsLoading(true);
 
@@ -60,11 +65,19 @@ export function useNotifications(activeTab: NotificationTab) {
   }, [activeAccountType, activeTab]);
 
   return useMemo(() => {
+    const activeReadIds = readNotificationIds[activeAccountType] ?? [];
+
     const accountNotifications = notifications
       .filter(
         (notification) =>
           notification.recipientAccountType === activeAccountType,
       )
+      .map((notification) => ({
+        ...notification,
+        isRead:
+          notification.isRead === true ||
+          activeReadIds.includes(notification.id),
+      }))
       .sort(
         (a, b) =>
           new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
@@ -98,5 +111,11 @@ export function useNotifications(activeTab: NotificationTab) {
       activeAccountType,
       isLoading,
     };
-  }, [activeAccountType, activeTab, notifications, isLoading]);
+  }, [
+    activeAccountType,
+    activeTab,
+    notifications,
+    readNotificationIds,
+    isLoading,
+  ]);
 }
