@@ -54,3 +54,20 @@ export type ResendCodePayload = {
 export type ResendCodeResponse = {
   success: boolean;
 };
+
+export type ForgotPasswordPayload = {
+  email: string;
+};
+
+export type ForgotPasswordResponse = {
+  success: boolean;
+};
+
+export type ResetPasswordPayload = {
+  password: string;
+  confirmPassword: string;
+};
+
+export type ResetPasswordResponse = {
+  success: boolean;
+};

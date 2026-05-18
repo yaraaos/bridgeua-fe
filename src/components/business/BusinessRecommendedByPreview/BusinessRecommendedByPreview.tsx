@@ -3,38 +3,38 @@ import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { Ionicons } from "@expo/vector-icons";
 import { Pressable, Text, View } from "react-native";
 import RecommendedByCard from "../RecommendedByCard";
-import { createStyles } from "./BusinessRecommendsSection.styles";
+import { createStyles } from "./BusinessRecommendedByPreview.styles";
 
 type Props = {
-  recommends?: BusinessRecommendation[];
-  onPressSeeAll?: () => void;
+  recommendations?: BusinessRecommendation[];
+  onPressViewAll?: () => void;
   onPressRecommendation?: (recommendation: BusinessRecommendation) => void;
 };
 
 const PREVIEW_LIMIT = 3;
 
-export default function BusinessRecommendsSection({
-  recommends = [],
-  onPressSeeAll,
+export default function BusinessRecommendedByPreview({
+  recommendations = [],
+  onPressViewAll,
   onPressRecommendation,
 }: Props) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
 
-  if (recommends.length < 1) {
+  if (recommendations.length < 1) {
     return null;
   }
 
-  const previewItems = recommends.slice(0, PREVIEW_LIMIT);
-  const shouldShowSeeAll = recommends.length > PREVIEW_LIMIT;
+  const previewItems = recommendations.slice(0, PREVIEW_LIMIT);
+  const shouldShowViewAll = recommendations.length > PREVIEW_LIMIT;
 
   return (
     <View style={styles.container}>
       <View style={styles.headerRow}>
-        <Text style={styles.title}>Recommends</Text>
+        <Text style={styles.title}>Recommended by</Text>
 
-        {shouldShowSeeAll ? (
-          <Pressable style={styles.viewAllButton} onPress={onPressSeeAll}>
+        {shouldShowViewAll ? (
+          <Pressable style={styles.viewAllButton} onPress={onPressViewAll}>
             <Text style={styles.viewAllText}>View all</Text>
             <Ionicons
               name="chevron-forward"
@@ -45,7 +45,7 @@ export default function BusinessRecommendsSection({
         ) : null}
       </View>
 
-      <View style={styles.list}>
+      <View style={styles.actions}>
         {previewItems.map((recommendation, index) => (
           <RecommendedByCard
             key={recommendation.id}

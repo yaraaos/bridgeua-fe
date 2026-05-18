@@ -9,58 +9,54 @@ import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { router, useLocalSearchParams } from "expo-router";
 import { ActivityIndicator, ScrollView, StyleSheet, View } from "react-native";
 
-export default function RecommendedByScreen() {
+export default function RecommendsScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
 
   const { businessId } = useLocalSearchParams<{ businessId?: string }>();
   const { business, isLoading } = useBusinessDetails(businessId);
 
-  const recommendations = business?.about?.recommendedBy ?? [];
+  const recommends = business?.about?.recommendedBy ?? [];
 
   return (
     <AppScreen withTopInset={false} style={styles.container}>
       <ScreenHeader
-        title="Recommended by"
-        titleSubtitle="Businesses that trust and recommend this place"
+        title="Recommends"
+        titleSubtitle="Businesses this place recommends"
       />
 
       {isLoading ? (
         <View style={styles.center}>
           <ActivityIndicator />
         </View>
+      ) : recommends.length < 1 ? (
+        <View style={styles.emptyWrap}>
+          <AppEmptyState
+            title="No recommendations yet"
+            description="Businesses recommended by this place will appear here."
+          />
+        </View>
       ) : (
-        <>
-          {recommendations.length < 1 ? (
-            <View style={styles.emptyWrap}>
-              <AppEmptyState
-                title="No recommendations yet"
-                description="Businesses that recommend this place will appear here."
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContent}
+        >
+          <View style={styles.card}>
+            {recommends.map((recommendation, index) => (
+              <RecommendedByCard
+                key={recommendation.id}
+                recommendation={recommendation}
+                isBordered={index !== 0}
+                onPress={() =>
+                  router.push({
+                    pathname: "/business/[id]",
+                    params: { id: recommendation.businessId },
+                  })
+                }
               />
-            </View>
-          ) : (
-            <ScrollView
-              showsVerticalScrollIndicator={false}
-              contentContainerStyle={styles.scrollContent}
-            >
-              <View style={styles.card}>
-                {recommendations.map((recommendation, index) => (
-                  <RecommendedByCard
-                    key={recommendation.id}
-                    recommendation={recommendation}
-                    isBordered={index !== 0}
-                    onPress={() =>
-                      router.push({
-                        pathname: "/business/[id]",
-                        params: { id: recommendation.businessId },
-                      })
-                    }
-                  />
-                ))}
-              </View>
-            </ScrollView>
-          )}
-        </>
+            ))}
+          </View>
+        </ScrollView>
       )}
     </AppScreen>
   );

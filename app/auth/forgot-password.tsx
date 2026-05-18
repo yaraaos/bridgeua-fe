@@ -8,38 +8,40 @@ import AppButton from "../../src/components/ui/AppButton/AppButton";
 import AppInput from "../../src/components/ui/AppInput/AppInput";
 import AppLoader from "../../src/components/ui/AppLoader/AppLoader";
 import AppScreen from "../../src/components/ui/AppScreen/AppScreen";
+import { useForgotPassword } from "../../src/features/auth/hooks/useForgotPassword";
+import {
+  ForgotPasswordFormErrors,
+  validateForgotPasswordForm,
+} from "../../src/features/auth/validation/forgotPassword.validation";
 
 export default function ForgotPasswordScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
 
   const [email, setEmail] = useState("");
-  const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+
+  const { submitForgotPassword, isLoading, apiError, setApiError } =
+    useForgotPassword();
+
+  const [errors, setErrors] = useState<ForgotPasswordFormErrors>({});
 
   const handleSubmit = async () => {
-    if (isLoading) return;
-    if (!email.trim()) {
-      setError("Email is required");
+    const values = { email };
+
+    const validationErrors = validateForgotPasswordForm(values);
+
+    setErrors(validationErrors);
+    setApiError(null);
+
+    if (Object.keys(validationErrors).length > 0) {
       return;
     }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const response = await submitForgotPassword(values);
 
-    if (!emailRegex.test(email)) {
-      setError("Please enter a valid email");
-      return;
-    }
-
-    setError("");
-    setIsLoading(true);
-
-    // AFTER BE
-
-    setTimeout(() => {
-      setIsLoading(false);
+    if (response) {
       router.push("/auth/reset-password");
-    }, 1000);
+    }
   };
 
   return (
@@ -59,16 +61,25 @@ export default function ForgotPasswordScreen() {
             value={email}
             onChangeText={(value) => {
               setEmail(value);
-              setError("");
+              setErrors((current) => ({
+                ...current,
+                email: undefined,
+              }));
+
+              setApiError(null);
             }}
             autoCapitalize="none"
             keyboardType="email-address"
-            error={!!error}
+            error={Boolean(errors.email)}
             disabled={isLoading}
           />
 
-          {error ? <Text style={styles.errorText}>{error}</Text> : null}
+          {errors.email ? (
+            <Text style={styles.errorText}>{errors.email}</Text>
+          ) : null}
         </View>
+
+        {apiError ? <Text style={styles.errorText}>{apiError}</Text> : null}
 
         {isLoading ? (
           <AppLoader />

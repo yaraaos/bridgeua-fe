@@ -4,6 +4,7 @@ import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Image, Pressable, Text, View } from "react-native";
 
+import { useBusinessReviewSummary } from "@/src/features/reviews/hooks/useBusinessReviewSummary";
 import { Business } from "@/src/types/business";
 import { createStyles } from "./BusinessCard.styles";
 
@@ -26,6 +27,11 @@ export default function BusinessCard({
   const recommendedByPreview = business.recommendedByPreview ?? [];
   const recommendedByCount = business.recommendedByCount ?? 0;
   const recommendedPreview = recommendedByPreview.join(", ");
+  const reviewSummary = useBusinessReviewSummary({
+    businessId: String(business.id),
+    fallbackRating: business.rating,
+    fallbackReviewCount: 0,
+  });
 
   return (
     <Pressable
@@ -55,7 +61,9 @@ export default function BusinessCard({
           <View style={styles.ratingRow}>
             <Ionicons name="star" size={13} color={colors.accentOrange} />
 
-            <Text style={styles.ratingText}>{business.rating.toFixed(1)}</Text>
+            <Text style={styles.ratingText}>
+              {reviewSummary.rating.toFixed(1)}
+            </Text>
           </View>
 
           <View style={styles.metaRow}>

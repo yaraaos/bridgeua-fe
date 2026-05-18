@@ -50,7 +50,7 @@ export default function ReviewCard({
   const profile = useProfileStore((state) => state.profile);
 
   const isOwnReview =
-    businessReview?.authorName === profile.displayName ||
+    businessReview?.authorUsername === profile.username ||
     businessReview?.authorUsername === profile.username;
 
   const [isExpanded, setIsExpanded] = useState(false);
@@ -172,138 +172,144 @@ export default function ReviewCard({
         </>
       ) : businessReview ? (
         <>
-          <View style={styles.header}>
-            <Pressable
-              onPress={() => {
-                if (!businessReview.authorAvatar?.trim()) return;
+          <View style={styles.previewContent}>
+            <View style={styles.header}>
+              <Pressable
+                onPress={() => {
+                  if (!businessReview.authorAvatar?.trim()) return;
 
-                router.push({
-                  pathname: "/modal/image-viewer",
-                  params: {
-                    images: JSON.stringify([
-                      {
-                        id: "author-avatar",
-                        url: businessReview.authorAvatar,
-                      },
-                    ]),
-                    initialIndex: "0",
-                  },
-                });
-              }}
-            >
-              <AppAvatar
-                name={businessReview.authorName}
-                username={businessReview.authorUsername}
-                imageUrl={businessReview.authorAvatar}
-                size={isPreview ? "sm" : "md"}
-              />
-            </Pressable>
-
-            <Pressable
-              style={styles.authorInfo}
-              disabled={!isOwnReview}
-              onPress={() => {
-                if (!isOwnReview) return;
-                router.push("/profile/personal");
-              }}
-            >
-              <Text
-                style={[
-                  styles.authorName,
-                  isPreview && styles.authorNamePreview,
-                ]}
-                numberOfLines={1}
+                  router.push({
+                    pathname: "/modal/image-viewer",
+                    params: {
+                      images: JSON.stringify([
+                        {
+                          id: "author-avatar",
+                          url: businessReview.authorAvatar,
+                        },
+                      ]),
+                      initialIndex: "0",
+                    },
+                  });
+                }}
               >
-                {businessReview.authorName}
-              </Text>
+                <AppAvatar
+                  name={businessReview.authorUsername}
+                  username={businessReview.authorUsername}
+                  imageUrl={
+                    isOwnReview
+                      ? profile.avatarUrl
+                      : businessReview.authorAvatar
+                  }
+                  size={isPreview ? "sm" : "md"}
+                />
+              </Pressable>
 
-              <View style={styles.starsRow}>
-                {Array.from({ length: 5 }).map((_, index) => {
-                  const isFilled = index < Math.round(businessReview.rating);
+              <Pressable
+                style={styles.authorInfo}
+                disabled={!isOwnReview}
+                onPress={() => {
+                  if (!isOwnReview) return;
+                  router.push("/profile/personal");
+                }}
+              >
+                <Text
+                  style={[
+                    styles.authorName,
+                    isPreview && styles.authorNamePreview,
+                  ]}
+                  numberOfLines={1}
+                >
+                  @{businessReview.authorUsername}
+                </Text>
 
-                  return (
-                    <MaterialIcons
-                      key={index}
-                      name={isFilled ? "star" : "star-border"}
-                      size={isPreview ? 11 : 14}
-                      color={colors.accentOrange}
-                    />
-                  );
-                })}
-              </View>
-            </Pressable>
+                <View style={styles.starsRow}>
+                  {Array.from({ length: 5 }).map((_, index) => {
+                    const isFilled = index < Math.round(businessReview.rating);
 
-            {!isPreview ? (
-              <Text style={styles.reviewDate}>
-                {new Date(businessReview.createdAt).toLocaleDateString(
-                  "en-US",
-                  {
-                    month: "short",
-                    day: "numeric",
-                    year: "numeric",
-                  },
-                )}
+                    return (
+                      <MaterialIcons
+                        key={index}
+                        name={isFilled ? "star" : "star-border"}
+                        size={isPreview ? 11 : 14}
+                        color={colors.accentOrange}
+                      />
+                    );
+                  })}
+                </View>
+              </Pressable>
+
+              {!isPreview ? (
+                <Text style={styles.reviewDate}>
+                  {new Date(businessReview.createdAt).toLocaleDateString(
+                    "en-US",
+                    {
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                    },
+                  )}
+                </Text>
+              ) : null}
+            </View>
+
+            {hasReviewText ? (
+              <Text
+                style={[styles.text, isPreview && styles.textPreview]}
+                numberOfLines={isPreview ? 4 : isExpanded ? undefined : 3}
+              >
+                {businessReview.text}
               </Text>
             ) : null}
+
+            {isPreview ? (
+              <Pressable
+                style={styles.moreButton}
+                onPress={() => onPressMore?.(businessReview.id)}
+              >
+                <Text style={styles.moreText}>More</Text>
+              </Pressable>
+            ) : shouldShowReadMore ? (
+              <Pressable
+                style={styles.moreButton}
+                onPress={() => setIsExpanded((value) => !value)}
+              >
+                <Text style={styles.moreText}>
+                  {isExpanded ? "Show less" : "Read more"}
+                </Text>
+              </Pressable>
+            ) : null}
+
+            {showPhotos ? (
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                style={styles.photosScroll}
+              >
+                {businessReview.photos?.map((photo, index) => (
+                  <Pressable
+                    key={photo.id}
+                    onPress={() => openReviewPhotoViewer(index)}
+                    style={styles.photoItem}
+                  >
+                    <Image
+                      source={{ uri: photo.url }}
+                      style={styles.reviewPhoto}
+                    />
+                  </Pressable>
+                ))}
+              </ScrollView>
+            ) : null}
+
+            {!isPreview && businessReview.tags?.length ? (
+              <View style={styles.tagsWrap}>
+                {businessReview.tags.map((tag) => (
+                  <View key={tag} style={styles.tag}>
+                    <Text style={styles.tagText}>{tag}</Text>
+                  </View>
+                ))}
+              </View>
+            ) : null}
           </View>
-
-          {hasReviewText ? (
-            <Text
-              style={[styles.text, isPreview && styles.textPreview]}
-              numberOfLines={isPreview ? 4 : isExpanded ? undefined : 3}
-            >
-              {businessReview.text}
-            </Text>
-          ) : null}
-
-          {isPreview ? (
-            <Pressable
-              style={styles.moreButton}
-              onPress={() => onPressMore?.(businessReview.id)}
-            >
-              <Text style={styles.moreText}>More</Text>
-            </Pressable>
-          ) : shouldShowReadMore ? (
-            <Pressable
-              style={styles.moreButton}
-              onPress={() => setIsExpanded((value) => !value)}
-            >
-              <Text style={styles.moreText}>
-                {isExpanded ? "Show less" : "Read more"}
-              </Text>
-            </Pressable>
-          ) : null}
-
-          {showPhotos ? (
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              style={styles.photosScroll}
-            >
-              {businessReview.photos?.map((photo, index) => (
-                <Pressable
-                  key={photo.id}
-                  onPress={() => openReviewPhotoViewer(index)}
-                  style={styles.photoItem}
-                >
-                  <Image
-                    source={{ uri: photo.url }}
-                    style={styles.reviewPhoto}
-                  />
-                </Pressable>
-              ))}
-            </ScrollView>
-          ) : null}
-
-          {!isPreview && businessReview.tags?.length ? (
-            <View style={styles.tagsWrap}>
-              {businessReview.tags.map((tag) => (
-                <View key={tag} style={styles.tag}>
-                  <Text style={styles.tagText}>{tag}</Text>
-                </View>
-              ))}
-            </View>
-          ) : null}
         </>
       ) : null}
     </Pressable>

@@ -1,19 +1,23 @@
 import {
   BusinessAmenitiesSection,
   BusinessLanguagesSection,
-  BusinessRecommendedBySection
+  BusinessRecommendedBySection,
 } from "@/src/components/business";
-import type { BusinessAbout } from "@/src/features/businesses/types/business.types";
+import type {
+  BusinessAbout,
+  BusinessRecommendation,
+} from "@/src/features/businesses/types/business.types";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { router } from "expo-router";
 import { Text, View } from "react-native";
 import { createStyles } from "./BusinessAboutSection.styles";
 
 type Props = {
-  businessName: string;
+  businessId: string;
   about: BusinessAbout;
 };
 
-export default function BusinessAboutSection({ about }: Props) {
+export default function BusinessAboutSection({ businessId, about }: Props) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
 
@@ -29,9 +33,22 @@ export default function BusinessAboutSection({ about }: Props) {
 
       <BusinessRecommendedBySection
         recommends={about.recommendedBy}
-        onPressSeeAll={() => {
-          console.log("Open full recommended by screen");
-        }}
+        onPressSeeAll={() =>
+          router.push({
+            pathname: "/business/recommends",
+            params: {
+              businessId,
+            },
+          })
+        }
+        onPressRecommendation={(recommendation: BusinessRecommendation) =>
+          router.push({
+            pathname: "/business/[id]",
+            params: {
+              id: recommendation.businessId,
+            },
+          })
+        }
       />
 
       <BusinessLanguagesSection languages={about.languages} />

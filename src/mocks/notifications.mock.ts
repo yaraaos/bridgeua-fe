@@ -1,0 +1,163 @@
+import type { AppNotification } from "@/src/features/notifications/types/notification.types";
+
+const now = Date.now();
+
+const hoursAgo = (hours: number) =>
+  new Date(now - hours * 60 * 60 * 1000).toISOString();
+
+const daysAgo = (days: number) =>
+  new Date(now - days * 24 * 60 * 60 * 1000).toISOString();
+
+export const notificationsMock: AppNotification[] = [
+  {
+    id: "notif-business-1",
+    recipientAccountType: "business",
+    type: "recommendation_received",
+    title: "Zelenska Beauty",
+    subtitle: "Tory Pro Nails recommended your business.",
+    createdAt: hoursAgo(0.1),
+    isRead: false,
+    imageUrl:
+      "https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=300",
+    targetId: "business-1",
+    targetType: "business",
+  },
+  {
+    id: "notif-business-2",
+    recipientAccountType: "business",
+    type: "promotion",
+    title: "Free dessert today",
+    subtitle: "Your promotion is live and visible to customers.",
+    createdAt: hoursAgo(1),
+    isRead: false,
+    imageUrl:
+      "https://images.unsplash.com/photo-1551024506-0bccd828d307?w=300",
+    targetId: "promotion-1",
+    targetType: "promotion",
+  },
+  {
+    id: "notif-business-3",
+    recipientAccountType: "business",
+    type: "new_review",
+    title: "You received a new review",
+    subtitle: "La Pasta House left you a 5-star review.",
+    createdAt: hoursAgo(3),
+    isRead: false,
+    targetId: "business-1",
+    targetType: "review",
+  },
+  {
+    id: "notif-business-4",
+    recipientAccountType: "business",
+    type: "business_update",
+    title: "Sushi Zen",
+    subtitle: "Your business hours were updated successfully.",
+    createdAt: hoursAgo(6),
+    isRead: true,
+    imageUrl:
+      "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=300",
+    targetId: "business-2",
+    targetType: "business",
+  },
+  {
+    id: "notif-business-5",
+    recipientAccountType: "business",
+    type: "system_update",
+    title: "System update",
+    subtitle: "We improved business profile analytics.",
+    createdAt: daysAgo(1),
+    isRead: true,
+    targetType: "settings",
+  },
+  {
+    id: "notif-business-6",
+    recipientAccountType: "business",
+    type: "profile_suggestion",
+    title: "Improve your profile",
+    subtitle: "Add more details to your About section to build trust.",
+    createdAt: daysAgo(2),
+    isRead: true,
+    targetId: "business-1",
+    targetType: "business",
+  },
+  {
+    id: "notif-business-7",
+    recipientAccountType: "business",
+    type: "new_follower",
+    title: "You have a new follower",
+    subtitle: "Someone started following your business.",
+    createdAt: daysAgo(3),
+    isRead: true,
+    targetId: "business-1",
+    targetType: "business",
+  },
+
+  {
+    id: "notif-personal-1",
+    recipientAccountType: "personal",
+    type: "promotion",
+    title: "Fresh promo near you",
+    subtitle: "A Ukrainian bakery added a new weekend offer.",
+    createdAt: hoursAgo(0.5),
+    isRead: false,
+    imageUrl:
+      "https://images.unsplash.com/photo-1517433670267-08bbd4be890f?w=300",
+    targetId: "promotion-2",
+    targetType: "promotion",
+  },
+  {
+    id: "notif-personal-2",
+    recipientAccountType: "personal",
+    type: "review_upvote",
+    title: "Your review helped someone",
+    subtitle: "A user found your review useful.",
+    createdAt: hoursAgo(2),
+    isRead: false,
+    targetId: "business-1",
+    targetType: "review",
+  },
+  {
+    id: "notif-personal-3",
+    recipientAccountType: "personal",
+    type: "new_business",
+    title: "New business added",
+    subtitle: "Tory Pro Nails joined BridgeUA.",
+    createdAt: hoursAgo(8),
+    isRead: true,
+    imageUrl:
+      "https://images.unsplash.com/photo-1604654894610-df63bc536371?w=300",
+    targetId: "business-3",
+    targetType: "business",
+  },
+  {
+    id: "notif-personal-4",
+    recipientAccountType: "personal",
+    type: "birthday",
+    title: "Happy Birthday!",
+    subtitle: "Celebrate with special offers from local businesses.",
+    createdAt: daysAgo(1),
+    isRead: true,
+    targetType: "promotion",
+  },
+  {
+    id: "notif-personal-5",
+    recipientAccountType: "personal",
+    type: "business_update",
+    title: "Business update",
+    subtitle: "A business you follow updated their opening hours.",
+    createdAt: daysAgo(2),
+    isRead: true,
+    targetId: "business-2",
+    targetType: "business",
+  },
+  {
+    id: "notif-personal-6",
+    recipientAccountType: "personal",
+    type: "system_update",
+    title: "System update",
+    subtitle: "We made improvements to recommendations.",
+    createdAt: daysAgo(3),
+    isRead: true,
+    targetType: "settings",
+  },
+];

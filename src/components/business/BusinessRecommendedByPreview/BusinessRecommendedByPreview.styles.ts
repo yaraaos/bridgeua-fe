@@ -14,38 +14,32 @@ export function createStyles(colors: AppColors) {
       borderWidth: 1,
       borderColor: colors.border,
     },
-
     headerRow: {
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "space-between",
       gap: spacing.md,
     },
-
     title: {
       flex: 1,
       fontSize: 18,
       fontWeight: "700",
       color: colors.textPrimary,
     },
-
     viewAllButton: {
       flexDirection: "row",
       alignItems: "center",
-      gap: 2,
+      gap: spacing.xs,
     },
-
     viewAllText: {
       fontSize: 13,
       fontWeight: "700",
       color: colors.primaryGreen,
     },
-
     viewAllIcon: {
       color: colors.primaryGreen,
     },
-
-    list: {
+    actions: {
       marginTop: spacing.md,
     },
   });

@@ -25,6 +25,22 @@ type Props = {
   onReviewsListLayout?: (y: number) => void;
 };
 
+function getReviewRelevanceScore(review: BusinessDetailsReview) {
+  const hasText = review.text.trim().length > 0;
+  const hasPhotos = Boolean(review.photos?.length);
+  const hasLabels = Boolean(review.tags?.length);
+
+  if (hasText && hasPhotos && hasLabels) return 8;
+  if (hasText && hasPhotos) return 7;
+  if (hasPhotos && hasLabels) return 6;
+  if (hasText && hasLabels) return 5;
+  if (hasText) return 4;
+  if (hasPhotos) return 3;
+  if (hasLabels) return 2;
+
+  return 1;
+}
+
 export default function BusinessReviewsList({
   reviews,
   reviewCount,
@@ -41,6 +57,17 @@ export default function BusinessReviewsList({
     useState<ReviewFilterOption>("Most relevant");
 
   const sortedReviews = [...reviews].sort((a, b) => {
+    if (activeFilter === "Most relevant") {
+      const relevanceDifference =
+        getReviewRelevanceScore(b) - getReviewRelevanceScore(a);
+
+      if (relevanceDifference !== 0) {
+        return relevanceDifference;
+      }
+
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    }
+
     if (activeFilter === "Newest") {
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     }

@@ -64,6 +64,7 @@ type Props = {
   onPressBack?: () => void;
 
   profileContent?: React.ReactNode;
+  bottomSlot?: React.ReactNode;
 };
 
 export default function ScreenHeader({
@@ -100,6 +101,7 @@ export default function ScreenHeader({
   onPressShare,
   onPressBack,
   profileContent,
+  bottomSlot,
 }: Props) {
   const { colors, isDark } = useAppTheme();
   const styles = createStyles(colors);
@@ -342,7 +344,11 @@ export default function ScreenHeader({
         </View>
       </View>
 
-      {showSearch && (
+      {bottomSlot ? (
+        <View style={styles.bottomSlotRow}>{bottomSlot}</View>
+      ) : null}
+
+      {!bottomSlot && showSearch && (
         <View style={styles.searchRow}>
           <View style={styles.searchInputWrap}>
             <AppInput

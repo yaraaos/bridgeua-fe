@@ -109,7 +109,8 @@ export const businessDetailsMock: BusinessDetails[] = [
           businessLocation: "Los Angeles / California",
           businessImageUrl:
             "https://images.unsplash.com/photo-1604654894610-df63bc536371?w=300",
-          recommendationsCount: 14,
+          recommendedByCount: 5,
+          recommendedByPreview: ["ToryProNails", "Best deal"],
         },
         {
           id: "recommended-by-2",
@@ -119,7 +120,8 @@ export const businessDetailsMock: BusinessDetails[] = [
           businessLocation: "Beverly Hills / California",
           businessImageUrl:
             "https://images.unsplash.com/photo-1604719312566-8912e9227c6a?w=300",
-          recommendationsCount: 9,
+          recommendedByCount: 5,
+          recommendedByPreview: ["ToryProNails", "Best deal"],
         },
         {
           id: "recommended-by-3",
@@ -129,7 +131,19 @@ export const businessDetailsMock: BusinessDetails[] = [
           businessLocation: "Santa Monica / California",
           businessImageUrl:
             "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=300",
-          recommendationsCount: 21,
+          recommendedByCount: 5,
+          recommendedByPreview: ["ToryProNails", "Best deal"],
+        },
+        {
+          id: "rec-4",
+          businessId: "business-4",
+          businessName: "Dnipro Wellness Studio",
+          businessCategory: "Wellness",
+          businessLocation: "Brooklyn, NY",
+          businessImageUrl:
+            "https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?q=80&w=800",
+          recommendedByCount: 5,
+          recommendedByPreview: ["ToryProNails", "Best deal"],
         },
       ],
     },
@@ -217,6 +231,7 @@ export const businessDetailsMock: BusinessDetails[] = [
       {
         id: "review-1",
         authorName: "Kateryna",
+        authorUsername: "kate678",
         authorAvatar:
           "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300",
         rating: 4,
@@ -226,6 +241,7 @@ export const businessDetailsMock: BusinessDetails[] = [
       {
         id: "review-2",
         authorName: "Kristina",
+        authorUsername: "kris33",
         authorAvatar:
           "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300",
         rating: 5,
@@ -235,6 +251,7 @@ export const businessDetailsMock: BusinessDetails[] = [
       {
         id: "review-3",
         authorName: "Anna",
+        authorUsername: "anna.love",
         authorAvatar:
           "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=300",
         rating: 5,
@@ -248,6 +265,7 @@ export const businessDetailsMock: BusinessDetails[] = [
       {
         id: "review-1",
         authorName: "Kateryna",
+        authorUsername: "kate678",
         authorAvatar:
           "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300",
         rating: 4,
@@ -268,6 +286,7 @@ export const businessDetailsMock: BusinessDetails[] = [
       {
         id: "review-2",
         authorName: "Kristina",
+        authorUsername: "kris33",
         authorAvatar:
           "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300",
         rating: 5,
@@ -277,6 +296,7 @@ export const businessDetailsMock: BusinessDetails[] = [
       {
         id: "review-3",
         authorName: "Anna",
+        authorUsername: "anna.love",
         authorAvatar:
           "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=300",
         rating: 5,
