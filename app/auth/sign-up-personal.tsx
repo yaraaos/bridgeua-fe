@@ -5,6 +5,7 @@ import { router } from "expo-router";
 import React, { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
+import { useNotificationsStore } from "@/src/store/notifications.store";
 import { useProfileStore } from "@/src/store/profile.store";
 import { AccountTypeSwitch } from "../../src/components/auth";
 import AppButton from "../../src/components/ui/AppButton/AppButton";
@@ -17,21 +18,21 @@ import {
   SignUpPersonalFormErrors,
   validateSignUpPersonalForm,
 } from "../../src/features/auth/validation/signUpPersonal.validation";
-import { useNotificationsStore } from "@/src/store/notifications.store";
 
 export default function SignUpPersonalScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
   const setProfile = useProfileStore((state) => state.setProfile);
   const setNotificationsAccountType = useNotificationsStore(
-  (state) => state.setActiveAccountType,
-);
+    (state) => state.setActiveAccountType,
+  );
 
   const { submitRegisterPersonal, isLoading, apiError, setApiError } =
     useRegisterPersonal();
 
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -49,6 +50,7 @@ export default function SignUpPersonalScreen() {
     const values = {
       firstName,
       lastName,
+      username,
       email,
       password,
       confirmPassword,
@@ -65,6 +67,7 @@ export default function SignUpPersonalScreen() {
     const response = await submitRegisterPersonal({
       firstName,
       lastName,
+      username,
       email,
       password,
     });
@@ -76,7 +79,7 @@ export default function SignUpPersonalScreen() {
         firstName: firstName.trim(),
         lastName: lastName.trim(),
         displayName: `${firstName.trim()} ${lastName.trim()}`.trim(),
-        username: email.trim().split("@")[0],
+        username: username.trim(),
         email: response.email,
         avatarUrl: "",
         phoneNumber: "",
@@ -144,6 +147,23 @@ export default function SignUpPersonalScreen() {
             />
             {errors.lastName ? (
               <Text style={styles.errorText}>{errors.lastName}</Text>
+            ) : null}
+          </View>
+
+          <View>
+            <AppInput
+              placeholder="Username"
+              value={username}
+              onChangeText={(value) => {
+                setUsername(value);
+                clearFieldError("username");
+              }}
+              autoCapitalize="none"
+              disabled={isLoading}
+              error={Boolean(errors.username)}
+            />
+            {errors.username ? (
+              <Text style={styles.errorText}>{errors.username}</Text>
             ) : null}
           </View>
 

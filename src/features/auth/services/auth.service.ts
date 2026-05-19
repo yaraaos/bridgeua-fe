@@ -43,6 +43,9 @@ export async function registerPersonal(
   if (payload.email === "taken@test.com") {
     throw new Error("Email is already registered");
   }
+  if (payload.username === "taken") {
+    throw new Error("Username is already taken");
+  }
 
   return {
     userId: "user-1",
