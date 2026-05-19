@@ -8,8 +8,7 @@ export function createStyles(colors: AppColors) {
     container: {
       marginHorizontal: spacing.lg,
       marginTop: spacing.md,
-      paddingHorizontal: spacing.lg,
-      paddingVertical: spacing.sm,
+      padding: spacing.lg,
       borderRadius: radius.xl,
       backgroundColor: colors.surface,
       borderWidth: 1,
@@ -24,11 +23,13 @@ export function createStyles(colors: AppColors) {
       flexDirection: "row",
       alignItems: "center",
       gap: spacing.md,
-      paddingVertical: spacing.md,
+      paddingVertical: 0,
     },
     serviceRowBordered: {
       borderTopWidth: 1,
       borderTopColor: colors.border,
+      paddingTop: spacing.md,
+      marginTop: spacing.md,
     },
     iconBox: {
       width: 38,

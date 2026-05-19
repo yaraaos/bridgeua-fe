@@ -8,7 +8,7 @@ export function createStyles(colors: AppColors) {
     container: {
       flexDirection: "row",
       gap: spacing.md,
-      paddingVertical: spacing.md,
+      paddingVertical: 0,
     },
     iconBox: {
       width: 36,

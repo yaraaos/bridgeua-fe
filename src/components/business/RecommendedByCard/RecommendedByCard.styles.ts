@@ -8,11 +8,12 @@ export function createStyles(colors: AppColors) {
       flexDirection: "row",
       alignItems: "center",
       gap: spacing.md,
-      paddingVertical: spacing.md,
     },
     bordered: {
       borderTopWidth: 1,
       borderTopColor: colors.border,
+      paddingTop: spacing.md,
+      marginTop: spacing.md,
     },
     content: {
       flex: 1,

@@ -111,8 +111,14 @@ export default function BusinessOverviewCard({ business }: Props) {
               }
             >
               {isHoursRow
-                ? business.about.openingHours?.map((hour) => (
-                    <View key={hour.id} style={styles.hoursRow}>
+                ? business.about.openingHours?.map((hour, index, array) => (
+                    <View
+                      key={hour.id}
+                      style={[
+                        styles.hoursRow,
+                        index === array.length - 1 && styles.hoursRowLast,
+                      ]}
+                    >
                       <Text style={styles.hoursDay}>{hour.day}</Text>
                       <Text style={styles.hoursValue}>{hour.hours}</Text>
                     </View>

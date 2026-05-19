@@ -8,8 +8,7 @@ export function createStyles(colors: AppColors) {
     container: {
       marginHorizontal: spacing.lg,
       marginTop: spacing.md,
-      paddingHorizontal: spacing.lg,
-      paddingVertical: spacing.sm,
+      padding: spacing.lg,
       borderRadius: radius.xl,
       backgroundColor: colors.surface,
       borderWidth: 1,
@@ -19,7 +18,7 @@ export function createStyles(colors: AppColors) {
       flexDirection: "row",
       justifyContent: "space-between",
       gap: spacing.md,
-      paddingVertical: spacing.xs,
+      paddingVertical: spacing.sm,
     },
     hoursDay: {
       fontSize: 14,
@@ -29,6 +28,9 @@ export function createStyles(colors: AppColors) {
       fontSize: 14,
       fontWeight: "600",
       color: colors.textPrimary,
+    },
+    hoursRowLast: {
+      paddingBottom: 0,
     },
   });
 }

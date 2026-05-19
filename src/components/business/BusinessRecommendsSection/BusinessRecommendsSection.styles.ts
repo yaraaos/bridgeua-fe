@@ -46,7 +46,7 @@ export function createStyles(colors: AppColors) {
     },
 
     list: {
-      marginTop: spacing.md,
+      marginTop: spacing.lg,
     },
   });
 }

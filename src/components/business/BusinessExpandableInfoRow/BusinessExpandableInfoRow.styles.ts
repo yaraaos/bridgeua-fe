@@ -8,14 +8,17 @@ export function createStyles(colors: AppColors) {
     container: {
       borderBottomWidth: 1,
       borderBottomColor: colors.border,
+      paddingBottom: spacing.md,
+      marginBottom: spacing.md,
     },
     containerLast: {
       borderBottomWidth: 0,
+      paddingBottom: 0,
+      marginBottom: 0,
     },
     row: {
       flexDirection: "row",
       alignItems: "center",
-      paddingVertical: spacing.md,
       gap: spacing.md,
     },
     iconBox: {
@@ -56,7 +59,6 @@ export function createStyles(colors: AppColors) {
     expandedContent: {
       paddingLeft: 51,
       paddingRight: 28,
-      paddingBottom: spacing.md,
     },
   });
 }
