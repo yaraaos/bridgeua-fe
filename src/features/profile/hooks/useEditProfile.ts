@@ -1,4 +1,5 @@
 import { useProfileStore } from "@/src/store/profile.store";
+import { useReviewsStore } from "@/src/store/reviews.store";
 import { useState } from "react";
 
 type EditProfilePayload = {
@@ -13,6 +14,10 @@ type EditProfilePayload = {
 export function useEditProfile() {
   const [isSaving, setIsSaving] = useState(false);
   const updateProfile = useProfileStore((state) => state.updateProfile);
+  const profile = useProfileStore((state) => state.profile);
+  const syncReviewAuthorUsername = useReviewsStore(
+    (state) => state.syncReviewAuthorUsername,
+  );
 
   const saveProfile = async (payload: EditProfilePayload) => {
     try {
@@ -20,6 +25,14 @@ export function useEditProfile() {
 
       // TODO: replace with API PATCH /profile/me
       await new Promise((resolve) => setTimeout(resolve, 600));
+
+      if (profile.username !== payload.username) {
+        syncReviewAuthorUsername({
+          previousUsername: profile.username,
+          nextUsername: payload.username,
+          avatarUrl: payload.avatarUrl,
+        });
+      }
 
       updateProfile({
         displayName: `${payload.firstName} ${payload.lastName}`.trim(),

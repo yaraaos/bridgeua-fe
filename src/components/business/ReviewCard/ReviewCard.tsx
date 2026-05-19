@@ -219,7 +219,7 @@ export default function ReviewCard({
                   ]}
                   numberOfLines={1}
                 >
-                  @{businessReview.authorUsername}
+                  {businessReview.authorUsername}
                 </Text>
 
                 <View style={styles.starsRow}>

@@ -1,12 +1,12 @@
-import {AppColors} from "@/src/constants/colors";
-import {StyleSheet} from "react-native";
+import { AppColors } from "@/src/constants/colors";
+import { StyleSheet } from "react-native";
 
 export function createStyles(colors: AppColors) {
   return StyleSheet.create({
     wrapper: {
       paddingHorizontal: 16,
       paddingTop: 12,
-      paddingBottom: 8,
+      paddingBottom: 12,
       backgroundColor: colors.background,
     },
     wrapperOverlay: {

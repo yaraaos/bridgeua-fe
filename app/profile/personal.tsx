@@ -104,7 +104,7 @@ export default function PersonalProfileScreen() {
 
               <View style={styles.heroTextWrap}>
                 <AppText style={styles.heroName} numberOfLines={1}>
-                  @{profile.username}
+                  {profile.username}
                 </AppText>
               </View>
 

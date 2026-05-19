@@ -4,6 +4,15 @@ export const signUpPersonalSchema = z
   .object({
     firstName: z.string().trim().min(1, "First name is required"),
     lastName: z.string().trim().min(1, "Last name is required"),
+    username: z
+      .string()
+      .trim()
+      .min(3, "Username must be at least 3 characters")
+      .max(20, "Username must be 20 characters or less")
+      .regex(
+        /^[a-zA-Z0-9._]+$/,
+        "Username can only use letters, numbers, dots, or underscores",
+      ),
     email: z
       .string()
       .trim()

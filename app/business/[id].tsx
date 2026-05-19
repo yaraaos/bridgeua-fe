@@ -382,9 +382,8 @@ function createStyles(colors: AppColors) {
     },
     stickyTabsWrap: {
       backgroundColor: colors.background,
-      paddingBottom: spacing.sm,
+      paddingBottom: spacing.md,
       zIndex: 10,
-      marginBottom: -8,
     },
     scrollContent: {
       paddingBottom: spacing.xl,

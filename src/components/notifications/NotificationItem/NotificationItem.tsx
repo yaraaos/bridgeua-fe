@@ -2,8 +2,8 @@ import { Feather } from "@expo/vector-icons";
 import { Image, Pressable, Text, View } from "react-native";
 
 import type {
-    AppNotification,
-    NotificationType,
+  AppNotification,
+  NotificationType,
 } from "@/src/features/notifications/types/notification.types";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { createStyles } from "./NotificationItem.styles";
@@ -55,7 +55,11 @@ export default function NotificationItem({ item, onPress }: Props) {
   return (
     <Pressable
       onPress={() => onPress?.(item)}
-      style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
+      style={({ pressed }) => [
+        styles.card,
+        item.imageUrl ? styles.cardWithThumbnail : styles.cardWithoutThumbnail,
+        pressed && styles.cardPressed,
+      ]}
     >
       <View style={styles.iconWrap}>
         <Feather name={iconName} size={19} color={colors.primaryGreen} />
@@ -85,7 +89,11 @@ export default function NotificationItem({ item, onPress }: Props) {
         <Image source={{ uri: item.imageUrl }} style={styles.thumbnail} />
       ) : null}
 
-      <Text style={styles.time}>{formatNotificationTime(item.createdAt)}</Text>
+      <View style={styles.timeSlot}>
+        <Text style={styles.time}>
+          {formatNotificationTime(item.createdAt)}
+        </Text>
+      </View>
     </Pressable>
   );
 }

@@ -241,7 +241,7 @@ function createStyles(colors: AppColors) {
     switchWrap: {
       paddingHorizontal: 16,
       paddingTop: 12,
-      paddingBottom: 8,
+      paddingBottom: 12,
     },
     loaderWrap: {
       flex: 1,
@@ -250,7 +250,6 @@ function createStyles(colors: AppColors) {
     listContent: {
       paddingHorizontal: 16,
       paddingBottom: 24,
-      paddingTop: 4,
     },
   });
 }

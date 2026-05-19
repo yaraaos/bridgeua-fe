@@ -18,6 +18,7 @@ export type SignInResponse = {
 export type RegisterPersonalPayload = {
   firstName: string;
   lastName: string;
+  username: string;
   email: string;
   password: string;
 };

@@ -40,7 +40,7 @@ export function createStyles(colors: AppColors) {
       color: colors.primaryGreen,
     },
     actions: {
-      marginTop: spacing.md,
+      marginTop: spacing.lg,
     },
   });
 }

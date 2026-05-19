@@ -291,7 +291,7 @@ const styles = StyleSheet.create({
 
   listContent: {
     paddingHorizontal: 16,
-    paddingTop: 8,
+    paddingTop: 2,
     paddingBottom: 4,
   },
   emptyStateWrap: {

@@ -9,13 +9,21 @@ export function createStyles(colors: AppColors) {
       flexDirection: "row",
       alignItems: "center",
       gap: spacing.md,
-      minHeight: 78,
       paddingHorizontal: spacing.md,
       paddingVertical: spacing.md,
       borderRadius: radius.xl,
       backgroundColor: colors.surface,
       borderWidth: 1,
       borderColor: colors.border,
+      position: "relative",
+    },
+
+    cardWithThumbnail: {
+      paddingRight: 104,
+    },
+
+    cardWithoutThumbnail: {
+      paddingRight: 42,
     },
 
     cardPressed: {
@@ -74,6 +82,13 @@ export function createStyles(colors: AppColors) {
       color: colors.textMuted,
     },
 
+    timeSlot: {
+      position: "absolute",
+      right: spacing.md,
+      width: 32,
+      alignItems: "flex-end",
+    },
+
     subtitle: {
       marginTop: 4,
       fontSize: 12,
@@ -86,10 +101,11 @@ export function createStyles(colors: AppColors) {
     },
 
     thumbnail: {
-      width: 46,
-      height: 46,
+      position: "absolute",
+      right: 42,
+      width: 44,
+      height: 44,
       borderRadius: radius.md,
-      backgroundColor: colors.background,
     },
   });
 }

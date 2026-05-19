@@ -8,6 +8,12 @@ type ReviewsState = {
   submittedReviews: Review[];
 
   addReview: (review: Review) => void;
+
+  syncReviewAuthorUsername: (payload: {
+    previousUsername: string;
+    nextUsername: string;
+    avatarUrl?: string;
+  }) => void;
   clearReviews: () => void;
 };
 
@@ -19,6 +25,24 @@ export const useReviewsStore = create<ReviewsState>()(
       addReview: (review) =>
         set((state) => ({
           submittedReviews: [review, ...state.submittedReviews],
+        })),
+
+      syncReviewAuthorUsername: ({
+        previousUsername,
+        nextUsername,
+        avatarUrl,
+      }) =>
+        set((state) => ({
+          submittedReviews: state.submittedReviews.map((review) =>
+            review.authorUsername === previousUsername
+              ? {
+                  ...review,
+                  authorName: nextUsername,
+                  authorUsername: nextUsername,
+                  authorAvatar: avatarUrl ?? review.authorAvatar,
+                }
+              : review,
+          ),
         })),
 
       clearReviews: () =>
