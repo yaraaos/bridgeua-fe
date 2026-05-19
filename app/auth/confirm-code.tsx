@@ -82,11 +82,11 @@ export default function ConfirmCodeScreen() {
       resetFollowing();
       clearReviews();
 
-      await saveAuthTokens("mock-access-token", "mock-refresh-token");
+      await saveAuthTokens(response.accessToken);
 
       setUser({
         id: profile.id,
-        email: profile.email,
+        email: profile.email ?? email,
         name: profile.displayName,
       });
 

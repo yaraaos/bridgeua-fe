@@ -248,7 +248,9 @@ export default function MapScreen() {
             showsMyLocationButton={false}
             onPress={() => setSelectedBusinessId(null)}
           >
-            {filteredBusinesses.map((business) => {
+            {filteredBusinesses.filter(
+              (b) => b.coordinates?.latitude != null && b.coordinates?.longitude != null
+            ).map((business) => {
               const isFollowed = followedBusinessIds.includes(
                 String(business.id),
               );
