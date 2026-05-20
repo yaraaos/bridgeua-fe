@@ -7,6 +7,7 @@ import type {
   GetReviewsResponse,
   Review,
   SubmitReviewPayload,
+  UpdateReviewPayload,
 } from "../types/review.types";
 
 const EMPTY_BREAKDOWN = ([5, 4, 3, 2, 1] as const).map((rating) => ({
@@ -109,6 +110,46 @@ export const submitReview = async (
 
   return Promise.resolve(newReview);
 };
+
+export const updateReview = async (
+  payload: UpdateReviewPayload,
+): Promise<Review | null> => {
+  const review = useReviewsStore
+    .getState()
+    .submittedReviews.find((item) => item.id === payload.reviewId);
+
+  if (!review) {
+    return Promise.resolve(null);
+  }
+
+  const updatedReview: Review = {
+    ...review,
+    rating: payload.rating,
+    text: payload.text,
+    tags: payload.tags ?? review.tags,
+    photos: payload.photos
+      ? payload.photos.map((uri, index) => ({
+          id: `updated-photo-${Date.now()}-${index}`,
+          url: uri,
+        }))
+      : review.photos,
+  };
+
+  console.log("API PATCH /reviews/:reviewId", payload);
+
+  useReviewsStore.getState().updateReview(payload.reviewId, updatedReview);
+
+  return Promise.resolve(updatedReview);
+};
+
+export const deleteReview = async (reviewId: string): Promise<void> => {
+  console.log("API DELETE /reviews/:reviewId", { reviewId });
+
+  useReviewsStore.getState().deleteReview(reviewId);
+
+  return Promise.resolve();
+};
+
 export const getMyReviews = async (): Promise<PersonalProfileReview[]> => {
   const profile = useProfileStore.getState().profile;
 

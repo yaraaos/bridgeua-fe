@@ -8,6 +8,8 @@ type ReviewsState = {
   submittedReviews: Review[];
 
   addReview: (review: Review) => void;
+  updateReview: (reviewId: string, updates: Partial<Review>) => void;
+  deleteReview: (reviewId: string) => void;
 
   syncReviewAuthorUsername: (payload: {
     previousUsername: string;
@@ -25,6 +27,25 @@ export const useReviewsStore = create<ReviewsState>()(
       addReview: (review) =>
         set((state) => ({
           submittedReviews: [review, ...state.submittedReviews],
+        })),
+
+      updateReview: (reviewId, updates) =>
+        set((state) => ({
+          submittedReviews: state.submittedReviews.map((review) =>
+            review.id === reviewId
+              ? {
+                  ...review,
+                  ...updates,
+                }
+              : review,
+          ),
+        })),
+
+      deleteReview: (reviewId) =>
+        set((state) => ({
+          submittedReviews: state.submittedReviews.filter(
+            (review) => review.id !== reviewId,
+          ),
         })),
 
       syncReviewAuthorUsername: ({

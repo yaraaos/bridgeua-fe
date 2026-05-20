@@ -39,6 +39,14 @@ export type SubmitReviewPayload = {
   photos?: string[];
 };
 
+export type UpdateReviewPayload = {
+  reviewId: string;
+  rating: number;
+  text: string;
+  tags?: string[];
+  photos?: string[];
+};
+
 export type ReviewsSummary = {
   rating: number;
   reviewCount: number;
