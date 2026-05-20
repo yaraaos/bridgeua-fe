@@ -1,14 +1,17 @@
 import ReviewCard from "@/src/components/business/ReviewCard";
+import ReviewCommentCard from "@/src/components/reviews/ReviewCommentCard";
+import ReviewCommentComposer from "@/src/components/reviews/ReviewCommentComposer";
 import AppEmptyState from "@/src/components/ui/AppEmptyState";
 import AppLoader from "@/src/components/ui/AppLoader/AppLoader";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
 import { getReviewById } from "@/src/features/reviews/services/review.service";
+import { useReviewCommentsStore } from "@/src/features/reviews/store/review-comments.store";
 import type { Review } from "@/src/features/reviews/types/review.types";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { MaterialIcons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
-import { useEffect, useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { useEffect, useMemo, useState } from "react";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 export default function ReviewThreadScreen() {
   const { colors } = useAppTheme();
@@ -16,6 +19,20 @@ export default function ReviewThreadScreen() {
 
   const [review, setReview] = useState<Review | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  const comments = useReviewCommentsStore((state) => state.comments);
+  const addComment = useReviewCommentsStore((state) => state.addComment);
+
+  const reviewComments = useMemo(() => {
+    if (!reviewId) return [];
+
+    return comments
+      .filter((comment) => comment.reviewId === reviewId)
+      .sort(
+        (a, b) =>
+          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+      );
+  }, [comments, reviewId]);
 
   useEffect(() => {
     const loadReview = async () => {
@@ -34,6 +51,15 @@ export default function ReviewThreadScreen() {
 
     loadReview();
   }, [reviewId]);
+
+  const handleAddComment = (text: string) => {
+    if (!reviewId) return;
+
+    addComment({
+      reviewId,
+      text,
+    });
+  };
 
   return (
     <AppScreen style={styles.container}>
@@ -61,9 +87,36 @@ export default function ReviewThreadScreen() {
           <AppLoader />
         </View>
       ) : review ? (
-        <View style={styles.content}>
-          <ReviewCard review={review} />
-        </View>
+        <>
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={styles.scrollContent}
+            keyboardShouldPersistTaps="handled"
+          >
+            <ReviewCard review={review} />
+
+            <View
+              style={[styles.divider, { backgroundColor: colors.border }]}
+            />
+
+            <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>
+              Comments
+            </Text>
+
+            {reviewComments.length > 0 ? (
+              reviewComments.map((comment) => (
+                <ReviewCommentCard key={comment.id} comment={comment} />
+              ))
+            ) : (
+              <AppEmptyState
+                title="No comments yet"
+                description="Start the conversation around this review."
+              />
+            )}
+          </ScrollView>
+
+          <ReviewCommentComposer onSubmit={handleAddComment} />
+        </>
       ) : (
         <AppEmptyState
           title="Review not found"
@@ -107,7 +160,18 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
   },
-  content: {
+  scrollContent: {
     paddingHorizontal: 16,
+    paddingBottom: 24,
+  },
+  divider: {
+    height: 1,
+    marginVertical: 8,
+  },
+  sectionTitle: {
+    marginTop: 8,
+    marginBottom: 4,
+    fontSize: 16,
+    fontWeight: "800",
   },
 });
