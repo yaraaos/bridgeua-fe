@@ -153,6 +153,29 @@ export const deleteReview = async (reviewId: string): Promise<void> => {
   return Promise.resolve();
 };
 
+export const getReviewById = async (
+  reviewId: string,
+): Promise<Review | null> => {
+  const submittedReview = useReviewsStore
+    .getState()
+    .submittedReviews.find((review) => review.id === reviewId);
+
+  if (submittedReview) {
+    return Promise.resolve(submittedReview);
+  }
+
+  const mockReview = businessDetailsMock
+    .flatMap((business) =>
+      business.reviews.map((review) => ({
+        ...review,
+        businessId: business.id,
+      })),
+    )
+    .find((review) => review.id === reviewId);
+
+  return Promise.resolve(mockReview ?? null);
+};
+
 export const getMyReviews = async (): Promise<PersonalProfileReview[]> => {
   const profile = useProfileStore.getState().profile;
 

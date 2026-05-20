@@ -317,13 +317,24 @@ export default function ReviewCard({
                 </Text>
               </Pressable>
 
-              <Pressable style={styles.interactionButton}>
+              <Pressable
+                style={styles.interactionButton}
+                onPress={(event) => {
+                  event.stopPropagation();
+
+                  router.push({
+                    pathname: "/business/review/[reviewId]",
+                    params: {
+                      reviewId: review.id,
+                    },
+                  });
+                }}
+              >
                 <MaterialIcons
                   name="chat-bubble-outline"
                   size={16}
                   color={colors.textSecondary}
                 />
-
                 <Text style={styles.interactionText}>
                   {review.commentsCount}
                 </Text>
@@ -491,13 +502,24 @@ export default function ReviewCard({
                 </Text>
               </Pressable>
 
-              <Pressable style={styles.interactionButton}>
+              <Pressable
+                style={styles.interactionButton}
+                onPress={(event) => {
+                  event.stopPropagation();
+
+                  router.push({
+                    pathname: "/business/review/[reviewId]",
+                    params: {
+                      reviewId: review.id,
+                    },
+                  });
+                }}
+              >
                 <MaterialIcons
                   name="chat-bubble-outline"
                   size={16}
                   color={colors.textSecondary}
                 />
-
                 <Text style={styles.interactionText}>
                   {review.commentsCount}
                 </Text>
