@@ -10,6 +10,7 @@ type ReviewsState = {
   addReview: (review: Review) => void;
   updateReview: (reviewId: string, updates: Partial<Review>) => void;
   deleteReview: (reviewId: string) => void;
+  toggleReviewLike: (reviewId: string) => void;
 
   syncReviewAuthorUsername: (payload: {
     previousUsername: string;
@@ -46,6 +47,25 @@ export const useReviewsStore = create<ReviewsState>()(
           submittedReviews: state.submittedReviews.filter(
             (review) => review.id !== reviewId,
           ),
+        })),
+
+      toggleReviewLike: (reviewId) =>
+        set((state) => ({
+          submittedReviews: state.submittedReviews.map((review) => {
+            if (review.id !== reviewId) {
+              return review;
+            }
+
+            const isLiked = review.likedByMe;
+
+            return {
+              ...review,
+              likedByMe: !isLiked,
+              likesCount: isLiked
+                ? Math.max(0, review.likesCount - 1)
+                : review.likesCount + 1,
+            };
+          }),
         })),
 
       syncReviewAuthorUsername: ({

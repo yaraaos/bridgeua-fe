@@ -9,6 +9,9 @@ export type Review = {
   authorName: string;
   authorAvatar: string;
   rating: number;
+  likesCount: number;
+  commentsCount: number;
+  likedByMe: boolean;
   text: string;
   tags?: string[];
   photos?: BusinessReviewPhoto[];
