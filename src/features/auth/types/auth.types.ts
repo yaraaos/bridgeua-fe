@@ -4,15 +4,16 @@ export type SignInPayload = {
 };
 
 export type AuthUser = {
-  id: string;
+  id: string | number;
   email: string;
   name?: string;
+  accountType?: "personal" | "business";
+  isEmailConfirmed?: boolean;
 };
 
 export type SignInResponse = {
   user: AuthUser;
-  accessToken: string;
-  refreshToken?: string;
+  token: string;
 };
 
 export type RegisterPersonalPayload = {
