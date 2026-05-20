@@ -8,6 +8,10 @@ export function createStyles(colors: AppColors) {
     container: {
       paddingVertical: spacing.md,
     },
+    containerMenuOpen: {
+      zIndex: 999,
+      elevation: 999,
+    },
     containerPreview: {
       width: 200,
       minHeight: 150,
@@ -177,11 +181,6 @@ export function createStyles(colors: AppColors) {
       gap: spacing.sm,
     },
 
-    profileActionsWrap: {
-      position: "relative",
-      alignItems: "flex-end",
-    },
-
     profileActionsButton: {
       width: 32,
       height: 32,
@@ -196,6 +195,13 @@ export function createStyles(colors: AppColors) {
       borderColor: colors.primaryGreenSoft,
     },
 
+    profileActionsWrap: {
+      position: "relative",
+      alignItems: "flex-end",
+      zIndex: 20,
+      elevation: 20,
+    },
+
     profileActionsMenu: {
       position: "absolute",
       top: 38,
@@ -206,8 +212,16 @@ export function createStyles(colors: AppColors) {
       borderColor: colors.border,
       borderRadius: radius.lg,
       backgroundColor: colors.surface,
-      zIndex: 10,
-      elevation: 4,
+      opacity: 1,
+      zIndex: 999,
+      elevation: 999,
+      shadowColor: "#000",
+      shadowOpacity: 0.14,
+      shadowRadius: 12,
+      shadowOffset: {
+        width: 0,
+        height: 6,
+      },
     },
 
     profileActionsMenuItem: {

@@ -66,7 +66,18 @@ export default function ProfileReviewsScreen() {
     setRefreshing(false);
   };
 
+  const handleToggleActionMenu = (reviewId: string) => {
+    setOpenActionMenuReviewId((currentReviewId) =>
+      currentReviewId === reviewId ? null : reviewId,
+    );
+  };
+
+  const handleCloseActionMenu = () => {
+    setOpenActionMenuReviewId(null);
+  };
+
   const openEditModal = (review: PersonalProfileReview) => {
+    handleCloseActionMenu();
     setEditingReview(review);
     setEditedText(review.text);
     setEditedPhotos(review.photos?.map((photo) => photo.url) ?? []);
@@ -79,6 +90,10 @@ export default function ProfileReviewsScreen() {
     setEditedPhotos([]);
     setIsSaving(false);
   };
+
+  const [openActionMenuReviewId, setOpenActionMenuReviewId] = useState<
+    string | null
+  >(null);
 
   const handleRemoveEditedPhoto = (photoUrl: string) => {
     setEditedPhotos((currentPhotos) =>
@@ -163,6 +178,8 @@ export default function ProfileReviewsScreen() {
           data={reviews}
           keyExtractor={(item) => item.id}
           showsVerticalScrollIndicator={false}
+          onScrollBeginDrag={handleCloseActionMenu}
+          keyboardShouldPersistTaps="handled"
           contentContainerStyle={[
             styles.listContent,
             reviews.length === 0 && styles.emptyContent,
@@ -185,6 +202,9 @@ export default function ProfileReviewsScreen() {
               variant="profile"
               onEditReview={openEditModal}
               onDeleteReview={handleDeleteReview}
+              isActionMenuOpen={openActionMenuReviewId === item.id}
+              onToggleActionMenu={handleToggleActionMenu}
+              onCloseActionMenu={handleCloseActionMenu}
             />
           )}
           ListEmptyComponent={
@@ -195,6 +215,13 @@ export default function ProfileReviewsScreen() {
           }
         />
       )}
+
+      {openActionMenuReviewId ? (
+        <Pressable
+          style={styles.menuBackdrop}
+          onPress={handleCloseActionMenu}
+        />
+      ) : null}
 
       <Modal
         visible={!!editingReview}
@@ -423,5 +450,10 @@ const styles = StyleSheet.create({
   },
   disabledButton: {
     opacity: 0.6,
+  },
+  menuBackdrop: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "transparent",
+    zIndex: -1,
   },
 });

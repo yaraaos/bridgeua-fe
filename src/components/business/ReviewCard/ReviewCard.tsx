@@ -23,6 +23,9 @@ type Props =
       onPressMore?: (reviewId: string) => void;
       onEditReview?: never;
       onDeleteReview?: never;
+      isActionMenuOpen?: never;
+      onToggleActionMenu?: never;
+      onCloseActionMenu?: never;
     }
   | {
       review: PersonalProfileReview;
@@ -30,6 +33,9 @@ type Props =
       onPressMore?: never;
       onEditReview?: (review: PersonalProfileReview) => void;
       onDeleteReview?: (review: PersonalProfileReview) => void;
+      isActionMenuOpen?: boolean;
+      onToggleActionMenu?: (reviewId: string) => void;
+      onCloseActionMenu?: () => void;
     };
 
 function isProfileReview(
@@ -50,6 +56,9 @@ export default function ReviewCard({
   onPressMore,
   onEditReview,
   onDeleteReview,
+  isActionMenuOpen = false,
+  onToggleActionMenu,
+  onCloseActionMenu,
 }: Props) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
@@ -67,7 +76,6 @@ export default function ReviewCard({
     businessReview?.authorUsername === profile.username;
 
   const [isExpanded, setIsExpanded] = useState(false);
-  const [isActionsOpen, setIsActionsOpen] = useState(false);
 
   const hasReviewText = !!review.text?.trim();
 
@@ -93,7 +101,8 @@ export default function ReviewCard({
 
   const handlePressActions = (event: GestureResponderEvent) => {
     event.stopPropagation();
-    setIsActionsOpen((value) => !value);
+    if (!profileReview) return;
+    onToggleActionMenu?.(profileReview.id);
   };
 
   const handleEditReview = (event: GestureResponderEvent) => {
@@ -101,7 +110,7 @@ export default function ReviewCard({
 
     if (!profileReview) return;
 
-    setIsActionsOpen(false);
+    onCloseActionMenu?.();
     onEditReview?.(profileReview);
   };
 
@@ -110,7 +119,7 @@ export default function ReviewCard({
 
     if (!profileReview) return;
 
-    setIsActionsOpen(false);
+    onCloseActionMenu?.();
     onDeleteReview?.(profileReview);
   };
 
@@ -130,7 +139,11 @@ export default function ReviewCard({
   return (
     <Pressable
       disabled={!isProfile}
-      style={[styles.container, isPreview && styles.containerPreview]}
+      style={[
+        styles.container,
+        isPreview && styles.containerPreview,
+        isActionMenuOpen && styles.containerMenuOpen,
+      ]}
       onPress={handlePressCard}
     >
       {isProfile && profileReview ? (
@@ -175,7 +188,7 @@ export default function ReviewCard({
                 <Pressable
                   style={[
                     styles.profileActionsButton,
-                    isActionsOpen && styles.profileActionsButtonActive,
+                    isActionMenuOpen && styles.profileActionsButtonActive,
                   ]}
                   onPress={handlePressActions}
                   hitSlop={8}
@@ -187,7 +200,7 @@ export default function ReviewCard({
                   />
                 </Pressable>
 
-                {isActionsOpen ? (
+                {isActionMenuOpen ? (
                   <View style={styles.profileActionsMenu}>
                     <Pressable
                       style={styles.profileActionsMenuItem}
