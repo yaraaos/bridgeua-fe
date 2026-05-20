@@ -127,70 +127,73 @@ export default function ReviewThreadScreen() {
         </View>
       ) : review ? (
         <>
-          <ScrollView
-            ref={scrollViewRef}
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={styles.scrollContent}
-            keyboardShouldPersistTaps="handled"
+          <KeyboardAvoidingView
+            style={styles.keyboardContainer}
+            behavior={Platform.OS === "ios" ? "padding" : undefined}
+            keyboardVerticalOffset={0}
           >
-            <ReviewCard review={review} />
+            <ScrollView
+              ref={scrollViewRef}
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={styles.scrollContent}
+              keyboardShouldPersistTaps="handled"
+            >
+              <ReviewCard review={review} />
 
-            <View
-              style={[styles.divider, { backgroundColor: colors.border }]}
-            />
+              <View
+                style={[styles.divider, { backgroundColor: colors.border }]}
+              />
 
-            <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>
-              Comments
-            </Text>
+              <Text
+                style={[styles.sectionTitle, { color: colors.textPrimary }]}
+              >
+                Comments
+              </Text>
 
-            {reviewComments.length > 0 ? (
-              reviewComments
-                .filter((comment) => !comment.parentCommentId)
-                .map((comment) => {
-                  const replies = reviewComments.filter(
-                    (reply) => reply.parentCommentId === comment.id,
-                  );
+              {reviewComments.length > 0 ? (
+                reviewComments
+                  .filter((comment) => !comment.parentCommentId)
+                  .map((comment) => {
+                    const replies = reviewComments.filter(
+                      (reply) => reply.parentCommentId === comment.id,
+                    );
 
-                  return (
-                    <View key={comment.id}>
-                      <ReviewCommentCard
-                        comment={comment}
-                        onReply={setReplyingToComment}
-                        onToggleLike={toggleCommentLike}
-                        onDelete={deleteComment}
-                      />
-
-                      {replies.map((reply) => (
+                    return (
+                      <View key={comment.id}>
                         <ReviewCommentCard
-                          key={reply.id}
-                          comment={reply}
+                          comment={comment}
                           onReply={setReplyingToComment}
                           onToggleLike={toggleCommentLike}
                           onDelete={deleteComment}
                         />
-                      ))}
 
-                      <View
-                        style={[
-                          styles.commentGroupDivider,
-                          { backgroundColor: colors.border },
-                        ]}
-                      />
-                    </View>
-                  );
-                })
-            ) : (
-              <AppEmptyState
-                title="No comments yet"
-                description="Start the conversation around this review."
-              />
-            )}
-          </ScrollView>
+                        {replies.map((reply) => (
+                          <ReviewCommentCard
+                            key={reply.id}
+                            comment={reply}
+                            onReply={setReplyingToComment}
+                            onToggleLike={toggleCommentLike}
+                            onDelete={deleteComment}
+                          />
+                        ))}
 
-          <KeyboardAvoidingView
-            behavior={Platform.OS === "ios" ? "padding" : undefined}
-            keyboardVerticalOffset={Platform.OS === "ios" ? 12 : 0}
-          >
+                        <View
+                          style={[
+                            styles.commentGroupDivider,
+                            { backgroundColor: colors.border },
+                          ]}
+                        />
+                      </View>
+                    );
+                  })
+              ) : (
+                <AppEmptyState
+                  title="No comments yet"
+                  description="Start the conversation around this review."
+                />
+              )}
+            </ScrollView>
+
             {replyingToComment ? (
               <View
                 style={[styles.replyBanner, { borderColor: colors.border }]}
@@ -292,5 +295,8 @@ const styles = StyleSheet.create({
   commentGroupDivider: {
     height: 1,
     marginTop: 4,
+  },
+  keyboardContainer: {
+    flex: 1,
   },
 });

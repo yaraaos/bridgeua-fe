@@ -20,50 +20,75 @@ export default function ReviewCommentComposer({ onSubmit }: Props) {
     setText("");
   };
 
-  return (
-    <View style={[styles.container, { borderColor: colors.border }]}>
-      <TextInput
-        value={text}
-        onChangeText={setText}
-        placeholder="Add a comment..."
-        placeholderTextColor={colors.textMuted}
-        style={[styles.input, { color: colors.textPrimary }]}
-      />
+  const canSubmit = !!text.trim();
 
-      <Pressable
+  return (
+    <View style={styles.container}>
+      <View
         style={[
-          styles.sendButton,
+          styles.inputPill,
           {
-            backgroundColor: text.trim() ? colors.primaryGreen : colors.border,
+            backgroundColor: colors.surface,
+            borderColor: colors.border,
           },
         ]}
-        onPress={handleSubmit}
       >
-        <MaterialIcons name="arrow-upward" size={18} color="#FFFFFF" />
-      </Pressable>
+        <TextInput
+          value={text}
+          onChangeText={setText}
+          placeholder="Add your reply..."
+          placeholderTextColor={colors.textMuted}
+          style={[styles.input, { color: colors.textPrimary }]}
+        />
+
+        <Pressable
+          style={[
+            styles.sendButton,
+            {
+              backgroundColor: canSubmit
+                ? colors.primaryGreen
+                : colors.primaryGreenSoft,
+            },
+          ]}
+          onPress={handleSubmit}
+          disabled={!canSubmit}
+        >
+          <MaterialIcons
+            name="arrow-upward"
+            size={18}
+            color={canSubmit ? "#FFFFFF" : colors.primaryGreen}
+          />
+        </Pressable>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    minHeight: 58,
     paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderTopWidth: 1,
+    paddingTop: 8,
+    paddingBottom: 10,
+  },
+  inputPill: {
+    minHeight: 54,
+    paddingLeft: 18,
+    paddingRight: 8,
+    borderWidth: 1,
+    borderRadius: 999,
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
   },
   input: {
     flex: 1,
-    minHeight: 40,
-    fontSize: 14,
+    minHeight: 42,
+    fontSize: 16,
   },
   sendButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 38,
+    height: 38,
+    borderRadius: 19,
     alignItems: "center",
     justifyContent: "center",
   },
