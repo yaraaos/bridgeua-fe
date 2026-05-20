@@ -6,6 +6,7 @@ import AppLoader from "@/src/components/ui/AppLoader/AppLoader";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
 import { getReviewById } from "@/src/features/reviews/services/review.service";
 import { useReviewCommentsStore } from "@/src/features/reviews/store/review-comments.store";
+import { ReviewComment } from "@/src/features/reviews/types/review-comment.types";
 import type { Review } from "@/src/features/reviews/types/review.types";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -19,7 +20,8 @@ export default function ReviewThreadScreen() {
 
   const [review, setReview] = useState<Review | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-
+  const [replyingToComment, setReplyingToComment] =
+    useState<ReviewComment | null>(null);
   const comments = useReviewCommentsStore((state) => state.comments);
   const addComment = useReviewCommentsStore((state) => state.addComment);
 
@@ -57,8 +59,11 @@ export default function ReviewThreadScreen() {
 
     addComment({
       reviewId,
+      parentCommentId: replyingToComment?.id,
       text,
     });
+
+    setReplyingToComment(null);
   };
 
   return (
@@ -105,7 +110,11 @@ export default function ReviewThreadScreen() {
 
             {reviewComments.length > 0 ? (
               reviewComments.map((comment) => (
-                <ReviewCommentCard key={comment.id} comment={comment} />
+                <ReviewCommentCard
+                  key={comment.id}
+                  comment={comment}
+                  onReply={setReplyingToComment}
+                />
               ))
             ) : (
               <AppEmptyState
@@ -114,6 +123,27 @@ export default function ReviewThreadScreen() {
               />
             )}
           </ScrollView>
+
+          {replyingToComment ? (
+            <View style={[styles.replyBanner, { borderColor: colors.border }]}>
+              <Text
+                style={[
+                  styles.replyBannerText,
+                  { color: colors.textSecondary },
+                ]}
+              >
+                Replying to @{replyingToComment.author.username}
+              </Text>
+
+              <Pressable onPress={() => setReplyingToComment(null)} hitSlop={8}>
+                <MaterialIcons
+                  name="close"
+                  size={18}
+                  color={colors.textSecondary}
+                />
+              </Pressable>
+            </View>
+          ) : null}
 
           <ReviewCommentComposer onSubmit={handleAddComment} />
         </>
@@ -173,5 +203,17 @@ const styles = StyleSheet.create({
     marginBottom: 4,
     fontSize: 16,
     fontWeight: "800",
+  },
+  replyBanner: {
+    minHeight: 42,
+    paddingHorizontal: 16,
+    borderTopWidth: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  replyBannerText: {
+    fontSize: 12,
+    fontWeight: "700",
   },
 });

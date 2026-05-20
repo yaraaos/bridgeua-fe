@@ -1,13 +1,14 @@
 import AppAvatar from "@/src/components/ui/AppAvatar";
 import type { ReviewComment } from "@/src/features/reviews/types/review-comment.types";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
-import { StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 type Props = {
   comment: ReviewComment;
+  onReply: (comment: ReviewComment) => void;
 };
 
-export default function ReviewCommentCard({ comment }: Props) {
+export default function ReviewCommentCard({ comment, onReply }: Props) {
   const { colors } = useAppTheme();
   const isReply = !!comment.parentCommentId;
 
@@ -38,9 +39,17 @@ export default function ReviewCommentCard({ comment }: Props) {
           {comment.text}
         </Text>
 
-        <Text style={[styles.meta, { color: colors.textMuted }]}>
-          {comment.likesCount} likes
-        </Text>
+        <View style={styles.actionsRow}>
+          <Text style={[styles.meta, { color: colors.textMuted }]}>
+            {comment.likesCount} likes
+          </Text>
+
+          <Pressable onPress={() => onReply(comment)} hitSlop={8}>
+            <Text style={[styles.replyText, { color: colors.primaryGreen }]}>
+              Reply
+            </Text>
+          </Pressable>
+        </View>
       </View>
     </View>
   );
@@ -76,9 +85,18 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 20,
   },
-  meta: {
+  actionsRow: {
     marginTop: 8,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 14,
+  },
+  meta: {
     fontSize: 12,
     fontWeight: "700",
+  },
+  replyText: {
+    fontSize: 12,
+    fontWeight: "800",
   },
 });
