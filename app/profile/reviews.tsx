@@ -4,18 +4,41 @@ import AppEmptyState from "@/src/components/ui/AppEmptyState";
 import AppLoader from "@/src/components/ui/AppLoader/AppLoader";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
 import { DISCOVERY_GRADIENT } from "@/src/constants/gradients";
-import { getMyReviews } from "@/src/features/reviews/services/review.service";
+import {
+  deleteReview,
+  getMyReviews,
+  updateReview,
+} from "@/src/features/reviews/services/review.service";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import type { PersonalProfileReview } from "@/src/types/profile";
+import { MaterialIcons } from "@expo/vector-icons";
 import { useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
-import { FlatList, RefreshControl, StyleSheet, View } from "react-native";
+import {
+  Alert,
+  FlatList,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  Pressable,
+  RefreshControl,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 
 export default function ProfileReviewsScreen() {
   const { colors } = useAppTheme();
   const [reviews, setReviews] = useState<PersonalProfileReview[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+
+  const [editingReview, setEditingReview] =
+    useState<PersonalProfileReview | null>(null);
+  const [editedRating, setEditedRating] = useState(5);
+  const [editedText, setEditedText] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
 
   const loadReviews = useCallback(async () => {
     const data = await getMyReviews();
@@ -40,17 +63,85 @@ export default function ProfileReviewsScreen() {
     setRefreshing(false);
   };
 
+  const openEditModal = (review: PersonalProfileReview) => {
+    setEditingReview(review);
+    setEditedRating(review.rating);
+    setEditedText(review.text);
+  };
+
+  const closeEditModal = () => {
+    setEditingReview(null);
+    setEditedRating(5);
+    setEditedText("");
+    setIsSaving(false);
+  };
+
+  const handleSaveReview = async () => {
+    if (!editingReview || isSaving) return;
+
+    const trimmedText = editedText.trim();
+
+    setIsSaving(true);
+
+    const updatedReview = await updateReview({
+      reviewId: editingReview.id,
+      rating: editedRating,
+      text: trimmedText,
+      photos: editingReview.photos?.map((photo) => photo.url),
+    });
+
+    if (!updatedReview) {
+      setIsSaving(false);
+      Alert.alert("Review not found", "This review could not be updated.");
+      return;
+    }
+
+    setReviews((currentReviews) =>
+      currentReviews.map((review) =>
+        review.id === editingReview.id
+          ? {
+              ...review,
+              rating: updatedReview.rating,
+              text: updatedReview.text,
+              photos: updatedReview.photos,
+            }
+          : review,
+      ),
+    );
+
+    closeEditModal();
+  };
+
+  const handleDeleteReview = (review: PersonalProfileReview) => {
+    Alert.alert(
+      "Delete review?",
+      "This will remove your review from this business.",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            await deleteReview(review.id);
+
+            setReviews((currentReviews) =>
+              currentReviews.filter((item) => item.id !== review.id),
+            );
+          },
+        },
+      ],
+    );
+  };
+
   return (
     <AppScreen withTopInset={false} style={styles.container}>
       <ScreenHeader
         title="My Reviews"
         titleSubtitle="Reviews you have written"
         gradientColors={DISCOVERY_GRADIENT}
-        //for same height as in discovery
-        /*headerInnerStyle={{
-          paddingBottom: 20,
-          minHeight: 153,
-        }}*/
       />
 
       {isLoading ? (
@@ -79,7 +170,52 @@ export default function ProfileReviewsScreen() {
             />
           )}
           renderItem={({ item }) => (
-            <ReviewCard review={item} variant="profile" />
+            <View>
+              <ReviewCard review={item} variant="profile" />
+
+              <View style={styles.reviewActionsRow}>
+                <Pressable
+                  style={[
+                    styles.reviewActionButton,
+                    { borderColor: colors.border },
+                  ]}
+                  onPress={() => openEditModal(item)}
+                >
+                  <MaterialIcons
+                    name="edit"
+                    size={16}
+                    color={colors.primaryGreen}
+                  />
+                  <Text
+                    style={[
+                      styles.reviewActionText,
+                      { color: colors.primaryGreen },
+                    ]}
+                  >
+                    Edit
+                  </Text>
+                </Pressable>
+
+                <Pressable
+                  style={[
+                    styles.reviewActionButton,
+                    { borderColor: colors.border },
+                  ]}
+                  onPress={() => handleDeleteReview(item)}
+                >
+                  <MaterialIcons
+                    name="delete-outline"
+                    size={16}
+                    color={colors.error}
+                  />
+                  <Text
+                    style={[styles.reviewActionText, { color: colors.error }]}
+                  >
+                    Delete
+                  </Text>
+                </Pressable>
+              </View>
+            </View>
           )}
           ListEmptyComponent={
             <AppEmptyState
@@ -89,6 +225,105 @@ export default function ProfileReviewsScreen() {
           }
         />
       )}
+
+      <Modal
+        visible={!!editingReview}
+        transparent
+        animationType="fade"
+        onRequestClose={closeEditModal}
+      >
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+          style={styles.modalOverlay}
+        >
+          <View style={[styles.modalCard, { backgroundColor: colors.surface }]}>
+            <Text style={[styles.modalTitle, { color: colors.textPrimary }]}>
+              Edit review
+            </Text>
+
+            <Text
+              style={[
+                styles.modalBusinessName,
+                { color: colors.textSecondary },
+              ]}
+            >
+              {editingReview?.businessName}
+            </Text>
+
+            <View style={styles.modalStarsRow}>
+              {Array.from({ length: 5 }).map((_, index) => {
+                const ratingValue = index + 1;
+                const isFilled = ratingValue <= editedRating;
+
+                return (
+                  <Pressable
+                    key={ratingValue}
+                    onPress={() => setEditedRating(ratingValue)}
+                    hitSlop={8}
+                  >
+                    <MaterialIcons
+                      name={isFilled ? "star" : "star-border"}
+                      size={28}
+                      color={colors.accentOrange}
+                    />
+                  </Pressable>
+                );
+              })}
+            </View>
+
+            <TextInput
+              value={editedText}
+              onChangeText={setEditedText}
+              multiline
+              placeholder="Update your review..."
+              placeholderTextColor={colors.textMuted}
+              style={[
+                styles.modalInput,
+                {
+                  borderColor: colors.border,
+                  color: colors.textPrimary,
+                  backgroundColor: colors.background,
+                },
+              ]}
+            />
+
+            <View style={styles.modalActionsRow}>
+              <Pressable
+                style={[
+                  styles.modalButton,
+                  styles.modalSecondaryButton,
+                  { borderColor: colors.border },
+                ]}
+                onPress={closeEditModal}
+                disabled={isSaving}
+              >
+                <Text
+                  style={[
+                    styles.modalSecondaryText,
+                    { color: colors.textPrimary },
+                  ]}
+                >
+                  Cancel
+                </Text>
+              </Pressable>
+
+              <Pressable
+                style={[
+                  styles.modalButton,
+                  { backgroundColor: colors.primaryGreen },
+                  isSaving && styles.disabledButton,
+                ]}
+                onPress={handleSaveReview}
+                disabled={isSaving}
+              >
+                <Text style={styles.modalPrimaryText}>
+                  {isSaving ? "Saving..." : "Save"}
+                </Text>
+              </Pressable>
+            </View>
+          </View>
+        </KeyboardAvoidingView>
+      </Modal>
     </AppScreen>
   );
 }
@@ -109,5 +344,87 @@ const styles = StyleSheet.create({
   emptyContent: {
     flexGrow: 1,
     justifyContent: "center",
+  },
+  reviewActionsRow: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    gap: 8,
+    paddingBottom: 14,
+  },
+  reviewActionButton: {
+    minHeight: 34,
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderRadius: 999,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+  },
+  reviewActionText: {
+    fontSize: 12,
+    fontWeight: "700",
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: "flex-end",
+    backgroundColor: "rgba(0,0,0,0.35)",
+  },
+  modalCard: {
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 32,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "800",
+  },
+  modalBusinessName: {
+    marginTop: 4,
+    fontSize: 13,
+    fontWeight: "600",
+  },
+  modalStarsRow: {
+    flexDirection: "row",
+    gap: 4,
+    marginTop: 18,
+  },
+  modalInput: {
+    minHeight: 120,
+    marginTop: 18,
+    padding: 14,
+    borderWidth: 1,
+    borderRadius: 16,
+    fontSize: 14,
+    lineHeight: 20,
+    textAlignVertical: "top",
+  },
+  modalActionsRow: {
+    marginTop: 18,
+    flexDirection: "row",
+    gap: 12,
+  },
+  modalButton: {
+    flex: 1,
+    height: 48,
+    borderRadius: 999,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  modalSecondaryButton: {
+    borderWidth: 1,
+  },
+  modalSecondaryText: {
+    fontSize: 14,
+    fontWeight: "800",
+  },
+  modalPrimaryText: {
+    fontSize: 14,
+    fontWeight: "800",
+    color: "#FFFFFF",
+  },
+  disabledButton: {
+    opacity: 0.6,
   },
 });
