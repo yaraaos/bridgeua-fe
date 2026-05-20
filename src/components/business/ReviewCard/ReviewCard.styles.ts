@@ -170,8 +170,61 @@ export function createStyles(colors: AppColors) {
       gap: 12,
     },
 
-    profileReviewDate: {
+    profileRatingDateRow: {
       marginTop: 2,
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.sm,
+    },
+
+    profileActionsWrap: {
+      position: "relative",
+      alignItems: "flex-end",
+    },
+
+    profileActionsButton: {
+      width: 32,
+      height: 32,
+      borderRadius: radius.pill,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+
+    profileActionsButtonActive: {
+      backgroundColor: colors.primaryGreenSoft,
+      borderWidth: 1,
+      borderColor: colors.primaryGreenSoft,
+    },
+
+    profileActionsMenu: {
+      position: "absolute",
+      top: 38,
+      right: 0,
+      width: 164,
+      paddingVertical: spacing.xs,
+      borderWidth: 1,
+      borderColor: colors.border,
+      borderRadius: radius.lg,
+      backgroundColor: colors.surface,
+      zIndex: 10,
+      elevation: 4,
+    },
+
+    profileActionsMenuItem: {
+      minHeight: 40,
+      paddingHorizontal: spacing.md,
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.sm,
+    },
+
+    profileActionsMenuText: {
+      fontSize: 13,
+      fontWeight: "700",
+      color: colors.primaryGreen,
+    },
+
+    profileReviewDate: {
       fontSize: 11,
       color: colors.textSecondary,
     },

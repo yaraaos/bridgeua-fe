@@ -6,7 +6,14 @@ import type { PersonalProfileReview } from "@/src/types/profile";
 import { MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useState } from "react";
-import { Image, Pressable, ScrollView, Text, View } from "react-native";
+import {
+  GestureResponderEvent,
+  Image,
+  Pressable,
+  ScrollView,
+  Text,
+  View,
+} from "react-native";
 import { createStyles } from "./ReviewCard.styles";
 
 type Props =
@@ -14,11 +21,15 @@ type Props =
       review: BusinessDetailsReview;
       variant?: "default" | "preview";
       onPressMore?: (reviewId: string) => void;
+      onEditReview?: never;
+      onDeleteReview?: never;
     }
   | {
       review: PersonalProfileReview;
       variant: "profile";
       onPressMore?: never;
+      onEditReview?: (review: PersonalProfileReview) => void;
+      onDeleteReview?: (review: PersonalProfileReview) => void;
     };
 
 function isProfileReview(
@@ -37,6 +48,8 @@ export default function ReviewCard({
   review,
   variant = "default",
   onPressMore,
+  onEditReview,
+  onDeleteReview,
 }: Props) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
@@ -54,6 +67,7 @@ export default function ReviewCard({
     businessReview?.authorUsername === profile.username;
 
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isActionsOpen, setIsActionsOpen] = useState(false);
 
   const hasReviewText = !!review.text?.trim();
 
@@ -67,11 +81,37 @@ export default function ReviewCard({
       pathname: "/modal/image-viewer",
       params: {
         images: JSON.stringify(
-          (review.photos ?? []).map(({ id, url }) => ({ id, url })),
+          (review.photos ?? []).map((photo) => ({
+            id: photo.id,
+            url: photo.url,
+          })),
         ),
         initialIndex: String(index),
       },
     });
+  };
+
+  const handlePressActions = (event: GestureResponderEvent) => {
+    event.stopPropagation();
+    setIsActionsOpen((value) => !value);
+  };
+
+  const handleEditReview = (event: GestureResponderEvent) => {
+    event.stopPropagation();
+
+    if (!profileReview) return;
+
+    setIsActionsOpen(false);
+    onEditReview?.(profileReview);
+  };
+
+  const handleDeleteReview = (event: GestureResponderEvent) => {
+    event.stopPropagation();
+
+    if (!profileReview) return;
+
+    setIsActionsOpen(false);
+    onDeleteReview?.(profileReview);
   };
 
   const handlePressCard = () => {
@@ -102,29 +142,88 @@ export default function ReviewCard({
                   {profileReview.businessName}
                 </Text>
 
-                <View style={styles.starsRow}>
-                  {Array.from({ length: 5 }).map((_, index) => {
-                    const isFilled = index < Math.round(profileReview.rating);
+                <View style={styles.profileRatingDateRow}>
+                  <View style={styles.starsRow}>
+                    {Array.from({ length: 5 }).map((_, index) => {
+                      const isFilled = index < Math.round(profileReview.rating);
 
-                    return (
-                      <MaterialIcons
-                        key={index}
-                        name={isFilled ? "star" : "star-border"}
-                        size={14}
-                        color={colors.accentOrange}
-                      />
-                    );
-                  })}
+                      return (
+                        <MaterialIcons
+                          key={index}
+                          name={isFilled ? "star" : "star-border"}
+                          size={14}
+                          color={colors.accentOrange}
+                        />
+                      );
+                    })}
+                  </View>
+
+                  <Text style={styles.profileReviewDate}>
+                    {new Date(profileReview.createdAt).toLocaleDateString(
+                      "en-US",
+                      {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                      },
+                    )}
+                  </Text>
                 </View>
               </View>
 
-              <Text style={styles.profileReviewDate}>
-                {new Date(profileReview.createdAt).toLocaleDateString("en-US", {
-                  month: "short",
-                  day: "numeric",
-                  year: "numeric",
-                })}
-              </Text>
+              <View style={styles.profileActionsWrap}>
+                <Pressable
+                  style={[
+                    styles.profileActionsButton,
+                    isActionsOpen && styles.profileActionsButtonActive,
+                  ]}
+                  onPress={handlePressActions}
+                  hitSlop={8}
+                >
+                  <MaterialIcons
+                    name="more-horiz"
+                    size={22}
+                    color={colors.primaryGreen}
+                  />
+                </Pressable>
+
+                {isActionsOpen ? (
+                  <View style={styles.profileActionsMenu}>
+                    <Pressable
+                      style={styles.profileActionsMenuItem}
+                      onPress={handleEditReview}
+                    >
+                      <MaterialIcons
+                        name="edit"
+                        size={16}
+                        color={colors.primaryGreen}
+                      />
+                      <Text style={styles.profileActionsMenuText}>
+                        Edit review
+                      </Text>
+                    </Pressable>
+
+                    <Pressable
+                      style={styles.profileActionsMenuItem}
+                      onPress={handleDeleteReview}
+                    >
+                      <MaterialIcons
+                        name="delete-outline"
+                        size={16}
+                        color={colors.error}
+                      />
+                      <Text
+                        style={[
+                          styles.profileActionsMenuText,
+                          { color: colors.error },
+                        ]}
+                      >
+                        Delete review
+                      </Text>
+                    </Pressable>
+                  </View>
+                ) : null}
+              </View>
             </View>
 
             {hasReviewText ? (

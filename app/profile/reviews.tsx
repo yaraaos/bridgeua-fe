@@ -170,52 +170,12 @@ export default function ProfileReviewsScreen() {
             />
           )}
           renderItem={({ item }) => (
-            <View>
-              <ReviewCard review={item} variant="profile" />
-
-              <View style={styles.reviewActionsRow}>
-                <Pressable
-                  style={[
-                    styles.reviewActionButton,
-                    { borderColor: colors.border },
-                  ]}
-                  onPress={() => openEditModal(item)}
-                >
-                  <MaterialIcons
-                    name="edit"
-                    size={16}
-                    color={colors.primaryGreen}
-                  />
-                  <Text
-                    style={[
-                      styles.reviewActionText,
-                      { color: colors.primaryGreen },
-                    ]}
-                  >
-                    Edit
-                  </Text>
-                </Pressable>
-
-                <Pressable
-                  style={[
-                    styles.reviewActionButton,
-                    { borderColor: colors.border },
-                  ]}
-                  onPress={() => handleDeleteReview(item)}
-                >
-                  <MaterialIcons
-                    name="delete-outline"
-                    size={16}
-                    color={colors.error}
-                  />
-                  <Text
-                    style={[styles.reviewActionText, { color: colors.error }]}
-                  >
-                    Delete
-                  </Text>
-                </Pressable>
-              </View>
-            </View>
+            <ReviewCard
+              review={item}
+              variant="profile"
+              onEditReview={openEditModal}
+              onDeleteReview={handleDeleteReview}
+            />
           )}
           ListEmptyComponent={
             <AppEmptyState
@@ -344,25 +304,6 @@ const styles = StyleSheet.create({
   emptyContent: {
     flexGrow: 1,
     justifyContent: "center",
-  },
-  reviewActionsRow: {
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    gap: 8,
-    paddingBottom: 14,
-  },
-  reviewActionButton: {
-    minHeight: 34,
-    paddingHorizontal: 12,
-    borderWidth: 1,
-    borderRadius: 999,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-  },
-  reviewActionText: {
-    fontSize: 12,
-    fontWeight: "700",
   },
   modalOverlay: {
     flex: 1,
