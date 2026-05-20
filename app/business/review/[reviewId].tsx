@@ -11,7 +11,8 @@ import type { Review } from "@/src/features/reviews/types/review.types";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { MaterialIcons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import type { ScrollView as ScrollViewType } from "react-native";
 import {
     KeyboardAvoidingView,
     Platform,
@@ -30,6 +31,7 @@ export default function ReviewThreadScreen() {
   const [isLoading, setIsLoading] = useState(true);
   const [replyingToComment, setReplyingToComment] =
     useState<ReviewComment | null>(null);
+  const scrollViewRef = useRef<ScrollViewType | null>(null);
   const comments = useReviewCommentsStore((state) => state.comments);
   const addComment = useReviewCommentsStore((state) => state.addComment);
 
@@ -40,12 +42,27 @@ export default function ReviewThreadScreen() {
   const reviewComments = useMemo(() => {
     if (!reviewId) return [];
 
-    return comments
-      .filter((comment) => comment.reviewId === reviewId)
+    const commentsForReview = comments.filter(
+      (comment) => comment.reviewId === reviewId,
+    );
+
+    const rootComments = commentsForReview
+      .filter((comment) => !comment.parentCommentId)
       .sort(
         (a, b) =>
           new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
       );
+
+    return rootComments.flatMap((comment) => {
+      const replies = commentsForReview
+        .filter((reply) => reply.parentCommentId === comment.id)
+        .sort(
+          (a, b) =>
+            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+        );
+
+      return [comment, ...replies];
+    });
   }, [comments, reviewId]);
 
   useEffect(() => {
@@ -76,6 +93,10 @@ export default function ReviewThreadScreen() {
     });
 
     setReplyingToComment(null);
+
+    setTimeout(() => {
+      scrollViewRef.current?.scrollToEnd({ animated: true });
+    }, 100);
   };
 
   return (
@@ -106,6 +127,7 @@ export default function ReviewThreadScreen() {
       ) : review ? (
         <>
           <ScrollView
+            ref={scrollViewRef}
             showsVerticalScrollIndicator={false}
             contentContainerStyle={styles.scrollContent}
             keyboardShouldPersistTaps="handled"
