@@ -1,14 +1,20 @@
 import AppAvatar from "@/src/components/ui/AppAvatar";
 import type { ReviewComment } from "@/src/features/reviews/types/review-comment.types";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { MaterialIcons } from "@expo/vector-icons";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 type Props = {
   comment: ReviewComment;
   onReply: (comment: ReviewComment) => void;
+  onToggleLike: (commentId: string) => void;
 };
 
-export default function ReviewCommentCard({ comment, onReply }: Props) {
+export default function ReviewCommentCard({
+  comment,
+  onReply,
+  onToggleLike,
+}: Props) {
   const { colors } = useAppTheme();
   const isReply = !!comment.parentCommentId;
 
@@ -40,11 +46,42 @@ export default function ReviewCommentCard({ comment, onReply }: Props) {
         </Text>
 
         <View style={styles.actionsRow}>
-          <Text style={[styles.meta, { color: colors.textMuted }]}>
-            {comment.likesCount} likes
-          </Text>
+          <Pressable
+            style={styles.likeButton}
+            onPress={() => onToggleLike(comment.id)}
+            hitSlop={8}
+          >
+            <MaterialIcons
+              name={comment.likedByMe ? "thumb-up" : "thumb-up-off-alt"}
+              size={14}
+              color={comment.likedByMe ? colors.primaryGreen : colors.textMuted}
+            />
 
-          <Pressable onPress={() => onReply(comment)} hitSlop={8}>
+            <Text
+              style={[
+                styles.meta,
+                {
+                  color: comment.likedByMe
+                    ? colors.primaryGreen
+                    : colors.textMuted,
+                },
+              ]}
+            >
+              {comment.likesCount} likes
+            </Text>
+          </Pressable>
+
+          <Pressable
+            style={styles.likeButton}
+            onPress={() => onReply(comment)}
+            hitSlop={8}
+          >
+            <MaterialIcons
+              name="chat-bubble-outline"
+              size={14}
+              color={colors.textMuted}
+            />
+
             <Text style={[styles.replyText, { color: colors.primaryGreen }]}>
               Reply
             </Text>
@@ -98,5 +135,10 @@ const styles = StyleSheet.create({
   replyText: {
     fontSize: 12,
     fontWeight: "800",
+  },
+  likeButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
   },
 });

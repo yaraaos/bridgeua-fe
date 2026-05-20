@@ -14,6 +14,7 @@ type ReviewCommentsState = {
 
   getCommentsByReviewId: (reviewId: string) => ReviewComment[];
   addComment: (payload: CreateReviewCommentPayload) => ReviewComment;
+  toggleCommentLike: (commentId: string) => void;
 };
 
 export const useReviewCommentsStore = create<ReviewCommentsState>()(
@@ -57,6 +58,25 @@ export const useReviewCommentsStore = create<ReviewCommentsState>()(
 
         return newComment;
       },
+      toggleCommentLike: (commentId) =>
+        set((state) => ({
+          comments: state.comments.map((comment) => {
+            if (comment.id !== commentId) {
+              return comment;
+            }
+
+            const isLiked = comment.likedByMe ?? false;
+            const currentLikesCount = comment.likesCount ?? 0;
+
+            return {
+              ...comment,
+              likedByMe: !isLiked,
+              likesCount: isLiked
+                ? Math.max(0, currentLikesCount - 1)
+                : currentLikesCount + 1,
+            };
+          }),
+        })),
     }),
     {
       name: "review-comments-storage",

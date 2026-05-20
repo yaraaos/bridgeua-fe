@@ -12,7 +12,15 @@ import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { MaterialIcons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+    KeyboardAvoidingView,
+    Platform,
+    Pressable,
+    ScrollView,
+    StyleSheet,
+    Text,
+    View,
+} from "react-native";
 
 export default function ReviewThreadScreen() {
   const { colors } = useAppTheme();
@@ -24,6 +32,10 @@ export default function ReviewThreadScreen() {
     useState<ReviewComment | null>(null);
   const comments = useReviewCommentsStore((state) => state.comments);
   const addComment = useReviewCommentsStore((state) => state.addComment);
+
+  const toggleCommentLike = useReviewCommentsStore(
+    (state) => state.toggleCommentLike,
+  );
 
   const reviewComments = useMemo(() => {
     if (!reviewId) return [];
@@ -114,6 +126,7 @@ export default function ReviewThreadScreen() {
                   key={comment.id}
                   comment={comment}
                   onReply={setReplyingToComment}
+                  onToggleLike={toggleCommentLike}
                 />
               ))
             ) : (
@@ -124,28 +137,38 @@ export default function ReviewThreadScreen() {
             )}
           </ScrollView>
 
-          {replyingToComment ? (
-            <View style={[styles.replyBanner, { borderColor: colors.border }]}>
-              <Text
-                style={[
-                  styles.replyBannerText,
-                  { color: colors.textSecondary },
-                ]}
+          <KeyboardAvoidingView
+            behavior={Platform.OS === "ios" ? "padding" : undefined}
+            keyboardVerticalOffset={Platform.OS === "ios" ? 12 : 0}
+          >
+            {replyingToComment ? (
+              <View
+                style={[styles.replyBanner, { borderColor: colors.border }]}
               >
-                Replying to @{replyingToComment.author.username}
-              </Text>
+                <Text
+                  style={[
+                    styles.replyBannerText,
+                    { color: colors.textSecondary },
+                  ]}
+                >
+                  Replying to @{replyingToComment.author.username}
+                </Text>
 
-              <Pressable onPress={() => setReplyingToComment(null)} hitSlop={8}>
-                <MaterialIcons
-                  name="close"
-                  size={18}
-                  color={colors.textSecondary}
-                />
-              </Pressable>
-            </View>
-          ) : null}
+                <Pressable
+                  onPress={() => setReplyingToComment(null)}
+                  hitSlop={8}
+                >
+                  <MaterialIcons
+                    name="close"
+                    size={18}
+                    color={colors.textSecondary}
+                  />
+                </Pressable>
+              </View>
+            ) : null}
 
-          <ReviewCommentComposer onSubmit={handleAddComment} />
+            <ReviewCommentComposer onSubmit={handleAddComment} />
+          </KeyboardAvoidingView>
         </>
       ) : (
         <AppEmptyState
