@@ -2,6 +2,7 @@ import AppAvatar from "@/src/components/ui/AppAvatar";
 import type { BusinessDetailsReview } from "@/src/features/businesses/types/business.types";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { useProfileStore } from "@/src/store/profile.store";
+import { useReviewsStore } from "@/src/store/reviews.store";
 import type { PersonalProfileReview } from "@/src/types/profile";
 import { MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
@@ -76,6 +77,10 @@ export default function ReviewCard({
     businessReview?.authorUsername === profile.username;
 
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isLiked, setIsLiked] = useState(review.likedByMe ?? false);
+  const [likesCount, setLikesCount] = useState(review.likesCount ?? 0);
+
+  const toggleReviewLike = useReviewsStore((state) => state.toggleReviewLike);
 
   const hasReviewText = !!review.text?.trim();
 
@@ -121,6 +126,17 @@ export default function ReviewCard({
 
     onCloseActionMenu?.();
     onDeleteReview?.(profileReview);
+  };
+
+  const handleToggleLike = (event: GestureResponderEvent) => {
+    event.stopPropagation();
+
+    setIsLiked((currentValue) => !currentValue);
+    setLikesCount((currentCount) =>
+      isLiked ? Math.max(0, currentCount - 1) : currentCount + 1,
+    );
+
+    toggleReviewLike(review.id);
   };
 
   const handlePressCard = () => {
@@ -280,6 +296,39 @@ export default function ReviewCard({
                 ))}
               </ScrollView>
             ) : null}
+            <View style={styles.interactionRow}>
+              <Pressable
+                style={styles.interactionButton}
+                onPress={handleToggleLike}
+              >
+                <MaterialIcons
+                  name={isLiked ? "thumb-up" : "thumb-up-off-alt"}
+                  size={16}
+                  color={isLiked ? colors.primaryGreen : colors.textSecondary}
+                />
+
+                <Text
+                  style={[
+                    styles.interactionText,
+                    isLiked && styles.interactionTextActive,
+                  ]}
+                >
+                  {likesCount}{" "}
+                </Text>
+              </Pressable>
+
+              <Pressable style={styles.interactionButton}>
+                <MaterialIcons
+                  name="chat-bubble-outline"
+                  size={16}
+                  color={colors.textSecondary}
+                />
+
+                <Text style={styles.interactionText}>
+                  {review.commentsCount}
+                </Text>
+              </Pressable>
+            </View>
           </View>
         </>
       ) : businessReview ? (
@@ -421,6 +470,39 @@ export default function ReviewCard({
                 ))}
               </View>
             ) : null}
+            <View style={styles.interactionRow}>
+              <Pressable
+                style={styles.interactionButton}
+                onPress={handleToggleLike}
+              >
+                <MaterialIcons
+                  name={isLiked ? "thumb-up" : "thumb-up-off-alt"}
+                  size={16}
+                  color={isLiked ? colors.primaryGreen : colors.textSecondary}
+                />
+
+                <Text
+                  style={[
+                    styles.interactionText,
+                    isLiked && styles.interactionTextActive,
+                  ]}
+                >
+                  {likesCount}
+                </Text>
+              </Pressable>
+
+              <Pressable style={styles.interactionButton}>
+                <MaterialIcons
+                  name="chat-bubble-outline"
+                  size={16}
+                  color={colors.textSecondary}
+                />
+
+                <Text style={styles.interactionText}>
+                  {review.commentsCount}
+                </Text>
+              </Pressable>
+            </View>
           </View>
         </>
       ) : null}

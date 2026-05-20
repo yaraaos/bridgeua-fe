@@ -56,14 +56,14 @@ export const useReviewsStore = create<ReviewsState>()(
               return review;
             }
 
-            const isLiked = review.likedByMe;
-
+            const isLiked = review.likedByMe ?? false;
+            const currentLikesCount = review.likesCount ?? 0;
             return {
               ...review,
               likedByMe: !isLiked,
               likesCount: isLiked
-                ? Math.max(0, review.likesCount - 1)
-                : review.likesCount + 1,
+                ? Math.max(0, currentLikesCount - 1)
+                : currentLikesCount + 1,
             };
           }),
         })),

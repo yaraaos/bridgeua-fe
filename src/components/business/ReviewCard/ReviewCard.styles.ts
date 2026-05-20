@@ -116,6 +116,28 @@ export function createStyles(colors: AppColors) {
       width: "92%",
       height: "75%",
     },
+    interactionRow: {
+      marginTop: spacing.md,
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.md,
+    },
+
+    interactionButton: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6,
+    },
+
+    interactionText: {
+      fontSize: 12,
+      fontWeight: "700",
+      color: colors.textSecondary,
+    },
+
+    interactionTextActive: {
+      color: colors.primaryGreen,
+    },
     tagsWrap: {
       marginTop: spacing.md,
       flexDirection: "row",
