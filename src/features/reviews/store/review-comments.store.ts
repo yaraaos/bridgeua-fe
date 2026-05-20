@@ -3,10 +3,11 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
 import { useProfileStore } from "@/src/store/profile.store";
+import { useReviewsStore } from "@/src/store/reviews.store";
 import { reviewCommentsMock } from "../mocks/review-comments.mock";
 import type {
-    CreateReviewCommentPayload,
-    ReviewComment,
+  CreateReviewCommentPayload,
+  ReviewComment,
 } from "../types/review-comment.types";
 
 type ReviewCommentsState = {
@@ -15,6 +16,7 @@ type ReviewCommentsState = {
   getCommentsByReviewId: (reviewId: string) => ReviewComment[];
   addComment: (payload: CreateReviewCommentPayload) => ReviewComment;
   toggleCommentLike: (commentId: string) => void;
+  deleteComment: (commentId: string) => void;
 };
 
 export const useReviewCommentsStore = create<ReviewCommentsState>()(
@@ -52,6 +54,28 @@ export const useReviewCommentsStore = create<ReviewCommentsState>()(
 
         console.log("API POST /reviews/:reviewId/comments", payload);
 
+        if (payload.parentCommentId) {
+          set((state) => ({
+            comments: state.comments.map((comment) =>
+              comment.id === payload.parentCommentId
+                ? {
+                    ...comment,
+                    repliesCount: comment.repliesCount + 1,
+                  }
+                : comment,
+            ),
+          }));
+        } else {
+          useReviewsStore.getState().updateReview(payload.reviewId, {
+            commentsCount:
+              (useReviewsStore
+                .getState()
+                .submittedReviews.find(
+                  (review) => review.id === payload.reviewId,
+                )?.commentsCount ?? 0) + 1,
+          });
+        }
+
         set((state) => ({
           comments: [...state.comments, newComment],
         }));
@@ -77,6 +101,25 @@ export const useReviewCommentsStore = create<ReviewCommentsState>()(
             };
           }),
         })),
+
+      deleteComment: (commentId) =>
+        set((state) => {
+          const commentToDelete = state.comments.find(
+            (comment) => comment.id === commentId,
+          );
+
+          if (!commentToDelete) {
+            return state;
+          }
+
+          return {
+            comments: state.comments.filter(
+              (comment) =>
+                comment.id !== commentId &&
+                comment.parentCommentId !== commentId,
+            ),
+          };
+        }),
     }),
     {
       name: "review-comments-storage",

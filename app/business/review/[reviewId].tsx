@@ -14,13 +14,13 @@ import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { ScrollView as ScrollViewType } from "react-native";
 import {
-    KeyboardAvoidingView,
-    Platform,
-    Pressable,
-    ScrollView,
-    StyleSheet,
-    Text,
-    View,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
 } from "react-native";
 
 export default function ReviewThreadScreen() {
@@ -38,6 +38,7 @@ export default function ReviewThreadScreen() {
   const toggleCommentLike = useReviewCommentsStore(
     (state) => state.toggleCommentLike,
   );
+  const deleteComment = useReviewCommentsStore((state) => state.deleteComment);
 
   const reviewComments = useMemo(() => {
     if (!reviewId) return [];
@@ -143,14 +144,41 @@ export default function ReviewThreadScreen() {
             </Text>
 
             {reviewComments.length > 0 ? (
-              reviewComments.map((comment) => (
-                <ReviewCommentCard
-                  key={comment.id}
-                  comment={comment}
-                  onReply={setReplyingToComment}
-                  onToggleLike={toggleCommentLike}
-                />
-              ))
+              reviewComments
+                .filter((comment) => !comment.parentCommentId)
+                .map((comment) => {
+                  const replies = reviewComments.filter(
+                    (reply) => reply.parentCommentId === comment.id,
+                  );
+
+                  return (
+                    <View key={comment.id}>
+                      <ReviewCommentCard
+                        comment={comment}
+                        onReply={setReplyingToComment}
+                        onToggleLike={toggleCommentLike}
+                        onDelete={deleteComment}
+                      />
+
+                      {replies.map((reply) => (
+                        <ReviewCommentCard
+                          key={reply.id}
+                          comment={reply}
+                          onReply={setReplyingToComment}
+                          onToggleLike={toggleCommentLike}
+                          onDelete={deleteComment}
+                        />
+                      ))}
+
+                      <View
+                        style={[
+                          styles.commentGroupDivider,
+                          { backgroundColor: colors.border },
+                        ]}
+                      />
+                    </View>
+                  );
+                })
             ) : (
               <AppEmptyState
                 title="No comments yet"
@@ -260,5 +288,9 @@ const styles = StyleSheet.create({
   replyBannerText: {
     fontSize: 12,
     fontWeight: "700",
+  },
+  commentGroupDivider: {
+    height: 1,
+    marginTop: 4,
   },
 });
