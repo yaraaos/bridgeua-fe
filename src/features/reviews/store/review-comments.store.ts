@@ -54,6 +54,14 @@ export const useReviewCommentsStore = create<ReviewCommentsState>()(
 
         console.log("API POST /reviews/:reviewId/comments", payload);
 
+        useReviewsStore.getState().updateReview(payload.reviewId, {
+          commentsCount:
+            (useReviewsStore
+              .getState()
+              .submittedReviews.find((review) => review.id === payload.reviewId)
+              ?.commentsCount ?? 0) + 1,
+        });
+
         if (payload.parentCommentId) {
           set((state) => ({
             comments: state.comments.map((comment) =>
@@ -65,15 +73,6 @@ export const useReviewCommentsStore = create<ReviewCommentsState>()(
                 : comment,
             ),
           }));
-        } else {
-          useReviewsStore.getState().updateReview(payload.reviewId, {
-            commentsCount:
-              (useReviewsStore
-                .getState()
-                .submittedReviews.find(
-                  (review) => review.id === payload.reviewId,
-                )?.commentsCount ?? 0) + 1,
-          });
         }
 
         set((state) => ({
@@ -111,6 +110,22 @@ export const useReviewCommentsStore = create<ReviewCommentsState>()(
           if (!commentToDelete) {
             return state;
           }
+          const deletedRepliesCount = state.comments.filter(
+            (comment) => comment.parentCommentId === commentId,
+          ).length;
+
+          useReviewsStore.getState().updateReview(commentToDelete.reviewId, {
+            commentsCount: Math.max(
+              0,
+              (useReviewsStore
+                .getState()
+                .submittedReviews.find(
+                  (review) => review.id === commentToDelete.reviewId,
+                )?.commentsCount ?? 0) -
+                1 -
+                deletedRepliesCount,
+            ),
+          });
 
           return {
             comments: state.comments.filter(

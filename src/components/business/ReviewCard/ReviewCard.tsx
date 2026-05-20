@@ -6,7 +6,7 @@ import { useReviewsStore } from "@/src/store/reviews.store";
 import type { PersonalProfileReview } from "@/src/types/profile";
 import { MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   GestureResponderEvent,
   Image,
@@ -80,6 +80,10 @@ export default function ReviewCard({
   const [isLiked, setIsLiked] = useState(review.likedByMe ?? false);
   const [likesCount, setLikesCount] = useState(review.likesCount ?? 0);
 
+  const [commentsCount, setCommentsCount] = useState(review.commentsCount ?? 0);
+
+  const submittedReviews = useReviewsStore((state) => state.submittedReviews);
+
   const toggleReviewLike = useReviewsStore((state) => state.toggleReviewLike);
 
   const hasReviewText = !!review.text?.trim();
@@ -138,6 +142,16 @@ export default function ReviewCard({
 
     toggleReviewLike(review.id);
   };
+
+  useEffect(() => {
+    const updatedReview = submittedReviews.find(
+      (submittedReview) => submittedReview.id === review.id,
+    );
+
+    if (!updatedReview) return;
+
+    setCommentsCount(updatedReview.commentsCount ?? 0);
+  }, [submittedReviews, review.id]);
 
   const handlePressCard = () => {
     if (!profileReview) return;
@@ -335,9 +349,7 @@ export default function ReviewCard({
                   size={16}
                   color={colors.textSecondary}
                 />
-                <Text style={styles.interactionText}>
-                  {review.commentsCount}
-                </Text>
+                <Text style={styles.interactionText}>{commentsCount} </Text>
               </Pressable>
             </View>
           </View>
@@ -520,9 +532,7 @@ export default function ReviewCard({
                   size={16}
                   color={colors.textSecondary}
                 />
-                <Text style={styles.interactionText}>
-                  {review.commentsCount}
-                </Text>
+                <Text style={styles.interactionText}>{commentsCount} </Text>
               </Pressable>
             </View>
           </View>
