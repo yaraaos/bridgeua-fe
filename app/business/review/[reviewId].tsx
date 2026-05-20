@@ -14,6 +14,7 @@ import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { ScrollView as ScrollViewType } from "react-native";
 import {
+  Alert,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -39,6 +40,21 @@ export default function ReviewThreadScreen() {
     (state) => state.toggleCommentLike,
   );
   const deleteComment = useReviewCommentsStore((state) => state.deleteComment);
+  const handleDeleteComment = (commentId: string) => {
+    Alert.alert("Delete comment?", "This action cannot be undone.", [
+      {
+        text: "Cancel",
+        style: "cancel",
+      },
+      {
+        text: "Delete",
+        style: "destructive",
+        onPress: () => {
+          deleteComment(commentId);
+        },
+      },
+    ]);
+  };
 
   const reviewComments = useMemo(() => {
     if (!reviewId) return [];
@@ -164,7 +180,7 @@ export default function ReviewThreadScreen() {
                           comment={comment}
                           onReply={setReplyingToComment}
                           onToggleLike={toggleCommentLike}
-                          onDelete={deleteComment}
+                          onDelete={handleDeleteComment}
                         />
 
                         {replies.map((reply) => (
@@ -173,7 +189,7 @@ export default function ReviewThreadScreen() {
                             comment={reply}
                             onReply={setReplyingToComment}
                             onToggleLike={toggleCommentLike}
-                            onDelete={deleteComment}
+                            onDelete={handleDeleteComment}
                           />
                         ))}
 

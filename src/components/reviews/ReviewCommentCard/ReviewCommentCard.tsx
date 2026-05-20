@@ -72,7 +72,7 @@ export default function ReviewCommentCard({
                   },
                 ]}
               >
-                {comment.likesCount} likes
+                {comment.likesCount}
               </Text>
             </Pressable>
 
