@@ -22,6 +22,7 @@ type Props =
       review: BusinessDetailsReview;
       variant?: "default" | "preview";
       onPressMore?: (reviewId: string) => void;
+      onExpandReview?: (reviewId: string) => void;
       onEditReview?: never;
       onDeleteReview?: never;
       isActionMenuOpen?: never;
@@ -32,6 +33,7 @@ type Props =
       review: PersonalProfileReview;
       variant: "profile";
       onPressMore?: never;
+      onExpandReview?: (reviewId: string) => void;
       onEditReview?: (review: PersonalProfileReview) => void;
       onDeleteReview?: (review: PersonalProfileReview) => void;
       isActionMenuOpen?: boolean;
@@ -55,6 +57,7 @@ export default function ReviewCard({
   review,
   variant = "default",
   onPressMore,
+  onExpandReview,
   onEditReview,
   onDeleteReview,
   isActionMenuOpen = false,
@@ -281,7 +284,17 @@ export default function ReviewCard({
                 {shouldShowReadMore ? (
                   <Pressable
                     style={styles.moreButton}
-                    onPress={() => setIsExpanded((value) => !value)}
+                    onPress={() => {
+                      setIsExpanded((value) => {
+                        const nextValue = !value;
+
+                        if (nextValue) {
+                          onExpandReview?.(review.id);
+                        }
+
+                        return nextValue;
+                      });
+                    }}
                   >
                     <Text style={styles.moreText}>
                       {isExpanded ? "Show less" : "Read more"}
@@ -455,7 +468,17 @@ export default function ReviewCard({
             ) : shouldShowReadMore ? (
               <Pressable
                 style={styles.moreButton}
-                onPress={() => setIsExpanded((value) => !value)}
+                onPress={() => {
+                  setIsExpanded((value) => {
+                    const nextValue = !value;
+
+                    if (nextValue) {
+                      onExpandReview?.(review.id);
+                    }
+
+                    return nextValue;
+                  });
+                }}
               >
                 <Text style={styles.moreText}>
                   {isExpanded ? "Show less" : "Read more"}

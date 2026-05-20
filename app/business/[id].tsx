@@ -330,6 +330,16 @@ export default function BusinessDetailsScreen() {
                   onReviewsListLayout={(y) => {
                     reviewsListYRef.current = y;
                   }}
+                  onExpandReview={(reviewOffsetY) => {
+                    scrollViewRef.current?.scrollTo({
+                      y:
+                        reviewsSectionYRef.current +
+                        reviewsListYRef.current +
+                        reviewOffsetY -
+                        120,
+                      animated: true,
+                    });
+                  }}
                   onPressWriteReview={(rating) =>
                     router.push({
                       pathname: "/business/write-review",
