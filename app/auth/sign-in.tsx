@@ -49,7 +49,7 @@ export default function SignInScreen() {
       resetFollowing();
       clearReviews();
 
-      await saveAuthTokens(response.accessToken, response.refreshToken);
+      await saveAuthTokens(response.token);
 
       setUser(response.user);
 
