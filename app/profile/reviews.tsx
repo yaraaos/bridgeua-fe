@@ -17,6 +17,7 @@ import { useCallback, useState } from "react";
 import {
   Alert,
   FlatList,
+  Image,
   KeyboardAvoidingView,
   Modal,
   Platform,
@@ -38,6 +39,8 @@ export default function ProfileReviewsScreen() {
     useState<PersonalProfileReview | null>(null);
   const [editedRating, setEditedRating] = useState(5);
   const [editedText, setEditedText] = useState("");
+
+  const [editedPhotos, setEditedPhotos] = useState<string[]>([]);
   const [isSaving, setIsSaving] = useState(false);
 
   const loadReviews = useCallback(async () => {
@@ -65,15 +68,22 @@ export default function ProfileReviewsScreen() {
 
   const openEditModal = (review: PersonalProfileReview) => {
     setEditingReview(review);
-    setEditedRating(review.rating);
     setEditedText(review.text);
+    setEditedPhotos(review.photos?.map((photo) => photo.url) ?? []);
   };
 
   const closeEditModal = () => {
     setEditingReview(null);
     setEditedRating(5);
     setEditedText("");
+    setEditedPhotos([]);
     setIsSaving(false);
+  };
+
+  const handleRemoveEditedPhoto = (photoUrl: string) => {
+    setEditedPhotos((currentPhotos) =>
+      currentPhotos.filter((url) => url !== photoUrl),
+    );
   };
 
   const handleSaveReview = async () => {
@@ -87,7 +97,7 @@ export default function ProfileReviewsScreen() {
       reviewId: editingReview.id,
       rating: editedRating,
       text: trimmedText,
-      photos: editingReview.photos?.map((photo) => photo.url),
+      photos: editedPhotos,
     });
 
     if (!updatedReview) {
@@ -231,6 +241,27 @@ export default function ProfileReviewsScreen() {
               })}
             </View>
 
+            {editedPhotos.length > 0 ? (
+              <View style={styles.editPhotosGrid}>
+                {editedPhotos.map((photoUrl) => (
+                  <View key={photoUrl} style={styles.editPhotoWrap}>
+                    <Image
+                      source={{ uri: photoUrl }}
+                      style={styles.editPhoto}
+                    />
+
+                    <Pressable
+                      style={styles.removePhotoButton}
+                      onPress={() => handleRemoveEditedPhoto(photoUrl)}
+                      hitSlop={8}
+                    >
+                      <MaterialIcons name="close" size={14} color="#FFFFFF" />
+                    </Pressable>
+                  </View>
+                ))}
+              </View>
+            ) : null}
+
             <TextInput
               value={editedText}
               onChangeText={setEditedText}
@@ -330,6 +361,31 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 4,
     marginTop: 18,
+  },
+  editPhotosGrid: {
+    marginTop: 18,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 10,
+  },
+  editPhotoWrap: {
+    position: "relative",
+  },
+  editPhoto: {
+    width: 74,
+    height: 74,
+    borderRadius: 14,
+  },
+  removePhotoButton: {
+    position: "absolute",
+    top: -7,
+    right: -7,
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "rgba(0,0,0,0.72)",
   },
   modalInput: {
     minHeight: 120,
