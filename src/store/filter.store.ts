@@ -28,6 +28,7 @@ export type DistanceOption = "" | "nearby" | "1" | "5" | "10" | "25" | "custom";
 export type FilterScope = "discovery" | "following";
 
 export type FilterValues = {
+  category: string;
   sort: SortOption;
   cuisines: string[];
   rating: RatingOption;
@@ -36,6 +37,7 @@ export type FilterValues = {
 };
 
 const defaultFilters: FilterValues = {
+  category: "",
   sort: "relevance",
   cuisines: [],
   rating: "",
@@ -46,7 +48,7 @@ const defaultFilters: FilterValues = {
 type FilterState = {
   discoveryFilters: FilterValues;
   followingFilters: FilterValues;
-
+  setCategory: (scope: FilterScope, value: string) => void;
   setSort: (scope: FilterScope, value: SortOption) => void;
   toggleCuisine: (scope: FilterScope, value: string) => void;
   setRating: (scope: FilterScope, value: RatingOption) => void;
@@ -61,7 +63,18 @@ const getScopeKey = (scope: FilterScope) =>
 export const useFilterStore = create<FilterState>((set) => ({
   discoveryFilters: defaultFilters,
   followingFilters: defaultFilters,
+  setCategory: (scope, value) =>
+    set((state) => {
+      const key = getScopeKey(scope);
 
+      return {
+        [key]: {
+          ...state[key],
+          category: value,
+          cuisines: value === "Food" ? state[key].cuisines : [],
+        },
+      };
+    }),
   setSort: (scope, value) =>
     set((state) => ({
       [getScopeKey(scope)]: {
@@ -78,6 +91,7 @@ export const useFilterStore = create<FilterState>((set) => ({
       return {
         [key]: {
           ...currentFilters,
+          category: "Food",
           cuisines: currentFilters.cuisines.includes(value)
             ? currentFilters.cuisines.filter((item) => item !== value)
             : [...currentFilters.cuisines, value],

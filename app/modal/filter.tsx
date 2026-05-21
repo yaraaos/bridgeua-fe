@@ -56,7 +56,8 @@ export default function FilterModalScreen() {
   const filters = useFilterStore((state) =>
     scope === "following" ? state.followingFilters : state.discoveryFilters,
   );
-  const { sort, cuisines, rating, distance, customDistance } = filters;
+  const { category, sort, cuisines, rating, distance, customDistance } =
+    filters;
   const {
     setSort,
     toggleCuisine,
@@ -156,7 +157,7 @@ export default function FilterModalScreen() {
   const sidebarItems = useMemo(
     () => [
       { key: "sort" as FilterTab, label: "Sort" },
-      { key: "cuisines" as FilterTab, label: "Cuisines" },
+      { key: "cuisines" as FilterTab, label: "Food" },
       { key: "ratings" as FilterTab, label: "Ratings" },
       { key: "distance" as FilterTab, label: "Distance" },
     ],
@@ -257,11 +258,15 @@ export default function FilterModalScreen() {
 
           <View style={[styles.footer, { paddingBottom: 14 + insets.bottom }]}>
             <ActiveFiltersSummary
+              category={category}
               sort={sort}
               cuisines={cuisines}
               rating={rating}
               distance={distance}
               customDistance={customDistance}
+              onClearCategory={() =>
+                useFilterStore.getState().setCategory(scope, "")
+              }
               onClearSort={() => setSort(scope, "relevance")}
               onRemoveCuisine={(value) => toggleCuisine(scope, value)}
               onClearRating={() => setRating(scope, "")}

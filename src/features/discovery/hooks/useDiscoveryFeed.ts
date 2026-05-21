@@ -1,8 +1,8 @@
 import type { Business } from "@/src/features/businesses";
 import type {
-    DistanceOption,
-    RatingOption,
-    SortOption,
+  DistanceOption,
+  RatingOption,
+  SortOption,
 } from "@/src/store/filter.store";
 
 const distanceMap: Record<DistanceOption, number | null> = {
@@ -18,6 +18,7 @@ const distanceMap: Record<DistanceOption, number | null> = {
 type UseDiscoveryFeedParams = {
   businesses: Business[];
   sort: SortOption;
+  category: string;
   cuisines: string[];
   rating: RatingOption;
   distance: DistanceOption;
@@ -27,6 +28,7 @@ type UseDiscoveryFeedParams = {
 export function useDiscoveryFeed({
   businesses,
   sort,
+  category,
   cuisines,
   rating,
   distance,
@@ -64,8 +66,21 @@ export function useDiscoveryFeed({
       const businessRating = Number(business.rating ?? 0);
       const businessDistance = Number(business.distanceKm ?? 0);
 
-      const cuisineMatch =
-        cuisines.length === 0 || cuisines.includes(businessCategory);
+      const categoryMatch =
+        !category ||
+        (category === "Food"
+          ? cuisines.length > 0
+            ? cuisines.includes(businessCategory)
+            : [
+                "American",
+                "Chinese",
+                "Italian",
+                "Japanese",
+                "Mediterranean",
+                "Mexican",
+                "Vegan",
+              ].includes(businessCategory)
+          : businessCategory === category);
 
       const ratingMatch =
         selectedRatingValue === null || businessRating >= selectedRatingValue;
@@ -75,7 +90,7 @@ export function useDiscoveryFeed({
         Number.isNaN(selectedDistanceKm) ||
         businessDistance <= selectedDistanceKm;
 
-      return cuisineMatch && ratingMatch && distanceMatch;
+      return categoryMatch && ratingMatch && distanceMatch;
     })
     .sort(sortBusinesses);
 
