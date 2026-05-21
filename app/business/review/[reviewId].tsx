@@ -116,11 +116,20 @@ export default function ReviewThreadScreen() {
   const handleAddComment = (text: string) => {
     if (!reviewId) return;
 
+    const parentCommentId = replyingToComment?.id;
+
     addComment({
       reviewId,
-      parentCommentId: replyingToComment?.id,
+      parentCommentId,
       text,
     });
+
+    if (parentCommentId) {
+      setExpandedReplies((current) => ({
+        ...current,
+        [parentCommentId]: true,
+      }));
+    }
 
     setReplyingToComment(null);
     setIsReplyingToReview(false);
