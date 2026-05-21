@@ -17,6 +17,7 @@ import { useRegisterPersonal } from "../../src/features/auth/hooks/useRegisterPe
 import {
   SignUpPersonalFormErrors,
   validateSignUpPersonalForm,
+  validateSignUpPersonalUsername,
 } from "../../src/features/auth/validation/signUpPersonal.validation";
 
 export default function SignUpPersonalScreen() {
@@ -43,6 +44,16 @@ export default function SignUpPersonalScreen() {
   const clearFieldError = (field: keyof SignUpPersonalFormErrors) => {
     setErrors((current) => ({ ...current, [field]: undefined }));
     setApiError(null);
+  };
+
+  const handleUsernameChange = (value: string) => {
+    setUsername(value);
+    setApiError(null);
+
+    setErrors((current) => ({
+      ...current,
+      username: validateSignUpPersonalUsername(value),
+    }));
   };
 
   const handleSubmit = async () => {
@@ -154,10 +165,7 @@ export default function SignUpPersonalScreen() {
             <AppInput
               placeholder="Username"
               value={username}
-              onChangeText={(value) => {
-                setUsername(value);
-                clearFieldError("username");
-              }}
+              onChangeText={handleUsernameChange}
               autoCapitalize="none"
               disabled={isLoading}
               error={Boolean(errors.username)}
