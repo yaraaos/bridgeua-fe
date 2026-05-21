@@ -13,7 +13,7 @@ import { useAppTheme } from "@/src/hooks/useAppTheme";
 import type { PersonalProfileReview } from "@/src/types/profile";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useFocusEffect } from "expo-router";
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import {
   Alert,
   FlatList,
@@ -42,6 +42,23 @@ export default function ProfileReviewsScreen() {
 
   const [editedPhotos, setEditedPhotos] = useState<string[]>([]);
   const [isSaving, setIsSaving] = useState(false);
+
+  const flatListRef = useRef<FlatList<PersonalProfileReview> | null>(null);
+
+  const reviewOffsets = useRef<Record<string, number>>({});
+
+  const handleExpandReview = (reviewId: string) => {
+    const y = reviewOffsets.current[reviewId];
+
+    if (typeof y !== "number") {
+      return;
+    }
+
+    flatListRef.current?.scrollToOffset({
+      offset: Math.max(0, y - 140),
+      animated: true,
+    });
+  };
 
   const loadReviews = useCallback(async () => {
     const data = await getMyReviews();
@@ -175,6 +192,7 @@ export default function ProfileReviewsScreen() {
         </View>
       ) : (
         <FlatList
+          ref={flatListRef}
           data={reviews}
           keyExtractor={(item) => item.id}
           showsVerticalScrollIndicator={false}
@@ -197,15 +215,22 @@ export default function ProfileReviewsScreen() {
             />
           )}
           renderItem={({ item }) => (
-            <ReviewCard
-              review={item}
-              variant="profile"
-              onEditReview={openEditModal}
-              onDeleteReview={handleDeleteReview}
-              isActionMenuOpen={openActionMenuReviewId === item.id}
-              onToggleActionMenu={handleToggleActionMenu}
-              onCloseActionMenu={handleCloseActionMenu}
-            />
+            <View
+              onLayout={(event) => {
+                reviewOffsets.current[item.id] = event.nativeEvent.layout.y;
+              }}
+            >
+              <ReviewCard
+                review={item}
+                variant="profile"
+                onExpandReview={handleExpandReview}
+                onEditReview={openEditModal}
+                onDeleteReview={handleDeleteReview}
+                isActionMenuOpen={openActionMenuReviewId === item.id}
+                onToggleActionMenu={handleToggleActionMenu}
+                onCloseActionMenu={handleCloseActionMenu}
+              />
+            </View>
           )}
           ListEmptyComponent={
             <AppEmptyState
