@@ -23,6 +23,7 @@ type Props =
       variant?: "default" | "preview";
       onPressMore?: (reviewId: string) => void;
       onExpandReview?: (reviewId: string) => void;
+      onPressComment?: (reviewId: string) => void;
       onEditReview?: never;
       onDeleteReview?: never;
       isActionMenuOpen?: never;
@@ -34,6 +35,7 @@ type Props =
       variant: "profile";
       onPressMore?: never;
       onExpandReview?: (reviewId: string) => void;
+      onPressComment?: (reviewId: string) => void;
       onEditReview?: (review: PersonalProfileReview) => void;
       onDeleteReview?: (review: PersonalProfileReview) => void;
       isActionMenuOpen?: boolean;
@@ -353,6 +355,11 @@ export default function ReviewCard({
                 onPress={(event) => {
                   event.stopPropagation();
 
+                  if (onPressComment) {
+                    onPressComment(review.id);
+                    return;
+                  }
+
                   router.push({
                     pathname: "/business/review/[reviewId]",
                     params: {
@@ -552,6 +559,11 @@ export default function ReviewCard({
                 style={styles.interactionButton}
                 onPress={(event) => {
                   event.stopPropagation();
+
+                  if (onPressComment) {
+                    onPressComment(review.id);
+                    return;
+                  }
 
                   router.push({
                     pathname: "/business/review/[reviewId]",
