@@ -29,6 +29,9 @@ export default function ReviewThreadScreen() {
   const { reviewId } = useLocalSearchParams<{ reviewId: string }>();
 
   const [review, setReview] = useState<Review | null>(null);
+  const [expandedReplies, setExpandedReplies] = useState<
+    Record<string, boolean>
+  >({});
   const [isLoading, setIsLoading] = useState(true);
   const [replyingToComment, setReplyingToComment] =
     useState<ReviewComment | null>(null);
@@ -99,6 +102,13 @@ export default function ReviewThreadScreen() {
 
     loadReview();
   }, [reviewId]);
+
+  const toggleReplies = (commentId: string) => {
+    setExpandedReplies((current) => ({
+      ...current,
+      [commentId]: !current[commentId],
+    }));
+  };
 
   const handleAddComment = (text: string) => {
     if (!reviewId) return;
@@ -183,15 +193,39 @@ export default function ReviewThreadScreen() {
                           onDelete={handleDeleteComment}
                         />
 
-                        {replies.map((reply) => (
-                          <ReviewCommentCard
-                            key={reply.id}
-                            comment={reply}
-                            onReply={setReplyingToComment}
-                            onToggleLike={toggleCommentLike}
-                            onDelete={handleDeleteComment}
-                          />
-                        ))}
+                        {replies.length > 0 ? (
+                          <>
+                            <Pressable
+                              style={styles.repliesToggle}
+                              onPress={() => toggleReplies(comment.id)}
+                            >
+                              <Text
+                                style={[
+                                  styles.repliesToggleText,
+                                  { color: colors.primaryGreen },
+                                ]}
+                              >
+                                {expandedReplies[comment.id]
+                                  ? "Hide replies"
+                                  : `View ${replies.length} repl${
+                                      replies.length === 1 ? "y" : "ies"
+                                    }`}
+                              </Text>
+                            </Pressable>
+
+                            {expandedReplies[comment.id]
+                              ? replies.map((reply) => (
+                                  <ReviewCommentCard
+                                    key={reply.id}
+                                    comment={reply}
+                                    onReply={setReplyingToComment}
+                                    onToggleLike={toggleCommentLike}
+                                    onDelete={handleDeleteComment}
+                                  />
+                                ))
+                              : null}
+                          </>
+                        ) : null}
 
                         <View
                           style={[
@@ -305,6 +339,16 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   replyBannerText: {
+    fontSize: 12,
+    fontWeight: "700",
+  },
+  repliesToggle: {
+    marginLeft: 52,
+    marginTop: -2,
+    marginBottom: 4,
+  },
+
+  repliesToggleText: {
     fontSize: 12,
     fontWeight: "700",
   },
