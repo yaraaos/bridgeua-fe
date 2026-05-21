@@ -1,6 +1,7 @@
 import AppAvatar from "@/src/components/ui/AppAvatar";
 import type { ReviewComment } from "@/src/features/reviews/types/review-comment.types";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { useProfileStore } from "@/src/store/profile.store";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
@@ -19,6 +20,10 @@ export default function ReviewCommentCard({
 }: Props) {
   const { colors } = useAppTheme();
   const isReply = !!comment.parentCommentId;
+  const profile = useProfileStore((state) => state.profile);
+  const isOwnComment = comment.author.username === profile.username;
+
+  const avatarUrl = isOwnComment ? profile.avatarUrl : comment.author.avatarUrl;
 
   return (
     <>
@@ -26,7 +31,7 @@ export default function ReviewCommentCard({
         <AppAvatar
           name={comment.author.name}
           username={comment.author.username}
-          imageUrl={comment.author.avatarUrl}
+          imageUrl={avatarUrl}
           size="sm"
         />
 

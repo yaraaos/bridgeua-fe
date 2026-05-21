@@ -1,135 +1,153 @@
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { MaterialIcons } from "@expo/vector-icons";
-import { useState } from "react";
+import { forwardRef, useImperativeHandle, useRef, useState } from "react";
 import { Animated, Pressable, StyleSheet, TextInput, View } from "react-native";
 
 const MAX_COMMENT_LENGTH = 700;
+
+export type ReviewCommentComposerRef = {
+  focus: () => void;
+};
 
 type Props = {
   onSubmit: (text: string) => void;
 };
 
-export default function ReviewCommentComposer({ onSubmit }: Props) {
-  const { colors } = useAppTheme();
-  const [text, setText] = useState("");
-  const counterShake = useState(new Animated.Value(0))[0];
+const ReviewCommentComposer = forwardRef<ReviewCommentComposerRef, Props>(
+  function ReviewCommentComposer({ onSubmit }, ref) {
+    const { colors } = useAppTheme();
+    const [text, setText] = useState("");
+    const inputRef = useRef<TextInput | null>(null);
 
-  const canSubmit = !!text.trim();
+    useImperativeHandle(ref, () => ({
+      focus: () => {
+        inputRef.current?.focus();
+      },
+    }));
+    const counterShake = useState(new Animated.Value(0))[0];
 
-  const shakeCounter = () => {
-    Animated.sequence([
-      Animated.timing(counterShake, {
-        toValue: -4,
-        duration: 50,
-        useNativeDriver: true,
-      }),
-      Animated.timing(counterShake, {
-        toValue: 4,
-        duration: 50,
-        useNativeDriver: true,
-      }),
-      Animated.timing(counterShake, {
-        toValue: -3,
-        duration: 50,
-        useNativeDriver: true,
-      }),
-      Animated.timing(counterShake, {
-        toValue: 3,
-        duration: 50,
-        useNativeDriver: true,
-      }),
-      Animated.timing(counterShake, {
-        toValue: 0,
-        duration: 50,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  };
+    const canSubmit = !!text.trim();
 
-  const handleSubmit = () => {
-    const trimmedText = text.trim();
+    const shakeCounter = () => {
+      Animated.sequence([
+        Animated.timing(counterShake, {
+          toValue: -4,
+          duration: 50,
+          useNativeDriver: true,
+        }),
+        Animated.timing(counterShake, {
+          toValue: 4,
+          duration: 50,
+          useNativeDriver: true,
+        }),
+        Animated.timing(counterShake, {
+          toValue: -3,
+          duration: 50,
+          useNativeDriver: true,
+        }),
+        Animated.timing(counterShake, {
+          toValue: 3,
+          duration: 50,
+          useNativeDriver: true,
+        }),
+        Animated.timing(counterShake, {
+          toValue: 0,
+          duration: 50,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    };
 
-    if (!trimmedText) return;
+    const handleSubmit = () => {
+      const trimmedText = text.trim();
 
-    onSubmit(trimmedText);
-    setText("");
-  };
+      if (!trimmedText) return;
 
-  return (
-    <View style={styles.container}>
-      <View
-        style={[
-          styles.inputPill,
-          {
-            backgroundColor: colors.surface,
-            borderColor:
-              text.length >= MAX_COMMENT_LENGTH ? colors.error : colors.border,
-          },
-        ]}
-      >
-        <TextInput
-          value={text}
-          maxLength={MAX_COMMENT_LENGTH}
-          onKeyPress={({ nativeEvent }) => {
-            if (
-              text.length >= MAX_COMMENT_LENGTH &&
-              nativeEvent.key !== "Backspace"
-            ) {
-              shakeCounter();
-            }
-          }}
-          onChangeText={(nextText) => {
-            if (
-              nextText.length >= MAX_COMMENT_LENGTH &&
-              text.length >= MAX_COMMENT_LENGTH
-            ) {
-              shakeCounter();
-            }
+      onSubmit(trimmedText);
+      setText("");
+    };
 
-            setText(nextText);
-          }}
-          placeholder="Add your reply..."
-          placeholderTextColor={colors.textMuted}
-          style={[styles.input, { color: colors.textPrimary }]}
-        />
-
-        <Animated.Text
+    return (
+      <View style={styles.container}>
+        <View
           style={[
-            styles.counter,
+            styles.inputPill,
             {
-              color:
+              backgroundColor: colors.surface,
+              borderColor:
                 text.length >= MAX_COMMENT_LENGTH
                   ? colors.error
-                  : colors.textMuted,
-              transform: [{ translateX: counterShake }],
+                  : colors.border,
             },
           ]}
         >
-          {text.length}/{MAX_COMMENT_LENGTH}
-        </Animated.Text>
+          <TextInput
+            ref={inputRef}
+            value={text}
+            maxLength={MAX_COMMENT_LENGTH}
+            onKeyPress={({ nativeEvent }) => {
+              if (
+                text.length >= MAX_COMMENT_LENGTH &&
+                nativeEvent.key !== "Backspace"
+              ) {
+                shakeCounter();
+              }
+            }}
+            onChangeText={(nextText) => {
+              if (
+                nextText.length >= MAX_COMMENT_LENGTH &&
+                text.length >= MAX_COMMENT_LENGTH
+              ) {
+                shakeCounter();
+              }
 
-        <Pressable
-          style={[
-            styles.sendButton,
-            {
-              backgroundColor: canSubmit
-                ? colors.primaryGreen
-                : colors.primaryGreenSoft,
-            },
-          ]}
-          onPress={handleSubmit}
-          disabled={!canSubmit}
-        >
-          <MaterialIcons
-            name="arrow-upward"
-            size={18}
-            color={canSubmit ? "#FFFFFF" : colors.primaryGreen}
+              setText(nextText);
+            }}
+            placeholder="Add your reply..."
+            placeholderTextColor={colors.textMuted}
+            style={[styles.input, { color: colors.textPrimary }]}
           />
-        </Pressable>
+
+          <Animated.Text
+            style={[
+              styles.counter,
+              {
+                color:
+                  text.length >= MAX_COMMENT_LENGTH
+                    ? colors.error
+                    : colors.textMuted,
+                transform: [{ translateX: counterShake }],
+              },
+            ]}
+          >
+            {text.length}/{MAX_COMMENT_LENGTH}
+          </Animated.Text>
+
+          <Pressable
+            style={[
+              styles.sendButton,
+              {
+                backgroundColor: canSubmit
+                  ? colors.primaryGreen
+                  : colors.primaryGreenSoft,
+              },
+            ]}
+            onPress={handleSubmit}
+            disabled={!canSubmit}
+          >
+            <MaterialIcons
+              name="arrow-upward"
+              size={18}
+              color={canSubmit ? "#FFFFFF" : colors.primaryGreen}
+            />
+          </Pressable>
+        </View>
       </View>
-    </View>
-  );
-}
+    );
+  },
+);
+
+export default ReviewCommentComposer;
 
 const styles = StyleSheet.create({
   container: {

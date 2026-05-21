@@ -1,6 +1,7 @@
 import ReviewCard from "@/src/components/business/ReviewCard";
 import ReviewCommentCard from "@/src/components/reviews/ReviewCommentCard";
 import ReviewCommentComposer from "@/src/components/reviews/ReviewCommentComposer";
+import { ReviewCommentComposerRef } from "@/src/components/reviews/ReviewCommentComposer/ReviewCommentComposer";
 import AppEmptyState from "@/src/components/ui/AppEmptyState";
 import AppLoader from "@/src/components/ui/AppLoader/AppLoader";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
@@ -37,6 +38,7 @@ export default function ReviewThreadScreen() {
     useState<ReviewComment | null>(null);
   const [isReplyingToReview, setIsReplyingToReview] = useState(false);
   const scrollViewRef = useRef<ScrollViewType | null>(null);
+  const composerRef = useRef<ReviewCommentComposerRef | null>(null);
   const comments = useReviewCommentsStore((state) => state.comments);
   const addComment = useReviewCommentsStore((state) => state.addComment);
 
@@ -171,6 +173,10 @@ export default function ReviewThreadScreen() {
                 onPressComment={() => {
                   setReplyingToComment(null);
                   setIsReplyingToReview(true);
+
+                  requestAnimationFrame(() => {
+                    composerRef.current?.focus();
+                  });
                 }}
               />
               <View
@@ -198,6 +204,10 @@ export default function ReviewThreadScreen() {
                           onReply={(comment) => {
                             setIsReplyingToReview(false);
                             setReplyingToComment(comment);
+
+                            requestAnimationFrame(() => {
+                              composerRef.current?.focus();
+                            });
                           }}
                           onToggleLike={toggleCommentLike}
                           onDelete={handleDeleteComment}
@@ -231,6 +241,10 @@ export default function ReviewThreadScreen() {
                                     onReply={(comment) => {
                                       setIsReplyingToReview(false);
                                       setReplyingToComment(comment);
+
+                                      requestAnimationFrame(() => {
+                                        composerRef.current?.focus();
+                                      });
                                     }}
                                     onToggleLike={toggleCommentLike}
                                     onDelete={handleDeleteComment}
@@ -289,7 +303,10 @@ export default function ReviewThreadScreen() {
               </View>
             ) : null}
 
-            <ReviewCommentComposer onSubmit={handleAddComment} />
+            <ReviewCommentComposer
+              ref={composerRef}
+              onSubmit={handleAddComment}
+            />
           </KeyboardAvoidingView>
         </>
       ) : (
