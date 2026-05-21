@@ -42,7 +42,7 @@ export default function ProfileReviewsScreen() {
 
   const [editedPhotos, setEditedPhotos] = useState<string[]>([]);
   const [isSaving, setIsSaving] = useState(false);
-
+  const canSaveReview = editedText.trim().length > 0 || editedPhotos.length > 0;
   const flatListRef = useRef<FlatList<PersonalProfileReview> | null>(null);
 
   const reviewOffsets = useRef<Record<string, number>>({});
@@ -119,8 +119,7 @@ export default function ProfileReviewsScreen() {
   };
 
   const handleSaveReview = async () => {
-    if (!editingReview || isSaving) return;
-
+    if (!editingReview || isSaving || !canSaveReview) return;
     const trimmedText = editedText.trim();
 
     setIsSaving(true);
@@ -353,11 +352,15 @@ export default function ProfileReviewsScreen() {
               <Pressable
                 style={[
                   styles.modalButton,
-                  { backgroundColor: colors.primaryGreen },
-                  isSaving && styles.disabledButton,
+                  {
+                    backgroundColor: canSaveReview
+                      ? colors.primaryGreen
+                      : colors.border,
+                  },
+                  (!canSaveReview || isSaving) && styles.disabledButton,
                 ]}
                 onPress={handleSaveReview}
-                disabled={isSaving}
+                disabled={!canSaveReview || isSaving}
               >
                 <Text style={styles.modalPrimaryText}>
                   {isSaving ? "Saving..." : "Save"}
