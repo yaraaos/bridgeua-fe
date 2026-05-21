@@ -43,6 +43,12 @@ export default function ProfileReviewsScreen() {
   const [editedPhotos, setEditedPhotos] = useState<string[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const canSaveReview = editedText.trim().length > 0 || editedPhotos.length > 0;
+  const hasUnsavedChanges =
+    !!editingReview &&
+    (editedText.trim() !== editingReview.text.trim() ||
+      editedRating !== editingReview.rating ||
+      JSON.stringify(editedPhotos) !==
+        JSON.stringify(editingReview.photos?.map((photo) => photo.url) ?? []));
   const flatListRef = useRef<FlatList<PersonalProfileReview> | null>(null);
 
   const reviewOffsets = useRef<Record<string, number>>({});
@@ -97,15 +103,40 @@ export default function ProfileReviewsScreen() {
     handleCloseActionMenu();
     setEditingReview(review);
     setEditedText(review.text);
+    setEditedRating(review.rating);
     setEditedPhotos(review.photos?.map((photo) => photo.url) ?? []);
   };
 
-  const closeEditModal = () => {
+  const resetEditState = () => {
     setEditingReview(null);
     setEditedRating(5);
     setEditedText("");
     setEditedPhotos([]);
     setIsSaving(false);
+  };
+
+  const closeEditModal = () => {
+    if (hasUnsavedChanges) {
+      Alert.alert(
+        "Discard changes?",
+        "You have unsaved changes in this review.",
+        [
+          {
+            text: "Keep editing",
+            style: "cancel",
+          },
+          {
+            text: "Discard",
+            style: "destructive",
+            onPress: resetEditState,
+          },
+        ],
+      );
+
+      return;
+    }
+
+    resetEditState();
   };
 
   const [openActionMenuReviewId, setOpenActionMenuReviewId] = useState<
@@ -150,7 +181,7 @@ export default function ProfileReviewsScreen() {
       ),
     );
 
-    closeEditModal();
+    resetEditState();
   };
 
   const handleDeleteReview = (review: PersonalProfileReview) => {
