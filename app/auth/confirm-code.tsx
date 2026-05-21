@@ -84,7 +84,7 @@ export default function ConfirmCodeScreen() {
       clearReviews();
 
       if (response.accessToken) {
-        await saveAuthTokens(response.accessToken);
+        await saveAuthTokens(response.accessToken, response.refreshToken);
       }
 
       setUser({

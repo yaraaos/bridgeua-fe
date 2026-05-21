@@ -50,7 +50,7 @@ export default function SignInScreen() {
       resetFollowing();
       clearReviews();
 
-      await saveAuthTokens(response.accessToken);
+      await saveAuthTokens(response.accessToken, response.refreshToken);
 
       setUser(response.user);
       await loadProfile();

@@ -9,6 +9,8 @@ export const ENDPOINTS = {
   AUTH_ME: '/api/auth/me',
   AUTH_FORGOT_PASSWORD: '/api/auth/forgot-password',
   AUTH_RESET_PASSWORD: '/api/auth/reset-password',
+  AUTH_REFRESH: '/api/auth/refresh',
+  AUTH_LOGOUT: '/api/auth/logout',
 
   // Users
   USERS_ME: '/api/users/me',
