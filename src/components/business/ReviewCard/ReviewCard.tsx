@@ -65,6 +65,7 @@ export default function ReviewCard({
   isActionMenuOpen = false,
   onToggleActionMenu,
   onCloseActionMenu,
+  onPressComment,
 }: Props) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);

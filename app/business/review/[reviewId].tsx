@@ -35,6 +35,7 @@ export default function ReviewThreadScreen() {
   const [isLoading, setIsLoading] = useState(true);
   const [replyingToComment, setReplyingToComment] =
     useState<ReviewComment | null>(null);
+  const [isReplyingToReview, setIsReplyingToReview] = useState(false);
   const scrollViewRef = useRef<ScrollViewType | null>(null);
   const comments = useReviewCommentsStore((state) => state.comments);
   const addComment = useReviewCommentsStore((state) => state.addComment);
@@ -120,6 +121,7 @@ export default function ReviewThreadScreen() {
     });
 
     setReplyingToComment(null);
+    setIsReplyingToReview(false);
 
     setTimeout(() => {
       scrollViewRef.current?.scrollToEnd({ animated: true });
@@ -164,8 +166,13 @@ export default function ReviewThreadScreen() {
               contentContainerStyle={styles.scrollContent}
               keyboardShouldPersistTaps="handled"
             >
-              <ReviewCard review={review} />
-
+              <ReviewCard
+                review={review}
+                onPressComment={() => {
+                  setReplyingToComment(null);
+                  setIsReplyingToReview(true);
+                }}
+              />
               <View
                 style={[styles.divider, { backgroundColor: colors.border }]}
               />
@@ -188,7 +195,10 @@ export default function ReviewThreadScreen() {
                       <View key={comment.id}>
                         <ReviewCommentCard
                           comment={comment}
-                          onReply={setReplyingToComment}
+                          onReply={(comment) => {
+                            setIsReplyingToReview(false);
+                            setReplyingToComment(comment);
+                          }}
                           onToggleLike={toggleCommentLike}
                           onDelete={handleDeleteComment}
                         />
@@ -218,7 +228,10 @@ export default function ReviewThreadScreen() {
                                   <ReviewCommentCard
                                     key={reply.id}
                                     comment={reply}
-                                    onReply={setReplyingToComment}
+                                    onReply={(comment) => {
+                                      setIsReplyingToReview(false);
+                                      setReplyingToComment(comment);
+                                    }}
                                     onToggleLike={toggleCommentLike}
                                     onDelete={handleDeleteComment}
                                   />
@@ -244,7 +257,7 @@ export default function ReviewThreadScreen() {
               )}
             </ScrollView>
 
-            {replyingToComment ? (
+            {replyingToComment || isReplyingToReview ? (
               <View
                 style={[styles.replyBanner, { borderColor: colors.border }]}
               >
@@ -254,11 +267,17 @@ export default function ReviewThreadScreen() {
                     { color: colors.textSecondary },
                   ]}
                 >
-                  Replying to @{replyingToComment.author.username}
+                  Replying to @
+                  {replyingToComment?.author.username ??
+                    review.authorUsername ??
+                    review.authorName}
                 </Text>
 
                 <Pressable
-                  onPress={() => setReplyingToComment(null)}
+                  onPress={() => {
+                    setReplyingToComment(null);
+                    setIsReplyingToReview(false);
+                  }}
                   hitSlop={8}
                 >
                   <MaterialIcons
