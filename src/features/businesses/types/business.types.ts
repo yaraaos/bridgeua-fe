@@ -63,12 +63,15 @@ export type BusinessDetailsReview = {
   authorUsername?: string;
   authorAvatar: string;
   rating: number;
+  likesCount: number;
+  commentsCount: number;
+  likedByMe: boolean;
   text: string;
   createdAt: string;
+  isEdited?: boolean;
   tags?: string[];
   photos?: BusinessReviewPhoto[];
 };
-
 export type BusinessDetailsService = {
   id: string;
   name: string;

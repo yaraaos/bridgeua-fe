@@ -17,7 +17,7 @@ import type {
 } from "@/src/types/profile";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useFocusEffect } from "expo-router";
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 
 import {
   Image,
@@ -42,6 +42,9 @@ export default function PersonalProfileScreen() {
   const profile = useProfileStore((state) => state.profile);
 
   const [myReviews, setMyReviews] = useState<PersonalProfileReview[]>([]);
+  const scrollViewRef = useRef<ScrollView | null>(null);
+
+  const reviewOffsets = useRef<Record<string, number>>({});
   const [previewFollowedBusinesses, setPreviewFollowedBusinesses] = useState<
     PersonalProfileFollowedBusiness[]
   >([]);
@@ -69,6 +72,19 @@ export default function PersonalProfileScreen() {
       setPreviewFollowedBusinesses(mappedBusinesses);
     }, []),
   );
+
+  const handleExpandReview = (reviewId: string) => {
+    const y = reviewOffsets.current[reviewId];
+
+    if (typeof y !== "number") {
+      return;
+    }
+
+    scrollViewRef.current?.scrollTo({
+      y: y + 220,
+      animated: true,
+    });
+  };
 
   const profileStats = useMemo(
     () => [
@@ -179,6 +195,7 @@ export default function PersonalProfileScreen() {
         </View>
       </View>
       <ScrollView
+        ref={scrollViewRef}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.content}
         refreshControl={
@@ -257,7 +274,18 @@ export default function PersonalProfileScreen() {
           ) : (
             <View style={styles.reviewsList}>
               {myReviews.map((review) => (
-                <ReviewCard key={review.id} review={review} />
+                <View
+                  key={review.id}
+                  onLayout={(event) => {
+                    reviewOffsets.current[review.id] =
+                      event.nativeEvent.layout.y;
+                  }}
+                >
+                  <ReviewCard
+                    review={review}
+                    onExpandReview={handleExpandReview}
+                  />
+                </View>
               ))}
             </View>
           )}
@@ -317,7 +345,13 @@ function FollowedBusinessCard({
   );
 }
 
-function ReviewCard({ review }: { review: PersonalProfileReview }) {
+function ReviewCard({
+  review,
+  onExpandReview,
+}: {
+  review: PersonalProfileReview;
+  onExpandReview?: (reviewId: string) => void;
+}) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -368,7 +402,19 @@ function ReviewCard({ review }: { review: PersonalProfileReview }) {
             </AppText>
 
             {shouldShowReadMore ? (
-              <Pressable onPress={() => setIsExpanded((value) => !value)}>
+              <Pressable
+                onPress={() => {
+                  setIsExpanded((value) => {
+                    const nextValue = !value;
+
+                    if (nextValue) {
+                      onExpandReview?.(review.id);
+                    }
+
+                    return nextValue;
+                  });
+                }}
+              >
                 <AppText style={styles.reviewReadMore}>
                   {isExpanded ? "Show less" : "Read more"}
                 </AppText>

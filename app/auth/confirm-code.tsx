@@ -82,7 +82,9 @@ export default function ConfirmCodeScreen() {
       resetFollowing();
       clearReviews();
 
-      await saveAuthTokens(response.accessToken);
+      if (response.accessToken) {
+        await saveAuthTokens(response.accessToken);
+      }
 
       setUser({
         id: profile.id,

@@ -235,6 +235,9 @@ export const businessDetailsMock: BusinessDetails[] = [
         authorAvatar:
           "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300",
         rating: 4,
+        likesCount: 18,
+        commentsCount: 3,
+        likedByMe: false,
         createdAt: "2026-05-01T10:00:00.000Z",
         text: "Amazing experience from start to finish. The whole team had a very professional approach and paid close attention to every small detail throughout the appointment. The space was clean, comfortable, and beautifully organized, which made the experience even better. I really appreciated how carefully everything was explained and how much effort was put into making me feel comfortable. The results exceeded my expectations and I will definitely be coming back again.",
       },
@@ -245,6 +248,9 @@ export const businessDetailsMock: BusinessDetails[] = [
         authorAvatar:
           "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300",
         rating: 5,
+        likesCount: 24,
+        commentsCount: 5,
+        likedByMe: true,
         createdAt: "2026-05-05T12:00:00.000Z",
         text: "The team was incredibly friendly and welcoming from the moment I arrived, and the whole experience felt very personal and professional. Everything was explained clearly, the atmosphere was relaxing, and I never felt rushed during the appointment. You can really tell they care about the quality of their work and customer experience. I would definitely come back again and would also recommend this place to friends looking for reliable service. ",
       },
@@ -255,6 +261,9 @@ export const businessDetailsMock: BusinessDetails[] = [
         authorAvatar:
           "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=300",
         rating: 5,
+        likesCount: 9,
+        commentsCount: 1,
+        likedByMe: false,
         createdAt: "2026-04-20T09:30:00.000Z",
         text: "Beautiful salon, clean space, and very professional service. Highly recommended.",
       },
@@ -269,6 +278,9 @@ export const businessDetailsMock: BusinessDetails[] = [
         authorAvatar:
           "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300",
         rating: 4,
+        likesCount: 18,
+        commentsCount: 3,
+        likedByMe: false,
         createdAt: "2026-05-01T10:00:00.000Z",
         text: "Amazing experience from start to finish. The whole team had a very professional approach and paid close attention to every small detail throughout the appointment. The space was clean, comfortable, and beautifully organized, which made the experience even better. I really appreciated how carefully everything was explained and how much effort was put into making me feel comfortable. The results exceeded my expectations and I will definitely be coming back again.",
         photos: [
@@ -290,6 +302,9 @@ export const businessDetailsMock: BusinessDetails[] = [
         authorAvatar:
           "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300",
         rating: 5,
+        likesCount: 24,
+        commentsCount: 5,
+        likedByMe: true,
         createdAt: "2026-05-05T12:00:00.000Z",
         text: "The team was incredibly friendly and welcoming from the moment I arrived, and the whole experience felt very personal and professional. Everything was explained clearly, the atmosphere was relaxing, and I never felt rushed during the appointment. You can really tell they care about the quality of their work and customer experience. I would definitely come back again and would also recommend this place to friends looking for reliable service.",
       },
@@ -300,6 +315,9 @@ export const businessDetailsMock: BusinessDetails[] = [
         authorAvatar:
           "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=300",
         rating: 5,
+        likesCount: 9,
+        commentsCount: 1,
+        likedByMe: false,
         createdAt: "2026-04-20T09:30:00.000Z",
         text: "Beautiful salon, clean space, and very professional service. Highly recommended.",
         tags: ["Good value", "Easy booking"],

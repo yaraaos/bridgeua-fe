@@ -2,11 +2,20 @@ import AppAvatar from "@/src/components/ui/AppAvatar";
 import type { BusinessDetailsReview } from "@/src/features/businesses/types/business.types";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { useProfileStore } from "@/src/store/profile.store";
+import { useReviewsStore } from "@/src/store/reviews.store";
 import type { PersonalProfileReview } from "@/src/types/profile";
+import { formatRelativeTime } from "@/src/utils/formatRelativeTime";
 import { MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import { useState } from "react";
-import { Image, Pressable, ScrollView, Text, View } from "react-native";
+import { useEffect, useState } from "react";
+import {
+  GestureResponderEvent,
+  Image,
+  Pressable,
+  ScrollView,
+  Text,
+  View,
+} from "react-native";
 import { createStyles } from "./ReviewCard.styles";
 
 type Props =
@@ -14,11 +23,27 @@ type Props =
       review: BusinessDetailsReview;
       variant?: "default" | "preview";
       onPressMore?: (reviewId: string) => void;
+      onExpandReview?: (reviewId: string) => void;
+      onPressComment?: (reviewId: string) => void;
+      onPressReview?: (reviewId: string) => void;
+      onEditReview?: never;
+      onDeleteReview?: never;
+      isActionMenuOpen?: never;
+      onToggleActionMenu?: never;
+      onCloseActionMenu?: never;
     }
   | {
       review: PersonalProfileReview;
       variant: "profile";
       onPressMore?: never;
+      onExpandReview?: (reviewId: string) => void;
+      onPressComment?: (reviewId: string) => void;
+      onPressReview?: (reviewId: string) => void;
+      onEditReview?: (review: PersonalProfileReview) => void;
+      onDeleteReview?: (review: PersonalProfileReview) => void;
+      isActionMenuOpen?: boolean;
+      onToggleActionMenu?: (reviewId: string) => void;
+      onCloseActionMenu?: () => void;
     };
 
 function isProfileReview(
@@ -37,6 +62,14 @@ export default function ReviewCard({
   review,
   variant = "default",
   onPressMore,
+  onExpandReview,
+  onEditReview,
+  onDeleteReview,
+  isActionMenuOpen = false,
+  onToggleActionMenu,
+  onCloseActionMenu,
+  onPressReview,
+  onPressComment,
 }: Props) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
@@ -54,6 +87,14 @@ export default function ReviewCard({
     businessReview?.authorUsername === profile.username;
 
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isLiked, setIsLiked] = useState(review.likedByMe ?? false);
+  const [likesCount, setLikesCount] = useState(review.likesCount ?? 0);
+
+  const [commentsCount, setCommentsCount] = useState(review.commentsCount ?? 0);
+
+  const submittedReviews = useReviewsStore((state) => state.submittedReviews);
+
+  const toggleReviewLike = useReviewsStore((state) => state.toggleReviewLike);
 
   const hasReviewText = !!review.text?.trim();
 
@@ -67,30 +108,89 @@ export default function ReviewCard({
       pathname: "/modal/image-viewer",
       params: {
         images: JSON.stringify(
-          (review.photos ?? []).map(({ id, url }) => ({ id, url })),
+          (review.photos ?? []).map((photo) => ({
+            id: photo.id,
+            url: photo.url,
+          })),
         ),
         initialIndex: String(index),
       },
     });
   };
 
-  const handlePressCard = () => {
+  const handlePressActions = (event: GestureResponderEvent) => {
+    event.stopPropagation();
+    if (!profileReview) return;
+    onToggleActionMenu?.(profileReview.id);
+  };
+
+  const handleEditReview = (event: GestureResponderEvent) => {
+    event.stopPropagation();
+
     if (!profileReview) return;
 
+    onCloseActionMenu?.();
+    onEditReview?.(profileReview);
+  };
+
+  const handleDeleteReview = (event: GestureResponderEvent) => {
+    event.stopPropagation();
+
+    if (!profileReview) return;
+
+    onCloseActionMenu?.();
+    onDeleteReview?.(profileReview);
+  };
+
+  const handleToggleLike = (event: GestureResponderEvent) => {
+    event.stopPropagation();
+
+    setIsLiked((currentValue) => !currentValue);
+    setLikesCount((currentCount) =>
+      isLiked ? Math.max(0, currentCount - 1) : currentCount + 1,
+    );
+
+    toggleReviewLike(review.id);
+  };
+
+  useEffect(() => {
+    const updatedReview = submittedReviews.find(
+      (submittedReview) => submittedReview.id === review.id,
+    );
+
+    if (!updatedReview) return;
+
+    setCommentsCount(updatedReview.commentsCount ?? 0);
+  }, [submittedReviews, review.id]);
+
+  const openReviewThread = () => {
     router.push({
-      pathname: "/business/[id]",
+      pathname: "/business/review/[reviewId]",
       params: {
-        id: profileReview.businessId,
-        tab: "reviews",
-        focusedReviewId: profileReview.id,
+        reviewId: review.id,
       },
     });
   };
 
+  const handlePressCard = () => {
+    if (isPreview) return;
+
+    if (onPressReview) {
+      onPressReview(review.id);
+      return;
+    }
+
+    openReviewThread();
+  };
+
   return (
     <Pressable
-      disabled={!isProfile}
-      style={[styles.container, isPreview && styles.containerPreview]}
+      disabled={isPreview}
+      style={[
+        styles.container,
+        isPreview && styles.containerPreview,
+        isActionMenuOpen && styles.containerMenuOpen,
+      ]}
       onPress={handlePressCard}
     >
       {isProfile && profileReview ? (
@@ -102,29 +202,85 @@ export default function ReviewCard({
                   {profileReview.businessName}
                 </Text>
 
-                <View style={styles.starsRow}>
-                  {Array.from({ length: 5 }).map((_, index) => {
-                    const isFilled = index < Math.round(profileReview.rating);
+                <View style={styles.profileRatingDateRow}>
+                  <View style={styles.starsRow}>
+                    {Array.from({ length: 5 }).map((_, index) => {
+                      const isFilled = index < Math.round(profileReview.rating);
 
-                    return (
-                      <MaterialIcons
-                        key={index}
-                        name={isFilled ? "star" : "star-border"}
-                        size={14}
-                        color={colors.accentOrange}
-                      />
-                    );
-                  })}
+                      return (
+                        <MaterialIcons
+                          key={index}
+                          name={isFilled ? "star" : "star-border"}
+                          size={14}
+                          color={colors.accentOrange}
+                        />
+                      );
+                    })}
+                  </View>
+
+                  {review.isEdited ? (
+                    <Text style={styles.profileReviewDate}>Edited</Text>
+                  ) : null}
+
+                  <Text style={styles.profileReviewDate}>
+                    {formatRelativeTime(profileReview.createdAt)}
+                  </Text>
                 </View>
               </View>
 
-              <Text style={styles.profileReviewDate}>
-                {new Date(profileReview.createdAt).toLocaleDateString("en-US", {
-                  month: "short",
-                  day: "numeric",
-                  year: "numeric",
-                })}
-              </Text>
+              <View style={styles.profileActionsWrap}>
+                <Pressable
+                  style={[
+                    styles.profileActionsButton,
+                    isActionMenuOpen && styles.profileActionsButtonActive,
+                  ]}
+                  onPress={handlePressActions}
+                  hitSlop={8}
+                >
+                  <MaterialIcons
+                    name="more-horiz"
+                    size={22}
+                    color={colors.primaryGreen}
+                  />
+                </Pressable>
+
+                {isActionMenuOpen ? (
+                  <View style={styles.profileActionsMenu}>
+                    <Pressable
+                      style={styles.profileActionsMenuItem}
+                      onPress={handleEditReview}
+                    >
+                      <MaterialIcons
+                        name="edit"
+                        size={16}
+                        color={colors.primaryGreen}
+                      />
+                      <Text style={styles.profileActionsMenuText}>
+                        Edit review
+                      </Text>
+                    </Pressable>
+
+                    <Pressable
+                      style={styles.profileActionsMenuItem}
+                      onPress={handleDeleteReview}
+                    >
+                      <MaterialIcons
+                        name="delete-outline"
+                        size={16}
+                        color={colors.error}
+                      />
+                      <Text
+                        style={[
+                          styles.profileActionsMenuText,
+                          { color: colors.error },
+                        ]}
+                      >
+                        Delete review
+                      </Text>
+                    </Pressable>
+                  </View>
+                ) : null}
+              </View>
             </View>
 
             {hasReviewText ? (
@@ -139,7 +295,17 @@ export default function ReviewCard({
                 {shouldShowReadMore ? (
                   <Pressable
                     style={styles.moreButton}
-                    onPress={() => setIsExpanded((value) => !value)}
+                    onPress={() => {
+                      setIsExpanded((value) => {
+                        const nextValue = !value;
+
+                        if (nextValue) {
+                          onExpandReview?.(review.id);
+                        }
+
+                        return nextValue;
+                      });
+                    }}
                   >
                     <Text style={styles.moreText}>
                       {isExpanded ? "Show less" : "Read more"}
@@ -168,6 +334,48 @@ export default function ReviewCard({
                 ))}
               </ScrollView>
             ) : null}
+            <View style={styles.interactionRow}>
+              <Pressable
+                style={styles.interactionButton}
+                onPress={handleToggleLike}
+              >
+                <MaterialIcons
+                  name={isLiked ? "thumb-up" : "thumb-up-off-alt"}
+                  size={16}
+                  color={isLiked ? colors.primaryGreen : colors.textSecondary}
+                />
+
+                <Text
+                  style={[
+                    styles.interactionText,
+                    isLiked && styles.interactionTextActive,
+                  ]}
+                >
+                  {likesCount}{" "}
+                </Text>
+              </Pressable>
+
+              <Pressable
+                style={styles.interactionButton}
+                onPress={(event) => {
+                  event.stopPropagation();
+
+                  if (onPressComment) {
+                    onPressComment(review.id);
+                    return;
+                  }
+
+                  openReviewThread();
+                }}
+              >
+                <MaterialIcons
+                  name="chat-bubble-outline"
+                  size={16}
+                  color={colors.textSecondary}
+                />
+                <Text style={styles.interactionText}>{commentsCount} </Text>
+              </Pressable>
+            </View>
           </View>
         </>
       ) : businessReview ? (
@@ -239,16 +447,15 @@ export default function ReviewCard({
               </Pressable>
 
               {!isPreview ? (
-                <Text style={styles.reviewDate}>
-                  {new Date(businessReview.createdAt).toLocaleDateString(
-                    "en-US",
-                    {
-                      month: "short",
-                      day: "numeric",
-                      year: "numeric",
-                    },
-                  )}
-                </Text>
+                <>
+                  {review.isEdited ? (
+                    <Text style={styles.reviewDate}>Edited</Text>
+                  ) : null}
+
+                  <Text style={styles.reviewDate}>
+                    {formatRelativeTime(businessReview.createdAt)}
+                  </Text>
+                </>
               ) : null}
             </View>
 
@@ -260,7 +467,6 @@ export default function ReviewCard({
                 {businessReview.text}
               </Text>
             ) : null}
-
             {isPreview ? (
               <Pressable
                 style={styles.moreButton}
@@ -271,7 +477,17 @@ export default function ReviewCard({
             ) : shouldShowReadMore ? (
               <Pressable
                 style={styles.moreButton}
-                onPress={() => setIsExpanded((value) => !value)}
+                onPress={() => {
+                  setIsExpanded((value) => {
+                    const nextValue = !value;
+
+                    if (nextValue) {
+                      onExpandReview?.(review.id);
+                    }
+
+                    return nextValue;
+                  });
+                }}
               >
                 <Text style={styles.moreText}>
                   {isExpanded ? "Show less" : "Read more"}
@@ -309,6 +525,48 @@ export default function ReviewCard({
                 ))}
               </View>
             ) : null}
+            <View style={styles.interactionRow}>
+              <Pressable
+                style={styles.interactionButton}
+                onPress={handleToggleLike}
+              >
+                <MaterialIcons
+                  name={isLiked ? "thumb-up" : "thumb-up-off-alt"}
+                  size={16}
+                  color={isLiked ? colors.primaryGreen : colors.textSecondary}
+                />
+
+                <Text
+                  style={[
+                    styles.interactionText,
+                    isLiked && styles.interactionTextActive,
+                  ]}
+                >
+                  {likesCount}
+                </Text>
+              </Pressable>
+
+              <Pressable
+                style={styles.interactionButton}
+                onPress={(event) => {
+                  event.stopPropagation();
+
+                  if (onPressComment) {
+                    onPressComment(review.id);
+                    return;
+                  }
+
+                  openReviewThread();
+                }}
+              >
+                <MaterialIcons
+                  name="chat-bubble-outline"
+                  size={16}
+                  color={colors.textSecondary}
+                />
+                <Text style={styles.interactionText}>{commentsCount} </Text>
+              </Pressable>
+            </View>
           </View>
         </>
       ) : null}

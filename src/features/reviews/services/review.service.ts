@@ -7,6 +7,7 @@ import type {
   GetReviewsResponse,
   Review,
   SubmitReviewPayload,
+  UpdateReviewPayload,
 } from "../types/review.types";
 
 const EMPTY_BREAKDOWN = ([5, 4, 3, 2, 1] as const).map((rating) => ({
@@ -94,6 +95,9 @@ export const submitReview = async (
     authorUsername: profile.username,
     authorAvatar: profile.avatarUrl,
     rating: payload.rating,
+    likesCount: 0,
+    commentsCount: 0,
+    likedByMe: false,
     text: payload.text,
     tags: payload.tags,
     photos: payload.photos?.map((uri, index) => ({
@@ -109,6 +113,70 @@ export const submitReview = async (
 
   return Promise.resolve(newReview);
 };
+
+export const updateReview = async (
+  payload: UpdateReviewPayload,
+): Promise<Review | null> => {
+  const review = useReviewsStore
+    .getState()
+    .submittedReviews.find((item) => item.id === payload.reviewId);
+
+  if (!review) {
+    return Promise.resolve(null);
+  }
+
+  const updatedReview: Review = {
+    ...review,
+    rating: payload.rating,
+    isEdited: true,
+    text: payload.text,
+    tags: payload.tags ?? review.tags,
+    photos: payload.photos
+      ? payload.photos.map((uri, index) => ({
+          id: `updated-photo-${Date.now()}-${index}`,
+          url: uri,
+        }))
+      : review.photos,
+  };
+
+  console.log("API PATCH /reviews/:reviewId", payload);
+
+  useReviewsStore.getState().updateReview(payload.reviewId, updatedReview);
+
+  return Promise.resolve(updatedReview);
+};
+
+export const deleteReview = async (reviewId: string): Promise<void> => {
+  console.log("API DELETE /reviews/:reviewId", { reviewId });
+
+  useReviewsStore.getState().deleteReview(reviewId);
+
+  return Promise.resolve();
+};
+
+export const getReviewById = async (
+  reviewId: string,
+): Promise<Review | null> => {
+  const submittedReview = useReviewsStore
+    .getState()
+    .submittedReviews.find((review) => review.id === reviewId);
+
+  if (submittedReview) {
+    return Promise.resolve(submittedReview);
+  }
+
+  const mockReview = businessDetailsMock
+    .flatMap((business) =>
+      business.reviews.map((review) => ({
+        ...review,
+        businessId: business.id,
+      })),
+    )
+    .find((review) => review.id === reviewId);
+
+  return Promise.resolve(mockReview ?? null);
+};
+
 export const getMyReviews = async (): Promise<PersonalProfileReview[]> => {
   const profile = useProfileStore.getState().profile;
 
@@ -123,6 +191,9 @@ export const getMyReviews = async (): Promise<PersonalProfileReview[]> => {
         businessName: business.name,
         businessImageUrl: business.images[0]?.url ?? "",
         rating: review.rating,
+        likesCount: review.likesCount,
+        commentsCount: review.commentsCount,
+        likedByMe: review.likedByMe,
         text: review.text,
         createdAt: review.createdAt,
         photos: review.photos,
@@ -142,6 +213,9 @@ export const getMyReviews = async (): Promise<PersonalProfileReview[]> => {
         businessName: business?.name ?? "Business",
         businessImageUrl: business?.images[0]?.url ?? "",
         rating: review.rating,
+        likesCount: review.likesCount,
+        commentsCount: review.commentsCount,
+        likedByMe: review.likedByMe,
         text: review.text,
         createdAt: review.createdAt,
         photos: review.photos,
