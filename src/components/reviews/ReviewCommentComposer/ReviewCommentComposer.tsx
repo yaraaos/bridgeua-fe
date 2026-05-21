@@ -1,7 +1,9 @@
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useState } from "react";
-import { Pressable, StyleSheet, TextInput, View } from "react-native";
+import { Animated, Pressable, StyleSheet, TextInput, View } from "react-native";
+
+const MAX_COMMENT_LENGTH = 700;
 
 type Props = {
   onSubmit: (text: string) => void;
@@ -10,6 +12,39 @@ type Props = {
 export default function ReviewCommentComposer({ onSubmit }: Props) {
   const { colors } = useAppTheme();
   const [text, setText] = useState("");
+  const counterShake = useState(new Animated.Value(0))[0];
+
+  const canSubmit = !!text.trim();
+
+  const shakeCounter = () => {
+    Animated.sequence([
+      Animated.timing(counterShake, {
+        toValue: -4,
+        duration: 50,
+        useNativeDriver: true,
+      }),
+      Animated.timing(counterShake, {
+        toValue: 4,
+        duration: 50,
+        useNativeDriver: true,
+      }),
+      Animated.timing(counterShake, {
+        toValue: -3,
+        duration: 50,
+        useNativeDriver: true,
+      }),
+      Animated.timing(counterShake, {
+        toValue: 3,
+        duration: 50,
+        useNativeDriver: true,
+      }),
+      Animated.timing(counterShake, {
+        toValue: 0,
+        duration: 50,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  };
 
   const handleSubmit = () => {
     const trimmedText = text.trim();
@@ -20,8 +55,6 @@ export default function ReviewCommentComposer({ onSubmit }: Props) {
     setText("");
   };
 
-  const canSubmit = !!text.trim();
-
   return (
     <View style={styles.container}>
       <View
@@ -29,17 +62,51 @@ export default function ReviewCommentComposer({ onSubmit }: Props) {
           styles.inputPill,
           {
             backgroundColor: colors.surface,
-            borderColor: colors.border,
+            borderColor:
+              text.length >= MAX_COMMENT_LENGTH ? colors.error : colors.border,
           },
         ]}
       >
         <TextInput
           value={text}
-          onChangeText={setText}
+          maxLength={MAX_COMMENT_LENGTH}
+          onKeyPress={({ nativeEvent }) => {
+            if (
+              text.length >= MAX_COMMENT_LENGTH &&
+              nativeEvent.key !== "Backspace"
+            ) {
+              shakeCounter();
+            }
+          }}
+          onChangeText={(nextText) => {
+            if (
+              nextText.length >= MAX_COMMENT_LENGTH &&
+              text.length >= MAX_COMMENT_LENGTH
+            ) {
+              shakeCounter();
+            }
+
+            setText(nextText);
+          }}
           placeholder="Add your reply..."
           placeholderTextColor={colors.textMuted}
           style={[styles.input, { color: colors.textPrimary }]}
         />
+
+        <Animated.Text
+          style={[
+            styles.counter,
+            {
+              color:
+                text.length >= MAX_COMMENT_LENGTH
+                  ? colors.error
+                  : colors.textMuted,
+              transform: [{ translateX: counterShake }],
+            },
+          ]}
+        >
+          {text.length}/{MAX_COMMENT_LENGTH}
+        </Animated.Text>
 
         <Pressable
           style={[
@@ -78,12 +145,18 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     flexDirection: "row",
     alignItems: "center",
-    gap: 10,
+    gap: 8,
   },
   input: {
     flex: 1,
     minHeight: 42,
     fontSize: 16,
+  },
+  counter: {
+    minWidth: 54,
+    textAlign: "right",
+    fontSize: 11,
+    fontWeight: "700",
   },
   sendButton: {
     width: 38,
