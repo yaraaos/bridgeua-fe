@@ -159,22 +159,24 @@ export default function ReviewCard({
     setCommentsCount(updatedReview.commentsCount ?? 0);
   }, [submittedReviews, review.id]);
 
-  const handlePressCard = () => {
-    if (!profileReview) return;
-
+  const openReviewThread = () => {
     router.push({
-      pathname: "/business/[id]",
+      pathname: "/business/review/[reviewId]",
       params: {
-        id: profileReview.businessId,
-        tab: "reviews",
-        focusedReviewId: profileReview.id,
+        reviewId: review.id,
       },
     });
   };
 
+  const handlePressCard = () => {
+    if (isPreview) return;
+
+    openReviewThread();
+  };
+
   return (
     <Pressable
-      disabled={!isProfile}
+      disabled={isPreview}
       style={[
         styles.container,
         isPreview && styles.containerPreview,
@@ -361,12 +363,7 @@ export default function ReviewCard({
                     return;
                   }
 
-                  router.push({
-                    pathname: "/business/review/[reviewId]",
-                    params: {
-                      reviewId: review.id,
-                    },
-                  });
+                  openReviewThread();
                 }}
               >
                 <MaterialIcons
@@ -566,12 +563,7 @@ export default function ReviewCard({
                     return;
                   }
 
-                  router.push({
-                    pathname: "/business/review/[reviewId]",
-                    params: {
-                      reviewId: review.id,
-                    },
-                  });
+                  openReviewThread();
                 }}
               >
                 <MaterialIcons
