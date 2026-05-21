@@ -24,6 +24,7 @@ type Props =
       onPressMore?: (reviewId: string) => void;
       onExpandReview?: (reviewId: string) => void;
       onPressComment?: (reviewId: string) => void;
+      onPressReview?: (reviewId: string) => void;
       onEditReview?: never;
       onDeleteReview?: never;
       isActionMenuOpen?: never;
@@ -36,6 +37,7 @@ type Props =
       onPressMore?: never;
       onExpandReview?: (reviewId: string) => void;
       onPressComment?: (reviewId: string) => void;
+      onPressReview?: (reviewId: string) => void;
       onEditReview?: (review: PersonalProfileReview) => void;
       onDeleteReview?: (review: PersonalProfileReview) => void;
       isActionMenuOpen?: boolean;
@@ -65,6 +67,7 @@ export default function ReviewCard({
   isActionMenuOpen = false,
   onToggleActionMenu,
   onCloseActionMenu,
+  onPressReview,
   onPressComment,
 }: Props) {
   const { colors } = useAppTheme();
@@ -170,6 +173,11 @@ export default function ReviewCard({
 
   const handlePressCard = () => {
     if (isPreview) return;
+
+    if (onPressReview) {
+      onPressReview(review.id);
+      return;
+    }
 
     openReviewThread();
   };

@@ -179,6 +179,7 @@ export default function ReviewThreadScreen() {
             >
               <ReviewCard
                 review={review}
+                onPressReview={() => {}}
                 onPressComment={() => {
                   setReplyingToComment(null);
                   setIsReplyingToReview(true);
