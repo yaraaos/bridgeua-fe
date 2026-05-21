@@ -42,6 +42,7 @@ export default function ConfirmCodeScreen() {
   const { submitResendCode, isLoading: isResending } = useResendCode();
   const setUser = useAuthStore((state) => state.setUser);
   const profile = useProfileStore((state) => state.profile);
+  const loadProfile = useProfileStore((state) => state.loadProfile);
   const resetFollowing = useFollowingStore((state) => state.resetFollowing);
 
   const clearReviews = useReviewsStore((state) => state.clearReviews);
@@ -91,6 +92,7 @@ export default function ConfirmCodeScreen() {
         email: profile.email ?? email,
         name: profile.displayName,
       });
+      await loadProfile();
 
       router.replace("/(tabs)/home");
     }
