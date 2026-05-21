@@ -19,7 +19,7 @@ import type { HomePromotion } from "@/src/features/promotions/types/promotion.ty
 import { useDiscoveryLocationStore } from "@/src/store/discovery-location";
 import { useFilterStore } from "@/src/store/filter.store";
 import { router } from "expo-router";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { Alert, Animated, StyleSheet, View } from "react-native";
 
 export default function HomeScreen() {
@@ -31,14 +31,24 @@ export default function HomeScreen() {
   } = useDiscoveryLocationStore();
 
   const scrollY = useRef(new Animated.Value(0)).current;
+  const [searchQuery, setSearchQuery] = useState("");
 
   const { sort, cuisines, rating, distance, customDistance } = useFilterStore(
     (state) => state.discoveryFilters,
   );
   const { businesses, isLoading } = useBusinesses();
 
+  const searchFiltered = searchQuery.trim()
+    ? businesses.filter(
+        (b) =>
+          b.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          b.category?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          b.location?.toLowerCase().includes(searchQuery.toLowerCase()),
+      )
+    : businesses;
+
   const { filteredBusinesses } = useDiscoveryFeed({
-    businesses,
+    businesses: searchFiltered,
     sort,
     cuisines,
     rating,
@@ -170,6 +180,8 @@ export default function HomeScreen() {
       onRequestNearby={handleRequestNearby}
       showSearch
       searchPlaceholder="Find services, food or places"
+      searchValue={searchQuery}
+      onSearchChangeText={setSearchQuery}
       actions={["map", "filter"]}
       onPressMap={handleMapPress}
       onPressFilter={handleFilterPress}

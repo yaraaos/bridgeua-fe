@@ -1,6 +1,8 @@
 import { create } from "zustand";
 
 import type { AuthUser } from "../features/auth/types/auth.types";
+import { apiClient } from "../services/api/client";
+import { ENDPOINTS } from "../services/api/endpoints";
 import { getAuthSession } from "../services/auth/session";
 import { clearAuthTokens } from "../services/auth/tokens";
 import { useFollowingStore } from "./following.store";
@@ -26,6 +28,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     set({
       user,
       isAuthenticated: true,
+      isLoading: false,
     });
   },
 
@@ -56,18 +59,15 @@ export const useAuthStore = create<AuthState>((set) => ({
         return;
       }
 
-      // TODO:
-      // Replace with backend /me request later
+      const res = await apiClient.get<AuthUser>(ENDPOINTS.AUTH_ME);
 
       set({
-        user: {
-          id: "user-1",
-          email: "test@test.com",
-          name: "Test User",
-        },
+        user: res.data,
         isAuthenticated: true,
         isLoading: false,
       });
+
+      await useProfileStore.getState().loadProfile();
     } catch {
       set({
         user: null,
