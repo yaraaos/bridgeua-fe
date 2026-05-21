@@ -68,6 +68,7 @@ export type BusinessDetailsReview = {
   likedByMe: boolean;
   text: string;
   createdAt: string;
+  isEdited?: boolean;
   tags?: string[];
   photos?: BusinessReviewPhoto[];
 };

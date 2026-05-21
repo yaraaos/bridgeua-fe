@@ -39,6 +39,7 @@ export type PersonalProfileReview = {
   likedByMe: boolean;
   text: string;
   createdAt: string;
+  isEdited?: boolean;
   photos?: {
     id: string;
     url: string;

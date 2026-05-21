@@ -176,6 +176,7 @@ export default function ProfileReviewsScreen() {
               rating: updatedReview.rating,
               text: updatedReview.text,
               photos: updatedReview.photos,
+              isEdited: updatedReview.isEdited,
             }
           : review,
       ),

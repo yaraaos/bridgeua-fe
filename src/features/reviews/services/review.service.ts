@@ -128,6 +128,7 @@ export const updateReview = async (
   const updatedReview: Review = {
     ...review,
     rating: payload.rating,
+    isEdited: true,
     text: payload.text,
     tags: payload.tags ?? review.tags,
     photos: payload.photos

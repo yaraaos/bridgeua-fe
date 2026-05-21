@@ -16,6 +16,7 @@ export type Review = {
   tags?: string[];
   photos?: BusinessReviewPhoto[];
   createdAt: string;
+  isEdited?: boolean;
   authorUsername?: string;
 };
 

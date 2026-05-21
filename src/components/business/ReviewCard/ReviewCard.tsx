@@ -204,6 +204,10 @@ export default function ReviewCard({
                     })}
                   </View>
 
+                  {review.isEdited ? (
+                    <Text style={styles.profileReviewDate}>Edited</Text>
+                  ) : null}
+
                   <Text style={styles.profileReviewDate}>
                     {new Date(profileReview.createdAt).toLocaleDateString(
                       "en-US",
@@ -435,17 +439,25 @@ export default function ReviewCard({
                 </View>
               </Pressable>
 
+              <Text style={styles.reviewDate}></Text>
+
               {!isPreview ? (
-                <Text style={styles.reviewDate}>
-                  {new Date(businessReview.createdAt).toLocaleDateString(
-                    "en-US",
-                    {
-                      month: "short",
-                      day: "numeric",
-                      year: "numeric",
-                    },
-                  )}
-                </Text>
+                <>
+                  {review.isEdited ? (
+                    <Text style={styles.reviewDate}>Edited</Text>
+                  ) : null}
+
+                  <Text style={styles.reviewDate}>
+                    {new Date(businessReview.createdAt).toLocaleDateString(
+                      "en-US",
+                      {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                      },
+                    )}
+                  </Text>
+                </>
               ) : null}
             </View>
 
@@ -457,7 +469,6 @@ export default function ReviewCard({
                 {businessReview.text}
               </Text>
             ) : null}
-
             {isPreview ? (
               <Pressable
                 style={styles.moreButton}
