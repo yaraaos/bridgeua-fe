@@ -4,6 +4,7 @@ import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { useProfileStore } from "@/src/store/profile.store";
 import { useReviewsStore } from "@/src/store/reviews.store";
 import type { PersonalProfileReview } from "@/src/types/profile";
+import { formatRelativeTime } from "@/src/utils/formatRelativeTime";
 import { MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
@@ -222,14 +223,7 @@ export default function ReviewCard({
                   ) : null}
 
                   <Text style={styles.profileReviewDate}>
-                    {new Date(profileReview.createdAt).toLocaleDateString(
-                      "en-US",
-                      {
-                        month: "short",
-                        day: "numeric",
-                        year: "numeric",
-                      },
-                    )}
+                    {formatRelativeTime(profileReview.createdAt)}
                   </Text>
                 </View>
               </View>
@@ -452,8 +446,6 @@ export default function ReviewCard({
                 </View>
               </Pressable>
 
-              <Text style={styles.reviewDate}></Text>
-
               {!isPreview ? (
                 <>
                   {review.isEdited ? (
@@ -461,14 +453,7 @@ export default function ReviewCard({
                   ) : null}
 
                   <Text style={styles.reviewDate}>
-                    {new Date(businessReview.createdAt).toLocaleDateString(
-                      "en-US",
-                      {
-                        month: "short",
-                        day: "numeric",
-                        year: "numeric",
-                      },
-                    )}
+                    {formatRelativeTime(businessReview.createdAt)}
                   </Text>
                 </>
               ) : null}

@@ -2,6 +2,7 @@ import AppAvatar from "@/src/components/ui/AppAvatar";
 import type { ReviewComment } from "@/src/features/reviews/types/review-comment.types";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { useProfileStore } from "@/src/store/profile.store";
+import { formatRelativeTime } from "@/src/utils/formatRelativeTime";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
@@ -42,10 +43,7 @@ export default function ReviewCommentCard({
             </Text>
 
             <Text style={[styles.date, { color: colors.textMuted }]}>
-              {new Date(comment.createdAt).toLocaleDateString("en-US", {
-                month: "short",
-                day: "numeric",
-              })}
+              {formatRelativeTime(comment.createdAt)}
             </Text>
           </View>
 
@@ -97,21 +95,23 @@ export default function ReviewCommentCard({
               </Text>
             </Pressable>
 
-            <Pressable
-              style={styles.likeButton}
-              onPress={() => onDelete(comment.id)}
-              hitSlop={8}
-            >
-              <MaterialIcons
-                name="delete-outline"
-                size={15}
-                color={colors.textMuted}
-              />
+            {isOwnComment ? (
+              <Pressable
+                style={styles.likeButton}
+                onPress={() => onDelete(comment.id)}
+                hitSlop={8}
+              >
+                <MaterialIcons
+                  name="delete-outline"
+                  size={15}
+                  color={colors.textMuted}
+                />
 
-              <Text style={[styles.replyText, { color: colors.textMuted }]}>
-                Delete
-              </Text>
-            </Pressable>
+                <Text style={[styles.replyText, { color: colors.textMuted }]}>
+                  Delete
+                </Text>
+              </Pressable>
+            ) : null}
           </View>
         </View>
       </View>
