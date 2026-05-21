@@ -6,7 +6,7 @@ export const signUpPersonalUsernameSchema = z
   .min(3, "Username must be at least 3 characters")
   .max(20, "Username must be 20 characters or less")
   .regex(
-    /^[a-zA-Z0-9._]+$/,
+    /^[a-z0-9._]+$/,
     "Username can only use letters, numbers, dots, or underscores",
   );
 
