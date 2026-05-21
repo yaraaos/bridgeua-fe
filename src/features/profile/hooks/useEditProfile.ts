@@ -69,10 +69,10 @@ export function useEditProfile() {
         avatarUrl: finalAvatarUrl,
       });
 
-      return true;
+      return { ok: true, avatarUrl: finalAvatarUrl };
     } catch (error) {
       console.error("Edit profile failed", error);
-      return false;
+      return { ok: false, avatarUrl: undefined };
     } finally {
       setIsSaving(false);
     }
