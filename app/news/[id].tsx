@@ -1,36 +1,60 @@
-import { BusinessAboutSection } from "@/src/components/business";
 import AppButton from "@/src/components/ui/AppButton/AppButton";
 import AppLoader from "@/src/components/ui/AppLoader/AppLoader";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
 import AppText from "@/src/components/ui/AppText/AppText";
-import { usePromotion } from "@/src/features/promotions/hooks/usePromotions";
+import { useNewsItem } from "@/src/features/news/hooks/useNews";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import { Image, Pressable, ScrollView, StyleSheet, View } from "react-native";
 
-export default function PromotionDetailScreen() {
+export default function NewsDetailScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
 
   const { id } = useLocalSearchParams<{ id: string }>();
+  const { newsItem, isLoading } = useNewsItem(id);
 
-  const { promotion, isLoading } = usePromotion(id);
-
-  if (isLoading || !promotion) {
+  if (isLoading || !newsItem) {
     return <AppLoader />;
   }
 
-  const businessAbout =
-    promotion.business && "about" in promotion.business
-      ? promotion.business.about
-      : undefined;
+  const handlePrimaryCta = () => {
+    if (newsItem.ctaType === "view_address") {
+      router.push({
+        pathname: "/business/[id]",
+        params: {
+          id: newsItem.businessId,
+          section: "address",
+        },
+      });
+      return;
+    }
+
+    if (newsItem.ctaType === "view_menu") {
+      router.push({
+        pathname: "/business/[id]",
+        params: {
+          id: newsItem.businessId,
+          section: "menu",
+        },
+      });
+      return;
+    }
+
+    router.push({
+      pathname: "/business/[id]",
+      params: {
+        id: newsItem.businessId,
+      },
+    });
+  };
 
   return (
     <AppScreen>
       <ScrollView showsVerticalScrollIndicator={false}>
         <View>
-          <Image source={{ uri: promotion.imageUrl }} style={styles.image} />
+          <Image source={{ uri: newsItem.imageUrl }} style={styles.image} />
 
           <Pressable style={styles.shareButton}>
             <Ionicons
@@ -42,55 +66,34 @@ export default function PromotionDetailScreen() {
         </View>
 
         <View style={styles.content}>
-          {!!promotion.categoryLabel && (
+          {!!newsItem.categoryLabel && (
             <View style={styles.badge}>
               <AppText style={styles.badgeText}>
-                {promotion.categoryLabel}
+                {newsItem.categoryLabel}
               </AppText>
             </View>
           )}
 
-          <AppText style={styles.title}>{promotion.title}</AppText>
+          <AppText style={styles.title}>{newsItem.title}</AppText>
 
-          <AppText style={styles.description}>{promotion.description}</AppText>
+          <AppText style={styles.time}>
+            {new Date(newsItem.publishedAt).toLocaleDateString()}
+          </AppText>
 
-          {!!promotion.offerDetails?.length && (
-            <View style={styles.section}>
-              <AppText style={styles.sectionTitle}>Offer details</AppText>
+          <View style={styles.businessCard}>
+            <AppText style={styles.businessName}>
+              {newsItem.business?.name}
+            </AppText>
 
-              {promotion.offerDetails.map((detail) => (
-                <AppText key={detail} style={styles.listItem}>
-                  • {detail}
-                </AppText>
-              ))}
-            </View>
-          )}
+            <AppText style={styles.businessMeta}>
+              {newsItem.business?.category} · {newsItem.business?.location}
+            </AppText>
+          </View>
 
-          {!!businessAbout && (
-            <BusinessAboutSection
-              businessId={promotion.businessId}
-              about={businessAbout}
-            />
-          )}
+          <AppText style={styles.contentText}>{newsItem.content}</AppText>
 
           <View style={styles.actions}>
-            <AppButton
-              title="Book Now"
-              onPress={() => router.push("/bookings/choose-service")}
-            />
-
-            <AppButton
-              title="View Business"
-              variant="secondary"
-              onPress={() =>
-                router.push({
-                  pathname: "/business/[id]",
-                  params: {
-                    id: promotion.businessId,
-                  },
-                })
-              }
-            />
+            <AppButton title={newsItem.ctaLabel} onPress={handlePrimaryCta} />
           </View>
         </View>
       </ScrollView>
@@ -119,7 +122,7 @@ function createStyles(colors: any) {
 
     content: {
       padding: 20,
-      gap: 20,
+      gap: 18,
     },
 
     badge: {
@@ -142,30 +145,38 @@ function createStyles(colors: any) {
       color: colors.textPrimary,
     },
 
-    description: {
+    time: {
+      fontSize: 13,
+      color: colors.textMuted,
+    },
+
+    businessCard: {
+      backgroundColor: colors.surface,
+      borderRadius: 18,
+      padding: 16,
+      borderWidth: 1,
+      borderColor: colors.border,
+      gap: 4,
+    },
+
+    businessName: {
+      fontSize: 16,
+      fontWeight: "800",
+      color: colors.textPrimary,
+    },
+
+    businessMeta: {
+      fontSize: 13,
+      color: colors.textSecondary,
+    },
+
+    contentText: {
       fontSize: 15,
       lineHeight: 24,
       color: colors.textSecondary,
     },
 
-    section: {
-      gap: 10,
-    },
-
-    sectionTitle: {
-      fontSize: 18,
-      fontWeight: "700",
-      color: colors.textPrimary,
-    },
-
-    listItem: {
-      fontSize: 14,
-      lineHeight: 22,
-      color: colors.textSecondary,
-    },
-
     actions: {
-      gap: 12,
       paddingBottom: 40,
     },
   });
