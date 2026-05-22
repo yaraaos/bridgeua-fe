@@ -19,8 +19,14 @@ export default function FollowingFeedCard({ item }: FollowingFeedCardProps) {
       style={styles.feedCard}
       onPress={() =>
         router.push({
-          pathname: "/business/[id]",
-          params: { id: String(item.businessId) },
+          pathname:
+            item.type === "promotion" ? "/promotions/[id]" : "/news/[id]",
+          params: {
+            id:
+              item.type === "promotion"
+                ? (item.promotionId ?? item.id)
+                : (item.newsId ?? item.id),
+          },
         })
       }
     >
