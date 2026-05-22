@@ -157,12 +157,12 @@ export default function PromotionDetailScreen() {
         <View style={styles.actions}>
           <AppButton
             title="Book Now"
+            variant="accent"
             onPress={() => router.push("/bookings/choose-service")}
           />
 
           <AppButton
             title="View Business"
-            variant="secondary"
             onPress={() =>
               router.push({
                 pathname: "/business/[id]",

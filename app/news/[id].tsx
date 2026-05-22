@@ -127,7 +127,11 @@ export default function NewsDetailScreen() {
           <AppText style={styles.articleText}>{newsItem.content}</AppText>
         </View>
 
-        <AppButton title={newsItem.ctaLabel} onPress={handlePrimaryCta} />
+        <AppButton
+          title={newsItem.ctaLabel}
+          variant="primary"
+          onPress={handlePrimaryCta}
+        />
       </ScrollView>
     </AppScreen>
   );
