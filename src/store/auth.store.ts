@@ -4,7 +4,7 @@ import type { AuthUser } from "../features/auth/types/auth.types";
 import { apiClient } from "../services/api/client";
 import { ENDPOINTS } from "../services/api/endpoints";
 import { getAuthSession } from "../services/auth/session";
-import { clearAuthTokens } from "../services/auth/tokens";
+import { clearAuthTokens, getRefreshToken } from "../services/auth/tokens";
 import { useFollowingStore } from "./following.store";
 import { useProfileStore } from "./profile.store";
 import { useReviewsStore } from "./reviews.store";
@@ -33,6 +33,15 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   clearUser: async () => {
+    try {
+      const refreshToken = await getRefreshToken();
+      if (refreshToken) {
+        await apiClient.post(ENDPOINTS.AUTH_LOGOUT, { refreshToken });
+      }
+    } catch {
+      // Ignore logout errors — clear locally regardless
+    }
+
     await clearAuthTokens();
 
     useFollowingStore.getState().resetFollowing();

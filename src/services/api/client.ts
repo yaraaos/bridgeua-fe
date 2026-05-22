@@ -1,12 +1,51 @@
 import { API_BASE_URL } from './config';
-import { getAccessToken } from '../auth/tokens';
+import { getAccessToken, getRefreshToken, saveAuthTokens, clearAuthTokens } from '../auth/tokens';
 import type { ApiResponse, ApiErrorResponse } from './types';
 
 type RequestOptions = Omit<RequestInit, 'body'> & {
   body?: Record<string, unknown> | FormData;
 };
 
-async function request<T>(path: string, options: RequestOptions = {}): Promise<ApiResponse<T>> {
+let isRefreshing = false;
+let refreshPromise: Promise<string | null> | null = null;
+
+async function tryRefreshToken(): Promise<string | null> {
+  if (isRefreshing && refreshPromise) return refreshPromise;
+
+  isRefreshing = true;
+  refreshPromise = (async () => {
+    try {
+      const refreshToken = await getRefreshToken();
+      if (!refreshToken) return null;
+
+      const response = await fetch(`${API_BASE_URL}/api/auth/refresh`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refreshToken }),
+      });
+
+      if (!response.ok) {
+        await clearAuthTokens();
+        return null;
+      }
+
+      const json = await response.json();
+      const { accessToken, refreshToken: newRefreshToken } = json.data;
+      await saveAuthTokens(accessToken, newRefreshToken);
+      return accessToken;
+    } catch {
+      await clearAuthTokens();
+      return null;
+    } finally {
+      isRefreshing = false;
+      refreshPromise = null;
+    }
+  })();
+
+  return refreshPromise;
+}
+
+async function request<T>(path: string, options: RequestOptions = {}, isRetry = false): Promise<ApiResponse<T>> {
   const token = await getAccessToken();
 
   const headers: Record<string, string> = {};
@@ -32,6 +71,16 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<A
           ? JSON.stringify(options.body)
           : undefined,
   });
+
+  // Auto-refresh on 401, but not for auth endpoints and not on retry
+  if (response.status === 401 && !isRetry && !path.includes('/api/auth/')) {
+    const newAccessToken = await tryRefreshToken();
+    if (newAccessToken) {
+      return request<T>(path, options, true);
+    }
+    // Refresh failed — throw so auth store can handle logout
+    throw new Error('Session expired. Please log in again.');
+  }
 
   const json = await response.json();
 
