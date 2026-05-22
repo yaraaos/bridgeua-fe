@@ -1,6 +1,6 @@
 import type { HomePromotion } from "../types/promotion.types";
 
-export const mockHomePromotions: HomePromotion[] = [
+export const mockBannerPromotions: HomePromotion[] = [
   {
     id: "home_feed_promo_001",
     businessId: "1",

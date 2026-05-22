@@ -13,8 +13,8 @@ import {
 } from "@/src/constants/locations";
 import { useBusinesses } from "@/src/features/businesses";
 import { useDiscoveryFeed } from "@/src/features/discovery/hooks/useDiscoveryFeed";
-import { useHomePromotion } from "@/src/features/promotions/hooks/useHomePromotion";
-import { useHomePromotionBanner } from "@/src/features/promotions/hooks/useHomePromotionBanner";
+import { useBannerPromotion } from "@/src/features/promotions/hooks/useBannerPromotion";
+import { useBannerPromotions } from "@/src/features/promotions/hooks/useBannerPromotions";
 import type { HomePromotion } from "@/src/features/promotions/types/promotion.types";
 import { useDiscoveryLocationStore } from "@/src/store/discovery-location";
 import { useFilterStore } from "@/src/store/filter.store";
@@ -60,10 +60,10 @@ export default function HomeScreen() {
     promotion,
     isVisible: isPromotionVisible,
     closePromotion,
-  } = useHomePromotion();
+  } = useBannerPromotion();
 
   const { promotions: bannerPromotions, isVisible: isBannerVisible } =
-    useHomePromotionBanner();
+    useBannerPromotions();
 
   const handlePromotionBannerPress = (promotion: HomePromotion) => {
     router.push({

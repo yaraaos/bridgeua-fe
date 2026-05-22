@@ -1,27 +1,33 @@
 import { businessesMock } from "@/src/mocks/businesses.mock";
-import { mockHomePromotions } from "../data/mockHomePromotions";
+import { mockBannerPromotions } from "../data/mockBannerPromotions";
+import { mockFollowingPromotions } from "../data/mockFollowingPromotions";
 import type { HomePromotion, Promotion } from "../types/promotion.types";
 
-export async function getHomePromotion(): Promise<HomePromotion | null> {
-  // Later BE integration:
-  // return api.get("/promotions/home");
+const allPromotions: Promotion[] = [
+  ...mockBannerPromotions,
+  ...mockFollowingPromotions,
+];
 
-  const activePromotion = mockHomePromotions.find(
+export async function getBannerPromotion(): Promise<HomePromotion | null> {
+  // Later BE integration:
+  // return api.get("/promotions/banner");
+
+  const activePromotion = mockBannerPromotions.find(
     (promotion) => promotion.isActive,
   );
 
   return activePromotion ?? null;
 }
 
-export async function getHomeFeedPromotions(): Promise<HomePromotion[]> {
+export async function getBannerPromotions(): Promise<HomePromotion[]> {
   // Later BE integration:
-  // return api.get("/promotions/home-feed");
+  // return api.get("/promotions/banner");
 
-  return mockHomePromotions.filter((promotion) => promotion.isActive);
+  return mockBannerPromotions.filter((promotion) => promotion.isActive);
 }
 
 export async function getActivePromotions(): Promise<Promotion[]> {
-  return mockHomePromotions
+  return allPromotions
     .filter((promotion) => promotion.isActive)
     .map((promotion) => ({
       ...promotion,
@@ -32,7 +38,7 @@ export async function getActivePromotions(): Promise<Promotion[]> {
 }
 
 export async function getPromotionById(id: string): Promise<Promotion | null> {
-  const promotion = mockHomePromotions.find((item) => item.id === id);
+  const promotion = allPromotions.find((item) => item.id === id);
 
   if (!promotion) {
     return null;
@@ -49,10 +55,21 @@ export async function getPromotionById(id: string): Promise<Promotion | null> {
 export async function getBusinessPromotions(
   businessId: string,
 ): Promise<Promotion[]> {
-  return mockHomePromotions
+  return allPromotions
     .filter(
       (promotion) => promotion.businessId === businessId && promotion.isActive,
     )
+    .map((promotion) => ({
+      ...promotion,
+      business: businessesMock.find(
+        (business) => business.id === promotion.businessId,
+      ),
+    }));
+}
+
+export async function getFollowingPromotions(): Promise<Promotion[]> {
+  return mockFollowingPromotions
+    .filter((promotion) => promotion.isActive)
     .map((promotion) => ({
       ...promotion,
       business: businessesMock.find(

@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 
-import { getHomePromotion } from "../services/promotion.service";
+import { getBannerPromotion } from "../services/promotion.service";
 import type { HomePromotion } from "../types/promotion.types";
 
-let hasShownHomePromotionThisSession = false;
+let hasShownBannerPromotionThisSession = false;
 
-export function useHomePromotion() {
+export function useBannerPromotion() {
   const [promotion, setPromotion] = useState<HomePromotion | null>(null);
   const [isVisible, setIsVisible] = useState(false);
 
@@ -13,11 +13,11 @@ export function useHomePromotion() {
     let isMounted = true;
 
     async function loadPromotion() {
-      if (hasShownHomePromotionThisSession) {
+      if (hasShownBannerPromotionThisSession) {
         return;
       }
 
-      const data = await getHomePromotion();
+      const data = await getBannerPromotion();
 
       if (!isMounted || !data) {
         return;
@@ -25,7 +25,7 @@ export function useHomePromotion() {
 
       setPromotion(data);
       setIsVisible(true);
-      hasShownHomePromotionThisSession = true;
+      hasShownBannerPromotionThisSession = true;
     }
 
     loadPromotion();
