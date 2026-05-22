@@ -24,14 +24,8 @@ export default function FollowingFeedCard({ item }: FollowingFeedCardProps) {
           params: {
             id:
               item.type === "promotion"
-                ? item.businessId === "1"
-                  ? "home_feed_promo_001"
-                  : item.businessId === "2"
-                    ? "home_feed_promo_002"
-                    : "home_feed_promo_003"
-                : item.id === "feed-3"
-                  ? "news-1"
-                  : "news-2",
+                ? (item.promotionId ?? item.id)
+                : (item.newsId ?? item.id),
           },
         })
       }
