@@ -33,6 +33,12 @@ export default function PromotionDetailScreen() {
       ? promotion.business.about
       : undefined;
 
+  const validUntil = promotion.expiresAt ?? promotion.endsAt;
+
+  const formattedValidUntil = validUntil
+    ? new Date(validUntil).toLocaleDateString()
+    : null;
+
   const handleShare = async () => {
     await Share.share({
       title: promotion.title,
@@ -112,15 +118,29 @@ export default function PromotionDetailScreen() {
           </View>
         )}
 
-        {!!promotion.offerDetails?.length && (
+        {(!!promotion.offerDetails?.length || !!formattedValidUntil) && (
           <View style={styles.sectionCard}>
             <AppText style={styles.sectionTitle}>Offer details</AppText>
 
-            {promotion.offerDetails.map((detail) => (
-              <AppText key={detail} style={styles.sectionText}>
-                {detail}
-              </AppText>
-            ))}
+            {!!promotion.offerDetails?.length &&
+              promotion.offerDetails.map((detail) => (
+                <AppText key={detail} style={styles.sectionText}>
+                  {detail}
+                </AppText>
+              ))}
+
+            {!!formattedValidUntil && (
+              <View style={styles.validityRow}>
+                <Ionicons
+                  name="calendar-outline"
+                  size={15}
+                  color={colors.textMuted}
+                />
+                <AppText style={styles.validityText}>
+                  Valid until {formattedValidUntil}
+                </AppText>
+              </View>
+            )}
           </View>
         )}
 
@@ -258,6 +278,18 @@ function createStyles(colors: AppColors) {
       fontSize: 14,
       lineHeight: 21,
       color: colors.textSecondary,
+    },
+    validityRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 8,
+      marginTop: 4,
+    },
+
+    validityText: {
+      fontSize: 13,
+      fontWeight: "600",
+      color: colors.textMuted,
     },
     actions: {
       gap: 12,
