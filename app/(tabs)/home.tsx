@@ -33,9 +33,8 @@ export default function HomeScreen() {
   const scrollY = useRef(new Animated.Value(0)).current;
   const [searchQuery, setSearchQuery] = useState("");
 
-  const { sort, cuisines, rating, distance, customDistance } = useFilterStore(
-    (state) => state.discoveryFilters,
-  );
+  const { category, sort, cuisines, rating, distance, customDistance } =
+    useFilterStore((state) => state.discoveryFilters);
   const { businesses, isLoading } = useBusinesses();
 
   const searchFiltered = searchQuery.trim()
@@ -49,6 +48,7 @@ export default function HomeScreen() {
 
   const { filteredBusinesses } = useDiscoveryFeed({
     businesses: searchFiltered,
+    category,
     sort,
     cuisines,
     rating,
@@ -133,35 +133,25 @@ export default function HomeScreen() {
     });
   };
 
-  const selectedHomeCategory =
-    cuisines.length === 0
-      ? "All Categories"
-      : cuisines[0] === "Automotive"
-        ? "Auto"
-        : cuisines[0];
+  const selectedHomeCategory = !category
+    ? "All Categories"
+    : category === "Automotive"
+      ? "Auto"
+      : category;
 
-  const handleSelectCategory = (category: string) => {
-    if (category === "All Categories") {
-      useFilterStore.setState((state) => ({
-        discoveryFilters: {
-          ...state.discoveryFilters,
-          cuisines: [],
-        },
-      }));
-      return;
-    }
+  const handleSelectCategory = (selectedCategory: string) => {
+    const mappedCategory =
+      selectedCategory === "All Categories"
+        ? ""
+        : selectedCategory === "Auto"
+          ? "Automotive"
+          : selectedCategory;
 
-    const mappedCategory = category === "Auto" ? "Automotive" : category;
-
-    useFilterStore.setState((state) => ({
-      discoveryFilters: {
-        ...state.discoveryFilters,
-        cuisines: [mappedCategory],
-      },
-    }));
+    useFilterStore.getState().setCategory("discovery", mappedCategory);
   };
 
   const activeFilterCount =
+    (category ? 1 : 0) +
     (sort !== "relevance" ? 1 : 0) +
     cuisines.length +
     (rating ? 1 : 0) +

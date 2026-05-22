@@ -13,15 +13,16 @@ export const ENDPOINTS = {
   AUTH_LOGOUT: '/api/auth/logout',
 
   // Users
-  USERS_ME: '/api/users/me',
-  USERS_ME_AVATAR: '/api/users/me/avatar',
+  USERS_ME: "/api/users/me",
+  USERS_ME_AVATAR: "/api/users/me/avatar",
 
   // Categories
-  CATEGORIES: '/api/categories',
+  CATEGORIES: "/api/categories",
 
   // Businesses
-  BUSINESSES: '/api/businesses',
+  BUSINESSES: "/api/businesses",
   BUSINESS_BY_ID: (id: string) => `/api/businesses/${id}`,
   BUSINESS_PHOTOS: (id: string) => `/api/businesses/${id}/photos`,
-  BUSINESS_PHOTO_BY_ID: (id: string, photoId: string) => `/api/businesses/${id}/photos/${photoId}`,
+  BUSINESS_PHOTO_BY_ID: (id: string, photoId: string) =>
+    `/api/businesses/${id}/photos/${photoId}`,
 } as const;
