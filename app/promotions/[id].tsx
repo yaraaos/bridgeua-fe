@@ -144,6 +144,24 @@ export default function PromotionDetailScreen() {
           </View>
         )}
 
+        {!!promotion.promoCode && (
+          <View style={styles.sectionCard}>
+            <AppText style={styles.sectionTitle}>Promo code</AppText>
+
+            <View style={styles.promoCodeBox}>
+              <AppText style={styles.promoCodeText}>
+                {promotion.promoCode}
+              </AppText>
+            </View>
+
+            {!!promotion.redemptionInstructions && (
+              <AppText style={styles.sectionText}>
+                {promotion.redemptionInstructions}
+              </AppText>
+            )}
+          </View>
+        )}
+
         {!!businessAbout && (
           <View style={styles.sectionCard}>
             <AppText style={styles.sectionTitle}>About the business</AppText>
@@ -158,7 +176,16 @@ export default function PromotionDetailScreen() {
           <AppButton
             title="Book Now"
             variant="accent"
-            onPress={() => router.push("/bookings/choose-service")}
+            onPress={() =>
+              router.push({
+                pathname: "/bookings/choose-service",
+                params: {
+                  businessId: promotion.businessId,
+                  promotionId: promotion.id,
+                  promoCode: promotion.promoCode,
+                },
+              })
+            }
           />
 
           <AppButton
@@ -294,6 +321,22 @@ function createStyles(colors: AppColors) {
     actions: {
       gap: 12,
       marginTop: 2,
+    },
+    promoCodeBox: {
+      alignSelf: "flex-start",
+      paddingHorizontal: 14,
+      paddingVertical: 10,
+      borderRadius: 12,
+      backgroundColor: colors.accentOrangeSoft,
+      borderWidth: 1,
+      borderColor: colors.accentOrange,
+    },
+
+    promoCodeText: {
+      fontSize: 18,
+      fontWeight: "900",
+      letterSpacing: 1,
+      color: colors.accentOrange,
     },
   });
 }

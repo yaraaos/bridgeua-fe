@@ -12,6 +12,11 @@ export const mockFollowingPromotions: Promotion[] = [
     categoryLabel: "Promotions",
     isActive: true,
     expiresAt: "2026-08-31T23:59:59.000Z",
+    promoCode: "BRIDGE20",
+    discountLabel: "20% off",
+    redemptionType: "auto_apply",
+    redemptionInstructions:
+      "This promo will be applied automatically when you book.",
     offerDetails: [
       "Breakfast combo includes coffee and one croissant.",
       "Available for dine-in and takeaway.",

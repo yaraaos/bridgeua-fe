@@ -22,6 +22,11 @@ export type Promotion = {
 
   isActive: boolean;
 
+  promoCode?: string;
+  discountLabel?: string;
+  redemptionType?: "auto_apply" | "show_code" | "manual";
+  redemptionInstructions?: string;
+
   offerDetails?: string[];
   terms?: string[];
 
