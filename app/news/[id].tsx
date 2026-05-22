@@ -2,11 +2,19 @@ import AppButton from "@/src/components/ui/AppButton/AppButton";
 import AppLoader from "@/src/components/ui/AppLoader/AppLoader";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
 import AppText from "@/src/components/ui/AppText/AppText";
+import type { AppColors } from "@/src/constants/colors";
 import { useNewsItem } from "@/src/features/news/hooks/useNews";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
-import { Image, Pressable, ScrollView, StyleSheet, View } from "react-native";
+import {
+    Image,
+    Pressable,
+    ScrollView,
+    Share,
+    StyleSheet,
+    View,
+} from "react-native";
 
 export default function NewsDetailScreen() {
   const { colors } = useAppTheme();
@@ -19,165 +27,208 @@ export default function NewsDetailScreen() {
     return <AppLoader />;
   }
 
+  const handleShare = async () => {
+    await Share.share({
+      title: newsItem.title,
+      message: `${newsItem.title}\n\n${newsItem.description}`,
+    });
+  };
+
   const handlePrimaryCta = () => {
-    if (newsItem.ctaType === "view_address") {
-      router.push({
-        pathname: "/business/[id]",
-        params: {
-          id: newsItem.businessId,
-          section: "address",
-        },
-      });
-      return;
-    }
-
-    if (newsItem.ctaType === "view_menu") {
-      router.push({
-        pathname: "/business/[id]",
-        params: {
-          id: newsItem.businessId,
-          section: "menu",
-        },
-      });
-      return;
-    }
-
     router.push({
       pathname: "/business/[id]",
       params: {
         id: newsItem.businessId,
+        section:
+          newsItem.ctaType === "view_menu"
+            ? "menu"
+            : newsItem.ctaType === "view_address"
+              ? "address"
+              : undefined,
       },
     });
   };
 
   return (
-    <AppScreen>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <View>
-          <Image source={{ uri: newsItem.imageUrl }} style={styles.image} />
-
-          <Pressable style={styles.shareButton}>
+    <AppScreen style={styles.appScreen}>
+      <ScrollView
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.topRow}>
+          <Pressable onPress={() => router.back()} hitSlop={12}>
             <Ionicons
-              name="share-outline"
-              size={22}
+              name="chevron-back"
+              size={24}
               color={colors.textPrimary}
             />
           </Pressable>
+
+          <Pressable style={styles.shareButton} onPress={handleShare}>
+            <Ionicons name="share-outline" size={16} color={colors.white} />
+          </Pressable>
         </View>
 
-        <View style={styles.content}>
-          {!!newsItem.categoryLabel && (
-            <View style={styles.badge}>
-              <AppText style={styles.badgeText}>
-                {newsItem.categoryLabel}
-              </AppText>
-            </View>
-          )}
+        <AppText style={styles.category}>
+          {newsItem.categoryLabel ?? "News"}
+        </AppText>
 
-          <AppText style={styles.title}>{newsItem.title}</AppText>
+        <AppText style={styles.title}>{newsItem.title}</AppText>
 
-          <AppText style={styles.time}>
-            {new Date(newsItem.publishedAt).toLocaleDateString()}
-          </AppText>
+        <AppText style={styles.time}>
+          {new Date(newsItem.publishedAt).toLocaleDateString()}
+        </AppText>
 
+        <Image source={{ uri: newsItem.imageUrl }} style={styles.heroImage} />
+
+        {!!newsItem.business && (
           <View style={styles.businessCard}>
-            <AppText style={styles.businessName}>
-              {newsItem.business?.name}
-            </AppText>
+            <Image
+              source={{
+                uri:
+                  "image" in newsItem.business
+                    ? newsItem.business.image
+                    : newsItem.imageUrl,
+              }}
+              style={styles.businessImage}
+            />
 
-            <AppText style={styles.businessMeta}>
-              {newsItem.business?.category} · {newsItem.business?.location}
-            </AppText>
+            <View style={styles.businessInfo}>
+              <AppText style={styles.businessName} numberOfLines={1}>
+                {newsItem.business.name}
+              </AppText>
+
+              <View style={styles.metaRow}>
+                <Ionicons name="star" size={14} color={colors.accentOrange} />
+                <AppText style={styles.metaText}>
+                  {newsItem.business.rating.toFixed(1)}
+                </AppText>
+                <AppText style={styles.dot}>•</AppText>
+                <AppText style={styles.metaText} numberOfLines={1}>
+                  {newsItem.business.category}
+                </AppText>
+              </View>
+
+              <View style={styles.metaRow}>
+                <Ionicons
+                  name="location-outline"
+                  size={14}
+                  color={colors.textMuted}
+                />
+                <AppText style={styles.metaText} numberOfLines={1}>
+                  {newsItem.business.location}
+                </AppText>
+              </View>
+            </View>
           </View>
+        )}
 
-          <AppText style={styles.contentText}>{newsItem.content}</AppText>
-
-          <View style={styles.actions}>
-            <AppButton title={newsItem.ctaLabel} onPress={handlePrimaryCta} />
-          </View>
+        <View style={styles.sectionCard}>
+          <AppText style={styles.articleText}>{newsItem.content}</AppText>
         </View>
+
+        <AppButton title={newsItem.ctaLabel} onPress={handlePrimaryCta} />
       </ScrollView>
     </AppScreen>
   );
 }
 
-function createStyles(colors: any) {
+function createStyles(colors: AppColors) {
   return StyleSheet.create({
-    image: {
-      width: "100%",
-      height: 260,
+    appScreen: {
+      padding: 0,
+      backgroundColor: colors.background,
     },
-
+    content: {
+      padding: 16,
+      paddingBottom: 40,
+      gap: 16,
+    },
+    topRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      marginBottom: 4,
+    },
     shareButton: {
-      position: "absolute",
-      top: 60,
-      right: 20,
-      width: 42,
-      height: 42,
-      borderRadius: 999,
-      backgroundColor: colors.surface,
+      width: 36,
+      height: 36,
+      borderRadius: 10,
+      backgroundColor: colors.accentOrange,
       alignItems: "center",
       justifyContent: "center",
     },
-
-    content: {
-      padding: 20,
-      gap: 18,
-    },
-
-    badge: {
-      alignSelf: "flex-start",
-      backgroundColor: colors.primaryGreenSoft,
-      paddingHorizontal: 12,
-      paddingVertical: 7,
-      borderRadius: 999,
-    },
-
-    badgeText: {
-      color: colors.primaryGreenDark,
-      fontWeight: "700",
+    category: {
       fontSize: 12,
-    },
-
-    title: {
-      fontSize: 28,
-      fontWeight: "800",
-      color: colors.textPrimary,
-    },
-
-    time: {
-      fontSize: 13,
+      fontWeight: "700",
       color: colors.textMuted,
     },
-
-    businessCard: {
-      backgroundColor: colors.surface,
+    title: {
+      fontSize: 28,
+      lineHeight: 34,
+      fontWeight: "900",
+      color: colors.textPrimary,
+    },
+    time: {
+      fontSize: 13,
+      fontWeight: "600",
+      color: colors.textMuted,
+    },
+    heroImage: {
+      width: "100%",
+      height: 210,
       borderRadius: 18,
-      padding: 16,
+    },
+    businessCard: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 12,
+      padding: 12,
+      borderRadius: 18,
+      backgroundColor: colors.surface,
       borderWidth: 1,
       borderColor: colors.border,
+    },
+    businessImage: {
+      width: 58,
+      height: 58,
+      borderRadius: 14,
+    },
+    businessInfo: {
+      flex: 1,
       gap: 4,
     },
-
     businessName: {
-      fontSize: 16,
+      fontSize: 17,
       fontWeight: "800",
       color: colors.textPrimary,
     },
-
-    businessMeta: {
-      fontSize: 13,
-      color: colors.textSecondary,
+    metaRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 4,
     },
-
-    contentText: {
+    metaText: {
+      fontSize: 12,
+      fontWeight: "600",
+      color: colors.textSecondary,
+      flexShrink: 1,
+    },
+    dot: {
+      fontSize: 12,
+      color: colors.textMuted,
+    },
+    sectionCard: {
+      padding: 14,
+      borderRadius: 16,
+      backgroundColor: colors.surface,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    articleText: {
       fontSize: 15,
-      lineHeight: 24,
+      lineHeight: 23,
       color: colors.textSecondary,
-    },
-
-    actions: {
-      paddingBottom: 40,
     },
   });
 }

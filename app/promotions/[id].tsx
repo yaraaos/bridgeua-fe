@@ -3,18 +3,25 @@ import AppButton from "@/src/components/ui/AppButton/AppButton";
 import AppLoader from "@/src/components/ui/AppLoader/AppLoader";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
 import AppText from "@/src/components/ui/AppText/AppText";
+import type { AppColors } from "@/src/constants/colors";
 import { usePromotion } from "@/src/features/promotions/hooks/usePromotions";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
-import { Image, Pressable, ScrollView, StyleSheet, View } from "react-native";
+import {
+    Image,
+    Pressable,
+    ScrollView,
+    Share,
+    StyleSheet,
+    View,
+} from "react-native";
 
 export default function PromotionDetailScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
 
   const { id } = useLocalSearchParams<{ id: string }>();
-
   const { promotion, isLoading } = usePromotion(id);
 
   if (isLoading || !promotion) {
@@ -26,147 +33,235 @@ export default function PromotionDetailScreen() {
       ? promotion.business.about
       : undefined;
 
-  return (
-    <AppScreen>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <View>
-          <Image source={{ uri: promotion.imageUrl }} style={styles.image} />
+  const handleShare = async () => {
+    await Share.share({
+      title: promotion.title,
+      message: `${promotion.title}\n\n${promotion.description}`,
+    });
+  };
 
-          <Pressable style={styles.shareButton}>
+  return (
+    <AppScreen style={styles.appScreen}>
+      <ScrollView
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.topRow}>
+          <Pressable onPress={() => router.back()} hitSlop={12}>
             <Ionicons
-              name="share-outline"
-              size={22}
+              name="chevron-back"
+              size={24}
               color={colors.textPrimary}
             />
           </Pressable>
+
+          <Pressable style={styles.shareButton} onPress={handleShare}>
+            <Ionicons name="share-outline" size={16} color={colors.white} />
+          </Pressable>
         </View>
 
-        <View style={styles.content}>
-          {!!promotion.categoryLabel && (
-            <View style={styles.badge}>
-              <AppText style={styles.badgeText}>
-                {promotion.categoryLabel}
+        <AppText style={styles.category}>
+          {promotion.categoryLabel ?? "Promotions"}
+        </AppText>
+
+        <AppText style={styles.title}>{promotion.title}</AppText>
+
+        <AppText style={styles.description}>{promotion.description}</AppText>
+
+        <Image source={{ uri: promotion.imageUrl }} style={styles.heroImage} />
+
+        {!!promotion.business && (
+          <View style={styles.businessCard}>
+            <Image
+              source={{
+                uri:
+                  "image" in promotion.business
+                    ? promotion.business.image
+                    : promotion.imageUrl,
+              }}
+              style={styles.businessImage}
+            />
+
+            <View style={styles.businessInfo}>
+              <AppText style={styles.businessName} numberOfLines={1}>
+                {promotion.business.name}
               </AppText>
-            </View>
-          )}
 
-          <AppText style={styles.title}>{promotion.title}</AppText>
-
-          <AppText style={styles.description}>{promotion.description}</AppText>
-
-          {!!promotion.offerDetails?.length && (
-            <View style={styles.section}>
-              <AppText style={styles.sectionTitle}>Offer details</AppText>
-
-              {promotion.offerDetails.map((detail) => (
-                <AppText key={detail} style={styles.listItem}>
-                  • {detail}
+              <View style={styles.metaRow}>
+                <Ionicons name="star" size={14} color={colors.accentOrange} />
+                <AppText style={styles.metaText}>
+                  {promotion.business.rating.toFixed(1)}
                 </AppText>
-              ))}
-            </View>
-          )}
+                <AppText style={styles.dot}>•</AppText>
+                <AppText style={styles.metaText} numberOfLines={1}>
+                  {promotion.business.category}
+                </AppText>
+              </View>
 
-          {!!businessAbout && (
+              <View style={styles.metaRow}>
+                <Ionicons
+                  name="location-outline"
+                  size={14}
+                  color={colors.textMuted}
+                />
+                <AppText style={styles.metaText} numberOfLines={1}>
+                  {promotion.business.location}
+                </AppText>
+              </View>
+            </View>
+          </View>
+        )}
+
+        {!!promotion.offerDetails?.length && (
+          <View style={styles.sectionCard}>
+            <AppText style={styles.sectionTitle}>Offer details</AppText>
+
+            {promotion.offerDetails.map((detail) => (
+              <AppText key={detail} style={styles.sectionText}>
+                {detail}
+              </AppText>
+            ))}
+          </View>
+        )}
+
+        {!!businessAbout && (
+          <View style={styles.sectionCard}>
+            <AppText style={styles.sectionTitle}>About the business</AppText>
             <BusinessAboutSection
               businessId={promotion.businessId}
               about={businessAbout}
             />
-          )}
-
-          <View style={styles.actions}>
-            <AppButton
-              title="Book Now"
-              onPress={() => router.push("/bookings/choose-service")}
-            />
-
-            <AppButton
-              title="View Business"
-              variant="secondary"
-              onPress={() =>
-                router.push({
-                  pathname: "/business/[id]",
-                  params: {
-                    id: promotion.businessId,
-                  },
-                })
-              }
-            />
           </View>
+        )}
+
+        <View style={styles.actions}>
+          <AppButton
+            title="Book Now"
+            onPress={() => router.push("/bookings/choose-service")}
+          />
+
+          <AppButton
+            title="View Business"
+            variant="secondary"
+            onPress={() =>
+              router.push({
+                pathname: "/business/[id]",
+                params: { id: promotion.businessId },
+              })
+            }
+          />
         </View>
       </ScrollView>
     </AppScreen>
   );
 }
 
-function createStyles(colors: any) {
+function createStyles(colors: AppColors) {
   return StyleSheet.create({
-    image: {
-      width: "100%",
-      height: 260,
+    appScreen: {
+      padding: 0,
+      backgroundColor: colors.background,
     },
-
+    content: {
+      padding: 16,
+      paddingBottom: 40,
+      gap: 16,
+    },
+    topRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      marginBottom: 4,
+    },
     shareButton: {
-      position: "absolute",
-      top: 60,
-      right: 20,
-      width: 42,
-      height: 42,
-      borderRadius: 999,
-      backgroundColor: colors.surface,
+      width: 36,
+      height: 36,
+      borderRadius: 10,
+      backgroundColor: colors.accentOrange,
       alignItems: "center",
       justifyContent: "center",
     },
-
-    content: {
-      padding: 20,
-      gap: 20,
-    },
-
-    badge: {
-      alignSelf: "flex-start",
-      backgroundColor: colors.primaryGreenSoft,
-      paddingHorizontal: 12,
-      paddingVertical: 7,
-      borderRadius: 999,
-    },
-
-    badgeText: {
-      color: colors.primaryGreenDark,
-      fontWeight: "700",
+    category: {
       fontSize: 12,
+      fontWeight: "700",
+      color: colors.textMuted,
     },
-
     title: {
       fontSize: 28,
-      fontWeight: "800",
+      lineHeight: 34,
+      fontWeight: "900",
       color: colors.textPrimary,
     },
-
     description: {
       fontSize: 15,
-      lineHeight: 24,
-      color: colors.textSecondary,
-    },
-
-    section: {
-      gap: 10,
-    },
-
-    sectionTitle: {
-      fontSize: 18,
-      fontWeight: "700",
-      color: colors.textPrimary,
-    },
-
-    listItem: {
-      fontSize: 14,
       lineHeight: 22,
       color: colors.textSecondary,
     },
-
+    heroImage: {
+      width: "100%",
+      height: 210,
+      borderRadius: 18,
+    },
+    businessCard: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 12,
+      padding: 12,
+      borderRadius: 18,
+      backgroundColor: colors.surface,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    businessImage: {
+      width: 58,
+      height: 58,
+      borderRadius: 14,
+    },
+    businessInfo: {
+      flex: 1,
+      gap: 4,
+    },
+    businessName: {
+      fontSize: 17,
+      fontWeight: "800",
+      color: colors.textPrimary,
+    },
+    metaRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 4,
+    },
+    metaText: {
+      fontSize: 12,
+      fontWeight: "600",
+      color: colors.textSecondary,
+      flexShrink: 1,
+    },
+    dot: {
+      fontSize: 12,
+      color: colors.textMuted,
+    },
+    sectionCard: {
+      padding: 14,
+      borderRadius: 16,
+      backgroundColor: colors.surface,
+      borderWidth: 1,
+      borderColor: colors.border,
+      gap: 8,
+    },
+    sectionTitle: {
+      fontSize: 16,
+      fontWeight: "800",
+      color: colors.textPrimary,
+    },
+    sectionText: {
+      fontSize: 14,
+      lineHeight: 21,
+      color: colors.textSecondary,
+    },
     actions: {
       gap: 12,
-      paddingBottom: 40,
+      marginTop: 2,
     },
   });
 }
