@@ -121,18 +121,6 @@ export default function PersonalProfileScreen() {
               <AppText style={styles.heroName} numberOfLines={1}>
                 {profile.username}
               </AppText>
-
-              <Pressable
-                style={[styles.heroActionButton, styles.editButton]}
-                onPress={() => router.push("/profile/edit")}
-              >
-                <Ionicons
-                  name="create-outline"
-                  size={16}
-                  color={colors.primaryGreen}
-                />
-                <AppText style={styles.editButtonText}>Edit profile</AppText>
-              </Pressable>
             </View>
 
             <View style={styles.headerIconActions}>
@@ -142,6 +130,17 @@ export default function PersonalProfileScreen() {
               >
                 <Ionicons
                   name="swap-horizontal-outline"
+                  size={20}
+                  color={colors.white}
+                />
+              </Pressable>
+
+              <Pressable
+                style={styles.settingsButton}
+                onPress={() => router.push("/profile/edit")}
+              >
+                <Ionicons
+                  name="create-outline"
                   size={20}
                   color={colors.white}
                 />
