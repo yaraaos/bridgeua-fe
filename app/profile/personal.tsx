@@ -502,9 +502,8 @@ function createStyles(colors: AppColors) {
       flex: 1,
       minWidth: 0,
       justifyContent: "flex-end",
-      marginTop: 30,
-      paddingBottom: 4,
-      gap: 10,
+      paddingBottom: -6,
+      gap: 6,
     },
 
     heroName: {
@@ -543,6 +542,7 @@ function createStyles(colors: AppColors) {
       backgroundColor: colors.primaryGreenSoft,
       borderWidth: 1,
       borderColor: colors.primaryGreenSoft,
+      marginTop: 6,
     },
 
     switchButton: {
