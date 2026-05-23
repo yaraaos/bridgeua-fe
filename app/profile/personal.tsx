@@ -143,7 +143,7 @@ export default function PersonalProfileScreen() {
                   <Ionicons
                     name="create-outline"
                     size={18}
-                    color={colors.primaryGreen}
+                    color={colors.textMuted}
                   />
                   <AppText style={styles.editButtonText}>Edit profile</AppText>
                 </Pressable>
@@ -553,9 +553,9 @@ function createStyles(colors: AppColors) {
       gap: 6,
     },
     editButton: {
-      backgroundColor: colors.primaryGreenSoft,
+      backgroundColor: colors.surface,
       borderWidth: 1,
-      borderColor: colors.primaryGreenSoft,
+      borderColor: colors.border,
     },
     switchButton: {
       backgroundColor: colors.surface,
@@ -565,7 +565,7 @@ function createStyles(colors: AppColors) {
     editButtonText: {
       fontSize: 11,
       fontWeight: "700",
-      color: colors.primaryGreen,
+      color: colors.textMuted,
     },
     switchButtonText: {
       fontSize: 11,
