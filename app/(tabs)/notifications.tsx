@@ -12,6 +12,7 @@ import {
 } from "@/src/features/notifications";
 import { getNotificationNavigation } from "@/src/features/notifications/utils/notification-navigation";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { useAuthStore } from "@/src/store/auth.store";
 import { router } from "expo-router";
 import { useState } from "react";
 import {
@@ -71,6 +72,7 @@ const EMPTY_STATE_BY_TAB: Record<
 export default function NotificationsScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+  const isGuest = useAuthStore((state) => state.isGuest);
 
   const [activeTab, setActiveTab] = useState<NotificationTab>("all");
 
@@ -101,6 +103,10 @@ export default function NotificationsScreen() {
 
   const emptyState = EMPTY_STATE_BY_TAB[activeTab];
 
+  const handleRegisterPress = () => {
+    router.push("/auth/sign-in");
+  };
+
   const handlePressNotification = (item: AppNotification) => {
     markOne(item.id);
 
@@ -110,6 +116,27 @@ export default function NotificationsScreen() {
 
     router.push(navigation as never);
   };
+
+  if (isGuest) {
+    return (
+      <View style={styles.container}>
+        <ScreenHeader
+          title="Notifications"
+          titleSubtitle="Stay updated with BridgeUA"
+          headerInnerStyle={styles.guestHeaderInner}
+        />
+
+        <View style={styles.guestContent}>
+          <AppEmptyState
+            title="Register to get notifications"
+            description="Create an account to receive updates, promotions, follows, and activity notifications."
+            actionLabel="Register to BridgeUA"
+            onPressAction={handleRegisterPress}
+          />
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -187,6 +214,12 @@ function createStyles(colors: AppColors) {
       justifyContent: "center",
     },
 
+    guestContent: {
+      flex: 1,
+      justifyContent: "center",
+      paddingHorizontal: spacing.lg,
+    },
+
     markAllText: {
       fontSize: 13,
       lineHeight: 16,
@@ -210,6 +243,10 @@ function createStyles(colors: AppColors) {
     },
     headerInner: {
       height: 154,
+    },
+
+    guestHeaderInner: {
+      paddingHorizontal: spacing.lg,
     },
 
     listContent: {

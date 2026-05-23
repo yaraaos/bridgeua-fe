@@ -13,6 +13,7 @@ import {
 import { useFollowingFeed } from "@/src/features/following";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { useFollowingStore } from "@/src/store";
+import { useAuthStore } from "@/src/store/auth.store";
 import { useFilterStore } from "@/src/store/filter.store";
 import { useFollowingLocationStore } from "@/src/store/following-location.store";
 import { router, useFocusEffect } from "expo-router";
@@ -28,6 +29,7 @@ import {
 export default function FollowingScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+  const isGuest = useAuthStore((state) => state.isGuest);
 
   const {
     label: selectedLocationLabel,
@@ -126,6 +128,40 @@ export default function FollowingScreen() {
       params: { scope: "following" },
     });
   };
+
+  const handleRegisterPress = () => {
+    router.push("/auth/sign-in");
+  };
+
+  if (isGuest) {
+    return (
+      <AppScreen withTopInset={false} style={styles.container}>
+        <ScreenHeader
+          title="News & Promos"
+          titleSubtitle="Updates from followed businesses"
+          gradientColors={DISCOVERY_GRADIENT}
+        />
+
+        <View style={styles.switchWrap}>
+          <AccountTypeSwitch
+            options={[
+              { label: "Promotions", value: "promotion" },
+              { label: "News", value: "news" },
+            ]}
+            value={activeTab}
+            onChange={setActiveTab}
+          />
+        </View>
+
+        <AppEmptyState
+          title="Register to see promotions and news"
+          description="Register and follow businesses to see promotions and news from places you trust."
+          actionLabel="Register to BridgeUA"
+          onPressAction={handleRegisterPress}
+        />
+      </AppScreen>
+    );
+  }
 
   if (isLoading) {
     return (
