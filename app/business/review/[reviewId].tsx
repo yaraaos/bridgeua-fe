@@ -5,6 +5,7 @@ import { ReviewCommentComposerRef } from "@/src/components/reviews/ReviewComment
 import AppEmptyState from "@/src/components/ui/AppEmptyState";
 import AppLoader from "@/src/components/ui/AppLoader/AppLoader";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
+import { AuthRequiredModal, useRequireAuth } from "@/src/features/auth";
 import { getReviewById } from "@/src/features/reviews/services/review.service";
 import { useReviewCommentsStore } from "@/src/features/reviews/store/review-comments.store";
 import { ReviewComment } from "@/src/features/reviews/types/review-comment.types";
@@ -27,6 +28,8 @@ import {
 
 export default function ReviewThreadScreen() {
   const { colors } = useAppTheme();
+  const { isAuthModalVisible, closeAuthModal, confirmAuthModal, requireAuth } =
+    useRequireAuth();
   const { reviewId } = useLocalSearchParams<{ reviewId: string }>();
 
   const [review, setReview] = useState<Review | null>(null);
@@ -114,29 +117,36 @@ export default function ReviewThreadScreen() {
   };
 
   const handleAddComment = (text: string) => {
-    if (!reviewId) return;
+    requireAuth(
+      () => {
+        if (!reviewId) return;
 
-    const parentCommentId = replyingToComment?.id;
+        const parentCommentId = replyingToComment?.id;
 
-    addComment({
-      reviewId,
-      parentCommentId,
-      text,
-    });
+        addComment({
+          reviewId,
+          parentCommentId,
+          text,
+        });
 
-    if (parentCommentId) {
-      setExpandedReplies((current) => ({
-        ...current,
-        [parentCommentId]: true,
-      }));
-    }
+        if (parentCommentId) {
+          setExpandedReplies((current) => ({
+            ...current,
+            [parentCommentId]: true,
+          }));
+        }
 
-    setReplyingToComment(null);
-    setIsReplyingToReview(false);
+        setReplyingToComment(null);
+        setIsReplyingToReview(false);
 
-    setTimeout(() => {
-      scrollViewRef.current?.scrollToEnd({ animated: true });
-    }, 100);
+        setTimeout(() => {
+          scrollViewRef.current?.scrollToEnd({ animated: true });
+        }, 100);
+      },
+      {
+        action: "comment",
+      },
+    );
   };
 
   return (
@@ -325,6 +335,11 @@ export default function ReviewThreadScreen() {
           description="This review may have been removed."
         />
       )}
+      <AuthRequiredModal
+        visible={isAuthModalVisible}
+        onClose={closeAuthModal}
+        onConfirm={confirmAuthModal}
+      />
     </AppScreen>
   );
 }

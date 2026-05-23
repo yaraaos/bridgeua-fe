@@ -1,4 +1,5 @@
 import AppAvatar from "@/src/components/ui/AppAvatar";
+import { AuthRequiredModal, useRequireAuth } from "@/src/features/auth";
 import type { BusinessDetailsReview } from "@/src/features/businesses/types/business.types";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { useProfileStore } from "@/src/store/profile.store";
@@ -73,6 +74,8 @@ export default function ReviewCard({
 }: Props) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+  const { isAuthModalVisible, closeAuthModal, confirmAuthModal, requireAuth } =
+    useRequireAuth();
 
   const isProfile = variant === "profile";
   const isPreview = variant === "preview";
@@ -145,12 +148,19 @@ export default function ReviewCard({
   const handleToggleLike = (event: GestureResponderEvent) => {
     event.stopPropagation();
 
-    setIsLiked((currentValue) => !currentValue);
-    setLikesCount((currentCount) =>
-      isLiked ? Math.max(0, currentCount - 1) : currentCount + 1,
-    );
+    requireAuth(
+      () => {
+        setIsLiked((currentValue) => !currentValue);
+        setLikesCount((currentCount) =>
+          isLiked ? Math.max(0, currentCount - 1) : currentCount + 1,
+        );
 
-    toggleReviewLike(review.id);
+        toggleReviewLike(review.id);
+      },
+      {
+        action: "review",
+      },
+    );
   };
 
   useEffect(() => {
@@ -184,392 +194,402 @@ export default function ReviewCard({
   };
 
   return (
-    <Pressable
-      disabled={isPreview}
-      style={[
-        styles.container,
-        isPreview && styles.containerPreview,
-        isActionMenuOpen && styles.containerMenuOpen,
-      ]}
-      onPress={handlePressCard}
-    >
-      {isProfile && profileReview ? (
-        <>
-          <View style={styles.reviewContent}>
-            <View style={styles.profileHeader}>
-              <View style={styles.profileBusinessInfo}>
-                <Text style={styles.profileBusinessName} numberOfLines={1}>
-                  {profileReview.businessName}
-                </Text>
+    <>
+      <Pressable
+        disabled={isPreview}
+        style={[
+          styles.container,
+          isPreview && styles.containerPreview,
+          isActionMenuOpen && styles.containerMenuOpen,
+        ]}
+        onPress={handlePressCard}
+      >
+        {isProfile && profileReview ? (
+          <>
+            <View style={styles.reviewContent}>
+              <View style={styles.profileHeader}>
+                <View style={styles.profileBusinessInfo}>
+                  <Text style={styles.profileBusinessName} numberOfLines={1}>
+                    {profileReview.businessName}
+                  </Text>
 
-                <View style={styles.profileRatingDateRow}>
+                  <View style={styles.profileRatingDateRow}>
+                    <View style={styles.starsRow}>
+                      {Array.from({ length: 5 }).map((_, index) => {
+                        const isFilled =
+                          index < Math.round(profileReview.rating);
+
+                        return (
+                          <MaterialIcons
+                            key={index}
+                            name={isFilled ? "star" : "star-border"}
+                            size={14}
+                            color={colors.accentOrange}
+                          />
+                        );
+                      })}
+                    </View>
+
+                    {review.isEdited ? (
+                      <Text style={styles.profileReviewDate}>Edited</Text>
+                    ) : null}
+
+                    <Text style={styles.profileReviewDate}>
+                      {formatRelativeTime(profileReview.createdAt)}
+                    </Text>
+                  </View>
+                </View>
+
+                <View style={styles.profileActionsWrap}>
+                  <Pressable
+                    style={[
+                      styles.profileActionsButton,
+                      isActionMenuOpen && styles.profileActionsButtonActive,
+                    ]}
+                    onPress={handlePressActions}
+                    hitSlop={8}
+                  >
+                    <MaterialIcons
+                      name="more-horiz"
+                      size={22}
+                      color={colors.primaryGreen}
+                    />
+                  </Pressable>
+
+                  {isActionMenuOpen ? (
+                    <View style={styles.profileActionsMenu}>
+                      <Pressable
+                        style={styles.profileActionsMenuItem}
+                        onPress={handleEditReview}
+                      >
+                        <MaterialIcons
+                          name="edit"
+                          size={16}
+                          color={colors.primaryGreen}
+                        />
+                        <Text style={styles.profileActionsMenuText}>
+                          Edit review
+                        </Text>
+                      </Pressable>
+
+                      <Pressable
+                        style={styles.profileActionsMenuItem}
+                        onPress={handleDeleteReview}
+                      >
+                        <MaterialIcons
+                          name="delete-outline"
+                          size={16}
+                          color={colors.error}
+                        />
+                        <Text
+                          style={[
+                            styles.profileActionsMenuText,
+                            { color: colors.error },
+                          ]}
+                        >
+                          Delete review
+                        </Text>
+                      </Pressable>
+                    </View>
+                  ) : null}
+                </View>
+              </View>
+
+              {hasReviewText ? (
+                <>
+                  <Text
+                    style={styles.text}
+                    numberOfLines={isExpanded ? undefined : 3}
+                  >
+                    {profileReview.text}
+                  </Text>
+
+                  {shouldShowReadMore ? (
+                    <Pressable
+                      style={styles.moreButton}
+                      onPress={() => {
+                        setIsExpanded((value) => {
+                          const nextValue = !value;
+
+                          if (nextValue) {
+                            onExpandReview?.(review.id);
+                          }
+
+                          return nextValue;
+                        });
+                      }}
+                    >
+                      <Text style={styles.moreText}>
+                        {isExpanded ? "Show less" : "Read more"}
+                      </Text>
+                    </Pressable>
+                  ) : null}
+                </>
+              ) : null}
+
+              {showPhotos ? (
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  style={styles.reviewPhotosScroll}
+                >
+                  {profileReview.photos?.map((photo, index) => (
+                    <Pressable
+                      key={photo.id}
+                      onPress={() => openReviewPhotoViewer(index)}
+                    >
+                      <Image
+                        source={{ uri: photo.url }}
+                        style={styles.reviewPhotoPreview}
+                      />
+                    </Pressable>
+                  ))}
+                </ScrollView>
+              ) : null}
+              <View style={styles.interactionRow}>
+                <Pressable
+                  style={styles.interactionButton}
+                  onPress={handleToggleLike}
+                >
+                  <MaterialIcons
+                    name={isLiked ? "thumb-up" : "thumb-up-off-alt"}
+                    size={16}
+                    color={isLiked ? colors.primaryGreen : colors.textSecondary}
+                  />
+
+                  <Text
+                    style={[
+                      styles.interactionText,
+                      isLiked && styles.interactionTextActive,
+                    ]}
+                  >
+                    {likesCount}{" "}
+                  </Text>
+                </Pressable>
+
+                <Pressable
+                  style={styles.interactionButton}
+                  onPress={(event) => {
+                    event.stopPropagation();
+
+                    if (onPressComment) {
+                      onPressComment(review.id);
+                      return;
+                    }
+
+                    openReviewThread();
+                  }}
+                >
+                  <MaterialIcons
+                    name="chat-bubble-outline"
+                    size={16}
+                    color={colors.textSecondary}
+                  />
+                  <Text style={styles.interactionText}>{commentsCount} </Text>
+                </Pressable>
+              </View>
+            </View>
+          </>
+        ) : businessReview ? (
+          <>
+            <View style={styles.previewContent}>
+              <View style={styles.header}>
+                <Pressable
+                  onPress={() => {
+                    if (!businessReview.authorAvatar?.trim()) return;
+
+                    router.push({
+                      pathname: "/modal/image-viewer",
+                      params: {
+                        images: JSON.stringify([
+                          {
+                            id: "author-avatar",
+                            url: businessReview.authorAvatar,
+                          },
+                        ]),
+                        initialIndex: "0",
+                      },
+                    });
+                  }}
+                >
+                  <AppAvatar
+                    name={businessReview.authorUsername}
+                    username={businessReview.authorUsername}
+                    imageUrl={
+                      isOwnReview
+                        ? profile.avatarUrl
+                        : businessReview.authorAvatar
+                    }
+                    size={isPreview ? "sm" : "md"}
+                  />
+                </Pressable>
+
+                <Pressable
+                  style={styles.authorInfo}
+                  disabled={!isOwnReview}
+                  onPress={() => {
+                    if (!isOwnReview) return;
+                    router.push("/profile/personal");
+                  }}
+                >
+                  <Text
+                    style={[
+                      styles.authorName,
+                      isPreview && styles.authorNamePreview,
+                    ]}
+                    numberOfLines={1}
+                  >
+                    {businessReview.authorUsername}
+                  </Text>
+
                   <View style={styles.starsRow}>
                     {Array.from({ length: 5 }).map((_, index) => {
-                      const isFilled = index < Math.round(profileReview.rating);
+                      const isFilled =
+                        index < Math.round(businessReview.rating);
 
                       return (
                         <MaterialIcons
                           key={index}
                           name={isFilled ? "star" : "star-border"}
-                          size={14}
+                          size={isPreview ? 11 : 14}
                           color={colors.accentOrange}
                         />
                       );
                     })}
                   </View>
-
-                  {review.isEdited ? (
-                    <Text style={styles.profileReviewDate}>Edited</Text>
-                  ) : null}
-
-                  <Text style={styles.profileReviewDate}>
-                    {formatRelativeTime(profileReview.createdAt)}
-                  </Text>
-                </View>
-              </View>
-
-              <View style={styles.profileActionsWrap}>
-                <Pressable
-                  style={[
-                    styles.profileActionsButton,
-                    isActionMenuOpen && styles.profileActionsButtonActive,
-                  ]}
-                  onPress={handlePressActions}
-                  hitSlop={8}
-                >
-                  <MaterialIcons
-                    name="more-horiz"
-                    size={22}
-                    color={colors.primaryGreen}
-                  />
                 </Pressable>
 
-                {isActionMenuOpen ? (
-                  <View style={styles.profileActionsMenu}>
-                    <Pressable
-                      style={styles.profileActionsMenuItem}
-                      onPress={handleEditReview}
-                    >
-                      <MaterialIcons
-                        name="edit"
-                        size={16}
-                        color={colors.primaryGreen}
-                      />
-                      <Text style={styles.profileActionsMenuText}>
-                        Edit review
-                      </Text>
-                    </Pressable>
+                {!isPreview ? (
+                  <>
+                    {review.isEdited ? (
+                      <Text style={styles.reviewDate}>Edited</Text>
+                    ) : null}
 
-                    <Pressable
-                      style={styles.profileActionsMenuItem}
-                      onPress={handleDeleteReview}
-                    >
-                      <MaterialIcons
-                        name="delete-outline"
-                        size={16}
-                        color={colors.error}
-                      />
-                      <Text
-                        style={[
-                          styles.profileActionsMenuText,
-                          { color: colors.error },
-                        ]}
-                      >
-                        Delete review
-                      </Text>
-                    </Pressable>
-                  </View>
+                    <Text style={styles.reviewDate}>
+                      {formatRelativeTime(businessReview.createdAt)}
+                    </Text>
+                  </>
                 ) : null}
               </View>
-            </View>
 
-            {hasReviewText ? (
-              <>
+              {hasReviewText ? (
                 <Text
-                  style={styles.text}
-                  numberOfLines={isExpanded ? undefined : 3}
+                  style={[styles.text, isPreview && styles.textPreview]}
+                  numberOfLines={isPreview ? 4 : isExpanded ? undefined : 3}
                 >
-                  {profileReview.text}
+                  {businessReview.text}
                 </Text>
-
-                {shouldShowReadMore ? (
-                  <Pressable
-                    style={styles.moreButton}
-                    onPress={() => {
-                      setIsExpanded((value) => {
-                        const nextValue = !value;
-
-                        if (nextValue) {
-                          onExpandReview?.(review.id);
-                        }
-
-                        return nextValue;
-                      });
-                    }}
-                  >
-                    <Text style={styles.moreText}>
-                      {isExpanded ? "Show less" : "Read more"}
-                    </Text>
-                  </Pressable>
-                ) : null}
-              </>
-            ) : null}
-
-            {showPhotos ? (
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                style={styles.reviewPhotosScroll}
-              >
-                {profileReview.photos?.map((photo, index) => (
-                  <Pressable
-                    key={photo.id}
-                    onPress={() => openReviewPhotoViewer(index)}
-                  >
-                    <Image
-                      source={{ uri: photo.url }}
-                      style={styles.reviewPhotoPreview}
-                    />
-                  </Pressable>
-                ))}
-              </ScrollView>
-            ) : null}
-            <View style={styles.interactionRow}>
-              <Pressable
-                style={styles.interactionButton}
-                onPress={handleToggleLike}
-              >
-                <MaterialIcons
-                  name={isLiked ? "thumb-up" : "thumb-up-off-alt"}
-                  size={16}
-                  color={isLiked ? colors.primaryGreen : colors.textSecondary}
-                />
-
-                <Text
-                  style={[
-                    styles.interactionText,
-                    isLiked && styles.interactionTextActive,
-                  ]}
-                >
-                  {likesCount}{" "}
-                </Text>
-              </Pressable>
-
-              <Pressable
-                style={styles.interactionButton}
-                onPress={(event) => {
-                  event.stopPropagation();
-
-                  if (onPressComment) {
-                    onPressComment(review.id);
-                    return;
-                  }
-
-                  openReviewThread();
-                }}
-              >
-                <MaterialIcons
-                  name="chat-bubble-outline"
-                  size={16}
-                  color={colors.textSecondary}
-                />
-                <Text style={styles.interactionText}>{commentsCount} </Text>
-              </Pressable>
-            </View>
-          </View>
-        </>
-      ) : businessReview ? (
-        <>
-          <View style={styles.previewContent}>
-            <View style={styles.header}>
-              <Pressable
-                onPress={() => {
-                  if (!businessReview.authorAvatar?.trim()) return;
-
-                  router.push({
-                    pathname: "/modal/image-viewer",
-                    params: {
-                      images: JSON.stringify([
-                        {
-                          id: "author-avatar",
-                          url: businessReview.authorAvatar,
-                        },
-                      ]),
-                      initialIndex: "0",
-                    },
-                  });
-                }}
-              >
-                <AppAvatar
-                  name={businessReview.authorUsername}
-                  username={businessReview.authorUsername}
-                  imageUrl={
-                    isOwnReview
-                      ? profile.avatarUrl
-                      : businessReview.authorAvatar
-                  }
-                  size={isPreview ? "sm" : "md"}
-                />
-              </Pressable>
-
-              <Pressable
-                style={styles.authorInfo}
-                disabled={!isOwnReview}
-                onPress={() => {
-                  if (!isOwnReview) return;
-                  router.push("/profile/personal");
-                }}
-              >
-                <Text
-                  style={[
-                    styles.authorName,
-                    isPreview && styles.authorNamePreview,
-                  ]}
-                  numberOfLines={1}
-                >
-                  {businessReview.authorUsername}
-                </Text>
-
-                <View style={styles.starsRow}>
-                  {Array.from({ length: 5 }).map((_, index) => {
-                    const isFilled = index < Math.round(businessReview.rating);
-
-                    return (
-                      <MaterialIcons
-                        key={index}
-                        name={isFilled ? "star" : "star-border"}
-                        size={isPreview ? 11 : 14}
-                        color={colors.accentOrange}
-                      />
-                    );
-                  })}
-                </View>
-              </Pressable>
-
-              {!isPreview ? (
-                <>
-                  {review.isEdited ? (
-                    <Text style={styles.reviewDate}>Edited</Text>
-                  ) : null}
-
-                  <Text style={styles.reviewDate}>
-                    {formatRelativeTime(businessReview.createdAt)}
-                  </Text>
-                </>
               ) : null}
-            </View>
+              {isPreview ? (
+                <Pressable
+                  style={styles.moreButton}
+                  onPress={() => onPressMore?.(businessReview.id)}
+                >
+                  <Text style={styles.moreText}>More</Text>
+                </Pressable>
+              ) : shouldShowReadMore ? (
+                <Pressable
+                  style={styles.moreButton}
+                  onPress={() => {
+                    setIsExpanded((value) => {
+                      const nextValue = !value;
 
-            {hasReviewText ? (
-              <Text
-                style={[styles.text, isPreview && styles.textPreview]}
-                numberOfLines={isPreview ? 4 : isExpanded ? undefined : 3}
-              >
-                {businessReview.text}
-              </Text>
-            ) : null}
-            {isPreview ? (
-              <Pressable
-                style={styles.moreButton}
-                onPress={() => onPressMore?.(businessReview.id)}
-              >
-                <Text style={styles.moreText}>More</Text>
-              </Pressable>
-            ) : shouldShowReadMore ? (
-              <Pressable
-                style={styles.moreButton}
-                onPress={() => {
-                  setIsExpanded((value) => {
-                    const nextValue = !value;
+                      if (nextValue) {
+                        onExpandReview?.(review.id);
+                      }
 
-                    if (nextValue) {
-                      onExpandReview?.(review.id);
+                      return nextValue;
+                    });
+                  }}
+                >
+                  <Text style={styles.moreText}>
+                    {isExpanded ? "Show less" : "Read more"}
+                  </Text>
+                </Pressable>
+              ) : null}
+
+              {showPhotos ? (
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  style={styles.photosScroll}
+                >
+                  {businessReview.photos?.map((photo, index) => (
+                    <Pressable
+                      key={photo.id}
+                      onPress={() => openReviewPhotoViewer(index)}
+                      style={styles.photoItem}
+                    >
+                      <Image
+                        source={{ uri: photo.url }}
+                        style={styles.reviewPhoto}
+                      />
+                    </Pressable>
+                  ))}
+                </ScrollView>
+              ) : null}
+
+              {!isPreview && businessReview.tags?.length ? (
+                <View style={styles.tagsWrap}>
+                  {businessReview.tags.map((tag) => (
+                    <View key={tag} style={styles.tag}>
+                      <Text style={styles.tagText}>{tag}</Text>
+                    </View>
+                  ))}
+                </View>
+              ) : null}
+              <View style={styles.interactionRow}>
+                <Pressable
+                  style={styles.interactionButton}
+                  onPress={handleToggleLike}
+                >
+                  <MaterialIcons
+                    name={isLiked ? "thumb-up" : "thumb-up-off-alt"}
+                    size={16}
+                    color={isLiked ? colors.primaryGreen : colors.textSecondary}
+                  />
+
+                  <Text
+                    style={[
+                      styles.interactionText,
+                      isLiked && styles.interactionTextActive,
+                    ]}
+                  >
+                    {likesCount}
+                  </Text>
+                </Pressable>
+
+                <Pressable
+                  style={styles.interactionButton}
+                  onPress={(event) => {
+                    event.stopPropagation();
+
+                    if (onPressComment) {
+                      onPressComment(review.id);
+                      return;
                     }
 
-                    return nextValue;
-                  });
-                }}
-              >
-                <Text style={styles.moreText}>
-                  {isExpanded ? "Show less" : "Read more"}
-                </Text>
-              </Pressable>
-            ) : null}
-
-            {showPhotos ? (
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                style={styles.photosScroll}
-              >
-                {businessReview.photos?.map((photo, index) => (
-                  <Pressable
-                    key={photo.id}
-                    onPress={() => openReviewPhotoViewer(index)}
-                    style={styles.photoItem}
-                  >
-                    <Image
-                      source={{ uri: photo.url }}
-                      style={styles.reviewPhoto}
-                    />
-                  </Pressable>
-                ))}
-              </ScrollView>
-            ) : null}
-
-            {!isPreview && businessReview.tags?.length ? (
-              <View style={styles.tagsWrap}>
-                {businessReview.tags.map((tag) => (
-                  <View key={tag} style={styles.tag}>
-                    <Text style={styles.tagText}>{tag}</Text>
-                  </View>
-                ))}
-              </View>
-            ) : null}
-            <View style={styles.interactionRow}>
-              <Pressable
-                style={styles.interactionButton}
-                onPress={handleToggleLike}
-              >
-                <MaterialIcons
-                  name={isLiked ? "thumb-up" : "thumb-up-off-alt"}
-                  size={16}
-                  color={isLiked ? colors.primaryGreen : colors.textSecondary}
-                />
-
-                <Text
-                  style={[
-                    styles.interactionText,
-                    isLiked && styles.interactionTextActive,
-                  ]}
+                    openReviewThread();
+                  }}
                 >
-                  {likesCount}
-                </Text>
-              </Pressable>
-
-              <Pressable
-                style={styles.interactionButton}
-                onPress={(event) => {
-                  event.stopPropagation();
-
-                  if (onPressComment) {
-                    onPressComment(review.id);
-                    return;
-                  }
-
-                  openReviewThread();
-                }}
-              >
-                <MaterialIcons
-                  name="chat-bubble-outline"
-                  size={16}
-                  color={colors.textSecondary}
-                />
-                <Text style={styles.interactionText}>{commentsCount} </Text>
-              </Pressable>
+                  <MaterialIcons
+                    name="chat-bubble-outline"
+                    size={16}
+                    color={colors.textSecondary}
+                  />
+                  <Text style={styles.interactionText}>{commentsCount} </Text>
+                </Pressable>
+              </View>
             </View>
-          </View>
-        </>
-      ) : null}
-    </Pressable>
+          </>
+        ) : null}
+      </Pressable>
+
+      <AuthRequiredModal
+        visible={isAuthModalVisible}
+        onClose={closeAuthModal}
+        onConfirm={confirmAuthModal}
+      />
+    </>
   );
 }
