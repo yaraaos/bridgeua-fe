@@ -126,7 +126,7 @@ export default function SignInScreen() {
         )}
         <AppButton
           title="Skip for now"
-          variant="secondary"
+          variant="ghost"
           onPress={handleSkipForNow}
         />
       </View>
