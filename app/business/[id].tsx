@@ -18,7 +18,11 @@ import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
 import { AppColors } from "@/src/constants/colors";
 import { DISCOVERY_GRADIENT } from "@/src/constants/gradients";
 import { spacing } from "@/src/constants/spacing";
-import { AuthRequiredModal, useRequireAuth } from "@/src/features/auth";
+import {
+  AuthRequiredModal,
+  GuestBusinessCtaBanner,
+  useRequireAuth,
+} from "@/src/features/auth";
 import { useBusinessDetails } from "@/src/features/businesses/hooks/useBusiness";
 import type {
   BusinessDetailsReview,
@@ -26,6 +30,7 @@ import type {
 } from "@/src/features/businesses/types/business.types";
 import { useReviews } from "@/src/features/reviews/hooks/useReviews";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { useAuthStore } from "@/src/store/auth.store";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -66,6 +71,8 @@ export default function BusinessDetailsScreen() {
   const styles = createStyles(colors);
   const { isAuthModalVisible, closeAuthModal, confirmAuthModal, requireAuth } =
     useRequireAuth();
+
+  const isGuest = useAuthStore((state) => state.isGuest);
 
   const {
     id,
@@ -268,10 +275,13 @@ export default function BusinessDetailsScreen() {
           />
         </View>
 
+        {isGuest ? <GuestBusinessCtaBanner /> : null}
+
         <Animated.View style={{ opacity: contentOpacity }}>
           {activeTab === "overview" ? (
             <>
               <BusinessOverviewCard business={business} />
+
               <BusinessBookingCard businessId={business.id} />
               <BusinessRecommendedByPreview
                 recommendations={business.about.recommendedBy}
