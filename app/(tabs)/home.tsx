@@ -16,9 +16,9 @@ import { useDiscoveryFeed } from "@/src/features/discovery/hooks/useDiscoveryFee
 import { useBannerPromotion } from "@/src/features/promotions/hooks/useBannerPromotion";
 import { useBannerPromotions } from "@/src/features/promotions/hooks/useBannerPromotions";
 import type { HomePromotion } from "@/src/features/promotions/types/promotion.types";
+import { useAuthStore } from "@/src/store/auth.store";
 import { useDiscoveryLocationStore } from "@/src/store/discovery-location";
 import { useFilterStore } from "@/src/store/filter.store";
-import { useAuthStore } from "@/src/store/auth.store";
 import { Feather } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
