@@ -109,34 +109,19 @@ export default function PersonalProfileScreen() {
         title=""
         rightSlot={null}
         profileContent={
-          <View>
-            <View style={styles.heroIdentityRow}>
-              <AppAvatar
-                name={profile.username}
-                username={profile.username}
-                imageUrl={profile.avatarUrl}
-                size="lg"
-              />
+          <View style={styles.heroIdentityRow}>
+            <AppAvatar
+              name={profile.username}
+              username={profile.username}
+              imageUrl={profile.avatarUrl}
+              size="lg"
+            />
 
-              <View style={styles.heroTextWrap}>
-                <AppText style={styles.heroName} numberOfLines={1}>
-                  {profile.username}
-                </AppText>
-              </View>
+            <View style={styles.heroTextWrap}>
+              <AppText style={styles.heroName} numberOfLines={1}>
+                {profile.username}
+              </AppText>
 
-              <Pressable
-                style={styles.settingsButton}
-                onPress={() => router.push("/settings")}
-              >
-                <Ionicons
-                  name="settings-outline"
-                  size={20}
-                  color={colors.white}
-                />
-              </Pressable>
-            </View>
-
-            <View style={styles.heroActionsRow}>
               <Pressable
                 style={[styles.heroActionButton, styles.editButton]}
                 onPress={() => router.push("/profile/edit")}
@@ -148,19 +133,29 @@ export default function PersonalProfileScreen() {
                 />
                 <AppText style={styles.editButtonText}>Edit profile</AppText>
               </Pressable>
+            </View>
 
+            <View style={styles.headerIconActions}>
               <Pressable
-                style={[styles.heroActionButton, styles.switchButton]}
+                style={styles.settingsButton}
                 onPress={() => router.push("/profile/switch-account")}
               >
                 <Ionicons
                   name="swap-horizontal-outline"
-                  size={16}
-                  color={colors.textMuted}
+                  size={20}
+                  color={colors.white}
                 />
-                <AppText style={styles.switchButtonText}>
-                  Switch account
-                </AppText>
+              </Pressable>
+
+              <Pressable
+                style={styles.settingsButton}
+                onPress={() => router.push("/settings")}
+              >
+                <Ionicons
+                  name="settings-outline"
+                  size={20}
+                  color={colors.white}
+                />
               </Pressable>
             </View>
           </View>
@@ -486,10 +481,15 @@ function createStyles(colors: AppColors) {
       height: 36,
       borderRadius: 10,
       alignItems: "center",
-      marginTop: 4, //to make the stngs btn look visually on the same leve as the top of the profile pic
       justifyContent: "center",
       backgroundColor: colors.accentOrange,
+    },
+    headerIconActions: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.sm,
       alignSelf: "flex-start",
+      marginTop: 4,
     },
     heroIdentityRow: {
       flexDirection: "row",
@@ -501,7 +501,10 @@ function createStyles(colors: AppColors) {
     heroTextWrap: {
       flex: 1,
       minWidth: 0,
-      justifyContent: "center",
+      justifyContent: "flex-end",
+      marginTop: 30,
+      paddingBottom: 4,
+      gap: 10,
     },
 
     heroName: {
@@ -526,8 +529,9 @@ function createStyles(colors: AppColors) {
     },
 
     heroActionButton: {
-      flex: 1,
+      alignSelf: "flex-start",
       minHeight: 30,
+      paddingHorizontal: spacing.md,
       borderRadius: 10,
       flexDirection: "row",
       alignItems: "center",
