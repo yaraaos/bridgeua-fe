@@ -16,6 +16,7 @@ import { useDiscoveryFeed } from "@/src/features/discovery/hooks/useDiscoveryFee
 import { useBannerPromotion } from "@/src/features/promotions/hooks/useBannerPromotion";
 import { useBannerPromotions } from "@/src/features/promotions/hooks/useBannerPromotions";
 import type { HomePromotion } from "@/src/features/promotions/types/promotion.types";
+import { useAuthStore } from "@/src/store/auth.store";
 import { useDiscoveryLocationStore } from "@/src/store/discovery-location";
 import { useFilterStore } from "@/src/store/filter.store";
 import { Feather } from "@expo/vector-icons";
@@ -52,6 +53,8 @@ export default function HomeScreen() {
 
   const { businesses, isLoading } = useBusinesses();
 
+  const isGuest = useAuthStore((state) => state.isGuest);
+
   useEffect(() => {
     const loadRecentSearches = async () => {
       const stored = await AsyncStorage.getItem(RECENT_SEARCHES_KEY);
@@ -81,6 +84,10 @@ export default function HomeScreen() {
         business.name?.toLowerCase().startsWith(normalizedSearchQuery),
       )
     : discoveryFilteredBusinesses;
+
+  const visibleBusinesses = isGuest
+    ? filteredBusinesses.slice(0, 10)
+    : filteredBusinesses;
 
   const {
     promotion,
@@ -340,7 +347,7 @@ export default function HomeScreen() {
           <View style={styles.stickyCategoryWrap}>{categoryBar}</View>
 
           <View style={styles.listContent}>
-            {filteredBusinesses.length === 0 ? (
+            {visibleBusinesses.length === 0 ? (
               <View style={styles.emptyStateWrap}>
                 <AppEmptyState
                   title={
@@ -367,7 +374,7 @@ export default function HomeScreen() {
                 />
               </View>
             ) : (
-              filteredBusinesses.map((item) => (
+              visibleBusinesses.map((item) => (
                 <BusinessCard
                   key={String(item.id)}
                   business={item}
