@@ -1,17 +1,7 @@
+import { useAuthStore } from "@/src/store/auth.store";
 import { router } from "expo-router";
 import { useState } from "react";
-
-import { useAuthStore } from "@/src/store/auth.store";
-
-type ProtectedAction =
-  | "follow"
-  | "book"
-  | "review"
-  | "comment"
-  | "promotion"
-  | "notification"
-  | "profile"
-  | "default";
+import type { ProtectedAction } from "../constants/permissions";
 
 type RequireAuthOptions = {
   action?: ProtectedAction;
