@@ -36,6 +36,8 @@ type Props = {
   searchPlaceholder?: string;
   searchValue?: string;
   onSearchChangeText?: (text: string) => void;
+  searchAutoFocus?: boolean;
+  onPressSearch?: () => void;
 
   activeFilterCount?: number;
 
@@ -80,6 +82,8 @@ export default function ScreenHeader({
   searchPlaceholder = "Search",
   searchValue,
   onSearchChangeText,
+  searchAutoFocus = false,
+  onPressSearch,
   actions = [],
   activeFilterCount = 0,
   onPressMap,
@@ -350,14 +354,37 @@ export default function ScreenHeader({
 
       {!bottomSlot && showSearch && (
         <View style={styles.searchRow}>
-          <View style={styles.searchInputWrap}>
-            <AppInput
-              value={searchValue}
-              onChangeText={onSearchChangeText}
-              placeholder={searchPlaceholder}
-              placeholderTextColor={colors.textSecondary}
-            />
-          </View>
+          {onPressSearch ? (
+            <Pressable style={styles.searchInputWrap} onPress={onPressSearch}>
+              <View pointerEvents="none">
+                <AppInput
+                  value={searchValue}
+                  onChangeText={onSearchChangeText}
+                  placeholder={searchPlaceholder}
+                  placeholderTextColor={colors.textSecondary}
+                  autoFocus={searchAutoFocus}
+                  onSubmitEditing={() => {
+                    if (searchValue?.trim()) {
+                      router.push({
+                        pathname: "/search/results" as never,
+                        params: { query: searchValue.trim() },
+                      });
+                    }
+                  }}
+                />
+              </View>
+            </Pressable>
+          ) : (
+            <View style={styles.searchInputWrap}>
+              <AppInput
+                value={searchValue}
+                onChangeText={onSearchChangeText}
+                placeholder={searchPlaceholder}
+                placeholderTextColor={colors.textSecondary}
+                autoFocus={searchAutoFocus}
+              />
+            </View>
+          )}
 
           {actions.map((action) => (
             <Pressable
