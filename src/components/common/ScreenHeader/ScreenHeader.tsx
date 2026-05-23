@@ -21,10 +21,8 @@ type ActionType = "map" | "filter";
 
 type Props = {
   variant?: "default" | "business" | "profile";
-
   title: string;
   titleSubtitle?: string;
-
   onBack?: () => void;
 
   subtitleLabel?: string;
@@ -37,7 +35,7 @@ type Props = {
   searchValue?: string;
   onSearchChangeText?: (text: string) => void;
   searchAutoFocus?: boolean;
-  onPressSearch?: () => void;
+  onSearchFocus?: () => void;
 
   activeFilterCount?: number;
 
@@ -50,6 +48,7 @@ type Props = {
   locationOptions?: LocationOption[];
   onSelectLocationOption?: (option: LocationOption) => void;
   onRequestNearby?: () => void;
+  onSearchBlur?: () => void;
 
   headerInnerStyle?: StyleProp<ViewStyle>;
 
@@ -83,11 +82,12 @@ export default function ScreenHeader({
   searchValue,
   onSearchChangeText,
   searchAutoFocus = false,
-  onPressSearch,
+  onSearchFocus,
   actions = [],
   activeFilterCount = 0,
   onPressMap,
   onPressFilter,
+  onSearchBlur,
   gradientColors,
   locationOptions,
   onSelectLocationOption,
@@ -110,10 +110,12 @@ export default function ScreenHeader({
   const { colors, isDark } = useAppTheme();
   const styles = createStyles(colors);
   const [titleLines, setTitleLines] = useState(1);
+
   const headerGradientColors =
     isDark && gradientColors
       ? (["#102019", "#183327", "#0F1A16"] as const)
       : gradientColors;
+
   const businessHeaderHeight =
     titleLines >= 3 ? 188 : titleLines === 2 ? 158 : 133;
 
@@ -161,9 +163,7 @@ export default function ScreenHeader({
           <View
             style={[
               styles.businessInfoWrap,
-              {
-                paddingBottom: titleLines >= 3 ? 10 : 0,
-              },
+              { paddingBottom: titleLines >= 3 ? 10 : 0 },
             ]}
           >
             <Text
@@ -344,6 +344,7 @@ export default function ScreenHeader({
           {!!titleSubtitle && (
             <Text style={styles.titleSubtitle}>{titleSubtitle}</Text>
           )}
+
           {rightSlot ? <View>{rightSlot}</View> : null}
         </View>
       </View>
@@ -354,37 +355,17 @@ export default function ScreenHeader({
 
       {!bottomSlot && showSearch && (
         <View style={styles.searchRow}>
-          {onPressSearch ? (
-            <Pressable style={styles.searchInputWrap} onPress={onPressSearch}>
-              <View pointerEvents="none">
-                <AppInput
-                  value={searchValue}
-                  onChangeText={onSearchChangeText}
-                  placeholder={searchPlaceholder}
-                  placeholderTextColor={colors.textSecondary}
-                  autoFocus={searchAutoFocus}
-                  onSubmitEditing={() => {
-                    if (searchValue?.trim()) {
-                      router.push({
-                        pathname: "/search/results" as never,
-                        params: { query: searchValue.trim() },
-                      });
-                    }
-                  }}
-                />
-              </View>
-            </Pressable>
-          ) : (
-            <View style={styles.searchInputWrap}>
-              <AppInput
-                value={searchValue}
-                onChangeText={onSearchChangeText}
-                placeholder={searchPlaceholder}
-                placeholderTextColor={colors.textSecondary}
-                autoFocus={searchAutoFocus}
-              />
-            </View>
-          )}
+          <View style={styles.searchInputWrap}>
+            <AppInput
+              value={searchValue}
+              onChangeText={onSearchChangeText}
+              placeholder={searchPlaceholder}
+              placeholderTextColor={colors.textSecondary}
+              autoFocus={searchAutoFocus}
+              onFocus={onSearchFocus}
+              onBlur={onSearchBlur}
+            />
+          </View>
 
           {actions.map((action) => (
             <Pressable
