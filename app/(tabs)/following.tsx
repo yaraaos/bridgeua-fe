@@ -130,7 +130,13 @@ export default function FollowingScreen() {
   };
 
   const handleRegisterPress = () => {
-    router.push("/auth/sign-in");
+    router.push({
+      pathname: "/auth/sign-in",
+      params: {
+        source: "guest_promotions_tab",
+        action: "promotion",
+      },
+    });
   };
 
   if (isGuest) {

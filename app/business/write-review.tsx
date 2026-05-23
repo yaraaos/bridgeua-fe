@@ -50,7 +50,13 @@ export default function WriteReviewScreen() {
 
   useEffect(() => {
     if (isGuest) {
-      router.replace("/auth/sign-in");
+      router.replace({
+        pathname: "/auth/sign-in",
+        params: {
+          source: "guest_write_review_route",
+          action: "review",
+        },
+      });
     }
   }, [isGuest]);
 

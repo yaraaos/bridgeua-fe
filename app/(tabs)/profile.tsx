@@ -27,7 +27,13 @@ export default function ProfileTabScreen() {
   const isGuest = useAuthStore((state) => state.isGuest);
 
   const handleRegisterPress = () => {
-    router.push("/auth/sign-in");
+    router.push({
+      pathname: "/auth/sign-in",
+      params: {
+        source: "guest_profile_tab",
+        action: "profile",
+      },
+    });
   };
 
   if (isGuest) {

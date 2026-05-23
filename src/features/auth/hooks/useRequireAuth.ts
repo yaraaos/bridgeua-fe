@@ -15,12 +15,15 @@ export function useRequireAuth() {
   const [pendingRedirectTo, setPendingRedirectTo] = useState<
     string | undefined
   >(undefined);
+  const [pendingAction, setPendingAction] =
+    useState<ProtectedAction>("default");
 
   const canAccessProtectedAction = isAuthenticated && !isGuest;
 
   const closeAuthModal = () => {
     setIsAuthModalVisible(false);
     setPendingRedirectTo(undefined);
+    setPendingAction("default");
   };
 
   const confirmAuthModal = () => {
@@ -30,6 +33,8 @@ export function useRequireAuth() {
       pathname: "/auth/sign-in",
       params: {
         redirectTo: pendingRedirectTo,
+        source: "guest_protected_action",
+        action: pendingAction,
       },
     });
   };
@@ -44,6 +49,7 @@ export function useRequireAuth() {
     }
 
     setPendingRedirectTo(options.redirectTo);
+    setPendingAction(options.action ?? "default");
     setIsAuthModalVisible(true);
   };
 
