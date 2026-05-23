@@ -26,6 +26,7 @@ export default function SignInScreen() {
 
   const { submitSignIn, isLoading, apiError, setApiError } = useSignIn();
   const setUser = useAuthStore((state) => state.setUser);
+  const enterGuestMode = useAuthStore((state) => state.enterGuestMode);
   const resetFollowing = useFollowingStore((state) => state.resetFollowing);
   const loadProfile = useProfileStore((state) => state.loadProfile);
   const clearReviews = useReviewsStore((state) => state.clearReviews);
@@ -57,6 +58,13 @@ export default function SignInScreen() {
 
       router.replace("/(tabs)/home");
     }
+  };
+
+  const handleSkipForNow = async () => {
+    if (isLoading) return;
+
+    await enterGuestMode();
+    router.replace("/(tabs)/home");
   };
 
   return (
@@ -116,6 +124,11 @@ export default function SignInScreen() {
         ) : (
           <AppButton title="Login" onPress={handleSubmit} />
         )}
+        <AppButton
+          title="Skip for now"
+          variant="secondary"
+          onPress={handleSkipForNow}
+        />
       </View>
 
       <Text style={styles.footer}>
