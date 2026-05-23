@@ -170,6 +170,7 @@ export default function HomeScreen() {
       onRequestNearby={handleRequestNearby}
       showSearch
       searchPlaceholder="Find services, food or places"
+      onPressSearch={() => router.push("/search")}
       searchValue={searchQuery}
       onSearchChangeText={setSearchQuery}
       actions={["map", "filter"]}
