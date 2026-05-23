@@ -18,9 +18,20 @@ import { useBannerPromotions } from "@/src/features/promotions/hooks/useBannerPr
 import type { HomePromotion } from "@/src/features/promotions/types/promotion.types";
 import { useDiscoveryLocationStore } from "@/src/store/discovery-location";
 import { useFilterStore } from "@/src/store/filter.store";
+import { Feather } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
-import { useRef, useState } from "react";
-import { Alert, Animated, StyleSheet, View } from "react-native";
+import { useEffect, useRef, useState } from "react";
+import {
+  Alert,
+  Animated,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+
+const RECENT_SEARCHES_KEY = "home-recent-searches";
 
 export default function HomeScreen() {
   const {
@@ -31,23 +42,32 @@ export default function HomeScreen() {
   } = useDiscoveryLocationStore();
 
   const scrollY = useRef(new Animated.Value(0)).current;
+
   const [searchQuery, setSearchQuery] = useState("");
+  const [recentSearches, setRecentSearches] = useState<string[]>([]);
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
 
   const { category, sort, cuisines, rating, distance, customDistance } =
     useFilterStore((state) => state.discoveryFilters);
+
   const { businesses, isLoading } = useBusinesses();
 
-  const searchFiltered = searchQuery.trim()
-    ? businesses.filter(
-        (b) =>
-          b.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          b.category?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          b.location?.toLowerCase().includes(searchQuery.toLowerCase()),
-      )
-    : businesses;
+  useEffect(() => {
+    const loadRecentSearches = async () => {
+      const stored = await AsyncStorage.getItem(RECENT_SEARCHES_KEY);
 
-  const { filteredBusinesses } = useDiscoveryFeed({
-    businesses: searchFiltered,
+      if (stored) {
+        setRecentSearches(JSON.parse(stored));
+      }
+    };
+
+    loadRecentSearches();
+  }, []);
+
+  const normalizedSearchQuery = searchQuery.trim().toLowerCase();
+
+  const { filteredBusinesses: discoveryFilteredBusinesses } = useDiscoveryFeed({
+    businesses,
     category,
     sort,
     cuisines,
@@ -55,6 +75,12 @@ export default function HomeScreen() {
     distance,
     customDistance,
   });
+
+  const filteredBusinesses = normalizedSearchQuery
+    ? discoveryFilteredBusinesses.filter((business) =>
+        business.name?.toLowerCase().startsWith(normalizedSearchQuery),
+      )
+    : discoveryFilteredBusinesses;
 
   const {
     promotion,
@@ -65,6 +91,54 @@ export default function HomeScreen() {
   const { promotions: bannerPromotions, isVisible: isBannerVisible } =
     useBannerPromotions();
 
+  const saveRecentSearch = async (value: string) => {
+    const trimmed = value.trim();
+
+    if (!trimmed) return;
+
+    const updated = [
+      trimmed,
+      ...recentSearches.filter((item) => item !== trimmed),
+    ].slice(0, 3);
+
+    setRecentSearches(updated);
+    await AsyncStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(updated));
+  };
+
+  const removeRecentSearch = async (value: string) => {
+    const updated = recentSearches.filter((item) => item !== value);
+
+    setRecentSearches(updated);
+    await AsyncStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(updated));
+  };
+
+  const clearRecentSearches = async () => {
+    setRecentSearches([]);
+    await AsyncStorage.removeItem(RECENT_SEARCHES_KEY);
+  };
+
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value);
+  };
+
+  const handleSelectRecentSearch = (value: string) => {
+    setSearchQuery(value);
+    setIsSearchFocused(false);
+  };
+
+  const handleBusinessPress = (businessId: string) => {
+    saveRecentSearch(searchQuery);
+    setIsSearchFocused(false);
+
+    router.push({
+      pathname: "/business/[id]",
+      params: { id: businessId },
+    });
+  };
+
+  const shouldShowRecentSearches =
+    isSearchFocused && recentSearches.length > 0 && !searchQuery.trim();
+
   const handlePromotionBannerPress = (promotion: HomePromotion) => {
     router.push({
       pathname: "/business/[id]",
@@ -73,9 +147,7 @@ export default function HomeScreen() {
   };
 
   const handlePromotionPress = () => {
-    if (!promotion) {
-      return;
-    }
+    if (!promotion) return;
 
     closePromotion();
 
@@ -170,15 +242,47 @@ export default function HomeScreen() {
       onRequestNearby={handleRequestNearby}
       showSearch
       searchPlaceholder="Find services, food or places"
-      onPressSearch={() => router.push("/search")}
       searchValue={searchQuery}
-      onSearchChangeText={setSearchQuery}
+      onSearchChangeText={handleSearchChange}
+      onSearchFocus={() => setIsSearchFocused(true)}
+      onSearchBlur={() => {
+        setTimeout(() => {
+          setIsSearchFocused(false);
+        }, 120);
+      }}
       actions={["map", "filter"]}
       onPressMap={handleMapPress}
       onPressFilter={handleFilterPress}
       activeFilterCount={activeFilterCount}
     />
   );
+
+  const recentSearchesDropdown = shouldShowRecentSearches ? (
+    <View style={styles.recentDropdown}>
+      <View style={styles.recentHeader}>
+        <Text style={styles.recentTitle}>Recent searches</Text>
+
+        <Pressable onPress={clearRecentSearches}>
+          <Text style={styles.clearAll}>Clear all</Text>
+        </Pressable>
+      </View>
+
+      {recentSearches.map((item) => (
+        <View key={item} style={styles.recentItem}>
+          <Pressable
+            style={styles.recentItemButton}
+            onPress={() => handleSelectRecentSearch(item)}
+          >
+            <Text style={styles.recentItemText}>{item}</Text>
+          </Pressable>
+
+          <Pressable onPress={() => removeRecentSearch(item)}>
+            <Feather name="x" size={16} color="#8EA399" />
+          </Pressable>
+        </View>
+      ))}
+    </View>
+  ) : null;
 
   const categoryBar = (
     <CategoryScroller
@@ -191,7 +295,10 @@ export default function HomeScreen() {
   if (isLoading) {
     return (
       <AppScreen withTopInset={false} style={styles.container}>
-        {header}
+        <View style={styles.headerWrap}>
+          {header}
+          {recentSearchesDropdown}
+        </View>
 
         <View style={styles.contentArea}>
           {categoryBar}
@@ -203,11 +310,15 @@ export default function HomeScreen() {
 
   return (
     <AppScreen withTopInset={false} style={styles.container}>
-      {header}
+      <View style={styles.headerWrap}>
+        {header}
+        {recentSearchesDropdown}
+      </View>
 
       <View style={styles.contentArea}>
         <Animated.ScrollView
           stickyHeaderIndices={[1]}
+          keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.scrollContent}
           onScroll={Animated.event(
@@ -216,7 +327,7 @@ export default function HomeScreen() {
           )}
           scrollEventThrottle={16}
         >
-          {isBannerVisible ? (
+          {isBannerVisible && !searchQuery.trim() ? (
             <View style={styles.bannerWrap}>
               <HomePromotionBanner
                 promotions={bannerPromotions}
@@ -232,12 +343,27 @@ export default function HomeScreen() {
             {filteredBusinesses.length === 0 ? (
               <View style={styles.emptyStateWrap}>
                 <AppEmptyState
-                  title="No businesses found"
-                  description="Try adjusting or clearing some filters to discover more places."
-                  actionLabel="Clear filters"
-                  onPressAction={() =>
-                    useFilterStore.getState().reset("discovery")
+                  title={
+                    searchQuery.trim()
+                      ? `No businesses found for "${searchQuery}"`
+                      : "No businesses found"
                   }
+                  description={
+                    searchQuery.trim()
+                      ? "Try another business name."
+                      : "Try adjusting or clearing some filters to discover more places."
+                  }
+                  actionLabel={
+                    searchQuery.trim() ? "Clear search" : "Clear filters"
+                  }
+                  onPressAction={() => {
+                    if (searchQuery.trim()) {
+                      setSearchQuery("");
+                      return;
+                    }
+
+                    useFilterStore.getState().reset("discovery");
+                  }}
                 />
               </View>
             ) : (
@@ -245,12 +371,7 @@ export default function HomeScreen() {
                 <BusinessCard
                   key={String(item.id)}
                   business={item}
-                  onPress={() =>
-                    router.push({
-                      pathname: "/business/[id]",
-                      params: { id: String(item.id) },
-                    })
-                  }
+                  onPress={() => handleBusinessPress(String(item.id))}
                 />
               ))
             )}
@@ -272,15 +393,24 @@ const styles = StyleSheet.create({
   container: {
     padding: 0,
   },
+
+  headerWrap: {
+    position: "relative",
+    zIndex: 100,
+  },
+
   contentArea: {
     flex: 1,
   },
+
   cardWrap: {
     paddingHorizontal: 16,
   },
+
   scrollContent: {
     paddingBottom: 4,
   },
+
   bannerWrap: {
     overflow: "hidden",
     marginBottom: -10,
@@ -297,8 +427,57 @@ const styles = StyleSheet.create({
     paddingTop: 2,
     paddingBottom: 4,
   },
+
   emptyStateWrap: {
     paddingTop: 48,
     paddingBottom: 32,
+  },
+
+  recentDropdown: {
+    position: "absolute",
+    top: "100%",
+    left: 16,
+    right: 16,
+    padding: 14,
+    borderRadius: 16,
+    backgroundColor: "#163126",
+    gap: 12,
+    zIndex: 999,
+    elevation: 20,
+  },
+
+  recentHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+
+  recentTitle: {
+    fontSize: 15,
+    fontWeight: "700",
+    color: "#FFFFFF",
+  },
+
+  clearAll: {
+    fontSize: 13,
+    fontWeight: "700",
+    color: "#7CCF9A",
+  },
+
+  recentItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 12,
+  },
+
+  recentItemButton: {
+    flex: 1,
+    paddingVertical: 4,
+  },
+
+  recentItemText: {
+    fontSize: 14,
+    color: "#FFFFFF",
   },
 });

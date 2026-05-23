@@ -89,7 +89,9 @@ export default function SearchScreen() {
         .join(" ")
         .toLowerCase();
 
-      return searchableText.includes(normalizedQuery);
+      return searchableText
+        .split(" ")
+        .some((word) => word.startsWith(normalizedQuery));
     });
   }, [businesses, query]);
 
