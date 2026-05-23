@@ -1,3 +1,4 @@
+import { AuthRequiredModal, useRequireAuth } from "@/src/features/auth";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { useFollowingStore } from "@/src/store/following.store";
 import { Ionicons } from "@expo/vector-icons";
@@ -21,6 +22,9 @@ export default function FollowButton({
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
 
+  const { isAuthModalVisible, closeAuthModal, confirmAuthModal, requireAuth } =
+    useRequireAuth();
+
   const followedBusinessIds = useFollowingStore(
     (state) => state.followedBusinessIds,
   );
@@ -31,42 +35,61 @@ export default function FollowButton({
   const normalizedId = String(businessId);
   const isFollowing = followedBusinessIds.includes(normalizedId);
 
+  const handlePress = () => {
+    requireAuth(() => toggleFollowBusiness(normalizedId), {
+      action: "follow",
+    });
+  };
+
   const useFilledStyle = variant === "filled" || isFollowing;
 
   if (size === "icon") {
     return (
-      <Pressable
-        onPress={() => toggleFollowBusiness(normalizedId)}
-        style={[styles.iconButton, style]}
-      >
-        <Ionicons
-          name={isFollowing ? "heart" : "heart-outline"}
-          size={16}
-          color={colors.white}
+      <>
+        <Pressable onPress={handlePress} style={[styles.iconButton, style]}>
+          <Ionicons
+            name={isFollowing ? "heart" : "heart-outline"}
+            size={16}
+            color={colors.white}
+          />
+        </Pressable>
+
+        <AuthRequiredModal
+          visible={isAuthModalVisible}
+          onClose={closeAuthModal}
+          onConfirm={confirmAuthModal}
         />
-      </Pressable>
+      </>
     );
   }
 
   return (
-    <Pressable
-      onPress={() => toggleFollowBusiness(normalizedId)}
-      style={[
-        styles.button,
-        size === "sm" ? styles.buttonSm : styles.buttonMd,
-        useFilledStyle ? styles.buttonFilled : styles.buttonOutline,
-        style,
-      ]}
-    >
-      <Text
+    <>
+      <Pressable
+        onPress={handlePress}
         style={[
-          styles.buttonText,
-          size === "sm" ? styles.buttonTextSm : styles.buttonTextMd,
-          useFilledStyle ? styles.buttonTextFilled : styles.buttonTextOutline,
+          styles.button,
+          size === "sm" ? styles.buttonSm : styles.buttonMd,
+          useFilledStyle ? styles.buttonFilled : styles.buttonOutline,
+          style,
         ]}
       >
-        {isFollowing ? "Following" : "Follow"}
-      </Text>
-    </Pressable>
+        <Text
+          style={[
+            styles.buttonText,
+            size === "sm" ? styles.buttonTextSm : styles.buttonTextMd,
+            useFilledStyle ? styles.buttonTextFilled : styles.buttonTextOutline,
+          ]}
+        >
+          {isFollowing ? "Following" : "Follow"}
+        </Text>
+      </Pressable>
+
+      <AuthRequiredModal
+        visible={isAuthModalVisible}
+        onClose={closeAuthModal}
+        onConfirm={confirmAuthModal}
+      />
+    </>
   );
 }

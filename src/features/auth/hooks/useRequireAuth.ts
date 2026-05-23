@@ -1,4 +1,5 @@
 import { router } from "expo-router";
+import { useState } from "react";
 
 import { useAuthStore } from "@/src/store/auth.store";
 
@@ -20,8 +21,28 @@ type RequireAuthOptions = {
 export function useRequireAuth() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const isGuest = useAuthStore((state) => state.isGuest);
+  const [isAuthModalVisible, setIsAuthModalVisible] = useState(false);
+  const [pendingRedirectTo, setPendingRedirectTo] = useState<
+    string | undefined
+  >(undefined);
 
   const canAccessProtectedAction = isAuthenticated && !isGuest;
+
+  const closeAuthModal = () => {
+    setIsAuthModalVisible(false);
+    setPendingRedirectTo(undefined);
+  };
+
+  const confirmAuthModal = () => {
+    setIsAuthModalVisible(false);
+
+    router.push({
+      pathname: "/auth/sign-in",
+      params: {
+        redirectTo: pendingRedirectTo,
+      },
+    });
+  };
 
   const requireAuth = (
     callback: () => void,
@@ -32,19 +53,17 @@ export function useRequireAuth() {
       return;
     }
 
-    router.push({
-      pathname: "/auth/sign-in",
-      params: {
-        reason: options.action ?? "default",
-        redirectTo: options.redirectTo,
-      },
-    });
+    setPendingRedirectTo(options.redirectTo);
+    setIsAuthModalVisible(true);
   };
 
   return {
     isAuthenticated,
     isGuest,
     canAccessProtectedAction,
+    isAuthModalVisible,
+    closeAuthModal,
+    confirmAuthModal,
     requireAuth,
   };
 }

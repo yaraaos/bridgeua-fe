@@ -1,3 +1,4 @@
+import { AuthRequiredModal, useRequireAuth } from "@/src/features/auth";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
@@ -44,11 +45,21 @@ export default function BusinessBookingCard({ businessId }: Props) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
 
+  const { isAuthModalVisible, closeAuthModal, confirmAuthModal, requireAuth } =
+    useRequireAuth();
+
   const handlePress = (pathname: BookingAction["pathname"]) => {
-    router.push({
-      pathname,
-      params: { businessId },
-    });
+    requireAuth(
+      () => {
+        router.push({
+          pathname,
+          params: { businessId },
+        });
+      },
+      {
+        action: "book",
+      },
+    );
   };
 
   return (
@@ -86,6 +97,12 @@ export default function BusinessBookingCard({ businessId }: Props) {
           </Pressable>
         ))}
       </View>
+
+      <AuthRequiredModal
+        visible={isAuthModalVisible}
+        onClose={closeAuthModal}
+        onConfirm={confirmAuthModal}
+      />
     </View>
   );
 }
