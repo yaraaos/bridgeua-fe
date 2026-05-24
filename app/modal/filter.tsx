@@ -2,23 +2,28 @@
 
 import ActiveFiltersSummary from "@/src/components/filters/ActiveFiltersSummary";
 import { AppColors } from "@/src/constants/colors";
-import { CUISINE_OPTIONS, SORT_OPTIONS } from "@/src/constants/filters";
+import {
+    BUSINESS_CATEGORY_OPTIONS,
+    CUISINE_OPTIONS,
+    FOOD_CATEGORY_VALUE,
+    SORT_OPTIONS,
+} from "@/src/constants/filters";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { useFilterStore } from "@/src/store/filter.store";
 import { Feather } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
-  Animated,
-  Dimensions,
-  Easing,
-  PanResponder,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableWithoutFeedback,
-  View,
+    Animated,
+    Dimensions,
+    Easing,
+    PanResponder,
+    Pressable,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableWithoutFeedback,
+    View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import DistanceSelector from "../../src/components/filters/DistanceSelector/DistanceSelector";
@@ -27,7 +32,8 @@ import FilterSidebar from "../../src/components/filters/FilterSidebar/FilterSide
 import RatingSelector from "../../src/components/filters/RatingSelector/RatingSelector";
 import AppButton from "../../src/components/ui/AppButton/AppButton";
 
-type FilterTab = "sort" | "cuisines" | "ratings" | "distance";
+type FilterTab = "sort" | "categories" | "ratings" | "distance";
+type CategoryPanel = "categories" | "food-cuisines";
 
 const SCREEN_HEIGHT = Dimensions.get("window").height;
 const HALF_HEIGHT = SCREEN_HEIGHT * 0.72;
@@ -41,6 +47,8 @@ export default function FilterModalScreen() {
   const insets = useSafeAreaInsets();
 
   const [activeTab, setActiveTab] = useState<FilterTab>("sort");
+  const [categoryPanel, setCategoryPanel] =
+    useState<CategoryPanel>("categories");
   const [isClosing, setIsClosing] = useState(false);
 
   // useNativeDriver: true — transform only
@@ -59,6 +67,7 @@ export default function FilterModalScreen() {
   const { category, sort, cuisines, rating, distance, customDistance } =
     filters;
   const {
+    setCategory,
     setSort,
     toggleCuisine,
     setRating,
@@ -157,7 +166,7 @@ export default function FilterModalScreen() {
   const sidebarItems = useMemo(
     () => [
       { key: "sort" as FilterTab, label: "Sort" },
-      { key: "cuisines" as FilterTab, label: "Food" },
+      { key: "categories" as FilterTab, label: "Categories" },
       { key: "ratings" as FilterTab, label: "Ratings" },
       { key: "distance" as FilterTab, label: "Distance" },
     ],
@@ -177,14 +186,32 @@ export default function FilterModalScreen() {
         />
       );
     }
-    if (activeTab === "cuisines") {
+    if (activeTab === "categories") {
+      if (categoryPanel === "food-cuisines") {
+        return (
+          <FilterOptionList
+            title="FOOD CUISINES"
+            type="checkbox"
+            options={CUISINE_OPTIONS.map((option) => option.value)}
+            selectedValues={cuisines}
+            onToggle={(value) => toggleCuisine(scope, value)}
+          />
+        );
+      }
+
       return (
         <FilterOptionList
-          title="FILTER BY CUISINE"
-          type="checkbox"
-          options={CUISINE_OPTIONS.map((option) => option.value)}
-          selectedValues={cuisines}
-          onToggle={(value) => toggleCuisine(scope, value)}
+          title="CATEGORIES"
+          type="radio"
+          options={BUSINESS_CATEGORY_OPTIONS}
+          selectedValue={category}
+          onSelect={(value) => {
+            setCategory(scope, value);
+
+            if (value === FOOD_CATEGORY_VALUE) {
+              setCategoryPanel("food-cuisines");
+            }
+          }}
         />
       );
     }
@@ -244,7 +271,13 @@ export default function FilterModalScreen() {
             <FilterSidebar
               items={sidebarItems}
               activeKey={activeTab}
-              onChange={(key) => setActiveTab(key)}
+              onChange={(key) => {
+                setActiveTab(key);
+
+                if (key === "categories") {
+                  setCategoryPanel("categories");
+                }
+              }}
             />
             <View style={styles.rightPanel}>
               <ScrollView

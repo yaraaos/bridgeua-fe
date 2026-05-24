@@ -27,10 +27,17 @@ export type DistanceOption = "" | "nearby" | "1" | "5" | "10" | "25" | "custom";
 
 export type FilterScope = "discovery" | "following";
 
+export type CategoryFilters = {
+  food: {
+    cuisines: string[];
+  };
+};
+
 export type FilterValues = {
   category: string;
   sort: SortOption;
   cuisines: string[];
+  categoryFilters: CategoryFilters;
   rating: RatingOption;
   distance: DistanceOption;
   customDistance: string;
@@ -40,6 +47,11 @@ const defaultFilters: FilterValues = {
   category: "",
   sort: "relevance",
   cuisines: [],
+  categoryFilters: {
+    food: {
+      cuisines: [],
+    },
+  },
   rating: "",
   distance: "",
   customDistance: "",
@@ -72,6 +84,15 @@ export const useFilterStore = create<FilterState>((set) => ({
           ...state[key],
           category: value,
           cuisines: value === "Food" ? state[key].cuisines : [],
+          categoryFilters:
+            value === "Food"
+              ? state[key].categoryFilters
+              : {
+                  ...state[key].categoryFilters,
+                  food: {
+                    cuisines: [],
+                  },
+                },
         },
       };
     }),
@@ -87,14 +108,21 @@ export const useFilterStore = create<FilterState>((set) => ({
     set((state) => {
       const key = getScopeKey(scope);
       const currentFilters = state[key];
+      const nextCuisines = currentFilters.cuisines.includes(value)
+        ? currentFilters.cuisines.filter((item) => item !== value)
+        : [...currentFilters.cuisines, value];
 
       return {
         [key]: {
           ...currentFilters,
           category: "Food",
-          cuisines: currentFilters.cuisines.includes(value)
-            ? currentFilters.cuisines.filter((item) => item !== value)
-            : [...currentFilters.cuisines, value],
+          cuisines: nextCuisines,
+          categoryFilters: {
+            ...currentFilters.categoryFilters,
+            food: {
+              cuisines: nextCuisines,
+            },
+          },
         },
       };
     }),
