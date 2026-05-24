@@ -111,64 +111,63 @@ export default function PersonalProfileScreen() {
         title=""
         rightSlot={null}
         profileContent={
-          <View style={styles.heroIdentityRow}>
-            <Pressable
-              style={styles.settingsButton}
-              onPress={() => router.push("/settings")}
-            >
-              <Ionicons
-                name="settings-outline"
-                size={20}
-                color={colors.white}
+          <View>
+            <View style={styles.heroIdentityRow}>
+              <AppAvatar
+                name={profile.username}
+                username={profile.username}
+                imageUrl={profile.avatarUrl}
+                size="lg"
               />
-            </Pressable>
 
-            <AppAvatar
-              name={profile.username}
-              username={profile.username}
-              imageUrl={profile.avatarUrl}
-              size="lg"
-            />
-
-            <View style={styles.heroTextWrap}>
-              <View style={styles.heroTopRow}>
+              <View style={styles.heroTextWrap}>
                 <AppText style={styles.heroName} numberOfLines={1}>
                   {profile.username}
                 </AppText>
               </View>
 
-              <View style={styles.heroActionsRow}>
-                <Pressable
-                  style={[styles.heroActionButton, styles.editButton]}
-                  onPress={() => router.push("/profile/edit")}
-                >
-                  <Ionicons
-                    name="create-outline"
-                    size={18}
-                    color={colors.textMuted}
-                  />
-                  <AppText style={styles.editButtonText}>Edit profile</AppText>
-                </Pressable>
+              <Pressable
+                style={styles.settingsButton}
+                onPress={() => router.push("/settings")}
+              >
+                <Ionicons
+                  name="settings-outline"
+                  size={20}
+                  color={colors.white}
+                />
+              </Pressable>
+            </View>
 
-                <Pressable
-                  style={[styles.heroActionButton, styles.switchButton]}
-                  onPress={() => router.push("/profile/switch-account")}
-                >
-                  <Ionicons
-                    name="swap-horizontal-outline"
-                    size={16}
-                    color={colors.textMuted}
-                  />
-                  <AppText style={styles.switchButtonText}>
-                    Switch account
-                  </AppText>
-                </Pressable>
-              </View>
+            <View style={styles.heroActionsRow}>
+              <Pressable
+                style={[styles.heroActionButton, styles.editButton]}
+                onPress={() => router.push("/profile/edit")}
+              >
+                <Ionicons
+                  name="create-outline"
+                  size={16}
+                  color={colors.primaryGreen}
+                />
+                <AppText style={styles.editButtonText}>Edit profile</AppText>
+              </Pressable>
+
+              <Pressable
+                style={[styles.heroActionButton, styles.switchButton]}
+                onPress={() => router.push("/modal/switch-account")}
+              >
+                <Ionicons
+                  name="swap-horizontal-outline"
+                  size={16}
+                  color={colors.textMuted}
+                />
+                <AppText style={styles.switchButtonText}>
+                  Switch account
+                </AppText>
+              </Pressable>
             </View>
           </View>
         }
       />
-
       <View style={styles.summaryBackground}>
         <View style={styles.profileSummaryCard}>
           <View style={styles.statsRow}>
@@ -197,7 +196,6 @@ export default function PersonalProfileScreen() {
           </View>
         </View>
       </View>
-
       <ScrollView
         ref={scrollViewRef}
         showsVerticalScrollIndicator={false}
@@ -479,7 +477,6 @@ function ReviewCard({
             ) : null}
           </>
         ) : null}
-
         {review.photos?.length ? (
           <ScrollView
             horizontal
@@ -540,48 +537,35 @@ function createStyles(colors: AppColors) {
       marginTop: -2,
     },
     settingsButton: {
-      position: "absolute",
-      top: -2,
-      right: 0,
-
-      marginTop: 4,
-
       width: 36,
       height: 36,
       borderRadius: 10,
-
       alignItems: "center",
+      marginTop: 4, //to make the stngs btn look visually on the same leve as the top of the profile pic
       justifyContent: "center",
-
       backgroundColor: colors.accentOrange,
+      alignSelf: "flex-start",
     },
     heroIdentityRow: {
-      position: "relative",
       flexDirection: "row",
       alignItems: "center",
-      gap: spacing.md,
+      gap: spacing.lg,
       marginTop: 5,
-      paddingRight: 48,
     },
+
     heroTextWrap: {
       flex: 1,
       minWidth: 0,
-      width: "100%",
-      gap: spacing.sm,
-      transform: [{ translateY: 12 }],
+      justifyContent: "center",
     },
-    heroTopRow: {
-      flexDirection: "row",
-      alignItems: "flex-start",
-      justifyContent: "space-between",
-      gap: spacing.sm,
-    },
+
     heroName: {
       fontSize: 22,
       lineHeight: 27,
       fontWeight: "800",
       color: colors.textPrimary,
     },
+
     heroUsername: {
       marginTop: 6,
       fontSize: 16,
@@ -589,41 +573,43 @@ function createStyles(colors: AppColors) {
       fontWeight: "700",
       color: colors.textSecondary,
     },
+
     heroActionsRow: {
+      marginTop: spacing.sm,
       flexDirection: "row",
       gap: spacing.sm,
-      marginTop: 2,
-      width: "100%",
     },
+
     heroActionButton: {
       flex: 1,
-      minHeight: 34,
-      paddingHorizontal: spacing.md,
+      minHeight: 30,
       borderRadius: 10,
-
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "center",
-
       gap: 6,
     },
+
     editButton: {
-      backgroundColor: colors.surface,
+      backgroundColor: colors.primaryGreenSoft,
       borderWidth: 1,
-      borderColor: colors.border,
+      borderColor: colors.primaryGreenSoft,
     },
+
     switchButton: {
       backgroundColor: colors.surface,
       borderWidth: 1,
       borderColor: colors.border,
     },
+
     editButtonText: {
-      fontSize: 11,
+      fontSize: 12,
       fontWeight: "700",
-      color: colors.textMuted,
+      color: colors.primaryGreen,
     },
+
     switchButtonText: {
-      fontSize: 11,
+      fontSize: 12,
       fontWeight: "700",
       color: colors.textMuted,
     },
@@ -660,6 +646,7 @@ function createStyles(colors: AppColors) {
     appointmentsSection: {
       marginBottom: spacing.xl,
     },
+
     appointmentCard: {
       flexDirection: "row",
       alignItems: "center",
@@ -670,6 +657,7 @@ function createStyles(colors: AppColors) {
       borderWidth: 1,
       borderColor: colors.border,
     },
+
     appointmentIconBox: {
       width: 44,
       height: 44,
@@ -678,14 +666,17 @@ function createStyles(colors: AppColors) {
       justifyContent: "center",
       backgroundColor: colors.primaryGreenSoft,
     },
+
     appointmentTextWrap: {
       flex: 1,
     },
+
     appointmentTitle: {
       fontSize: 15,
       fontWeight: "800",
       color: colors.textPrimary,
     },
+
     appointmentDescription: {
       marginTop: 4,
       fontSize: 13,
@@ -836,6 +827,7 @@ function createStyles(colors: AppColors) {
     reviewPhotosScroll: {
       marginTop: spacing.sm,
     },
+
     reviewPhotoPreview: {
       width: 72,
       height: 72,

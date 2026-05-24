@@ -4,15 +4,13 @@ import AppText from "@/src/components/ui/AppText/AppText";
 import { AppColors } from "@/src/constants/colors";
 import { spacing } from "@/src/constants/spacing";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { useActiveAccount } from "@/src/store/account.store";
 import { useAuthStore } from "@/src/store/auth.store";
 import { router } from "expo-router";
 import { StyleSheet, View } from "react-native";
 
 import BusinessProfileScreen from "../profile/business";
 import PersonalProfileScreen from "../profile/personal";
-
-// temporary FE-only mock
-const MOCK_ACCOUNT_TYPE = "personal"; // "personal" | "business"
 
 const GUEST_BENEFITS = [
   "Follow trusted businesses",
@@ -25,6 +23,7 @@ export default function ProfileTabScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
   const isGuest = useAuthStore((state) => state.isGuest);
+  const account = useActiveAccount();
 
   const handleRegisterPress = () => {
     router.push({
@@ -73,11 +72,11 @@ export default function ProfileTabScreen() {
     );
   }
 
-  if (MOCK_ACCOUNT_TYPE === "personal") {
-    return <PersonalProfileScreen />;
+  if (account?.kind === "business") {
+    return <BusinessProfileScreen />;
   }
 
-  return <BusinessProfileScreen />;
+  return <PersonalProfileScreen />;
 }
 
 function createStyles(colors: AppColors) {
