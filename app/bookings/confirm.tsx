@@ -5,12 +5,13 @@ import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
 import AppText from "@/src/components/ui/AppText/AppText";
 import type { AppColors } from "@/src/constants/colors";
 import { spacing } from "@/src/constants/spacing";
+import { useBookingFlow } from "@/src/features/bookings/hooks/useBookingFlow";
 import { useCreateBooking } from "@/src/features/bookings/hooks/useCreateBooking";
 import type { CreateBookingPayload } from "@/src/features/bookings/types/booking.types";
 import { useBusinessDetails } from "@/src/features/businesses/hooks/useBusiness";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { useBookingsStore } from "@/src/store/bookings.store";
-import { router, useLocalSearchParams } from "expo-router";
+import { router } from "expo-router";
 import React, { useMemo } from "react";
 import { StyleSheet, View } from "react-native";
 
@@ -18,20 +19,7 @@ export default function BookingConfirmScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
 
-  const params = useLocalSearchParams<{
-    businessId?: string;
-    serviceId?: string;
-    serviceName?: string;
-    specialistId?: string;
-    date?: string;
-    timeSlotId?: string;
-    time?: string;
-    firstName?: string;
-    lastName?: string;
-    phoneNumber?: string;
-    promotionId?: string;
-    promoCode?: string;
-  }>();
+  const { params, canCreateBooking } = useBookingFlow();
 
   const { business, isLoading } = useBusinessDetails(params.businessId);
   const { submitBooking, isCreating, error } = useCreateBooking();
@@ -61,19 +49,8 @@ export default function BookingConfirmScreen() {
     return [params.firstName, params.lastName].filter(Boolean).join(" ");
   }, [params.firstName, params.lastName]);
 
-  const canConfirm =
-    !!params.businessId &&
-    !!params.serviceId &&
-    !!params.specialistId &&
-    !!params.date &&
-    !!params.timeSlotId &&
-    !!params.time &&
-    !!params.firstName &&
-    !!params.lastName &&
-    !!params.phoneNumber;
-
   const handleConfirm = async () => {
-    if (!canConfirm) return;
+    if (!canCreateBooking) return;
 
     const payload: CreateBookingPayload = {
       businessId: params.businessId!,
@@ -139,13 +116,13 @@ export default function BookingConfirmScreen() {
           <AppButton
             title="Retry"
             variant="secondary"
-            disabled={!canConfirm || isCreating}
+            disabled={!canCreateBooking || isCreating}
             onPress={handleConfirm}
           />
         </View>
       )}
 
-      {!canConfirm && (
+      {!canCreateBooking && (
         <View style={styles.errorBox}>
           <AppText style={styles.errorTitle}>Missing booking details</AppText>
           <AppText style={styles.errorText}>
@@ -156,7 +133,7 @@ export default function BookingConfirmScreen() {
 
       <AppButton
         title={isCreating ? "Confirming..." : "Confirm booking"}
-        disabled={!canConfirm || isCreating}
+        disabled={!canCreateBooking || isCreating}
         onPress={handleConfirm}
       />
     </AppScreen>

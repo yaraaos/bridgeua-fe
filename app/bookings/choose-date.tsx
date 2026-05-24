@@ -6,6 +6,7 @@ import AppText from "@/src/components/ui/AppText/AppText";
 import AppTimeSlot from "@/src/components/ui/AppTimeSlot/AppTimeSlot";
 import type { AppColors } from "@/src/constants/colors";
 import { spacing } from "@/src/constants/spacing";
+import { useAvailability } from "@/src/features/bookings/hooks/useAvailability";
 import { useBusinessDetails } from "@/src/features/businesses/hooks/useBusiness";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { router, useLocalSearchParams } from "expo-router";
@@ -47,17 +48,6 @@ const buildDateOptions = (): DateOption[] => {
   });
 };
 
-const fallbackSlots = [
-  { id: "09-00", time: "09:00", isAvailable: true },
-  { id: "10-00", time: "10:00", isAvailable: true },
-  { id: "11-00", time: "11:00", isAvailable: false },
-  { id: "12-30", time: "12:30", isAvailable: true },
-  { id: "14-00", time: "14:00", isAvailable: true },
-  { id: "15-30", time: "15:30", isAvailable: false },
-  { id: "17-00", time: "17:00", isAvailable: true },
-  { id: "18-30", time: "18:30", isAvailable: true },
-];
-
 export default function ChooseDateScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
@@ -86,11 +76,20 @@ export default function ChooseDateScreen() {
     firstAvailableDate?.isoDate ?? formatIsoDate(new Date()),
   );
 
-  const selectedDayAvailability = business?.bookingAvailability?.find(
-    (day) => day.date === selectedDate,
+  const {
+    slots,
+    isLoading: isAvailabilityLoading,
+    error: availabilityError,
+  } = useAvailability(
+    businessId && serviceId && specialistId && selectedDate
+      ? {
+          businessId,
+          serviceId,
+          specialistId,
+          date: selectedDate,
+        }
+      : null,
   );
-
-  const slots = selectedDayAvailability?.slots ?? fallbackSlots;
 
   const handleSelectTime = (timeSlotId: string, time: string) => {
     if (!businessId || !serviceId) return;
@@ -150,6 +149,13 @@ export default function ChooseDateScreen() {
 
       <View style={styles.section}>
         <AppText style={styles.sectionTitle}>Available times</AppText>
+        {isAvailabilityLoading && (
+          <AppText style={styles.emptyText}>Loading available times...</AppText>
+        )}
+
+        {!!availabilityError && (
+          <AppText style={styles.emptyText}>{availabilityError}</AppText>
+        )}
 
         <View style={styles.timeGrid}>
           {slots.map((slot) => (

@@ -14,6 +14,19 @@ export type CreateBookingPayload = {
   promoCode?: string;
 };
 
+export type BookingTimeSlot = {
+  id: string;
+  time: string;
+  isAvailable: boolean;
+};
+
+export type BookingAvailabilityParams = {
+  businessId: string;
+  serviceId: string;
+  specialistId: string;
+  date: string;
+};
+
 export type Booking = CreateBookingPayload & {
   id: string;
   status: "pending" | "confirmed" | "cancelled";
