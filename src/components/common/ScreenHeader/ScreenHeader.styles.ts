@@ -83,8 +83,7 @@ export function createStyles(colors: AppColors) {
       color: colors.textPrimary,
     },
     profileHeaderInner: {
-      height: 154,
-      justifyContent: "center",
+      minHeight: 132,
     },
 
     profileHeaderRow: {
@@ -95,7 +94,7 @@ export function createStyles(colors: AppColors) {
     },
 
     profileHeaderContent: {
-      flex: 1,
+      width: "100%",
     },
 
     profileContent: {

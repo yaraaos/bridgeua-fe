@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Image, Pressable, ScrollView, StyleSheet, View } from "react-native";
-import { Feather, Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { Feather, Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 
 import ScreenHeader from "@/src/components/common/ScreenHeader/ScreenHeader";
@@ -176,16 +176,6 @@ export default function BusinessProfileScreen() {
                 <Feather name="eye" size={14} color={colors.textPrimary} />
                 <AppText style={styles.viewPublicButtonText}>
                   View public page
-                </AppText>
-              </Pressable>
-
-              <Pressable
-                style={[styles.heroActionButton, styles.promotionsButton]}
-                onPress={() => router.push("/promotions")}
-              >
-                <MaterialIcons name="campaign" size={14} color={colors.white} />
-                <AppText style={styles.promotionsButtonText}>
-                  Promotions
                 </AppText>
               </Pressable>
             </View>
@@ -547,14 +537,6 @@ function createStyles(colors: AppColors) {
       fontSize: 12,
       fontWeight: "700",
       color: colors.textPrimary,
-    },
-    promotionsButton: {
-      backgroundColor: colors.primaryGreen,
-    },
-    promotionsButtonText: {
-      fontSize: 12,
-      fontWeight: "700",
-      color: colors.white,
     },
 
     card: {

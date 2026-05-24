@@ -35,5 +35,12 @@ export function createStyles(colors: AppColors) {
     ghostText: {
       color: colors.primaryGreen,
     },
+    accent: {
+      backgroundColor: colors.accentOrange,
+    },
+
+    accentText: {
+      color: colors.white,
+    },
   });
 }

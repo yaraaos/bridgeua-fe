@@ -79,6 +79,28 @@ export type BusinessDetailsService = {
   duration?: string;
 };
 
+export type BusinessBookingSpecialist = {
+  id: string;
+  name: string;
+  role: string;
+  rating: number;
+  reviewsCount: number;
+  avatarUrl?: string;
+  description?: string;
+};
+
+export type BusinessBookingTimeSlot = {
+  id: string;
+  time: string;
+  isAvailable: boolean;
+};
+
+export type BusinessBookingAvailabilityDay = {
+  id: string;
+  date: string;
+  slots: BusinessBookingTimeSlot[];
+};
+
 export type BusinessDetailsImage = {
   id: string;
   url: string;
@@ -101,6 +123,8 @@ export type BusinessDetails = {
   isFollowing?: boolean;
   about: BusinessAbout;
   services: BusinessDetailsService[];
+  bookingSpecialists?: BusinessBookingSpecialist[];
+  bookingAvailability?: BusinessBookingAvailabilityDay[];
   topReviews: BusinessDetailsReview[];
   reviews: BusinessDetailsReview[];
   ratingBreakdown: BusinessRatingBreakdownItem[];

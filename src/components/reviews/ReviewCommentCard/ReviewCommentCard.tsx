@@ -1,4 +1,5 @@
 import AppAvatar from "@/src/components/ui/AppAvatar";
+import { AuthRequiredModal, useRequireAuth } from "@/src/features/auth";
 import type { ReviewComment } from "@/src/features/reviews/types/review-comment.types";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { useProfileStore } from "@/src/store/profile.store";
@@ -20,11 +21,31 @@ export default function ReviewCommentCard({
   onDelete,
 }: Props) {
   const { colors } = useAppTheme();
+  const { isAuthModalVisible, closeAuthModal, confirmAuthModal, requireAuth } =
+    useRequireAuth();
   const isReply = !!comment.parentCommentId;
   const profile = useProfileStore((state) => state.profile);
   const isOwnComment = comment.author.username === profile.username;
 
   const avatarUrl = isOwnComment ? profile.avatarUrl : comment.author.avatarUrl;
+
+  const handleToggleLike = () => {
+    requireAuth(() => onToggleLike(comment.id), {
+      action: "comment",
+    });
+  };
+
+  const handleReply = () => {
+    requireAuth(() => onReply(comment), {
+      action: "comment",
+    });
+  };
+
+  const handleDelete = () => {
+    requireAuth(() => onDelete(comment.id), {
+      action: "comment",
+    });
+  };
 
   return (
     <>
@@ -54,7 +75,7 @@ export default function ReviewCommentCard({
           <View style={styles.actionsRow}>
             <Pressable
               style={styles.likeButton}
-              onPress={() => onToggleLike(comment.id)}
+              onPress={handleToggleLike}
               hitSlop={8}
             >
               <MaterialIcons
@@ -81,7 +102,7 @@ export default function ReviewCommentCard({
 
             <Pressable
               style={styles.likeButton}
-              onPress={() => onReply(comment)}
+              onPress={handleReply}
               hitSlop={8}
             >
               <MaterialIcons
@@ -98,7 +119,7 @@ export default function ReviewCommentCard({
             {isOwnComment ? (
               <Pressable
                 style={styles.likeButton}
-                onPress={() => onDelete(comment.id)}
+                onPress={handleDelete}
                 hitSlop={8}
               >
                 <MaterialIcons
@@ -115,6 +136,12 @@ export default function ReviewCommentCard({
           </View>
         </View>
       </View>
+
+      <AuthRequiredModal
+        visible={isAuthModalVisible}
+        onClose={closeAuthModal}
+        onConfirm={confirmAuthModal}
+      />
     </>
   );
 }

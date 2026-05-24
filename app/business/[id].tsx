@@ -18,6 +18,11 @@ import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
 import { AppColors } from "@/src/constants/colors";
 import { DISCOVERY_GRADIENT } from "@/src/constants/gradients";
 import { spacing } from "@/src/constants/spacing";
+import {
+  AuthRequiredModal,
+  GuestBusinessCtaBanner,
+  useRequireAuth,
+} from "@/src/features/auth";
 import { useBusinessDetails } from "@/src/features/businesses/hooks/useBusiness";
 import type {
   BusinessDetailsReview,
@@ -25,6 +30,7 @@ import type {
 } from "@/src/features/businesses/types/business.types";
 import { useReviews } from "@/src/features/reviews/hooks/useReviews";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { useAuthStore } from "@/src/store/auth.store";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -63,6 +69,10 @@ function getTopReviews(reviews: BusinessDetailsReview[]) {
 export default function BusinessDetailsScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+  const { isAuthModalVisible, closeAuthModal, confirmAuthModal, requireAuth } =
+    useRequireAuth();
+
+  const isGuest = useAuthStore((state) => state.isGuest);
 
   const {
     id,
@@ -265,10 +275,13 @@ export default function BusinessDetailsScreen() {
           />
         </View>
 
+        {isGuest ? <GuestBusinessCtaBanner /> : null}
+
         <Animated.View style={{ opacity: contentOpacity }}>
           {activeTab === "overview" ? (
             <>
               <BusinessOverviewCard business={business} />
+
               <BusinessBookingCard businessId={business.id} />
               <BusinessRecommendedByPreview
                 recommendations={business.about.recommendedBy}
@@ -341,13 +354,20 @@ export default function BusinessDetailsScreen() {
                     });
                   }}
                   onPressWriteReview={(rating) =>
-                    router.push({
-                      pathname: "/business/write-review",
-                      params: {
-                        businessId: business.id,
-                        rating: rating ? String(rating) : undefined,
+                    requireAuth(
+                      () => {
+                        router.push({
+                          pathname: "/business/write-review",
+                          params: {
+                            businessId: business.id,
+                            rating: rating ? String(rating) : undefined,
+                          },
+                        });
                       },
-                    })
+                      {
+                        action: "review",
+                      },
+                    )
                   }
                 />
               </View>
@@ -369,6 +389,12 @@ export default function BusinessDetailsScreen() {
           ) : null}
         </Animated.View>
       </Animated.ScrollView>
+
+      <AuthRequiredModal
+        visible={isAuthModalVisible}
+        onClose={closeAuthModal}
+        onConfirm={confirmAuthModal}
+      />
     </AppScreen>
   );
 }

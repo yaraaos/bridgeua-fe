@@ -6,7 +6,7 @@ import { createStyles } from "./AppButton.styles";
 type Props = {
   title: string;
   onPress?: () => void;
-  variant?: "primary" | "secondary" | "ghost";
+  variant?: "primary" | "secondary" | "ghost" | "accent";
   disabled?: boolean;
 };
 
@@ -27,6 +27,7 @@ export default function AppButton({
         variant === "primary" && styles.primary,
         variant === "secondary" && styles.secondary,
         variant === "ghost" && styles.ghost,
+        variant === "accent" && styles.accent,
         disabled && styles.disabled,
       ]}
     >
@@ -36,6 +37,7 @@ export default function AppButton({
           variant === "primary" && styles.primaryText,
           variant === "secondary" && styles.secondaryText,
           variant === "ghost" && styles.ghostText,
+          variant === "accent" && styles.accentText,
         ]}
       >
         {title}
