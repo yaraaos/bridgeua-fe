@@ -9,6 +9,7 @@ import { useCreateBooking } from "@/src/features/bookings/hooks/useCreateBooking
 import type { CreateBookingPayload } from "@/src/features/bookings/types/booking.types";
 import { useBusinessDetails } from "@/src/features/businesses/hooks/useBusiness";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { useBookingsStore } from "@/src/store/bookings.store";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useMemo } from "react";
 import { StyleSheet, View } from "react-native";
@@ -34,6 +35,9 @@ export default function BookingConfirmScreen() {
 
   const { business, isLoading } = useBusinessDetails(params.businessId);
   const { submitBooking, isCreating, error } = useCreateBooking();
+  const addUpcomingBooking = useBookingsStore(
+    (state) => state.addUpcomingBooking,
+  );
 
   const selectedService = business?.services.find(
     (service) => service.id === params.serviceId,
@@ -90,6 +94,14 @@ export default function BookingConfirmScreen() {
     const booking = await submitBooking(payload);
 
     if (!booking) return;
+
+    addUpcomingBooking({
+      ...booking,
+      businessName: business?.name ?? "Selected business",
+      serviceName,
+      specialistName,
+      price,
+    });
 
     router.replace("/profile/personal");
   };
