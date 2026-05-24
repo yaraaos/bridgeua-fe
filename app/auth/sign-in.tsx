@@ -137,7 +137,7 @@ export default function SignInScreen() {
           style={styles.link}
           onPress={() => router.push("/auth/sign-up-personal")}
         >
-          Register now
+          Register for free
         </Text>
       </Text>
     </AppScreen>
