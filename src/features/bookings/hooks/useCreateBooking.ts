@@ -1,9 +1,6 @@
 import { useState } from "react";
 import { createBooking } from "../services/booking.service";
-import type {
-  Booking,
-  CreateBookingPayload,
-} from "../types/booking.types";
+import type { Booking, CreateBookingPayload } from "../types/booking.types";
 
 export const useCreateBooking = () => {
   const [isCreating, setIsCreating] = useState(false);

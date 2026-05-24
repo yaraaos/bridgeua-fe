@@ -1,20 +1,17 @@
-import React, { useMemo } from "react";
-import { StyleSheet, View } from "react-native";
-import { router, useLocalSearchParams } from "expo-router";
-import {
-  BookingStepper,
-  BookingSummaryCard,
-} from "@/src/components/bookings";
+import { BookingStepper, BookingSummaryCard } from "@/src/components/bookings";
 import AppButton from "@/src/components/ui/AppButton/AppButton";
 import AppLoader from "@/src/components/ui/AppLoader/AppLoader";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
 import AppText from "@/src/components/ui/AppText/AppText";
 import type { AppColors } from "@/src/constants/colors";
 import { spacing } from "@/src/constants/spacing";
-import { useBusinessDetails } from "@/src/features/businesses/hooks/useBusiness";
 import { useCreateBooking } from "@/src/features/bookings/hooks/useCreateBooking";
 import type { CreateBookingPayload } from "@/src/features/bookings/types/booking.types";
+import { useBusinessDetails } from "@/src/features/businesses/hooks/useBusiness";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { router, useLocalSearchParams } from "expo-router";
+import React, { useMemo } from "react";
+import { StyleSheet, View } from "react-native";
 
 export default function BookingConfirmScreen() {
   const { colors } = useAppTheme();
@@ -49,7 +46,7 @@ export default function BookingConfirmScreen() {
   const specialistName =
     params.specialistId === "any"
       ? "Any specialist"
-      : selectedSpecialist?.name ?? "Selected specialist";
+      : (selectedSpecialist?.name ?? "Selected specialist");
 
   const serviceName =
     params.serviceName ?? selectedService?.name ?? "Selected service";

@@ -1,7 +1,7 @@
-import React from "react";
-import { View } from "react-native";
 import AppText from "@/src/components/ui/AppText/AppText";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
+import React from "react";
+import { View } from "react-native";
 import { createStyles } from "./BookingSummaryCard.styles";
 
 type Props = {
