@@ -32,15 +32,17 @@ export default function ChooseServiceScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
 
-  const { businessId, promotionId, promoCode } = useLocalSearchParams<{
-    businessId?: string;
-    promotionId?: string;
-    promoCode?: string;
-  }>();
+  const { businessId, serviceId, promotionId, promoCode } =
+    useLocalSearchParams<{
+      businessId?: string;
+      serviceId?: string;
+      promotionId?: string;
+      promoCode?: string;
+    }>();
 
   const { business } = useBusinessDetails(businessId);
   const [selectedServiceId, setSelectedServiceId] = useState<string | null>(
-    null,
+    serviceId ?? null,
   );
 
   const services = business?.services?.length
