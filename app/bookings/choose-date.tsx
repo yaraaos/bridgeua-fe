@@ -1,6 +1,3 @@
-import React, { useMemo, useState } from "react";
-import { ScrollView, StyleSheet, View } from "react-native";
-import { router, useLocalSearchParams } from "expo-router";
 import { BookingStepper } from "@/src/components/bookings";
 import AppDatePickerCard from "@/src/components/ui/AppDatePickerCard/AppDatePickerCard";
 import AppLoader from "@/src/components/ui/AppLoader/AppLoader";
@@ -11,6 +8,9 @@ import type { AppColors } from "@/src/constants/colors";
 import { spacing } from "@/src/constants/spacing";
 import { useBusinessDetails } from "@/src/features/businesses/hooks/useBusiness";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { router, useLocalSearchParams } from "expo-router";
+import React, { useMemo, useState } from "react";
+import { ScrollView, StyleSheet, View } from "react-native";
 
 type DateOption = {
   id: string;
@@ -96,7 +96,7 @@ export default function ChooseDateScreen() {
     if (!businessId || !serviceId) return;
 
     router.push({
-      pathname: "/bookings/confirm",
+      pathname: "/bookings/personal-details",
       params: {
         businessId,
         serviceId,
