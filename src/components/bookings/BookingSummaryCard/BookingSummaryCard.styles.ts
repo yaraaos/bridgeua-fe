@@ -27,6 +27,10 @@ export function createStyles(colors: AppColors) {
       borderBottomWidth: 1,
       borderBottomColor: colors.border,
     },
+    lastRow: {
+      borderBottomWidth: 0,
+      paddingBottom: 0,
+    },
     label: {
       fontSize: 12,
       fontWeight: "700",

@@ -11,7 +11,7 @@ import { useBusinessDetails } from "@/src/features/businesses/hooks/useBusiness"
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 
 const fallbackBookingServices = [
   {
@@ -67,34 +67,42 @@ export default function ChooseServiceScreen() {
   };
 
   return (
-    <AppScreen scroll style={styles.container}>
-      <BookingStepper currentStep={1} />
+    <AppScreen style={styles.container}>
+      <View style={styles.content}>
+        <BookingStepper currentStep={1} />
 
-      <View style={styles.header}>
-        <AppText style={styles.title}>Choose service</AppText>
-        <AppText style={styles.subtitle}>
-          Select one service for your appointment.
-        </AppText>
+        <View style={styles.header}>
+          <AppText style={styles.title}>Choose service</AppText>
+          <AppText style={styles.subtitle}>
+            Select one service for your appointment.
+          </AppText>
+        </View>
+
+        <ScrollView
+          style={styles.scroll}
+          contentContainerStyle={styles.list}
+          showsVerticalScrollIndicator={false}
+        >
+          {services.map((service) => (
+            <ServiceSelectionCard
+              key={service.id}
+              title={service.name}
+              duration={service.duration ?? "Duration varies"}
+              price={service.priceFrom ?? "Price on request"}
+              isSelected={selectedServiceId === service.id}
+              onPress={() => setSelectedServiceId(service.id)}
+            />
+          ))}
+        </ScrollView>
       </View>
 
-      <View style={styles.list}>
-        {services.map((service) => (
-          <ServiceSelectionCard
-            key={service.id}
-            title={service.name}
-            duration={service.duration ?? "Duration varies"}
-            price={service.priceFrom ?? "Price on request"}
-            isSelected={selectedServiceId === service.id}
-            onPress={() => setSelectedServiceId(service.id)}
-          />
-        ))}
+      <View style={styles.footer}>
+        <AppButton
+          title="Next"
+          disabled={!selectedServiceId}
+          onPress={handleNext}
+        />
       </View>
-
-      <AppButton
-        title="Next"
-        disabled={!selectedServiceId}
-        onPress={handleNext}
-      />
     </AppScreen>
   );
 }
@@ -102,8 +110,23 @@ export default function ChooseServiceScreen() {
 function createStyles(colors: AppColors) {
   return StyleSheet.create({
     container: {
-      paddingBottom: spacing.xl,
+      flex: 1,
+    },
+    content: {
+      flex: 1,
       gap: spacing.lg,
+    },
+    scroll: {
+      flex: 1,
+    },
+    list: {
+      gap: spacing.md,
+      paddingBottom: spacing.lg,
+    },
+    footer: {
+      paddingTop: spacing.md,
+      paddingBottom: spacing.xl,
+      backgroundColor: colors.background,
     },
     header: {
       gap: spacing.xs,
@@ -117,9 +140,6 @@ function createStyles(colors: AppColors) {
       fontSize: 14,
       lineHeight: 20,
       color: colors.textSecondary,
-    },
-    list: {
-      gap: spacing.md,
     },
     emptyText: {
       fontSize: 14,

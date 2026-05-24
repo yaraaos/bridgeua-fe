@@ -40,18 +40,26 @@ export default function BookingSummaryCard({
         <SummaryRow label="Time" value={time} />
         <SummaryRow label="Price" value={price} />
         <SummaryRow label="Name" value={customerName} />
-        <SummaryRow label="Phone" value={phoneNumber} />
+        <SummaryRow label="Phone" value={phoneNumber} isLast />
       </View>
     </View>
   );
 }
 
-function SummaryRow({ label, value }: { label: string; value: string }) {
+function SummaryRow({
+  label,
+  value,
+  isLast = false,
+}: {
+  label: string;
+  value: string;
+  isLast?: boolean;
+}) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
 
   return (
-    <View style={styles.row}>
+    <View style={[styles.row, isLast && styles.lastRow]}>
       <AppText style={styles.label}>{label}</AppText>
       <AppText style={styles.value}>{value}</AppText>
     </View>

@@ -1,4 +1,5 @@
 import { BookingStepper } from "@/src/components/bookings";
+import AppButton from "@/src/components/ui/AppButton/AppButton";
 import AppDatePickerCard from "@/src/components/ui/AppDatePickerCard/AppDatePickerCard";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
 import AppText from "@/src/components/ui/AppText/AppText";
@@ -71,6 +72,10 @@ export default function ChooseDateScreen() {
   const [selectedDate, setSelectedDate] = useState<string>(
     firstAvailableDate?.isoDate ?? formatIsoDate(new Date()),
   );
+  const [selectedTimeSlot, setSelectedTimeSlot] = useState<{
+    id: string;
+    time: string;
+  } | null>(null);
 
   const {
     slots,
@@ -88,7 +93,11 @@ export default function ChooseDateScreen() {
   );
 
   const handleSelectTime = (timeSlotId: string, time: string) => {
-    if (!businessId || !serviceId) return;
+    setSelectedTimeSlot({ id: timeSlotId, time });
+  };
+
+  const handleNext = () => {
+    if (!businessId || !serviceId || !selectedTimeSlot) return;
 
     router.push({
       pathname: "/bookings/personal-details",
@@ -98,74 +107,97 @@ export default function ChooseDateScreen() {
         serviceName,
         specialistId,
         date: selectedDate,
-        timeSlotId,
-        time,
+        timeSlotId: selectedTimeSlot.id,
+        time: selectedTimeSlot.time,
         promotionId,
         promoCode,
       },
     });
   };
 
+  const handleSelectDate = (date: string) => {
+    setSelectedDate(date);
+    setSelectedTimeSlot(null);
+  };
+
   return (
-    <AppScreen scroll style={styles.container}>
-      <BookingStepper currentStep={3} />
+    <AppScreen style={styles.container}>
+      <View style={styles.content}>
+        <BookingStepper currentStep={3} />
 
-      <View style={styles.header}>
-        <AppText style={styles.title}>Choose date and time</AppText>
-        <AppText style={styles.subtitle}>
-          Select an available date and appointment time.
-        </AppText>
-      </View>
-
-      <View style={styles.section}>
-        <AppText style={styles.sectionTitle}>Date</AppText>
+        <View style={styles.header}>
+          <AppText style={styles.title}>Choose date and time</AppText>
+          <AppText style={styles.subtitle}>
+            Select an available date and appointment time.
+          </AppText>
+        </View>
 
         <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.dateList}
+          style={styles.scroll}
+          contentContainerStyle={styles.scrollContent}
         >
-          {dateOptions.map((option) => (
-            <AppDatePickerCard
-              key={option.id}
-              day={option.day}
-              date={option.dayNumber}
-              month={option.month}
-              selected={selectedDate === option.isoDate}
-              disabled={option.disabled}
-              onPress={() => setSelectedDate(option.isoDate)}
-            />
-          ))}
+          <View style={styles.section}>
+            <AppText style={styles.sectionTitle}>Date</AppText>
+
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.dateList}
+            >
+              {dateOptions.map((option) => (
+                <AppDatePickerCard
+                  key={option.id}
+                  day={option.day}
+                  date={option.dayNumber}
+                  month={option.month}
+                  selected={selectedDate === option.isoDate}
+                  disabled={option.disabled}
+                  onPress={() => handleSelectDate(option.isoDate)}
+                />
+              ))}
+            </ScrollView>
+          </View>
+
+          <View style={styles.section}>
+            <AppText style={styles.sectionTitle}>Available times</AppText>
+            {isAvailabilityLoading && (
+              <AppText style={styles.emptyText}>
+                Loading available times...
+              </AppText>
+            )}
+
+            {!!availabilityError && (
+              <AppText style={styles.emptyText}>{availabilityError}</AppText>
+            )}
+
+            <View style={styles.timeGrid}>
+              {slots.map((slot) => (
+                <View key={slot.id} style={styles.timeSlotWrap}>
+                  <AppTimeSlot
+                    label={slot.time}
+                    disabled={!slot.isAvailable}
+                    selected={selectedTimeSlot?.id === slot.id}
+                    onPress={() => handleSelectTime(slot.id, slot.time)}
+                  />
+                </View>
+              ))}
+            </View>
+
+            {!slots.some((slot) => slot.isAvailable) && (
+              <AppText style={styles.emptyText}>
+                No available times for this date. Please choose another date.
+              </AppText>
+            )}
+          </View>
         </ScrollView>
       </View>
 
-      <View style={styles.section}>
-        <AppText style={styles.sectionTitle}>Available times</AppText>
-        {isAvailabilityLoading && (
-          <AppText style={styles.emptyText}>Loading available times...</AppText>
-        )}
-
-        {!!availabilityError && (
-          <AppText style={styles.emptyText}>{availabilityError}</AppText>
-        )}
-
-        <View style={styles.timeGrid}>
-          {slots.map((slot) => (
-            <View key={slot.id} style={styles.timeSlotWrap}>
-              <AppTimeSlot
-                label={slot.time}
-                disabled={!slot.isAvailable}
-                onPress={() => handleSelectTime(slot.id, slot.time)}
-              />
-            </View>
-          ))}
-        </View>
-
-        {!slots.some((slot) => slot.isAvailable) && (
-          <AppText style={styles.emptyText}>
-            No available times for this date. Please choose another date.
-          </AppText>
-        )}
+      <View style={styles.footer}>
+        <AppButton
+          title="Next"
+          disabled={!selectedTimeSlot}
+          onPress={handleNext}
+        />
       </View>
     </AppScreen>
   );
@@ -174,8 +206,19 @@ export default function ChooseDateScreen() {
 function createStyles(colors: AppColors) {
   return StyleSheet.create({
     container: {
-      paddingBottom: spacing.xl,
+      flex: 1,
+    },
+    content: {
+      flex: 1,
       gap: spacing.lg,
+    },
+    scroll: {
+      flex: 1,
+    },
+    footer: {
+      paddingTop: spacing.sm,
+      paddingBottom: spacing.xl,
+      backgroundColor: colors.background,
     },
     header: {
       gap: spacing.xs,
@@ -214,6 +257,14 @@ function createStyles(colors: AppColors) {
     emptyText: {
       fontSize: 14,
       color: colors.textMuted,
+    },
+    list: {
+      gap: spacing.md,
+      paddingBottom: spacing.md,
+    },
+    scrollContent: {
+      gap: spacing.lg,
+      paddingBottom: spacing.md,
     },
   });
 }

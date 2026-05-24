@@ -1,4 +1,5 @@
 import { BookingStepper, SpecialistCard } from "@/src/components/bookings";
+import AppButton from "@/src/components/ui/AppButton/AppButton";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
 import AppText from "@/src/components/ui/AppText/AppText";
 import type { AppColors } from "@/src/constants/colors";
@@ -6,8 +7,8 @@ import { spacing } from "@/src/constants/spacing";
 import { useBusinessDetails } from "@/src/features/businesses/hooks/useBusiness";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { router, useLocalSearchParams } from "expo-router";
-import React from "react";
-import { StyleSheet, View } from "react-native";
+import React, { useState } from "react";
+import { ScrollView, StyleSheet, View } from "react-native";
 
 export default function ChooseSpecialistScreen() {
   const { colors } = useAppTheme();
@@ -24,8 +25,12 @@ export default function ChooseSpecialistScreen() {
 
   const { business } = useBusinessDetails(businessId);
 
-  const handleSelectSpecialist = (specialistId: string) => {
-    if (!businessId || !serviceId) return;
+  const [selectedSpecialistId, setSelectedSpecialistId] = useState<
+    string | null
+  >(null);
+
+  const handleNext = () => {
+    if (!businessId || !serviceId || !selectedSpecialistId) return;
 
     router.push({
       pathname: "/bookings/choose-date",
@@ -33,7 +38,7 @@ export default function ChooseSpecialistScreen() {
         businessId,
         serviceId,
         serviceName,
-        specialistId,
+        specialistId: selectedSpecialistId,
         promotionId,
         promoCode,
       },
@@ -41,39 +46,54 @@ export default function ChooseSpecialistScreen() {
   };
 
   return (
-    <AppScreen scroll style={styles.container}>
-      <BookingStepper currentStep={2} />
+    <AppScreen style={styles.container}>
+      <View style={styles.content}>
+        <BookingStepper currentStep={2} />
 
-      <View style={styles.header}>
-        <AppText style={styles.title}>Choose specialist</AppText>
-        <AppText style={styles.subtitle}>
-          Pick a specialist or let the business assign anyone available.
-        </AppText>
-      </View>
+        <View style={styles.header}>
+          <AppText style={styles.title}>Choose specialist</AppText>
+          <AppText style={styles.subtitle}>
+            Pick a specialist or let the business assign anyone available.
+          </AppText>
+        </View>
 
-      <View style={styles.list}>
-        <SpecialistCard
-          name="Any specialist"
-          role="First available professional"
-          rating={business?.rating ?? 5}
-          reviewsCount={business?.reviewCount ?? 0}
-          description="Recommended if you want the earliest available time."
-          badgeText="Fastest"
-          onPress={() => handleSelectSpecialist("any")}
-        />
-
-        {business?.bookingSpecialists?.map((specialist) => (
+        <ScrollView
+          style={styles.scroll}
+          contentContainerStyle={styles.list}
+          showsVerticalScrollIndicator={false}
+        >
           <SpecialistCard
-            key={specialist.id}
-            name={specialist.name}
-            role={specialist.role}
-            rating={specialist.rating}
-            reviewsCount={specialist.reviewsCount}
-            description={specialist.description}
-            avatarUrl={specialist.avatarUrl}
-            onPress={() => handleSelectSpecialist(specialist.id)}
+            name="Any specialist"
+            role="First available professional"
+            rating={business?.rating ?? 5}
+            reviewsCount={business?.reviewCount ?? 0}
+            description="Recommended if you want the earliest available time."
+            badgeText="Fastest"
+            onPress={() => setSelectedSpecialistId("any")}
+            isSelected={selectedSpecialistId === "any"}
           />
-        ))}
+
+          {business?.bookingSpecialists?.map((specialist) => (
+            <SpecialistCard
+              key={specialist.id}
+              name={specialist.name}
+              role={specialist.role}
+              rating={specialist.rating}
+              reviewsCount={specialist.reviewsCount}
+              description={specialist.description}
+              avatarUrl={specialist.avatarUrl}
+              onPress={() => setSelectedSpecialistId(specialist.id)}
+              isSelected={selectedSpecialistId === specialist.id}
+            />
+          ))}
+        </ScrollView>
+      </View>
+      <View style={styles.footer}>
+        <AppButton
+          title="Next"
+          disabled={!selectedSpecialistId}
+          onPress={handleNext}
+        />
       </View>
     </AppScreen>
   );
@@ -82,8 +102,23 @@ export default function ChooseSpecialistScreen() {
 function createStyles(colors: AppColors) {
   return StyleSheet.create({
     container: {
-      paddingBottom: spacing.xl,
+      flex: 1,
+    },
+    content: {
+      flex: 1,
       gap: spacing.lg,
+    },
+    scroll: {
+      flex: 1,
+    },
+    list: {
+      gap: spacing.md,
+      paddingBottom: spacing.md,
+    },
+    footer: {
+      paddingTop: spacing.sm,
+      paddingBottom: spacing.xl,
+      backgroundColor: colors.background,
     },
     header: {
       gap: spacing.xs,
@@ -97,9 +132,6 @@ function createStyles(colors: AppColors) {
       fontSize: 14,
       lineHeight: 20,
       color: colors.textSecondary,
-    },
-    list: {
-      gap: spacing.md,
     },
   });
 }
