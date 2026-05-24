@@ -103,7 +103,7 @@ export default function BookingConfirmScreen() {
       price,
     });
 
-    router.replace("/profile/personal");
+    router.replace("/(tabs)/profile");
   };
 
   if (isLoading) {
