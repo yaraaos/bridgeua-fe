@@ -1,60 +1,85 @@
-//app/bookings/choose-services.tsx
-
-import React, { useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
-import AppScreen from "../../src/components/ui/AppScreen/AppScreen";
-import AppButton from "../../src/components/ui/AppButton/AppButton";
-import ServiceSelectionCard from "../../src/components/bookings/ServiceSelectionCard/ServiceSelectionCard";
-import { AppColors } from "@/src/constants/colors";
+import { BookingStepper, SpecialistCard } from "@/src/components/bookings";
+import AppLoader from "@/src/components/ui/AppLoader/AppLoader";
+import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
+import AppText from "@/src/components/ui/AppText/AppText";
+import type { AppColors } from "@/src/constants/colors";
+import { spacing } from "@/src/constants/spacing";
+import { useBusinessDetails } from "@/src/features/businesses/hooks/useBusiness";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { router, useLocalSearchParams } from "expo-router";
+import React from "react";
+import { StyleSheet, View } from "react-native";
 
-export default function ChooseServicesScreen() {
+export default function ChooseSpecialistScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
 
-  const [selectedId, setSelectedId] = useState<string>("1");
+  const { businessId, serviceId, serviceName, promotionId, promoCode } =
+    useLocalSearchParams<{
+      businessId?: string;
+      serviceId?: string;
+      serviceName?: string;
+      promotionId?: string;
+      promoCode?: string;
+    }>();
 
-  const services = [
-    {
-      id: "1",
-      title: "Gel Manicure",
-      subtitle: "Long lasting manicure with gel polish",
-      duration: "75 min",
-      price: "$70",
-      imageUrl: "https://picsum.photos/200/200?11",
-    },
-    {
-      id: "2",
-      title: "French Manicure",
-      subtitle: "Classic finish and neat design",
-      duration: "60 min",
-      price: "$25",
-      imageUrl: "https://picsum.photos/200/200?12",
-    },
-  ];
+  const { business, isLoading } = useBusinessDetails(businessId);
+
+  const handleSelectSpecialist = (specialistId: string) => {
+    if (!businessId || !serviceId) return;
+
+    router.push({
+      pathname: "/bookings/choose-date",
+      params: {
+        businessId,
+        serviceId,
+        serviceName,
+        specialistId,
+        promotionId,
+        promoCode,
+      },
+    });
+  };
+
+  if (isLoading) {
+    return <AppLoader />;
+  }
 
   return (
-    <AppScreen style={styles.container}>
+    <AppScreen scroll style={styles.container}>
+      <BookingStepper currentStep={2} />
+
       <View style={styles.header}>
-        <Text style={styles.title}>Choose one or more services</Text>
+        <AppText style={styles.title}>Choose specialist</AppText>
+        <AppText style={styles.subtitle}>
+          Pick a specialist or let the business assign anyone available.
+        </AppText>
       </View>
 
       <View style={styles.list}>
-        {services.map((service) => (
-          <ServiceSelectionCard
-            key={service.id}
-            title={service.title}
-            subtitle={service.subtitle}
-            duration={service.duration}
-            price={service.price}
-            imageUrl={service.imageUrl}
-            isSelected={selectedId === service.id}
-            onPress={() => setSelectedId(service.id)}
+        <SpecialistCard
+          name="Any specialist"
+          role="First available professional"
+          rating={business?.rating ?? 5}
+          reviewsCount={business?.reviewCount ?? 0}
+          description="Recommended if you want the earliest available time."
+          badgeText="Fastest"
+          onPress={() => handleSelectSpecialist("any")}
+        />
+
+        {business?.bookingSpecialists?.map((specialist) => (
+          <SpecialistCard
+            key={specialist.id}
+            name={specialist.name}
+            role={specialist.role}
+            rating={specialist.rating}
+            reviewsCount={specialist.reviewsCount}
+            description={specialist.description}
+            avatarUrl={specialist.avatarUrl}
+            onPress={() => handleSelectSpecialist(specialist.id)}
           />
         ))}
       </View>
-
-      <AppButton title="Next Step" />
     </AppScreen>
   );
 }
@@ -62,20 +87,24 @@ export default function ChooseServicesScreen() {
 function createStyles(colors: AppColors) {
   return StyleSheet.create({
     container: {
-      justifyContent: "space-between",
+      paddingBottom: spacing.xl,
+      gap: spacing.lg,
     },
     header: {
-      marginTop: 10,
+      gap: spacing.xs,
     },
     title: {
-      fontSize: 20,
-      fontWeight: "800",
+      fontSize: 24,
+      fontWeight: "900",
       color: colors.textPrimary,
     },
+    subtitle: {
+      fontSize: 14,
+      lineHeight: 20,
+      color: colors.textSecondary,
+    },
     list: {
-      flex: 1,
-      gap: 12,
-      marginTop: 16,
+      gap: spacing.md,
     },
   });
 }
