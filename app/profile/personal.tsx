@@ -234,7 +234,16 @@ export default function PersonalProfileScreen() {
           ) : (
             <View style={styles.appointmentsList}>
               {upcomingBookings.map((booking) => (
-                <View key={booking.id} style={styles.appointmentCard}>
+                <Pressable
+                  key={booking.id}
+                  style={styles.appointmentCard}
+                  onPress={() =>
+                    router.push({
+                      pathname: "/bookings/[bookingId]",
+                      params: { bookingId: booking.id },
+                    })
+                  }
+                >
                   <View style={styles.appointmentIconBox}>
                     <Ionicons
                       name="calendar-outline"
@@ -256,7 +265,13 @@ export default function PersonalProfileScreen() {
                       {booking.specialistName} · {booking.price}
                     </AppText>
                   </View>
-                </View>
+
+                  <Ionicons
+                    name="chevron-forward"
+                    size={18}
+                    color={colors.textSecondary}
+                  />
+                </Pressable>
               ))}
             </View>
           )}

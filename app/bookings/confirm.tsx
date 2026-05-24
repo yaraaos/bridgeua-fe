@@ -79,6 +79,7 @@ export default function BookingConfirmScreen() {
       price,
     });
 
+    router.dismissAll();
     router.replace("/(tabs)/profile");
   };
   return (
