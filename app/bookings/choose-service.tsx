@@ -88,12 +88,6 @@ export default function ChooseServiceScreen() {
             onPress={() => setSelectedServiceId(service.id)}
           />
         ))}
-
-        {!business?.services.length && (
-          <AppText style={styles.emptyText}>
-            No services are available for booking yet.
-          </AppText>
-        )}
       </View>
 
       <AppButton
