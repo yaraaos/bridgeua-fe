@@ -21,18 +21,20 @@ type BookingAction = {
 };
 
 const BOOKING_ACTIONS: BookingAction[] = [
-  {
-    title: "Pick date and time",
-    subtitle: "Choose a time that works for you",
-    icon: "calendar-outline",
-    pathname: "/bookings/choose-date",
-  },
+  /*
   {
     title: "Choose a professional",
-    subtitle: "Select who you want to book with",
+    subtitle: "Find your preferred specialist",
     icon: "person-outline",
     pathname: "/bookings/choose-specialist",
   },
+  {
+    title: "Pick date and time",
+    subtitle: "See available appointment slots",
+    icon: "calendar-outline",
+    pathname: "/bookings/choose-date",
+  },
+  */
   {
     title: "Select services",
     subtitle: "Choose one or more services",
