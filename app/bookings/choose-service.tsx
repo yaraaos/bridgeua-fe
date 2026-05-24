@@ -3,7 +3,6 @@ import {
   ServiceSelectionCard,
 } from "@/src/components/bookings";
 import AppButton from "@/src/components/ui/AppButton/AppButton";
-import AppLoader from "@/src/components/ui/AppLoader/AppLoader";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
 import AppText from "@/src/components/ui/AppText/AppText";
 import type { AppColors } from "@/src/constants/colors";
@@ -39,7 +38,7 @@ export default function ChooseServiceScreen() {
     promoCode?: string;
   }>();
 
-  const { business, isLoading } = useBusinessDetails(businessId);
+  const { business } = useBusinessDetails(businessId);
   const [selectedServiceId, setSelectedServiceId] = useState<string | null>(
     null,
   );
@@ -66,10 +65,6 @@ export default function ChooseServiceScreen() {
       },
     });
   };
-
-  if (isLoading) {
-    return <AppLoader />;
-  }
 
   return (
     <AppScreen scroll style={styles.container}>

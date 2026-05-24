@@ -1,13 +1,11 @@
 import { BookingStepper } from "@/src/components/bookings";
 import AppDatePickerCard from "@/src/components/ui/AppDatePickerCard/AppDatePickerCard";
-import AppLoader from "@/src/components/ui/AppLoader/AppLoader";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
 import AppText from "@/src/components/ui/AppText/AppText";
 import AppTimeSlot from "@/src/components/ui/AppTimeSlot/AppTimeSlot";
 import type { AppColors } from "@/src/constants/colors";
 import { spacing } from "@/src/constants/spacing";
 import { useAvailability } from "@/src/features/bookings/hooks/useAvailability";
-import { useBusinessDetails } from "@/src/features/businesses/hooks/useBusiness";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useMemo, useState } from "react";
@@ -68,8 +66,6 @@ export default function ChooseDateScreen() {
     promoCode?: string;
   }>();
 
-  const { business, isLoading } = useBusinessDetails(businessId);
-
   const dateOptions = useMemo(() => buildDateOptions(), []);
   const firstAvailableDate = dateOptions.find((option) => !option.disabled);
   const [selectedDate, setSelectedDate] = useState<string>(
@@ -109,10 +105,6 @@ export default function ChooseDateScreen() {
       },
     });
   };
-
-  if (isLoading) {
-    return <AppLoader />;
-  }
 
   return (
     <AppScreen scroll style={styles.container}>

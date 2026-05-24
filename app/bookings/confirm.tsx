@@ -1,6 +1,5 @@
 import { BookingStepper, BookingSummaryCard } from "@/src/components/bookings";
 import AppButton from "@/src/components/ui/AppButton/AppButton";
-import AppLoader from "@/src/components/ui/AppLoader/AppLoader";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
 import AppText from "@/src/components/ui/AppText/AppText";
 import type { AppColors } from "@/src/constants/colors";
@@ -21,7 +20,7 @@ export default function BookingConfirmScreen() {
 
   const { params, canCreateBooking } = useBookingFlow();
 
-  const { business, isLoading } = useBusinessDetails(params.businessId);
+  const { business } = useBusinessDetails(params.businessId);
   const { submitBooking, isCreating, error } = useCreateBooking();
   const addUpcomingBooking = useBookingsStore(
     (state) => state.addUpcomingBooking,
@@ -82,11 +81,6 @@ export default function BookingConfirmScreen() {
 
     router.replace("/(tabs)/profile");
   };
-
-  if (isLoading) {
-    return <AppLoader />;
-  }
-
   return (
     <AppScreen scroll style={styles.container}>
       <BookingStepper currentStep={5} />

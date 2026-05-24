@@ -1,5 +1,4 @@
 import { BookingStepper, SpecialistCard } from "@/src/components/bookings";
-import AppLoader from "@/src/components/ui/AppLoader/AppLoader";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
 import AppText from "@/src/components/ui/AppText/AppText";
 import type { AppColors } from "@/src/constants/colors";
@@ -23,7 +22,7 @@ export default function ChooseSpecialistScreen() {
       promoCode?: string;
     }>();
 
-  const { business, isLoading } = useBusinessDetails(businessId);
+  const { business } = useBusinessDetails(businessId);
 
   const handleSelectSpecialist = (specialistId: string) => {
     if (!businessId || !serviceId) return;
@@ -40,10 +39,6 @@ export default function ChooseSpecialistScreen() {
       },
     });
   };
-
-  if (isLoading) {
-    return <AppLoader />;
-  }
 
   return (
     <AppScreen scroll style={styles.container}>
