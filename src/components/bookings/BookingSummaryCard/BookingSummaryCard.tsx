@@ -13,6 +13,7 @@ type Props = {
   price: string;
   customerName: string;
   phoneNumber: string;
+  status?: "pending" | "confirmed" | "cancelled";
 };
 
 export default function BookingSummaryCard({
@@ -24,6 +25,7 @@ export default function BookingSummaryCard({
   price,
   customerName,
   phoneNumber,
+  status,
 }: Props) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
@@ -31,6 +33,12 @@ export default function BookingSummaryCard({
   return (
     <View style={styles.card}>
       <AppText style={styles.title}>Booking summary</AppText>
+
+      {status && (
+        <View style={styles.statusBadge}>
+          <AppText style={styles.statusText}>{status}</AppText>
+        </View>
+      )}
 
       <View style={styles.rows}>
         <SummaryRow label="Business" value={businessName} />

@@ -261,9 +261,17 @@ export default function PersonalProfileScreen() {
                       {booking.serviceName} · {booking.date} at {booking.time}
                     </AppText>
 
-                    <AppText style={styles.appointmentMeta}>
-                      {booking.specialistName} · {booking.price}
-                    </AppText>
+                    <View style={styles.appointmentMetaRow}>
+                      <AppText style={styles.appointmentMeta}>
+                        {booking.specialistName} · {booking.price}
+                      </AppText>
+
+                      <View style={styles.appointmentStatusBadge}>
+                        <AppText style={styles.appointmentStatusText}>
+                          {booking.status}
+                        </AppText>
+                      </View>
+                    </View>
                   </View>
 
                   <Ionicons
@@ -688,10 +696,28 @@ function createStyles(colors: AppColors) {
       gap: spacing.sm,
     },
     appointmentMeta: {
-      marginTop: 4,
       fontSize: 12,
       fontWeight: "700",
       color: colors.textMuted,
+    },
+    appointmentMetaRow: {
+      marginTop: 4,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      gap: spacing.sm,
+    },
+    appointmentStatusBadge: {
+      paddingHorizontal: spacing.sm,
+      paddingVertical: 3,
+      borderRadius: 999,
+      backgroundColor: colors.primaryGreenSoft,
+    },
+    appointmentStatusText: {
+      fontSize: 11,
+      fontWeight: "800",
+      color: colors.primaryGreen,
+      textTransform: "capitalize",
     },
     sectionHeaderRow: {
       flexDirection: "row",

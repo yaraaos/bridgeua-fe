@@ -49,7 +49,7 @@ export default function BookingConfirmScreen() {
   }, [params.firstName, params.lastName]);
 
   const handleConfirm = async () => {
-    if (!canCreateBooking) return;
+    if (!canCreateBooking || isCreating) return;
 
     const payload: CreateBookingPayload = {
       businessId: params.businessId!,
@@ -102,6 +102,7 @@ export default function BookingConfirmScreen() {
         price={price}
         customerName={customerName || "Customer"}
         phoneNumber={params.phoneNumber ?? "Phone not added"}
+        status="pending"
       />
 
       {!!error && (

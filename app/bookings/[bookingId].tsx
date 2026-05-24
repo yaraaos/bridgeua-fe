@@ -52,6 +52,7 @@ export default function BookingDetailsScreen() {
           price={booking.price}
           customerName={`${booking.customer.firstName} ${booking.customer.lastName}`}
           phoneNumber={booking.customer.phoneNumber}
+          status={booking.status}
         />
       </ScrollView>
     </View>

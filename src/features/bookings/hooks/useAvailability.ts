@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
+
 import { getBookingAvailability } from "../services/booking.service";
+
 import type {
-  BookingAvailabilityParams,
-  BookingTimeSlot,
+    BookingAvailabilityParams,
+    BookingTimeSlot,
 } from "../types/booking.types";
 
 export const useAvailability = (params: BookingAvailabilityParams | null) => {
@@ -10,8 +12,13 @@ export const useAvailability = (params: BookingAvailabilityParams | null) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const businessId = params?.businessId;
+  const serviceId = params?.serviceId;
+  const specialistId = params?.specialistId;
+  const date = params?.date;
+
   useEffect(() => {
-    if (!params) {
+    if (!businessId || !serviceId || !specialistId || !date) {
       setSlots([]);
       return;
     }
@@ -23,7 +30,12 @@ export const useAvailability = (params: BookingAvailabilityParams | null) => {
         setIsLoading(true);
         setError(null);
 
-        const result = await getBookingAvailability(params);
+        const result = await getBookingAvailability({
+          businessId,
+          serviceId,
+          specialistId,
+          date,
+        });
 
         if (isMounted) {
           setSlots(result);
@@ -32,6 +44,7 @@ export const useAvailability = (params: BookingAvailabilityParams | null) => {
         if (isMounted) {
           const message =
             e instanceof Error ? e.message : "Failed to load availability.";
+
           setError(message);
           setSlots([]);
         }
@@ -47,7 +60,7 @@ export const useAvailability = (params: BookingAvailabilityParams | null) => {
     return () => {
       isMounted = false;
     };
-  }, [params?.businessId, params?.serviceId, params?.specialistId, params?.date]);
+  }, [businessId, serviceId, specialistId, date]);
 
   return {
     slots,

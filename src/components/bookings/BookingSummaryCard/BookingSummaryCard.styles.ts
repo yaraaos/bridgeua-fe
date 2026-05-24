@@ -42,5 +42,18 @@ export function createStyles(colors: AppColors) {
       fontWeight: "700",
       color: colors.textPrimary,
     },
+    statusBadge: {
+      alignSelf: "flex-start",
+      paddingHorizontal: spacing.sm,
+      paddingVertical: 4,
+      borderRadius: radius.pill,
+      backgroundColor: colors.primaryGreenSoft,
+    },
+    statusText: {
+      fontSize: 12,
+      fontWeight: "800",
+      color: colors.primaryGreen,
+      textTransform: "capitalize",
+    },
   });
 }
