@@ -151,7 +151,7 @@ export default function PersonalProfileScreen() {
 
               <Pressable
                 style={[styles.heroActionButton, styles.switchButton]}
-                onPress={() => router.push("/profile/switch-account")}
+                onPress={() => router.push("/modal/switch-account")}
               >
                 <Ionicons
                   name="swap-horizontal-outline"
