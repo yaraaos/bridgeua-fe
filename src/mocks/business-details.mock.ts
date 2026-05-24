@@ -226,6 +226,44 @@ export const businessDetailsMock: BusinessDetails[] = [
       },
     ],
 
+    bookingSpecialists: [
+      {
+        id: "specialist-1",
+        name: "Olena",
+        role: "Nail artist",
+        rating: 4.9,
+        reviewsCount: 42,
+        avatarUrl:
+          "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300",
+        description: "Specializes in gel manicures and detailed nail art.",
+      },
+      {
+        id: "specialist-2",
+        name: "Iryna",
+        role: "Hair stylist",
+        rating: 4.8,
+        reviewsCount: 36,
+        avatarUrl:
+          "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300",
+        description: "Best for styling, blow dry, and color consultations.",
+      },
+    ],
+
+    bookingAvailability: [
+      {
+        id: "availability-demo",
+        date: new Date().toISOString().split("T")[0],
+        slots: [
+          { id: "slot-09-00", time: "09:00", isAvailable: true },
+          { id: "slot-10-00", time: "10:00", isAvailable: true },
+          { id: "slot-11-00", time: "11:00", isAvailable: false },
+          { id: "slot-12-30", time: "12:30", isAvailable: true },
+          { id: "slot-14-00", time: "14:00", isAvailable: true },
+          { id: "slot-15-30", time: "15:30", isAvailable: false },
+        ],
+      },
+    ],
+
     // 👇 Preview (no photos here)
     topReviews: [
       {

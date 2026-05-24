@@ -9,6 +9,7 @@ import { spacing } from "@/src/constants/spacing";
 import { getMyReviews } from "@/src/features/reviews/services/review.service";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { businessesMock } from "@/src/mocks/businesses.mock";
+import { useBookingsStore } from "@/src/store/bookings.store";
 import { useFollowingStore } from "@/src/store/following.store";
 import { useProfileStore } from "@/src/store/profile.store";
 import type {
@@ -40,6 +41,7 @@ export default function PersonalProfileScreen() {
     setRefreshing(false);
   };
   const profile = useProfileStore((state) => state.profile);
+  const upcomingBookings = useBookingsStore((state) => state.upcomingBookings);
 
   const [myReviews, setMyReviews] = useState<PersonalProfileReview[]>([]);
   const scrollViewRef = useRef<ScrollView | null>(null);
@@ -209,25 +211,78 @@ export default function PersonalProfileScreen() {
             <AppText style={styles.sectionTitle}>Upcoming appointments</AppText>
           </View>
 
-          <View style={styles.appointmentCard}>
-            <View style={styles.appointmentIconBox}>
-              <Ionicons
-                name="calendar-outline"
-                size={20}
-                color={colors.primaryGreen}
-              />
-            </View>
+          {upcomingBookings.length === 0 ? (
+            <View style={styles.appointmentCard}>
+              <View style={styles.appointmentIconBox}>
+                <Ionicons
+                  name="calendar-outline"
+                  size={20}
+                  color={colors.primaryGreen}
+                />
+              </View>
 
-            <View style={styles.appointmentTextWrap}>
-              <AppText style={styles.appointmentTitle}>
-                No upcoming appointments
-              </AppText>
+              <View style={styles.appointmentTextWrap}>
+                <AppText style={styles.appointmentTitle}>
+                  No upcoming appointments
+                </AppText>
 
-              <AppText style={styles.appointmentDescription}>
-                Appointments booked through BridgeUA will appear here.
-              </AppText>
+                <AppText style={styles.appointmentDescription}>
+                  Appointments booked through BridgeUA will appear here.
+                </AppText>
+              </View>
             </View>
-          </View>
+          ) : (
+            <View style={styles.appointmentsList}>
+              {upcomingBookings.map((booking) => (
+                <Pressable
+                  key={booking.id}
+                  style={styles.appointmentCard}
+                  onPress={() =>
+                    router.push({
+                      pathname: "/bookings/[bookingId]",
+                      params: { bookingId: booking.id },
+                    })
+                  }
+                >
+                  <View style={styles.appointmentIconBox}>
+                    <Ionicons
+                      name="calendar-outline"
+                      size={20}
+                      color={colors.primaryGreen}
+                    />
+                  </View>
+
+                  <View style={styles.appointmentTextWrap}>
+                    <AppText style={styles.appointmentTitle} numberOfLines={1}>
+                      {booking.businessName}
+                    </AppText>
+
+                    <AppText style={styles.appointmentDescription}>
+                      {booking.serviceName} · {booking.date} at {booking.time}
+                    </AppText>
+
+                    <View style={styles.appointmentMetaRow}>
+                      <AppText style={styles.appointmentMeta}>
+                        {booking.specialistName} · {booking.price}
+                      </AppText>
+
+                      <View style={styles.appointmentStatusBadge}>
+                        <AppText style={styles.appointmentStatusText}>
+                          {booking.status}
+                        </AppText>
+                      </View>
+                    </View>
+                  </View>
+
+                  <Ionicons
+                    name="chevron-forward"
+                    size={18}
+                    color={colors.textSecondary}
+                  />
+                </Pressable>
+              ))}
+            </View>
+          )}
         </View>
 
         <View style={styles.sectionHeaderRow}>
@@ -636,6 +691,33 @@ function createStyles(colors: AppColors) {
       fontSize: 13,
       lineHeight: 18,
       color: colors.textSecondary,
+    },
+    appointmentsList: {
+      gap: spacing.sm,
+    },
+    appointmentMeta: {
+      fontSize: 12,
+      fontWeight: "700",
+      color: colors.textMuted,
+    },
+    appointmentMetaRow: {
+      marginTop: 4,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      gap: spacing.sm,
+    },
+    appointmentStatusBadge: {
+      paddingHorizontal: spacing.sm,
+      paddingVertical: 3,
+      borderRadius: 999,
+      backgroundColor: colors.primaryGreenSoft,
+    },
+    appointmentStatusText: {
+      fontSize: 11,
+      fontWeight: "800",
+      color: colors.primaryGreen,
+      textTransform: "capitalize",
     },
     sectionHeaderRow: {
       flexDirection: "row",
