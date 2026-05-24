@@ -81,19 +81,19 @@ export default function MapScreen() {
     setPermissionStatus,
   } = useDiscoveryLocationStore();
 
-  const { sort, cuisines, rating, distance, customDistance } = useFilterStore(
-    (state) => state.discoveryFilters,
-  );
+  const { category, sort, cuisines, rating, distance, customDistance } =
+    useFilterStore((state) => state.discoveryFilters);
 
   const activeFilterCount = useMemo(() => {
     let count = 0;
+    if (category) count += 1;
     if (sort && sort !== "relevance") count += 1;
     if (cuisines.length > 0) count += cuisines.length;
     if (rating) count += 1;
     if (distance) count += 1;
     if (distance === "custom" && customDistance) count += 1;
     return count;
-  }, [sort, cuisines, rating, distance, customDistance]);
+  }, [category, sort, cuisines, rating, distance, customDistance]);
 
   const followedBusinessIds = useFollowingStore(
     (state) => state.followedBusinessIds,
@@ -102,6 +102,7 @@ export default function MapScreen() {
 
   const { filteredBusinesses } = useDiscoveryFeed({
     businesses,
+    category,
     sort,
     cuisines,
     rating,
@@ -168,28 +169,23 @@ export default function MapScreen() {
     });
   };
 
-  const selectedCategory =
-    cuisines.length === 0
-      ? "All Categories"
-      : cuisines[0] === "Automotive"
-        ? "Auto"
-        : cuisines[0];
+  const selectedCategory = !category
+    ? "All Categories"
+    : category === "Automotive"
+      ? "Auto"
+      : category;
 
-  const handleSelectCategory = (category: string) => {
+  const handleSelectCategory = (selectedCategoryLabel: string) => {
     setSelectedBusinessId(null);
 
-    if (category === "All Categories") {
-      useFilterStore.setState((state) => ({
-        discoveryFilters: { ...state.discoveryFilters, cuisines: [] },
-      }));
-      return;
-    }
+    const mappedCategory =
+      selectedCategoryLabel === "All Categories"
+        ? ""
+        : selectedCategoryLabel === "Auto"
+          ? "Automotive"
+          : selectedCategoryLabel;
 
-    const mapped = category === "Auto" ? "Automotive" : category;
-
-    useFilterStore.setState((state) => ({
-      discoveryFilters: { ...state.discoveryFilters, cuisines: [mapped] },
-    }));
+    useFilterStore.getState().setCategory("discovery", mappedCategory);
   };
 
   const handleMarkerPress = (business: Business) => {
