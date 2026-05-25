@@ -6,6 +6,7 @@ import AppAvatar from "@/src/components/ui/AppAvatar";
 import AppText from "@/src/components/ui/AppText/AppText";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { useAccountStore, type AccountSummary } from "@/src/store/account.store";
+import { useNotificationsStore } from "@/src/store/notifications.store";
 
 import { createStyles } from "./AccountSwitcherSheet.styles";
 
@@ -29,6 +30,7 @@ export default function AccountSwitcherSheet({
 
   const handleSelect = (account: AccountSummary) => {
     setActiveAccountId(account.id);
+    useNotificationsStore.getState().setActiveAccountType(account.kind);
     onSelectAccount?.(account);
     onClose();
   };
