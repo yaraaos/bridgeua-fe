@@ -45,13 +45,13 @@ export default function FollowingScreen() {
     });
   };
 
-  const { sort, cuisines, rating, distance, customDistance } = useFilterStore(
-    (state) => state.followingFilters,
-  );
+  const { category, sort, cuisines, rating, distance, customDistance } =
+    useFilterStore((state) => state.followingFilters);
 
   const activeFilterCount = useMemo(() => {
     let count = 0;
 
+    if (category) count += 1;
     if (sort && sort !== "relevance") count += 1;
     if (cuisines.length > 0) count += cuisines.length;
     if (rating) count += 1;
@@ -59,7 +59,7 @@ export default function FollowingScreen() {
     if (distance === "custom" && customDistance) count += 1;
 
     return count;
-  }, [sort, cuisines, rating, distance, customDistance]);
+  }, [category, sort, cuisines, rating, distance, customDistance]);
 
   const handleRequestNearby = () => {
     Alert.alert(
