@@ -9,6 +9,11 @@ export function createStyles(colors: AppColors) {
       marginTop: spacing.md,
       marginBottom: spacing.xxl,
     },
+
+    containerWithoutExtras: {
+      marginTop: 0,
+    },
+
     writeCard: {
       marginHorizontal: spacing.lg,
       padding: spacing.lg,
@@ -84,6 +89,9 @@ export function createStyles(colors: AppColors) {
       backgroundColor: colors.surface,
       borderWidth: 1,
       borderColor: colors.border,
+    },
+    emptyStateWrap: {
+      paddingTop: spacing.xxl,
     },
     emptyTitle: {
       fontSize: 16,
