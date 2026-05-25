@@ -4,6 +4,7 @@ import type {
   RatingOption,
   SortOption,
 } from "@/src/store/filter.store";
+import { useMemo } from "react";
 
 const distanceMap: Record<DistanceOption, number | null> = {
   "": null,
@@ -40,59 +41,68 @@ export function useDiscoveryFeed({
   const selectedRatingValue =
     rating && rating !== "custom" ? Number(rating) : null;
 
-  const sortBusinesses = (a: Business, b: Business) => {
-    if (sort === "distance") {
-      return Number(a.distanceKm ?? 0) - Number(b.distanceKm ?? 0);
-    }
+  const filteredBusinesses = useMemo(() => {
+    const compareBusinesses = (a: Business, b: Business) => {
+      if (sort === "distance") {
+        return Number(a.distanceKm ?? 0) - Number(b.distanceKm ?? 0);
+      }
 
-    if (sort === "rating") {
-      return Number(b.rating ?? 0) - Number(a.rating ?? 0);
-    }
+      if (sort === "rating") {
+        return Number(b.rating ?? 0) - Number(a.rating ?? 0);
+      }
 
-    if (sort === "price_low") {
-      return Number(a.priceLevel ?? 0) - Number(b.priceLevel ?? 0);
-    }
+      if (sort === "price_low") {
+        return Number(a.priceLevel ?? 0) - Number(b.priceLevel ?? 0);
+      }
 
-    if (sort === "price_high") {
-      return Number(b.priceLevel ?? 0) - Number(a.priceLevel ?? 0);
-    }
+      if (sort === "price_high") {
+        return Number(b.priceLevel ?? 0) - Number(a.priceLevel ?? 0);
+      }
 
-    return 0;
-  };
+      return 0;
+    };
 
-  const filteredBusinesses = [...businesses]
-    .filter((business) => {
-      const businessCategory = String(business.category ?? "").trim();
-      const businessRating = Number(business.rating ?? 0);
-      const businessDistance = Number(business.distanceKm ?? 0);
+    return [...businesses]
+      .filter((business) => {
+        const businessCategory = String(business.category ?? "").trim();
+        const businessRating = Number(business.rating ?? 0);
+        const businessDistance = Number(business.distanceKm ?? 0);
 
-      const categoryMatch =
-        !category ||
-        (category === "Food"
-          ? cuisines.length > 0
-            ? cuisines.includes(businessCategory)
-            : [
-                "American",
-                "Chinese",
-                "Italian",
-                "Japanese",
-                "Mediterranean",
-                "Mexican",
-                "Vegan",
-              ].includes(businessCategory)
-          : businessCategory === category);
+        const categoryMatch =
+          !category ||
+          (category === "Food"
+            ? cuisines.length > 0
+              ? cuisines.includes(businessCategory)
+              : [
+                  "American",
+                  "Chinese",
+                  "Italian",
+                  "Japanese",
+                  "Mediterranean",
+                  "Mexican",
+                  "Vegan",
+                ].includes(businessCategory)
+            : businessCategory === category);
 
-      const ratingMatch =
-        selectedRatingValue === null || businessRating >= selectedRatingValue;
+        const ratingMatch =
+          selectedRatingValue === null || businessRating >= selectedRatingValue;
 
-      const distanceMatch =
-        selectedDistanceKm === null ||
-        Number.isNaN(selectedDistanceKm) ||
-        businessDistance <= selectedDistanceKm;
+        const distanceMatch =
+          selectedDistanceKm === null ||
+          Number.isNaN(selectedDistanceKm) ||
+          businessDistance <= selectedDistanceKm;
 
-      return categoryMatch && ratingMatch && distanceMatch;
-    })
-    .sort(sortBusinesses);
+        return categoryMatch && ratingMatch && distanceMatch;
+      })
+      .sort(compareBusinesses);
+  }, [
+    businesses,
+    category,
+    cuisines,
+    selectedRatingValue,
+    selectedDistanceKm,
+    sort,
+  ]);
 
   return {
     filteredBusinesses,

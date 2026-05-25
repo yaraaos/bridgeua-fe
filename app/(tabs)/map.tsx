@@ -110,6 +110,42 @@ export default function MapScreen() {
     customDistance,
   });
 
+  const markerKeyPrefix = useMemo(
+    () =>
+      [
+        category,
+        sort,
+        cuisines.join(","),
+        rating,
+        distance,
+        customDistance,
+      ].join("|"),
+    [category, sort, cuisines, rating, distance, customDistance],
+  );
+
+  const mappableBusinesses = useMemo(() => {
+    const seen = new Set<string>();
+    const result: Business[] = [];
+
+    for (const business of filteredBusinesses) {
+      if (!business?.id) continue;
+
+      const key = String(business.id);
+      if (seen.has(key)) continue;
+
+      const lat = business.coordinates?.latitude;
+      const lng = business.coordinates?.longitude;
+
+      if (typeof lat !== "number" || !Number.isFinite(lat)) continue;
+      if (typeof lng !== "number" || !Number.isFinite(lng)) continue;
+
+      seen.add(key);
+      result.push(business);
+    }
+
+    return result;
+  }, [filteredBusinesses]);
+
   const initialRegion: Region = useMemo(() => {
     if (typeof locationLatitude === "number" && typeof locationLongitude === "number") {
       return {
@@ -128,9 +164,42 @@ export default function MapScreen() {
   );
 
   const selectedBusiness: Business | undefined = useMemo(
-    () => filteredBusinesses.find((business) => business.id === selectedBusinessId),
-    [filteredBusinesses, selectedBusinessId],
+    () => mappableBusinesses.find((business) => business.id === selectedBusinessId),
+    [mappableBusinesses, selectedBusinessId],
   );
+
+  useEffect(() => {
+    if (selectedBusinessId && !selectedBusiness) {
+      setSelectedBusinessId(null);
+    }
+  }, [selectedBusinessId, selectedBusiness]);
+
+  useEffect(() => {
+    if (!mapRef.current) return;
+    if (mappableBusinesses.length === 0) return;
+
+    if (mappableBusinesses.length === 1) {
+      const only = mappableBusinesses[0].coordinates;
+      mapRef.current.animateToRegion(
+        {
+          latitude: only.latitude,
+          longitude: only.longitude,
+          latitudeDelta: 0.05,
+          longitudeDelta: 0.05,
+        },
+        300,
+      );
+      return;
+    }
+
+    mapRef.current.fitToCoordinates(
+      mappableBusinesses.map((business) => business.coordinates),
+      {
+        edgePadding: { top: 140, right: 56, bottom: 220, left: 56 },
+        animated: true,
+      },
+    );
+  }, [mappableBusinesses]);
 
   const handleSelectLocationOption = (option: LocationOption) => {
     setManualLocation({ label: option.label, value: option.value });
@@ -244,16 +313,14 @@ export default function MapScreen() {
             showsMyLocationButton={false}
             onPress={() => setSelectedBusinessId(null)}
           >
-            {filteredBusinesses.filter(
-              (b) => b.coordinates?.latitude != null && b.coordinates?.longitude != null
-            ).map((business) => {
+            {mappableBusinesses.map((business) => {
               const isFollowed = followedBusinessIds.includes(
                 String(business.id),
               );
 
               return (
                 <BusinessMarker
-                  key={business.id}
+                  key={`${markerKeyPrefix}-${String(business.id)}`}
                   business={business}
                   isFollowed={isFollowed}
                   onPress={(event) => {
