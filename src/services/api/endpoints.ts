@@ -25,6 +25,9 @@ export const ENDPOINTS = {
   BUSINESS_PHOTOS: (id: string) => `/api/businesses/${id}/photos`,
   BUSINESS_PHOTO_BY_ID: (id: string, photoId: string) =>
     `/api/businesses/${id}/photos/${photoId}`,
+  BUSINESS_REVIEWS: (id: string) => `/api/businesses/${id}/reviews`,
+  REVIEW_BY_ID: (businessId: string, reviewId: string) =>
+    `/api/businesses/${businessId}/reviews/${reviewId}`,
 
   // Bookings
   BOOKINGS: "/api/bookings",

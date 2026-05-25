@@ -45,6 +45,7 @@ export type SubmitReviewPayload = {
 
 export type UpdateReviewPayload = {
   reviewId: string;
+  businessId?: string;
   rating: number;
   text: string;
   tags?: string[];
