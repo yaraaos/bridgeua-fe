@@ -126,7 +126,7 @@ export function createStyles(colors: AppColors) {
     interactionButton: {
       flexDirection: "row",
       alignItems: "center",
-      gap: 6,
+      gap: spacing.cardGap,
     },
 
     interactionText: {

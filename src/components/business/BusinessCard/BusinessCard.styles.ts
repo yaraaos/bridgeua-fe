@@ -1,5 +1,6 @@
 import { AppColors } from "@/src/constants/colors";
 import { radius } from "@/src/constants/radius";
+import { spacing } from "@/src/constants/spacing";
 import { StyleSheet } from "react-native";
 
 export function createStyles(colors: AppColors) {
@@ -12,7 +13,7 @@ export function createStyles(colors: AppColors) {
       borderColor: colors.border,
       padding: 10,
       gap: 12,
-      marginBottom: 6,
+      marginBottom: spacing.cardGap,
       minHeight: 96,
     },
     cardCompact: {

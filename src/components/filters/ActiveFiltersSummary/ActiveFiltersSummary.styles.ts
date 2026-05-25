@@ -1,3 +1,4 @@
+import { spacing } from "@/src/constants/spacing";
 import { StyleSheet } from "react-native";
 
 import type { AppColors } from "@/src/constants/colors";
@@ -33,7 +34,7 @@ export function createStyles(colors: AppColors) {
       backgroundColor: colors.background,
       flexDirection: "row",
       alignItems: "center",
-      gap: 6,
+      gap: spacing.cardGap,
     },
     chipText: {
       fontSize: 13,

@@ -1,4 +1,5 @@
 import type { AppColors } from "@/src/constants/colors";
+import { spacing } from "@/src/constants/spacing";
 import { StyleSheet } from "react-native";
 
 export function createStyles(colors: AppColors) {
@@ -51,7 +52,7 @@ export function createStyles(colors: AppColors) {
     businessRow: {
       flexDirection: "row",
       alignItems: "center",
-      gap: 6,
+      gap: spacing.cardGap,
     },
 
     businessText: {
