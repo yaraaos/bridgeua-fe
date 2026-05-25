@@ -167,7 +167,7 @@ export default function PersonalProfileScreen() {
                         }
 
                         if (stat.id === "bookings") {
-                          router.push({ pathname: "/bookings/index" });
+                          router.push("/bookings");
                           return;
                         }
                       }}
@@ -237,9 +237,7 @@ export default function PersonalProfileScreen() {
           <View style={styles.sectionHeaderRow}>
             <AppText style={styles.sectionTitle}>Upcoming appointments</AppText>
 
-            <Pressable
-              onPress={() => router.push({ pathname: "/bookings/index" })}
-            >
+            <Pressable onPress={() => router.push("/bookings")}>
               <AppText style={styles.seeAllText}>See all</AppText>
             </Pressable>
           </View>
