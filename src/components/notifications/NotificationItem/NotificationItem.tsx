@@ -33,7 +33,13 @@ const NOTIFICATION_ICON_MAP: Record<
 
 function formatNotificationTime(createdAt: string) {
   const createdTime = new Date(createdAt).getTime();
-  const diffMs = Date.now() - createdTime;
+
+  if (Number.isNaN(createdTime)) {
+    return "";
+  }
+
+  const diffMs = Math.max(0, Date.now() - createdTime);
+
   const diffMinutes = Math.floor(diffMs / (60 * 1000));
   const diffHours = Math.floor(diffMs / (60 * 60 * 1000));
   const diffDays = Math.floor(diffMs / (24 * 60 * 60 * 1000));
@@ -43,7 +49,14 @@ function formatNotificationTime(createdAt: string) {
   if (diffHours < 24) return `${diffHours}h`;
   if (diffDays < 7) return `${diffDays}d`;
 
-  return new Date(createdAt).toLocaleDateString();
+  const diffWeeks = Math.floor(diffDays / 7);
+  if (diffWeeks < 4) return `${diffWeeks}w`;
+
+  const diffMonths = Math.floor(diffDays / 30);
+  if (diffMonths < 12) return `${diffMonths}m`;
+
+  const diffYears = Math.floor(diffDays / 365);
+  return `${diffYears}y`;
 }
 
 export default function NotificationItem({ item, onPress }: Props) {
