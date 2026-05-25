@@ -21,7 +21,7 @@ export function createStyles(colors: AppColors) {
     leftBlock: {
       flex: 1,
       paddingTop: 8,
-      gap: 6,
+      gap: spacing.cardGap,
     },
     subtitleLabel: {
       fontSize: 12,
@@ -55,12 +55,12 @@ export function createStyles(colors: AppColors) {
     searchRow: {
       flexDirection: "row",
       alignItems: "center",
-      gap: 6,
+      gap: spacing.cardGap,
     },
     bottomSlotRow: {
       flexDirection: "row",
       alignItems: "center",
-      gap: 6,
+      gap: spacing.cardGap,
       marginTop: 15,
       backgroundColor: "transparent",
     },
@@ -83,7 +83,7 @@ export function createStyles(colors: AppColors) {
       color: colors.textPrimary,
     },
     profileHeaderInner: {
-      minHeight: 132,
+      minHeight: 156,
     },
 
     profileHeaderRow: {
@@ -181,7 +181,7 @@ export function createStyles(colors: AppColors) {
       marginTop: 4,
       flexDirection: "row",
       alignItems: "center",
-      gap: 6,
+      gap: spacing.cardGap,
       maxWidth: "100%",
     },
 
@@ -204,7 +204,7 @@ export function createStyles(colors: AppColors) {
       marginTop: 4,
       flexDirection: "row",
       alignItems: "center",
-      gap: 6,
+      gap: spacing.cardGap,
     },
 
     businessStatusSeparator: {

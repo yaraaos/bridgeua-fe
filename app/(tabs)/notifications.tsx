@@ -78,9 +78,7 @@ export default function NotificationsScreen() {
   const activeAccount = useActiveAccount();
 
   useEffect(() => {
-    useNotificationsStore
-      .getState()
-      .setActiveAccountType(activeAccount.kind);
+    useNotificationsStore.getState().setActiveAccountType(activeAccount.kind);
   }, [activeAccount.kind]);
 
   const [activeTab, setActiveTab] = useState<NotificationTab>("all");
@@ -295,7 +293,8 @@ function createStyles(colors: AppColors) {
       letterSpacing: 0.4,
     },
     itemWrap: {
-      marginBottom: spacing.sm,
+      marginBottom: 6,
     },
   });
 }
+

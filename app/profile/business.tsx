@@ -1,9 +1,9 @@
 // app/profile/business.tsx
 
-import React from "react";
-import { Image, Pressable, ScrollView, StyleSheet, View } from "react-native";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
+import React from "react";
+import { Image, Pressable, ScrollView, StyleSheet, View } from "react-native";
 
 import ScreenHeader from "@/src/components/common/ScreenHeader/ScreenHeader";
 import BusinessDashboardStats from "@/src/components/profile/BusinessDashboardStats/BusinessDashboardStats";
@@ -143,7 +143,7 @@ export default function BusinessProfileScreen() {
                 <Ionicons
                   name="create-outline"
                   size={16}
-                  color={colors.primaryGreen}
+                  color={colors.textMuted}
                 />
                 <AppText style={styles.editButtonText}>Edit profile</AppText>
               </Pressable>
@@ -345,7 +345,8 @@ export default function BusinessProfileScreen() {
                     );
                   })}
                   <AppText style={styles.reviewAgo}>
-                    {" "}· {featuredReview.postedAgo}
+                    {" "}
+                    · {featuredReview.postedAgo}
                   </AppText>
                 </View>
               </View>
@@ -494,9 +495,9 @@ function createStyles(colors: AppColors) {
       gap: 6,
     },
     editButton: {
-      backgroundColor: colors.primaryGreenSoft,
+      backgroundColor: colors.surface,
       borderWidth: 1,
-      borderColor: colors.primaryGreenSoft,
+      borderColor: colors.border,
     },
     switchButton: {
       backgroundColor: colors.surface,
@@ -506,7 +507,7 @@ function createStyles(colors: AppColors) {
     editButtonText: {
       fontSize: 12,
       fontWeight: "700",
-      color: colors.primaryGreen,
+      color: colors.textMuted,
     },
     switchButtonText: {
       fontSize: 12,
@@ -613,7 +614,7 @@ function createStyles(colors: AppColors) {
     },
 
     bookingsList: {
-      gap: spacing.sm,
+      gap: 6,
     },
     bookingRow: {
       flexDirection: "row",

@@ -168,7 +168,8 @@ export default function BusinessDetailsScreen() {
     }).start();
   }, [activeTab, contentOpacity]);
 
-  const stickyIndex = activeTab === "photos" ? 0 : 1;
+  const shouldShowHeroGallery = activeTab === "overview";
+  const stickyIndex = shouldShowHeroGallery ? 1 : 0;
 
   const handleChangeTab = (nextTab: BusinessDetailsTab) => {
     scrollViewRef.current?.scrollTo({ y: 0, animated: false });
@@ -266,7 +267,7 @@ export default function BusinessDetailsScreen() {
         )}
         scrollEventThrottle={16}
       >
-        {activeTab !== "photos" ? (
+        {shouldShowHeroGallery ? (
           <View style={styles.galleryCollapseWrap}>
             <BusinessHeroGallery
               images={heroPhotos}

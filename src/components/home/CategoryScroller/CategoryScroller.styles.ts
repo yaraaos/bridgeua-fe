@@ -14,12 +14,11 @@ export function createStyles(colors: AppColors) {
       backgroundColor: "transparent",
     },
     content: {
-      paddingLeft: 12,
-      paddingRight: 12,
       gap: 8,
     },
     contentOverlay: {
-      paddingHorizontal: 0,
+      paddingLeft: 12,
+      paddingRight: 12,
     },
     chip: {
       minHeight: 32,

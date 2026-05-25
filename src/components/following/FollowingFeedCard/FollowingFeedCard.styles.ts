@@ -1,4 +1,5 @@
 import { AppColors } from "@/src/constants/colors";
+import { spacing } from "@/src/constants/spacing";
 import { StyleSheet } from "react-native";
 
 export function createStyles(colors: AppColors) {
@@ -9,7 +10,7 @@ export function createStyles(colors: AppColors) {
       borderWidth: 1,
       borderColor: colors.border,
       padding: 14,
-      marginBottom: 6,
+      marginBottom: spacing.cardGap,
     },
 
     feedHeader: {

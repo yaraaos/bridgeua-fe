@@ -8,7 +8,7 @@ const SCREEN_HEIGHT = Dimensions.get("window").height;
 export function createStyles(colors: AppColors) {
   return StyleSheet.create({
     container: {
-      marginTop: spacing.md,
+      marginTop: 0,
       paddingHorizontal: spacing.lg,
       paddingBottom: spacing.xxl,
     },

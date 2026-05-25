@@ -112,7 +112,7 @@ function createStyles(colors: AppColors) {
       flex: 1,
     },
     list: {
-      gap: spacing.md,
+      gap: spacing.cardGap,
       paddingBottom: spacing.md,
     },
     footer: {
