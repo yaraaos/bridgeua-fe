@@ -12,7 +12,7 @@ import {
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import type { PersonalProfileReview } from "@/src/types/profile";
 import { MaterialIcons } from "@expo/vector-icons";
-import { useFocusEffect } from "expo-router";
+import { router, useFocusEffect } from "expo-router";
 import { useCallback, useRef, useState } from "react";
 import {
   Alert,
@@ -214,6 +214,7 @@ export default function ProfileReviewsScreen() {
       <ScreenHeader
         title="My Reviews"
         titleSubtitle="Reviews you have written"
+        onBack={() => router.back()}
         gradientColors={DISCOVERY_GRADIENT}
       />
 

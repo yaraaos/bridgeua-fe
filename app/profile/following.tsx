@@ -141,6 +141,7 @@ export default function ProfileFollowingScreen() {
       <ScreenHeader
         title="Following"
         titleSubtitle="Businesses you follow"
+        onBack={() => router.back()}
         showSearch
         searchValue={search}
         onSearchChangeText={setSearch}
