@@ -684,7 +684,7 @@ function createStyles(colors: AppColors) {
       color: colors.textSecondary,
     },
     appointmentsList: {
-      gap: spacing.sm,
+      gap: 6,
     },
     appointmentMeta: {
       fontSize: 12,

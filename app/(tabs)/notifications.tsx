@@ -297,3 +297,4 @@ function createStyles(colors: AppColors) {
     },
   });
 }
+
