@@ -40,7 +40,7 @@ export default function ProfileFollowingScreen() {
 
   useEffect(() => {
     setVisibleBusinessIds(followedBusinessIds.map(String));
-  }, []);
+  }, [followedBusinessIds]);
 
   const followedBusinesses = useMemo(() => {
     const normalizedSearch = search.trim().toLowerCase();
