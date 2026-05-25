@@ -94,6 +94,8 @@ export default function BusinessReviewsList({
       ]
     : sortedReviews;
 
+  const hasReviews = displayedReviews.length > 0;
+
   const handleExpandReview = (reviewId: string) => {
     const reviewOffsetY = reviewOffsets.current[reviewId];
 
@@ -117,7 +119,14 @@ export default function BusinessReviewsList({
   };
 
   return (
-    <View style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        !hasReviews &&
+          reviewPhotos.length === 0 &&
+          styles.containerWithoutExtras,
+      ]}
+    >
       <View style={styles.writeCard}>
         <Text style={styles.writeTitle}>Write a review</Text>
 
@@ -150,7 +159,6 @@ export default function BusinessReviewsList({
           onPress={() => onPressWriteReview?.()}
         />
       </View>
-
       {reviewPhotos.length > 0 ? (
         <View style={styles.photosSection}>
           <View style={styles.sectionHeader}>
@@ -174,30 +182,33 @@ export default function BusinessReviewsList({
           </ScrollView>
         </View>
       ) : null}
-
-      <ReviewFilters
-        value={activeFilter}
-        onChange={(nextFilter) => {
-          setActiveFilter(nextFilter);
-          onClearFocusedReview?.();
-        }}
-      />
-
-      <View
-        style={styles.listHeader}
-        onLayout={(event) => {
-          onReviewsListLayout?.(event.nativeEvent.layout.y);
-        }}
-      >
-        <Text style={styles.sectionTitle}>All reviews</Text>
-        <Text style={styles.reviewCount}>{reviewCount} total</Text>
-      </View>
-
-      {displayedReviews.length === 0 ? (
-        <AppEmptyState
-          title="No reviews yet"
-          description="Be the first to share your experience."
+      {hasReviews ? (
+        <ReviewFilters
+          value={activeFilter}
+          onChange={(nextFilter) => {
+            setActiveFilter(nextFilter);
+            onClearFocusedReview?.();
+          }}
         />
+      ) : null}
+      {hasReviews ? (
+        <View
+          style={styles.listHeader}
+          onLayout={(event) => {
+            onReviewsListLayout?.(event.nativeEvent.layout.y);
+          }}
+        >
+          <Text style={styles.sectionTitle}>All reviews</Text>
+          <Text style={styles.reviewCount}>{reviewCount} total</Text>
+        </View>
+      ) : null}
+      {displayedReviews.length === 0 ? (
+        <View style={styles.emptyStateWrap}>
+          <AppEmptyState
+            title="No reviews yet"
+            description="Be the first to share your experience."
+          />
+        </View>
       ) : (
         <View style={styles.list}>
           {displayedReviews.map((review, index) => (

@@ -1,3 +1,11 @@
+export type BookingStatus =
+  | "pending"
+  | "confirmed"
+  | "active"
+  | "completed"
+  | "past"
+  | "cancelled";
+
 export type CreateBookingPayload = {
   businessId: string;
   serviceId: string;
@@ -29,6 +37,6 @@ export type BookingAvailabilityParams = {
 
 export type Booking = CreateBookingPayload & {
   id: string;
-  status: "pending" | "confirmed" | "cancelled";
+  status: BookingStatus;
   createdAt: string;
 };

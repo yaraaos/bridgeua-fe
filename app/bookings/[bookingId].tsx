@@ -15,7 +15,7 @@ export default function BookingDetailsScreen() {
   const { bookingId } = useLocalSearchParams<{ bookingId?: string }>();
 
   const booking = useBookingsStore((state) =>
-    state.upcomingBookings.find((item) => item.id === bookingId),
+    state.bookings.find((item) => item.id === bookingId),
   );
 
   if (!booking) {
