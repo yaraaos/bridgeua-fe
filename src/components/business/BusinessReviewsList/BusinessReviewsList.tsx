@@ -11,7 +11,7 @@ import type {
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { Image, Pressable, ScrollView, Text, View } from "react-native";
 import { createStyles } from "./BusinessReviewsList.styles";
 
@@ -23,6 +23,7 @@ type Props = {
   focusedReviewId?: string | null;
   onClearFocusedReview?: () => void;
   onReviewsListLayout?: (y: number) => void;
+  onExpandReview?: (reviewOffsetY: number) => void;
 };
 
 function getReviewRelevanceScore(review: BusinessDetailsReview) {
@@ -49,12 +50,15 @@ export default function BusinessReviewsList({
   onClearFocusedReview,
   onPressWriteReview,
   onReviewsListLayout,
+  onExpandReview,
 }: Props) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
 
   const [activeFilter, setActiveFilter] =
     useState<ReviewFilterOption>("Most relevant");
+
+  const reviewOffsets = useRef<Record<string, number>>({});
 
   const sortedReviews = [...reviews].sort((a, b) => {
     if (activeFilter === "Most relevant") {
@@ -90,6 +94,18 @@ export default function BusinessReviewsList({
       ]
     : sortedReviews;
 
+  const hasReviews = displayedReviews.length > 0;
+
+  const handleExpandReview = (reviewId: string) => {
+    const reviewOffsetY = reviewOffsets.current[reviewId];
+
+    if (typeof reviewOffsetY !== "number") {
+      return;
+    }
+
+    onExpandReview?.(reviewOffsetY);
+  };
+
   const openReviewPhotoViewer = (index: number) => {
     router.push({
       pathname: "/modal/image-viewer",
@@ -103,7 +119,14 @@ export default function BusinessReviewsList({
   };
 
   return (
-    <View style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        !hasReviews &&
+          reviewPhotos.length === 0 &&
+          styles.containerWithoutExtras,
+      ]}
+    >
       <View style={styles.writeCard}>
         <Text style={styles.writeTitle}>Write a review</Text>
 
@@ -136,7 +159,6 @@ export default function BusinessReviewsList({
           onPress={() => onPressWriteReview?.()}
         />
       </View>
-
       {reviewPhotos.length > 0 ? (
         <View style={styles.photosSection}>
           <View style={styles.sectionHeader}>
@@ -160,48 +182,53 @@ export default function BusinessReviewsList({
           </ScrollView>
         </View>
       ) : null}
-
-      <ReviewFilters
-        value={activeFilter}
-        onChange={(nextFilter) => {
-          setActiveFilter(nextFilter);
-          onClearFocusedReview?.();
-        }}
-      />
-
-      <View
-        style={styles.listHeader}
-        onLayout={(event) => {
-          onReviewsListLayout?.(event.nativeEvent.layout.y);
-        }}
-      >
-        <Text style={styles.sectionTitle}>All reviews</Text>
-        <Text style={styles.reviewCount}>{reviewCount} total</Text>
-      </View>
-
-      {displayedReviews.length === 0 ? (
-        <AppEmptyState
-          title="No reviews yet"
-          description="Be the first to share your experience."
+      {hasReviews ? (
+        <ReviewFilters
+          value={activeFilter}
+          onChange={(nextFilter) => {
+            setActiveFilter(nextFilter);
+            onClearFocusedReview?.();
+          }}
         />
+      ) : null}
+      {hasReviews ? (
+        <View
+          style={styles.listHeader}
+          onLayout={(event) => {
+            onReviewsListLayout?.(event.nativeEvent.layout.y);
+          }}
+        >
+          <Text style={styles.sectionTitle}>All reviews</Text>
+          <Text style={styles.reviewCount}>{reviewCount} total</Text>
+        </View>
+      ) : null}
+      {displayedReviews.length === 0 ? (
+        <View style={styles.emptyStateWrap}>
+          <AppEmptyState
+            title="No reviews yet"
+            description="Be the first to share your experience."
+          />
+        </View>
       ) : (
-        <View>
-          <View style={styles.list}>
-            {displayedReviews.map((review, index) => (
-              <View key={review.id}>
-                <ReviewCard
-                  review={review}
-                  onPressMore={() => {
-                    // TODO: expand review / open modal later
-                  }}
-                />
+        <View style={styles.list}>
+          {displayedReviews.map((review, index) => (
+            <View
+              key={review.id}
+              onLayout={(event) => {
+                reviewOffsets.current[review.id] = event.nativeEvent.layout.y;
+              }}
+            >
+              <ReviewCard
+                review={review}
+                onExpandReview={() => handleExpandReview(review.id)}
+                onPressMore={() => {}}
+              />
 
-                {index < displayedReviews.length - 1 ? (
-                  <View style={styles.separator} />
-                ) : null}
-              </View>
-            ))}
-          </View>
+              {index < displayedReviews.length - 1 ? (
+                <View style={styles.separator} />
+              ) : null}
+            </View>
+          ))}
         </View>
       )}
     </View>

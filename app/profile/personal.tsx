@@ -1,3 +1,4 @@
+import { BookingPreviewCard } from "@/src/components/bookings";
 import FollowButton from "@/src/components/business/FollowButton/FollowButton";
 import ScreenHeader from "@/src/components/common/ScreenHeader/ScreenHeader";
 import AppAvatar from "@/src/components/ui/AppAvatar";
@@ -6,9 +7,11 @@ import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
 import AppText from "@/src/components/ui/AppText/AppText";
 import { AppColors } from "@/src/constants/colors";
 import { spacing } from "@/src/constants/spacing";
+import { BookingStatus } from "@/src/features/bookings/types/booking.types";
 import { getMyReviews } from "@/src/features/reviews/services/review.service";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { businessesMock } from "@/src/mocks/businesses.mock";
+import { useBookingsStore } from "@/src/store/bookings.store";
 import { useFollowingStore } from "@/src/store/following.store";
 import { useProfileStore } from "@/src/store/profile.store";
 import type {
@@ -17,7 +20,7 @@ import type {
 } from "@/src/types/profile";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useFocusEffect } from "expo-router";
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 
 import {
   Image,
@@ -27,6 +30,12 @@ import {
   StyleSheet,
   View,
 } from "react-native";
+
+const ACTIVE_BOOKING_STATUSES: BookingStatus[] = [
+  "pending",
+  "confirmed",
+  "active",
+];
 
 export default function PersonalProfileScreen() {
   const { colors } = useAppTheme();
@@ -40,8 +49,20 @@ export default function PersonalProfileScreen() {
     setRefreshing(false);
   };
   const profile = useProfileStore((state) => state.profile);
+  const bookings = useBookingsStore((state) => state.bookings);
+
+  const upcomingBookings = useMemo(
+    () =>
+      bookings.filter((booking) =>
+        ACTIVE_BOOKING_STATUSES.includes(booking.status),
+      ),
+    [bookings],
+  );
 
   const [myReviews, setMyReviews] = useState<PersonalProfileReview[]>([]);
+  const scrollViewRef = useRef<ScrollView | null>(null);
+
+  const reviewOffsets = useRef<Record<string, number>>({});
   const [previewFollowedBusinesses, setPreviewFollowedBusinesses] = useState<
     PersonalProfileFollowedBusiness[]
   >([]);
@@ -70,6 +91,19 @@ export default function PersonalProfileScreen() {
     }, []),
   );
 
+  const handleExpandReview = (reviewId: string) => {
+    const y = reviewOffsets.current[reviewId];
+
+    if (typeof y !== "number") {
+      return;
+    }
+
+    scrollViewRef.current?.scrollTo({
+      y: y + 220,
+      animated: true,
+    });
+  };
+
   const profileStats = useMemo(
     () => [
       {
@@ -82,8 +116,17 @@ export default function PersonalProfileScreen() {
         label: "Reviews",
         value: myReviews.length,
       },
+      {
+        id: "bookings" as const,
+        label: "Bookings",
+        value: upcomingBookings.length,
+      },
     ],
-    [previewFollowedBusinesses.length, myReviews.length],
+    [
+      previewFollowedBusinesses.length,
+      myReviews.length,
+      upcomingBookings.length,
+    ],
   );
 
   return (
@@ -104,8 +147,40 @@ export default function PersonalProfileScreen() {
 
               <View style={styles.heroTextWrap}>
                 <AppText style={styles.heroName} numberOfLines={1}>
-                  @{profile.username}
+                  {profile.username}
                 </AppText>
+
+                <View style={styles.heroStatsRow}>
+                  {profileStats.map((stat) => (
+                    <Pressable
+                      key={stat.id}
+                      style={styles.heroStatItem}
+                      onPress={() => {
+                        if (stat.id === "following") {
+                          router.push("/profile/following");
+                          return;
+                        }
+
+                        if (stat.id === "reviews") {
+                          router.push("/profile/reviews");
+                          return;
+                        }
+
+                        if (stat.id === "bookings") {
+                          router.push("/bookings");
+                          return;
+                        }
+                      }}
+                    >
+                      <AppText style={styles.heroStatValue}>
+                        {stat.value}
+                      </AppText>
+                      <AppText style={styles.heroStatLabel}>
+                        {stat.label}
+                      </AppText>
+                    </Pressable>
+                  ))}
+                </View>
               </View>
 
               <Pressable
@@ -128,14 +203,14 @@ export default function PersonalProfileScreen() {
                 <Ionicons
                   name="create-outline"
                   size={16}
-                  color={colors.primaryGreen}
+                  color={colors.textMuted}
                 />
                 <AppText style={styles.editButtonText}>Edit profile</AppText>
               </Pressable>
 
               <Pressable
                 style={[styles.heroActionButton, styles.switchButton]}
-                onPress={() => router.push("/profile/switch-account")}
+                onPress={() => router.push("/modal/switch-account")}
               >
                 <Ionicons
                   name="swap-horizontal-outline"
@@ -150,35 +225,8 @@ export default function PersonalProfileScreen() {
           </View>
         }
       />
-      <View style={styles.summaryBackground}>
-        <View style={styles.profileSummaryCard}>
-          <View style={styles.statsRow}>
-            {profileStats.map((stat, index) => (
-              <React.Fragment key={stat.id}>
-                <Pressable
-                  style={styles.statItem}
-                  onPress={() => {
-                    if (stat.id === "following") {
-                      router.push("/profile/following");
-                      return;
-                    }
-
-                    router.push("/profile/reviews");
-                  }}
-                >
-                  <AppText style={styles.statValue}>{stat.value}</AppText>
-                  <AppText style={styles.statLabel}>{stat.label}</AppText>
-                </Pressable>
-
-                {index !== profileStats.length - 1 ? (
-                  <View style={styles.statDivider} />
-                ) : null}
-              </React.Fragment>
-            ))}
-          </View>
-        </View>
-      </View>
       <ScrollView
+        ref={scrollViewRef}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.content}
         refreshControl={
@@ -188,27 +236,54 @@ export default function PersonalProfileScreen() {
         <View style={styles.appointmentsSection}>
           <View style={styles.sectionHeaderRow}>
             <AppText style={styles.sectionTitle}>Upcoming appointments</AppText>
+
+            <Pressable onPress={() => router.push("/bookings")}>
+              <AppText style={styles.seeAllText}>See all</AppText>
+            </Pressable>
           </View>
 
-          <View style={styles.appointmentCard}>
-            <View style={styles.appointmentIconBox}>
-              <Ionicons
-                name="calendar-outline"
-                size={20}
-                color={colors.primaryGreen}
-              />
-            </View>
+          {upcomingBookings.length === 0 ? (
+            <View style={styles.appointmentCard}>
+              <View style={styles.appointmentIconBox}>
+                <Ionicons
+                  name="calendar-outline"
+                  size={20}
+                  color={colors.primaryGreen}
+                />
+              </View>
 
-            <View style={styles.appointmentTextWrap}>
-              <AppText style={styles.appointmentTitle}>
-                No upcoming appointments
-              </AppText>
+              <View style={styles.appointmentTextWrap}>
+                <AppText style={styles.appointmentTitle}>
+                  No upcoming appointments
+                </AppText>
 
-              <AppText style={styles.appointmentDescription}>
-                Appointments booked through BridgeUA will appear here.
-              </AppText>
+                <AppText style={styles.appointmentDescription}>
+                  Appointments booked through BridgeUA will appear here.
+                </AppText>
+              </View>
             </View>
-          </View>
+          ) : (
+            <View style={styles.appointmentsList}>
+              {upcomingBookings.map((booking) => (
+                <BookingPreviewCard
+                  key={booking.id}
+                  businessName={booking.businessName}
+                  serviceName={booking.serviceName}
+                  specialistName={booking.specialistName}
+                  date={booking.date}
+                  time={booking.time}
+                  price={booking.price}
+                  status={booking.status}
+                  onPress={() =>
+                    router.push({
+                      pathname: "/bookings/[bookingId]",
+                      params: { bookingId: booking.id },
+                    })
+                  }
+                />
+              ))}
+            </View>
+          )}
         </View>
 
         <View style={styles.sectionHeaderRow}>
@@ -257,7 +332,18 @@ export default function PersonalProfileScreen() {
           ) : (
             <View style={styles.reviewsList}>
               {myReviews.map((review) => (
-                <ReviewCard key={review.id} review={review} />
+                <View
+                  key={review.id}
+                  onLayout={(event) => {
+                    reviewOffsets.current[review.id] =
+                      event.nativeEvent.layout.y;
+                  }}
+                >
+                  <ReviewCard
+                    review={review}
+                    onExpandReview={handleExpandReview}
+                  />
+                </View>
               ))}
             </View>
           )}
@@ -317,7 +403,13 @@ function FollowedBusinessCard({
   );
 }
 
-function ReviewCard({ review }: { review: PersonalProfileReview }) {
+function ReviewCard({
+  review,
+  onExpandReview,
+}: {
+  review: PersonalProfileReview;
+  onExpandReview?: (reviewId: string) => void;
+}) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -368,7 +460,19 @@ function ReviewCard({ review }: { review: PersonalProfileReview }) {
             </AppText>
 
             {shouldShowReadMore ? (
-              <Pressable onPress={() => setIsExpanded((value) => !value)}>
+              <Pressable
+                onPress={() => {
+                  setIsExpanded((value) => {
+                    const nextValue = !value;
+
+                    if (nextValue) {
+                      onExpandReview?.(review.id);
+                    }
+
+                    return nextValue;
+                  });
+                }}
+              >
                 <AppText style={styles.reviewReadMore}>
                   {isExpanded ? "Show less" : "Read more"}
                 </AppText>
@@ -459,10 +563,37 @@ function createStyles(colors: AppColors) {
     },
 
     heroName: {
-      fontSize: 22,
-      lineHeight: 27,
+      fontSize: 20,
+      lineHeight: 24,
       fontWeight: "800",
       color: colors.textPrimary,
+    },
+
+    heroStatsRow: {
+      marginTop: spacing.md,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      width: "100%",
+    },
+
+    heroStatItem: {
+      alignItems: "flex-start",
+    },
+
+    heroStatValue: {
+      fontSize: 20,
+      lineHeight: 24,
+      fontWeight: "800",
+      color: colors.textPrimary,
+    },
+
+    heroStatLabel: {
+      marginTop: 1,
+      fontSize: 11,
+      lineHeight: 14,
+      fontWeight: "700",
+      color: colors.textSecondary,
     },
 
     heroUsername: {
@@ -474,7 +605,7 @@ function createStyles(colors: AppColors) {
     },
 
     heroActionsRow: {
-      marginTop: spacing.sm,
+      marginTop: spacing.md,
       flexDirection: "row",
       gap: spacing.sm,
     },
@@ -490,9 +621,9 @@ function createStyles(colors: AppColors) {
     },
 
     editButton: {
-      backgroundColor: colors.primaryGreenSoft,
+      backgroundColor: colors.surface,
       borderWidth: 1,
-      borderColor: colors.primaryGreenSoft,
+      borderColor: colors.border,
     },
 
     switchButton: {
@@ -504,7 +635,7 @@ function createStyles(colors: AppColors) {
     editButtonText: {
       fontSize: 12,
       fontWeight: "700",
-      color: colors.primaryGreen,
+      color: colors.textMuted,
     },
 
     switchButtonText: {
@@ -512,36 +643,7 @@ function createStyles(colors: AppColors) {
       fontWeight: "700",
       color: colors.textMuted,
     },
-    statsRow: {
-      marginTop: spacing.md,
-      paddingVertical: 10,
-      borderRadius: 16,
-      backgroundColor: colors.surface,
-      borderWidth: 1,
-      borderColor: colors.border,
-      flexDirection: "row",
-      alignItems: "center",
-    },
-    statItem: {
-      flex: 1,
-      alignItems: "center",
-    },
-    statValue: {
-      fontSize: 19,
-      fontWeight: "800",
-      color: colors.textPrimary,
-    },
-    statLabel: {
-      marginTop: 2,
-      fontSize: 12,
-      fontWeight: "600",
-      color: colors.textSecondary,
-    },
-    statDivider: {
-      width: 1,
-      height: 34,
-      backgroundColor: colors.border,
-    },
+
     appointmentsSection: {
       marginBottom: spacing.xl,
     },
@@ -581,6 +683,9 @@ function createStyles(colors: AppColors) {
       fontSize: 13,
       lineHeight: 18,
       color: colors.textSecondary,
+    },
+    appointmentsList: {
+      gap: spacing.cardGap,
     },
     sectionHeaderRow: {
       flexDirection: "row",
@@ -712,13 +817,6 @@ function createStyles(colors: AppColors) {
       fontSize: 13,
       fontWeight: "700",
       color: colors.primaryGreen,
-    },
-    profileSummaryCard: {
-      paddingHorizontal: spacing.lg,
-    },
-    summaryBackground: {
-      backgroundColor: colors.background,
-      paddingBottom: spacing.sm,
     },
     emptyStateWrap: {
       paddingVertical: spacing.lg,

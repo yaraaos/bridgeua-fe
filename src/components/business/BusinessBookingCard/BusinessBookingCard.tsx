@@ -1,3 +1,4 @@
+import { AuthRequiredModal, useRequireAuth } from "@/src/features/auth";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
@@ -20,18 +21,20 @@ type BookingAction = {
 };
 
 const BOOKING_ACTIONS: BookingAction[] = [
-  {
-    title: "Pick date and time",
-    subtitle: "Choose a time that works for you",
-    icon: "calendar-outline",
-    pathname: "/bookings/choose-date",
-  },
+  /*
   {
     title: "Choose a professional",
-    subtitle: "Select who you want to book with",
+    subtitle: "Find your preferred specialist",
     icon: "person-outline",
     pathname: "/bookings/choose-specialist",
   },
+  {
+    title: "Pick date and time",
+    subtitle: "See available appointment slots",
+    icon: "calendar-outline",
+    pathname: "/bookings/choose-date",
+  },
+  */
   {
     title: "Select services",
     subtitle: "Choose one or more services",
@@ -44,11 +47,21 @@ export default function BusinessBookingCard({ businessId }: Props) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
 
+  const { isAuthModalVisible, closeAuthModal, confirmAuthModal, requireAuth } =
+    useRequireAuth();
+
   const handlePress = (pathname: BookingAction["pathname"]) => {
-    router.push({
-      pathname,
-      params: { businessId },
-    });
+    requireAuth(
+      () => {
+        router.push({
+          pathname,
+          params: { businessId },
+        });
+      },
+      {
+        action: "book",
+      },
+    );
   };
 
   return (
@@ -86,6 +99,12 @@ export default function BusinessBookingCard({ businessId }: Props) {
           </Pressable>
         ))}
       </View>
+
+      <AuthRequiredModal
+        visible={isAuthModalVisible}
+        onClose={closeAuthModal}
+        onConfirm={confirmAuthModal}
+      />
     </View>
   );
 }

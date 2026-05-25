@@ -20,17 +20,19 @@ export function createStyles(colors: AppColors) {
       color: colors.textPrimary,
     },
     actions: {
-      marginTop: spacing.md,
+      marginTop: spacing.lg,
     },
     actionRow: {
       flexDirection: "row",
       alignItems: "center",
       gap: spacing.md,
-      paddingVertical: spacing.md,
+      paddingVertical: 0,
     },
     actionRowBordered: {
       borderTopWidth: 1,
       borderTopColor: colors.border,
+      paddingTop: spacing.md,
+      marginTop: spacing.md,
     },
     iconBox: {
       width: 38,

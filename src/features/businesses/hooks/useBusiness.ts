@@ -11,12 +11,15 @@ import {
 export const useBusinesses = () => {
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const loadBusinesses = async () => {
       try {
         const data = await getBusinesses();
         setBusinesses(data);
+      } catch (e) {
+        setError(e instanceof Error ? e.message : 'Failed to load businesses');
       } finally {
         setIsLoading(false);
       }
@@ -25,12 +28,13 @@ export const useBusinesses = () => {
     loadBusinesses();
   }, []);
 
-  return { businesses, isLoading };
+  return { businesses, isLoading, error };
 };
 
 export const useBusinessDetails = (id?: string) => {
   const [business, setBusiness] = useState<BusinessDetails | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const loadBusiness = async () => {
@@ -44,6 +48,8 @@ export const useBusinessDetails = (id?: string) => {
         setIsLoading(true);
         const data = await getBusinessDetailsById(id);
         setBusiness(data);
+      } catch (e) {
+        setError(e instanceof Error ? e.message : 'Failed to load business');
       } finally {
         setIsLoading(false);
       }
@@ -52,5 +58,5 @@ export const useBusinessDetails = (id?: string) => {
     loadBusiness();
   }, [id]);
 
-  return { business, isLoading };
+  return { business, isLoading, error };
 };

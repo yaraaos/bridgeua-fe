@@ -3,27 +3,29 @@ import React from "react";
 import { Pressable, Text, View } from "react-native";
 
 import {
-    CUISINE_OPTIONS,
-    DISTANCE_OPTIONS,
-    RATING_OPTIONS,
-    SORT_OPTIONS,
+  CUISINE_OPTIONS,
+  DISTANCE_OPTIONS,
+  RATING_OPTIONS,
+  SORT_OPTIONS,
 } from "@/src/constants/filters";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import type {
-    DistanceOption,
-    RatingOption,
-    SortOption,
+  DistanceOption,
+  RatingOption,
+  SortOption,
 } from "@/src/store/filter.store";
 
 import { createStyles } from "./ActiveFiltersSummary.styles";
 
 type Props = {
   sort: SortOption;
+  category: string;
   cuisines: string[];
   rating: RatingOption;
   distance: DistanceOption;
   customDistance: string;
   onClearSort: () => void;
+  onClearCategory: () => void;
   onRemoveCuisine: (value: string) => void;
   onClearRating: () => void;
   onClearDistance: () => void;
@@ -41,12 +43,14 @@ const getLabel = <T extends string>(
 ) => options.find((option) => option.value === value)?.label ?? value;
 
 export default function ActiveFiltersSummary({
+  category,
   sort,
   cuisines,
   rating,
   distance,
   customDistance,
   onClearSort,
+  onClearCategory,
   onRemoveCuisine,
   onClearRating,
   onClearDistance,
@@ -61,6 +65,14 @@ export default function ActiveFiltersSummary({
       key: `sort-${sort}`,
       label: getLabel(SORT_OPTIONS, sort),
       onRemove: onClearSort,
+    });
+  }
+
+  if (category) {
+    chips.push({
+      key: `category-${category}`,
+      label: category,
+      onRemove: onClearCategory,
     });
   }
 

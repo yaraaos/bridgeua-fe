@@ -1,0 +1,131 @@
+import React from "react";
+import { Pressable, ScrollView, View } from "react-native";
+import { Feather, Ionicons } from "@expo/vector-icons";
+
+import AppAvatar from "@/src/components/ui/AppAvatar";
+import AppText from "@/src/components/ui/AppText/AppText";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { useAccountStore, type AccountSummary } from "@/src/store/account.store";
+import { useNotificationsStore } from "@/src/store/notifications.store";
+
+import { createStyles } from "./AccountSwitcherSheet.styles";
+
+type Props = {
+  onClose: () => void;
+  onSelectAccount?: (account: AccountSummary) => void;
+  onAddBusiness?: () => void;
+};
+
+export default function AccountSwitcherSheet({
+  onClose,
+  onSelectAccount,
+  onAddBusiness,
+}: Props) {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
+  const accounts = useAccountStore((s) => s.accounts);
+  const activeAccountId = useAccountStore((s) => s.activeAccountId);
+  const setActiveAccountId = useAccountStore((s) => s.setActiveAccountId);
+
+  const handleSelect = (account: AccountSummary) => {
+    setActiveAccountId(account.id);
+    useNotificationsStore.getState().setActiveAccountType(account.kind);
+    onSelectAccount?.(account);
+    onClose();
+  };
+
+  return (
+    <View style={styles.container}>
+      <View style={styles.handleWrap}>
+        <View style={styles.handle} />
+      </View>
+
+      <View style={styles.header}>
+        <AppText style={styles.headerTitle}>Switch account</AppText>
+        <Pressable onPress={onClose} style={styles.closeButton} hitSlop={10}>
+          <Feather name="x" size={18} color={colors.textMuted} />
+        </Pressable>
+      </View>
+
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        {accounts.map((account) => {
+          const isActive = account.id === activeAccountId;
+
+          return (
+            <Pressable
+              key={account.id}
+              style={[styles.row, isActive && styles.rowActive]}
+              onPress={() => handleSelect(account)}
+            >
+              <AppAvatar
+                size="md"
+                name={account.displayName}
+                username={account.handle}
+                imageUrl={account.avatarUrl}
+              />
+
+              <View style={styles.rowText}>
+                <AppText style={styles.rowName} numberOfLines={1}>
+                  {account.displayName}
+                </AppText>
+
+                <AppText style={styles.rowHandle} numberOfLines={1}>
+                  @{account.handle}
+                </AppText>
+
+                <AppText style={styles.rowSubtype}>
+                  {account.kind === "personal"
+                    ? "Personal account"
+                    : "Business account"}
+                </AppText>
+
+                {account.notificationsCount > 0 ? (
+                  <AppText style={styles.notificationCount}>
+                    {account.notificationsCount} new notification
+                    {account.notificationsCount === 1 ? "" : "s"}
+                  </AppText>
+                ) : null}
+              </View>
+
+              <View style={styles.rowRight}>
+                {isActive ? (
+                  <View style={styles.activeBadge}>
+                    <Ionicons
+                      name="checkmark"
+                      size={14}
+                      color={colors.primaryGreen}
+                    />
+                  </View>
+                ) : (
+                  <Ionicons
+                    name="chevron-forward"
+                    size={18}
+                    color={colors.textMuted}
+                  />
+                )}
+              </View>
+            </Pressable>
+          );
+        })}
+
+        <Pressable
+          style={styles.addRow}
+          onPress={() => {
+            onAddBusiness?.();
+            onClose();
+          }}
+        >
+          <View style={styles.addIcon}>
+            <Ionicons name="add" size={22} color={colors.primaryGreen} />
+          </View>
+          <AppText style={styles.addText}>Add business</AppText>
+        </Pressable>
+      </ScrollView>
+    </View>
+  );
+}

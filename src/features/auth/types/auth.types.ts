@@ -3,21 +3,27 @@ export type SignInPayload = {
   password: string;
 };
 
+export type UsernameAvailabilityResponse = {
+  available: boolean;
+};
+
 export type AuthUser = {
-  id: string;
+  id: string | number;
   email: string;
   name?: string;
+  accountType?: "personal" | "business";
+  isEmailConfirmed?: boolean;
 };
 
 export type SignInResponse = {
   user: AuthUser;
-  accessToken: string;
-  refreshToken?: string;
+  token: string;
 };
 
 export type RegisterPersonalPayload = {
   firstName: string;
   lastName: string;
+  username: string;
   email: string;
   password: string;
 };
@@ -45,6 +51,8 @@ export type ConfirmCodePayload = {
 
 export type ConfirmCodeResponse = {
   verified: boolean;
+  accessToken?: string;
+  user?: AuthUser;
 };
 
 export type ResendCodePayload = {

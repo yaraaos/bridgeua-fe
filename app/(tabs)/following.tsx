@@ -13,6 +13,7 @@ import {
 import { useFollowingFeed } from "@/src/features/following";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { useFollowingStore } from "@/src/store";
+import { useAuthStore } from "@/src/store/auth.store";
 import { useFilterStore } from "@/src/store/filter.store";
 import { useFollowingLocationStore } from "@/src/store/following-location.store";
 import { router, useFocusEffect } from "expo-router";
@@ -28,6 +29,7 @@ import {
 export default function FollowingScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+  const isGuest = useAuthStore((state) => state.isGuest);
 
   const {
     label: selectedLocationLabel,
@@ -43,13 +45,13 @@ export default function FollowingScreen() {
     });
   };
 
-  const { sort, cuisines, rating, distance, customDistance } = useFilterStore(
-    (state) => state.followingFilters,
-  );
+  const { category, sort, cuisines, rating, distance, customDistance } =
+    useFilterStore((state) => state.followingFilters);
 
   const activeFilterCount = useMemo(() => {
     let count = 0;
 
+    if (category) count += 1;
     if (sort && sort !== "relevance") count += 1;
     if (cuisines.length > 0) count += cuisines.length;
     if (rating) count += 1;
@@ -57,7 +59,7 @@ export default function FollowingScreen() {
     if (distance === "custom" && customDistance) count += 1;
 
     return count;
-  }, [sort, cuisines, rating, distance, customDistance]);
+  }, [category, sort, cuisines, rating, distance, customDistance]);
 
   const handleRequestNearby = () => {
     Alert.alert(
@@ -126,6 +128,46 @@ export default function FollowingScreen() {
       params: { scope: "following" },
     });
   };
+
+  const handleRegisterPress = () => {
+    router.push({
+      pathname: "/auth/sign-in",
+      params: {
+        source: "guest_promotions_tab",
+        action: "promotion",
+      },
+    });
+  };
+
+  if (isGuest) {
+    return (
+      <AppScreen withTopInset={false} style={styles.container}>
+        <ScreenHeader
+          title="News & Promos"
+          titleSubtitle="Updates from followed businesses"
+          gradientColors={DISCOVERY_GRADIENT}
+        />
+
+        <View style={styles.switchWrap}>
+          <AccountTypeSwitch
+            options={[
+              { label: "Promotions", value: "promotion" },
+              { label: "News", value: "news" },
+            ]}
+            value={activeTab}
+            onChange={setActiveTab}
+          />
+        </View>
+
+        <AppEmptyState
+          title="Register to see promotions and news"
+          description="Register and follow businesses to see promotions and news from places you trust."
+          actionLabel="Register to BridgeUA"
+          onPressAction={handleRegisterPress}
+        />
+      </AppScreen>
+    );
+  }
 
   if (isLoading) {
     return (
@@ -241,7 +283,7 @@ function createStyles(colors: AppColors) {
     switchWrap: {
       paddingHorizontal: 16,
       paddingTop: 12,
-      paddingBottom: 8,
+      paddingBottom: 12,
     },
     loaderWrap: {
       flex: 1,
@@ -250,7 +292,6 @@ function createStyles(colors: AppColors) {
     listContent: {
       paddingHorizontal: 16,
       paddingBottom: 24,
-      paddingTop: 4,
     },
   });
 }

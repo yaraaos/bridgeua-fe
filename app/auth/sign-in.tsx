@@ -3,6 +3,7 @@ import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { saveAuthTokens } from "@/src/services/auth/tokens";
 import { useAuthStore } from "@/src/store/auth.store";
 import { useFollowingStore } from "@/src/store/following.store";
+import { useProfileStore } from "@/src/store/profile.store";
 import { useReviewsStore } from "@/src/store/reviews.store";
 import { router } from "expo-router";
 import { useState } from "react";
@@ -25,8 +26,9 @@ export default function SignInScreen() {
 
   const { submitSignIn, isLoading, apiError, setApiError } = useSignIn();
   const setUser = useAuthStore((state) => state.setUser);
+  const enterGuestMode = useAuthStore((state) => state.enterGuestMode);
   const resetFollowing = useFollowingStore((state) => state.resetFollowing);
-
+  const loadProfile = useProfileStore((state) => state.loadProfile);
   const clearReviews = useReviewsStore((state) => state.clearReviews);
 
   const [email, setEmail] = useState("");
@@ -52,9 +54,17 @@ export default function SignInScreen() {
       await saveAuthTokens(response.accessToken, response.refreshToken);
 
       setUser(response.user);
+      await loadProfile();
 
       router.replace("/(tabs)/home");
     }
+  };
+
+  const handleSkipForNow = async () => {
+    if (isLoading) return;
+
+    await enterGuestMode();
+    router.replace("/(tabs)/home");
   };
 
   return (
@@ -114,6 +124,11 @@ export default function SignInScreen() {
         ) : (
           <AppButton title="Login" onPress={handleSubmit} />
         )}
+        <AppButton
+          title="Skip for now"
+          variant="ghost"
+          onPress={handleSkipForNow}
+        />
       </View>
 
       <Text style={styles.footer}>
@@ -122,7 +137,7 @@ export default function SignInScreen() {
           style={styles.link}
           onPress={() => router.push("/auth/sign-up-personal")}
         >
-          Register now
+          Register for free
         </Text>
       </Text>
     </AppScreen>

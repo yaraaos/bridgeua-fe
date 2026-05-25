@@ -34,8 +34,12 @@ export type PersonalProfileReview = {
   businessName: string;
   businessImageUrl: string;
   rating: number;
+  likesCount: number;
+  commentsCount: number;
+  likedByMe: boolean;
   text: string;
   createdAt: string;
+  isEdited?: boolean;
   photos?: {
     id: string;
     url: string;

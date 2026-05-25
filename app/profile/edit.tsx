@@ -46,7 +46,7 @@ export default function EditProfileScreen() {
   const [lastName, setLastName] = useState(initialNames.lastName);
   const [username, setUsername] = useState(profile.username ?? "");
   const [phoneNumber, setPhoneNumber] = useState(profile.phoneNumber ?? "");
-  const [isPhoneValid, setIsPhoneValid] = useState(false);
+  const [isPhoneValid, setIsPhoneValid] = useState(!!(profile.phoneNumber));
   const [dateOfBirth, setDateOfBirth] = useState(profile.dateOfBirth ?? "");
 
   const { saveProfile, isSaving } = useEditProfile();
@@ -143,7 +143,7 @@ export default function EditProfileScreen() {
   };
 
   const handleSave = async () => {
-    const success = await saveProfile({
+    const result = await saveProfile({
       firstName: firstName.trim(),
       lastName: lastName.trim(),
       username: username.trim(),
@@ -152,7 +152,12 @@ export default function EditProfileScreen() {
       avatarUrl,
     });
 
-    if (success) router.back();
+    if (result.ok) {
+      if (result.avatarUrl !== undefined) setAvatarUrl(result.avatarUrl);
+      router.back();
+    } else {
+      Alert.alert("Error", "Failed to save profile. Please try again.");
+    }
   };
 
   console.log({

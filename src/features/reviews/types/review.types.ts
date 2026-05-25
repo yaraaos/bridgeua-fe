@@ -9,10 +9,14 @@ export type Review = {
   authorName: string;
   authorAvatar: string;
   rating: number;
+  likesCount: number;
+  commentsCount: number;
+  likedByMe: boolean;
   text: string;
   tags?: string[];
   photos?: BusinessReviewPhoto[];
   createdAt: string;
+  isEdited?: boolean;
   authorUsername?: string;
 };
 
@@ -33,6 +37,14 @@ export type GetReviewsResponse = {
 
 export type SubmitReviewPayload = {
   businessId: string;
+  rating: number;
+  text: string;
+  tags?: string[];
+  photos?: string[];
+};
+
+export type UpdateReviewPayload = {
+  reviewId: string;
   rating: number;
   text: string;
   tags?: string[];

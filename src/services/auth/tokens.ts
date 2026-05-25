@@ -9,6 +9,10 @@ export async function saveAuthTokens(
   accessToken: string,
   refreshToken?: string,
 ) {
+  if (!accessToken) {
+    throw new Error("Access token is missing");
+  }
+
   await setSecureItem(STORAGE_KEYS.AUTH_ACCESS_TOKEN, accessToken);
 
   if (refreshToken) {

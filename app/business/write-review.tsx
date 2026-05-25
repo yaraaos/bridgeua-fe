@@ -8,10 +8,11 @@ import { useBusinessDetails } from "@/src/features/businesses/hooks/useBusiness"
 import { useReviews } from "@/src/features/reviews/hooks/useReviews";
 import { useSubmitReview } from "@/src/features/reviews/hooks/useSubmitReview";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { useAuthStore } from "@/src/store/auth.store";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { router, useLocalSearchParams } from "expo-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -40,13 +41,27 @@ const MAX_PHOTOS = 8;
 export default function WriteReviewScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+  const isGuest = useAuthStore((state) => state.isGuest);
 
   const { businessId, rating: initialRating } = useLocalSearchParams<{
     businessId?: string;
     rating?: string;
   }>();
 
+  useEffect(() => {
+    if (isGuest) {
+      router.replace({
+        pathname: "/auth/sign-in",
+        params: {
+          source: "guest_write_review_route",
+          action: "review",
+        },
+      });
+    }
+  }, [isGuest]);
+
   const { business, isLoading } = useBusinessDetails(businessId);
+
   const { reviewCount, summary: reviewsSummary } = useReviews({
     businessId,
   });
@@ -67,6 +82,10 @@ export default function WriteReviewScreen() {
 
   const canSubmit = rating > 0;
   const { submit, isSubmitting } = useSubmitReview();
+
+  if (isGuest) {
+    return null;
+  }
 
   const toggleTag = (tag: string) => {
     setSelectedTags((current) =>

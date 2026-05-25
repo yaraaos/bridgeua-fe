@@ -24,9 +24,8 @@ export const useFollowingFeed = ({
 
   const feedBusinessIds = visibleBusinessIds ?? followedBusinessIds.map(String);
 
-  const { sort, cuisines, rating, distance, customDistance } = useFilterStore(
-    (state) => state.followingFilters,
-  );
+  const { category, sort, cuisines, rating, distance, customDistance } =
+    useFilterStore((state) => state.followingFilters);
 
   const [activeTab, setActiveTab] = useState<FollowingFeedType>("promotion");
   const [searchQuery, setSearchQuery] = useState("");
@@ -83,6 +82,26 @@ export const useFollowingFeed = ({
         const cuisineMatch =
           cuisines.length === 0 || cuisines.includes(item.businessCategory);
 
+        const businessCategory = String(item.businessCategory ?? "").trim();
+
+        const foodCategories = [
+          "American",
+          "Chinese",
+          "Italian",
+          "Japanese",
+          "Mediterranean",
+          "Mexican",
+          "Vegan",
+        ];
+
+        const categoryMatch =
+          !category ||
+          (category === "Food"
+            ? cuisines.length > 0
+              ? cuisines.includes(businessCategory)
+              : foodCategories.includes(businessCategory)
+            : businessCategory === category);
+
         const ratingMatch =
           selectedRatingValue === null || businessRating >= selectedRatingValue;
 
@@ -91,7 +110,7 @@ export const useFollowingFeed = ({
           Number.isNaN(selectedDistanceKm) ||
           businessDistance <= selectedDistanceKm;
 
-        return cuisineMatch && ratingMatch && distanceMatch;
+        return categoryMatch && cuisineMatch && ratingMatch && distanceMatch;
       })
       .filter((item) => {
         if (!normalizedQuery) {
@@ -141,6 +160,7 @@ export const useFollowingFeed = ({
     activeTab,
     searchQuery,
     sort,
+    category,
     cuisines,
     rating,
     distance,

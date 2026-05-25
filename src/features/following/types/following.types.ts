@@ -4,6 +4,8 @@ export type FollowingFeedItem = {
   id: string;
   businessId: string;
   type: FollowingFeedType;
+  promotionId?: string;
+  newsId?: string;
   title: string;
   description: string;
   createdAt: string;

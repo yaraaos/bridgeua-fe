@@ -29,6 +29,11 @@ export function createStyles(colors: AppColors) {
       width: "100%",
       height: "100%",
     },
+    fallback: {
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: colors.primaryGreenSoft,
+    },
     tail: {
       width: 0,
       height: 0,

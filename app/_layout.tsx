@@ -39,6 +39,14 @@ function RootLayoutInner() {
             contentStyle: { backgroundColor: "transparent" },
           }}
         />
+        <Stack.Screen
+          name="modal/switch-account"
+          options={{
+            presentation: "transparentModal",
+            animation: "none",
+            contentStyle: { backgroundColor: "transparent" },
+          }}
+        />
       </Stack>
     </QueryClientProvider>
   );

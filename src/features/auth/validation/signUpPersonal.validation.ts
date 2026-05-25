@@ -1,9 +1,30 @@
 import { z } from "zod";
 
+export const signUpPersonalUsernameSchema = z
+  .string()
+  .trim()
+  .min(3, "Username must be at least 3 characters")
+  .max(20, "Username must be 20 characters or less")
+  .regex(
+    /^[a-z0-9._]+$/,
+    "Username can only use letters, numbers, dots, or underscores",
+  );
+
+export function validateSignUpPersonalUsername(value: string) {
+  const result = signUpPersonalUsernameSchema.safeParse(value);
+
+  if (result.success) {
+    return undefined;
+  }
+
+  return result.error.issues[0]?.message;
+}
+
 export const signUpPersonalSchema = z
   .object({
     firstName: z.string().trim().min(1, "First name is required"),
     lastName: z.string().trim().min(1, "Last name is required"),
+    username: signUpPersonalUsernameSchema,
     email: z
       .string()
       .trim()

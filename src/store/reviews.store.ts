@@ -8,6 +8,15 @@ type ReviewsState = {
   submittedReviews: Review[];
 
   addReview: (review: Review) => void;
+  updateReview: (reviewId: string, updates: Partial<Review>) => void;
+  deleteReview: (reviewId: string) => void;
+  toggleReviewLike: (reviewId: string) => void;
+
+  syncReviewAuthorUsername: (payload: {
+    previousUsername: string;
+    nextUsername: string;
+    avatarUrl?: string;
+  }) => void;
   clearReviews: () => void;
 };
 
@@ -19,6 +28,62 @@ export const useReviewsStore = create<ReviewsState>()(
       addReview: (review) =>
         set((state) => ({
           submittedReviews: [review, ...state.submittedReviews],
+        })),
+
+      updateReview: (reviewId, updates) =>
+        set((state) => ({
+          submittedReviews: state.submittedReviews.map((review) =>
+            review.id === reviewId
+              ? {
+                  ...review,
+                  ...updates,
+                }
+              : review,
+          ),
+        })),
+
+      deleteReview: (reviewId) =>
+        set((state) => ({
+          submittedReviews: state.submittedReviews.filter(
+            (review) => review.id !== reviewId,
+          ),
+        })),
+
+      toggleReviewLike: (reviewId) =>
+        set((state) => ({
+          submittedReviews: state.submittedReviews.map((review) => {
+            if (review.id !== reviewId) {
+              return review;
+            }
+
+            const isLiked = review.likedByMe ?? false;
+            const currentLikesCount = review.likesCount ?? 0;
+            return {
+              ...review,
+              likedByMe: !isLiked,
+              likesCount: isLiked
+                ? Math.max(0, currentLikesCount - 1)
+                : currentLikesCount + 1,
+            };
+          }),
+        })),
+
+      syncReviewAuthorUsername: ({
+        previousUsername,
+        nextUsername,
+        avatarUrl,
+      }) =>
+        set((state) => ({
+          submittedReviews: state.submittedReviews.map((review) =>
+            review.authorUsername === previousUsername
+              ? {
+                  ...review,
+                  authorName: nextUsername,
+                  authorUsername: nextUsername,
+                  authorAvatar: avatarUrl ?? review.authorAvatar,
+                }
+              : review,
+          ),
         })),
 
       clearReviews: () =>

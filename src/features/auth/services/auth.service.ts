@@ -1,3 +1,6 @@
+import { apiClient } from "../../../services/api/client";
+import { ENDPOINTS } from "../../../services/api/endpoints";
+
 import type {
   ConfirmCodePayload,
   ConfirmCodeResponse,
@@ -13,105 +16,93 @@ import type {
   ResetPasswordResponse,
   SignInPayload,
   SignInResponse,
+  UsernameAvailabilityResponse,
 } from "../types/auth.types";
 
 export async function signIn(payload: SignInPayload): Promise<SignInResponse> {
-  // TODO: Replace with real BE request when endpoint is ready.
-  await new Promise((resolve) => setTimeout(resolve, 800));
-
-  if (payload.email !== "test@test.com" || payload.password !== "password") {
-    throw new Error("Invalid credentials");
-  }
-
-  return {
-    user: {
-      id: "user-1",
-      email: payload.email,
-      name: "Test User",
-    },
-    accessToken: "mock-access-token",
-    refreshToken: "mock-refresh-token",
-  };
+  const res = await apiClient.post<SignInResponse>(
+    ENDPOINTS.AUTH_LOGIN,
+    payload,
+  );
+  return res.data;
 }
 
 export async function registerPersonal(
   payload: RegisterPersonalPayload,
 ): Promise<RegisterResponse> {
-  // TODO: Replace with real BE request when endpoint is ready.
-  await new Promise((resolve) => setTimeout(resolve, 800));
+  const res = await apiClient.post<RegisterResponse>(
+    ENDPOINTS.AUTH_REGISTER_PERSONAL,
+    payload,
+  );
+  return res.data;
+}
 
-  if (payload.email === "taken@test.com") {
-    throw new Error("Email is already registered");
-  }
+export async function checkUsernameAvailability(
+  username: string,
+  signal?: AbortSignal,
+): Promise<UsernameAvailabilityResponse> {
+  await new Promise((resolve, reject) => {
+    const timeoutId = setTimeout(resolve, 500);
+
+    signal?.addEventListener("abort", () => {
+      clearTimeout(timeoutId);
+      reject({ name: "AbortError" });
+    });
+  });
+
+  const takenUsernames = ["admin", "test", "yara", "bridgeua"];
 
   return {
-    userId: "user-1",
-    email: payload.email,
-    verificationRequired: true,
+    available: !takenUsernames.includes(username.toLowerCase()),
   };
 }
 
 export async function registerBusiness(
   payload: RegisterBusinessPayload,
 ): Promise<RegisterBusinessResponse> {
-  // TODO: Replace with real BE request when endpoint is ready.
-  await new Promise((resolve) => setTimeout(resolve, 800));
-
-  if (payload.email === "taken@test.com") {
-    throw new Error("Email is already registered");
-  }
-
-  return {
-    userId: "business-user-1",
-    email: payload.email,
-    verificationRequired: true,
-  };
+  const res = await apiClient.post<RegisterBusinessResponse>(
+    ENDPOINTS.AUTH_REGISTER_BUSINESS,
+    payload,
+  );
+  return res.data;
 }
 
 export async function confirmCode(
   payload: ConfirmCodePayload,
 ): Promise<ConfirmCodeResponse> {
-  // TODO: Replace with real BE request when endpoint is ready.
-  await new Promise((resolve) => setTimeout(resolve, 800));
-
-  if (payload.code !== "1234") {
-    throw new Error("Incorrect confirmation code");
-  }
-
-  return {
-    verified: true,
-  };
+  const res = await apiClient.post<ConfirmCodeResponse>(
+    ENDPOINTS.AUTH_CONFIRM_CODE,
+    payload,
+  );
+  return res.data;
 }
 
 export async function resendCode(
   payload: ResendCodePayload,
 ): Promise<ResendCodeResponse> {
-  // TODO: Replace with real BE request when endpoint is ready.
-  await new Promise((resolve) => setTimeout(resolve, 800));
-
-  return {
-    success: true,
-  };
+  const res = await apiClient.post<ResendCodeResponse>(
+    ENDPOINTS.AUTH_RESEND_CODE,
+    payload,
+  );
+  return res.data;
 }
 
 export async function forgotPassword(
   payload: ForgotPasswordPayload,
 ): Promise<ForgotPasswordResponse> {
-  // TODO: Replace with real BE request when endpoint is ready.
-  await new Promise((resolve) => setTimeout(resolve, 800));
-
-  return {
-    success: true,
-  };
+  const res = await apiClient.post<ForgotPasswordResponse>(
+    ENDPOINTS.AUTH_FORGOT_PASSWORD,
+    payload,
+  );
+  return res.data;
 }
 
 export async function resetPassword(
   payload: ResetPasswordPayload,
 ): Promise<ResetPasswordResponse> {
-  // TODO: Replace with real BE request when endpoint is ready.
-  await new Promise((resolve) => setTimeout(resolve, 800));
-
-  return {
-    success: true,
-  };
+  const res = await apiClient.post<ResetPasswordResponse>(
+    ENDPOINTS.AUTH_RESET_PASSWORD,
+    payload,
+  );
+  return res.data;
 }

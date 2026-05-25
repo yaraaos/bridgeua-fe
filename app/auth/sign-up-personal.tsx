@@ -2,9 +2,12 @@ import { AppColors } from "@/src/constants/colors";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { Feather } from "@expo/vector-icons";
 import { router } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
+import { checkUsernameAvailability } from "@/src/features/auth/services/auth.service";
+import { useDebounce } from "@/src/hooks/useDebounce";
+import { useNotificationsStore } from "@/src/store/notifications.store";
 import { useProfileStore } from "@/src/store/profile.store";
 import { AccountTypeSwitch } from "../../src/components/auth";
 import AppButton from "../../src/components/ui/AppButton/AppButton";
@@ -16,32 +19,94 @@ import { useRegisterPersonal } from "../../src/features/auth/hooks/useRegisterPe
 import {
   SignUpPersonalFormErrors,
   validateSignUpPersonalForm,
+  validateSignUpPersonalUsername,
 } from "../../src/features/auth/validation/signUpPersonal.validation";
-import { useNotificationsStore } from "@/src/store/notifications.store";
+
+type UsernameAvailabilityStatus =
+  | "idle"
+  | "checking"
+  | "available"
+  | "taken"
+  | "error";
 
 export default function SignUpPersonalScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
   const setProfile = useProfileStore((state) => state.setProfile);
   const setNotificationsAccountType = useNotificationsStore(
-  (state) => state.setActiveAccountType,
-);
+    (state) => state.setActiveAccountType,
+  );
 
   const { submitRegisterPersonal, isLoading, apiError, setApiError } =
     useRegisterPersonal();
 
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
   const [agree, setAgree] = useState(false);
   const [errors, setErrors] = useState<SignUpPersonalFormErrors>({});
+  const [usernameAvailabilityStatus, setUsernameAvailabilityStatus] =
+    useState<UsernameAvailabilityStatus>("idle");
 
+  const debouncedUsername = useDebounce(username.trim(), 1000);
   const clearFieldError = (field: keyof SignUpPersonalFormErrors) => {
     setErrors((current) => ({ ...current, [field]: undefined }));
     setApiError(null);
+  };
+  useEffect(() => {
+    if (!debouncedUsername || errors.username) {
+      setUsernameAvailabilityStatus("idle");
+      return;
+    }
+
+    const controller = new AbortController();
+
+    async function validateUsernameAvailability() {
+      try {
+        setUsernameAvailabilityStatus("checking");
+
+        const response = await checkUsernameAvailability(
+          debouncedUsername,
+          controller.signal,
+        );
+
+        setUsernameAvailabilityStatus(
+          response.available ? "available" : "taken",
+        );
+      } catch (error) {
+        if (
+          typeof error === "object" &&
+          error !== null &&
+          "name" in error &&
+          error.name === "AbortError"
+        ) {
+          return;
+        }
+
+        setUsernameAvailabilityStatus("error");
+      }
+    }
+
+    validateUsernameAvailability();
+
+    return () => controller.abort();
+  }, [debouncedUsername, errors.username]);
+
+  const handleUsernameChange = (value: string) => {
+    const normalizedUsername = value.toLowerCase();
+
+    setUsername(normalizedUsername);
+    setApiError(null);
+    setUsernameAvailabilityStatus("idle");
+
+    setErrors((current) => ({
+      ...current,
+      username: validateSignUpPersonalUsername(value),
+    }));
   };
 
   const handleSubmit = async () => {
@@ -49,6 +114,7 @@ export default function SignUpPersonalScreen() {
     const values = {
       firstName,
       lastName,
+      username,
       email,
       password,
       confirmPassword,
@@ -62,9 +128,26 @@ export default function SignUpPersonalScreen() {
 
     if (Object.keys(validationErrors).length > 0) return;
 
+    if (usernameAvailabilityStatus === "checking") {
+      setErrors((current) => ({
+        ...current,
+        username: "Please wait while we check this username",
+      }));
+      return;
+    }
+
+    if (usernameAvailabilityStatus === "taken") {
+      setErrors((current) => ({
+        ...current,
+        username: "This username is already taken",
+      }));
+      return;
+    }
+
     const response = await submitRegisterPersonal({
       firstName,
       lastName,
+      username,
       email,
       password,
     });
@@ -76,7 +159,7 @@ export default function SignUpPersonalScreen() {
         firstName: firstName.trim(),
         lastName: lastName.trim(),
         displayName: `${firstName.trim()} ${lastName.trim()}`.trim(),
-        username: email.trim().split("@")[0],
+        username: username.trim(),
         email: response.email,
         avatarUrl: "",
         phoneNumber: "",
@@ -144,6 +227,40 @@ export default function SignUpPersonalScreen() {
             />
             {errors.lastName ? (
               <Text style={styles.errorText}>{errors.lastName}</Text>
+            ) : null}
+          </View>
+
+          <View>
+            <AppInput
+              placeholder="Username"
+              value={username}
+              onChangeText={handleUsernameChange}
+              autoCapitalize="none"
+              disabled={isLoading}
+              error={Boolean(errors.username)}
+            />
+            {errors.username ? (
+              <Text style={styles.errorText}>{errors.username}</Text>
+            ) : null}
+
+            {!errors.username && usernameAvailabilityStatus === "checking" ? (
+              <Text style={styles.helperText}>Checking username...</Text>
+            ) : null}
+
+            {!errors.username && usernameAvailabilityStatus === "available" ? (
+              <Text style={styles.successText}>Username is available</Text>
+            ) : null}
+
+            {!errors.username && usernameAvailabilityStatus === "taken" ? (
+              <Text style={styles.errorText}>
+                This username is already taken
+              </Text>
+            ) : null}
+
+            {!errors.username && usernameAvailabilityStatus === "error" ? (
+              <Text style={styles.errorText}>
+                Could not check username availability
+              </Text>
             ) : null}
           </View>
 
@@ -323,6 +440,18 @@ function createStyles(colors: AppColors) {
       marginTop: 4,
       fontSize: 12,
       color: colors.error,
+    },
+
+    helperText: {
+      marginTop: 4,
+      fontSize: 12,
+      color: colors.textSecondary,
+    },
+
+    successText: {
+      marginTop: 4,
+      fontSize: 12,
+      color: colors.primaryGreen,
     },
 
     apiError: {

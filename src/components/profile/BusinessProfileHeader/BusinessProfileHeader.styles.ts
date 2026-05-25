@@ -2,6 +2,7 @@
 
 import { AppColors } from "@/src/constants/colors";
 import { radius } from "@/src/constants/radius";
+import { spacing } from "@/src/constants/spacing";
 import { StyleSheet } from "react-native";
 
 export function createStyles(colors: AppColors) {
@@ -75,7 +76,7 @@ export function createStyles(colors: AppColors) {
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "center",
-      gap: 6,
+      gap: spacing.cardGap,
       paddingHorizontal: 10,
     },
     secondaryButtonText: {

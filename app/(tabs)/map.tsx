@@ -81,19 +81,19 @@ export default function MapScreen() {
     setPermissionStatus,
   } = useDiscoveryLocationStore();
 
-  const { sort, cuisines, rating, distance, customDistance } = useFilterStore(
-    (state) => state.discoveryFilters,
-  );
+  const { category, sort, cuisines, rating, distance, customDistance } =
+    useFilterStore((state) => state.discoveryFilters);
 
   const activeFilterCount = useMemo(() => {
     let count = 0;
+    if (category) count += 1;
     if (sort && sort !== "relevance") count += 1;
     if (cuisines.length > 0) count += cuisines.length;
     if (rating) count += 1;
     if (distance) count += 1;
     if (distance === "custom" && customDistance) count += 1;
     return count;
-  }, [sort, cuisines, rating, distance, customDistance]);
+  }, [category, sort, cuisines, rating, distance, customDistance]);
 
   const followedBusinessIds = useFollowingStore(
     (state) => state.followedBusinessIds,
@@ -102,12 +102,49 @@ export default function MapScreen() {
 
   const { filteredBusinesses } = useDiscoveryFeed({
     businesses,
+    category,
     sort,
     cuisines,
     rating,
     distance,
     customDistance,
   });
+
+  const markerKeyPrefix = useMemo(
+    () =>
+      [
+        category,
+        sort,
+        cuisines.join(","),
+        rating,
+        distance,
+        customDistance,
+      ].join("|"),
+    [category, sort, cuisines, rating, distance, customDistance],
+  );
+
+  const mappableBusinesses = useMemo(() => {
+    const seen = new Set<string>();
+    const result: Business[] = [];
+
+    for (const business of filteredBusinesses) {
+      if (!business?.id) continue;
+
+      const key = String(business.id);
+      if (seen.has(key)) continue;
+
+      const lat = business.coordinates?.latitude;
+      const lng = business.coordinates?.longitude;
+
+      if (typeof lat !== "number" || !Number.isFinite(lat)) continue;
+      if (typeof lng !== "number" || !Number.isFinite(lng)) continue;
+
+      seen.add(key);
+      result.push(business);
+    }
+
+    return result;
+  }, [filteredBusinesses]);
 
   const initialRegion: Region = useMemo(() => {
     if (typeof locationLatitude === "number" && typeof locationLongitude === "number") {
@@ -127,9 +164,42 @@ export default function MapScreen() {
   );
 
   const selectedBusiness: Business | undefined = useMemo(
-    () => filteredBusinesses.find((business) => business.id === selectedBusinessId),
-    [filteredBusinesses, selectedBusinessId],
+    () => mappableBusinesses.find((business) => business.id === selectedBusinessId),
+    [mappableBusinesses, selectedBusinessId],
   );
+
+  useEffect(() => {
+    if (selectedBusinessId && !selectedBusiness) {
+      setSelectedBusinessId(null);
+    }
+  }, [selectedBusinessId, selectedBusiness]);
+
+  useEffect(() => {
+    if (!mapRef.current) return;
+    if (mappableBusinesses.length === 0) return;
+
+    if (mappableBusinesses.length === 1) {
+      const only = mappableBusinesses[0].coordinates;
+      mapRef.current.animateToRegion(
+        {
+          latitude: only.latitude,
+          longitude: only.longitude,
+          latitudeDelta: 0.05,
+          longitudeDelta: 0.05,
+        },
+        300,
+      );
+      return;
+    }
+
+    mapRef.current.fitToCoordinates(
+      mappableBusinesses.map((business) => business.coordinates),
+      {
+        edgePadding: { top: 140, right: 56, bottom: 220, left: 56 },
+        animated: true,
+      },
+    );
+  }, [mappableBusinesses]);
 
   const handleSelectLocationOption = (option: LocationOption) => {
     setManualLocation({ label: option.label, value: option.value });
@@ -168,28 +238,23 @@ export default function MapScreen() {
     });
   };
 
-  const selectedCategory =
-    cuisines.length === 0
-      ? "All Categories"
-      : cuisines[0] === "Automotive"
-        ? "Auto"
-        : cuisines[0];
+  const selectedCategory = !category
+    ? "All Categories"
+    : category === "Automotive"
+      ? "Auto"
+      : category;
 
-  const handleSelectCategory = (category: string) => {
+  const handleSelectCategory = (selectedCategoryLabel: string) => {
     setSelectedBusinessId(null);
 
-    if (category === "All Categories") {
-      useFilterStore.setState((state) => ({
-        discoveryFilters: { ...state.discoveryFilters, cuisines: [] },
-      }));
-      return;
-    }
+    const mappedCategory =
+      selectedCategoryLabel === "All Categories"
+        ? ""
+        : selectedCategoryLabel === "Auto"
+          ? "Automotive"
+          : selectedCategoryLabel;
 
-    const mapped = category === "Auto" ? "Automotive" : category;
-
-    useFilterStore.setState((state) => ({
-      discoveryFilters: { ...state.discoveryFilters, cuisines: [mapped] },
-    }));
+    useFilterStore.getState().setCategory("discovery", mappedCategory);
   };
 
   const handleMarkerPress = (business: Business) => {
@@ -248,14 +313,14 @@ export default function MapScreen() {
             showsMyLocationButton={false}
             onPress={() => setSelectedBusinessId(null)}
           >
-            {filteredBusinesses.map((business) => {
+            {mappableBusinesses.map((business) => {
               const isFollowed = followedBusinessIds.includes(
                 String(business.id),
               );
 
               return (
                 <BusinessMarker
-                  key={business.id}
+                  key={`${markerKeyPrefix}-${String(business.id)}`}
                   business={business}
                   isFollowed={isFollowed}
                   onPress={(event) => {

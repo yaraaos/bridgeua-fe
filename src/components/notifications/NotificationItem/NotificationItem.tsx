@@ -2,8 +2,8 @@ import { Feather } from "@expo/vector-icons";
 import { Image, Pressable, Text, View } from "react-native";
 
 import type {
-    AppNotification,
-    NotificationType,
+  AppNotification,
+  NotificationType,
 } from "@/src/features/notifications/types/notification.types";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { createStyles } from "./NotificationItem.styles";
@@ -33,7 +33,13 @@ const NOTIFICATION_ICON_MAP: Record<
 
 function formatNotificationTime(createdAt: string) {
   const createdTime = new Date(createdAt).getTime();
-  const diffMs = Date.now() - createdTime;
+
+  if (Number.isNaN(createdTime)) {
+    return "";
+  }
+
+  const diffMs = Math.max(0, Date.now() - createdTime);
+
   const diffMinutes = Math.floor(diffMs / (60 * 1000));
   const diffHours = Math.floor(diffMs / (60 * 60 * 1000));
   const diffDays = Math.floor(diffMs / (24 * 60 * 60 * 1000));
@@ -43,7 +49,14 @@ function formatNotificationTime(createdAt: string) {
   if (diffHours < 24) return `${diffHours}h`;
   if (diffDays < 7) return `${diffDays}d`;
 
-  return new Date(createdAt).toLocaleDateString();
+  const diffWeeks = Math.floor(diffDays / 7);
+  if (diffWeeks < 4) return `${diffWeeks}w`;
+
+  const diffMonths = Math.floor(diffDays / 30);
+  if (diffMonths < 12) return `${diffMonths}m`;
+
+  const diffYears = Math.floor(diffDays / 365);
+  return `${diffYears}y`;
 }
 
 export default function NotificationItem({ item, onPress }: Props) {
@@ -55,7 +68,11 @@ export default function NotificationItem({ item, onPress }: Props) {
   return (
     <Pressable
       onPress={() => onPress?.(item)}
-      style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
+      style={({ pressed }) => [
+        styles.card,
+        item.imageUrl ? styles.cardWithThumbnail : styles.cardWithoutThumbnail,
+        pressed && styles.cardPressed,
+      ]}
     >
       <View style={styles.iconWrap}>
         <Feather name={iconName} size={19} color={colors.primaryGreen} />
@@ -85,7 +102,11 @@ export default function NotificationItem({ item, onPress }: Props) {
         <Image source={{ uri: item.imageUrl }} style={styles.thumbnail} />
       ) : null}
 
-      <Text style={styles.time}>{formatNotificationTime(item.createdAt)}</Text>
+      <View style={styles.timeSlot}>
+        <Text style={styles.time}>
+          {formatNotificationTime(item.createdAt)}
+        </Text>
+      </View>
     </Pressable>
   );
 }

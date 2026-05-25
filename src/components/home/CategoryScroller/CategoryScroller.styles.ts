@@ -1,12 +1,12 @@
-import {AppColors} from "@/src/constants/colors";
-import {StyleSheet} from "react-native";
+import { AppColors } from "@/src/constants/colors";
+import { StyleSheet } from "react-native";
 
 export function createStyles(colors: AppColors) {
   return StyleSheet.create({
     wrapper: {
       paddingHorizontal: 16,
       paddingTop: 12,
-      paddingBottom: 8,
+      paddingBottom: 12,
       backgroundColor: colors.background,
     },
     wrapperOverlay: {
@@ -14,12 +14,11 @@ export function createStyles(colors: AppColors) {
       backgroundColor: "transparent",
     },
     content: {
-      paddingLeft: 12,
-      paddingRight: 12,
       gap: 8,
     },
     contentOverlay: {
-      paddingHorizontal: 0,
+      paddingLeft: 12,
+      paddingRight: 12,
     },
     chip: {
       minHeight: 32,

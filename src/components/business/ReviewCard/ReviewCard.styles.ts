@@ -8,6 +8,10 @@ export function createStyles(colors: AppColors) {
     container: {
       paddingVertical: spacing.md,
     },
+    containerMenuOpen: {
+      zIndex: 999,
+      elevation: 999,
+    },
     containerPreview: {
       width: 200,
       minHeight: 150,
@@ -112,6 +116,28 @@ export function createStyles(colors: AppColors) {
       width: "92%",
       height: "75%",
     },
+    interactionRow: {
+      marginTop: spacing.md,
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.md,
+    },
+
+    interactionButton: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.cardGap,
+    },
+
+    interactionText: {
+      fontSize: 12,
+      fontWeight: "700",
+      color: colors.textSecondary,
+    },
+
+    interactionTextActive: {
+      color: colors.primaryGreen,
+    },
     tagsWrap: {
       marginTop: spacing.md,
       flexDirection: "row",
@@ -170,8 +196,71 @@ export function createStyles(colors: AppColors) {
       gap: 12,
     },
 
-    profileReviewDate: {
+    profileRatingDateRow: {
       marginTop: 2,
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.sm,
+    },
+
+    profileActionsButton: {
+      width: 32,
+      height: 32,
+      borderRadius: radius.pill,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+
+    profileActionsButtonActive: {
+      backgroundColor: colors.primaryGreenSoft,
+      borderWidth: 1,
+      borderColor: colors.primaryGreenSoft,
+    },
+
+    profileActionsWrap: {
+      position: "relative",
+      alignItems: "flex-end",
+      zIndex: 20,
+      elevation: 20,
+    },
+
+    profileActionsMenu: {
+      position: "absolute",
+      top: 38,
+      right: 0,
+      width: 164,
+      paddingVertical: spacing.xs,
+      borderWidth: 1,
+      borderColor: colors.border,
+      borderRadius: radius.lg,
+      backgroundColor: colors.surface,
+      opacity: 1,
+      zIndex: 999,
+      elevation: 999,
+      shadowColor: "#000",
+      shadowOpacity: 0.14,
+      shadowRadius: 12,
+      shadowOffset: {
+        width: 0,
+        height: 6,
+      },
+    },
+
+    profileActionsMenuItem: {
+      minHeight: 40,
+      paddingHorizontal: spacing.md,
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.sm,
+    },
+
+    profileActionsMenuText: {
+      fontSize: 13,
+      fontWeight: "700",
+      color: colors.primaryGreen,
+    },
+
+    profileReviewDate: {
       fontSize: 11,
       color: colors.textSecondary,
     },
