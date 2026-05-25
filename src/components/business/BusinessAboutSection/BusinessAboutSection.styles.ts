@@ -7,7 +7,7 @@ export function createStyles(colors: AppColors) {
   return StyleSheet.create({
     card: {
       marginHorizontal: spacing.lg,
-      marginTop: spacing.md,
+      marginTop: 0,
       padding: spacing.lg,
       borderRadius: radius.xl,
       backgroundColor: colors.surface,
