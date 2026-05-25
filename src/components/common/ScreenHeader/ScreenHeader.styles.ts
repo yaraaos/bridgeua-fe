@@ -83,7 +83,7 @@ export function createStyles(colors: AppColors) {
       color: colors.textPrimary,
     },
     profileHeaderInner: {
-      minHeight: 132,
+      minHeight: 156,
     },
 
     profileHeaderRow: {

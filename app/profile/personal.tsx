@@ -100,8 +100,17 @@ export default function PersonalProfileScreen() {
         label: "Reviews",
         value: myReviews.length,
       },
+      {
+        id: "bookings" as const,
+        label: "Bookings",
+        value: upcomingBookings.length,
+      },
     ],
-    [previewFollowedBusinesses.length, myReviews.length],
+    [
+      previewFollowedBusinesses.length,
+      myReviews.length,
+      upcomingBookings.length,
+    ],
   );
 
   return (
@@ -124,6 +133,35 @@ export default function PersonalProfileScreen() {
                 <AppText style={styles.heroName} numberOfLines={1}>
                   {profile.username}
                 </AppText>
+
+                <View style={styles.heroStatsRow}>
+                  {profileStats.map((stat) => (
+                    <Pressable
+                      key={stat.id}
+                      style={styles.heroStatItem}
+                      onPress={() => {
+                        if (stat.id === "following") {
+                          router.push("/profile/following");
+                          return;
+                        }
+
+                        if (stat.id === "reviews") {
+                          router.push("/profile/reviews");
+                          return;
+                        }
+
+                        // Later this can open the bookings screen with filters.
+                      }}
+                    >
+                      <AppText style={styles.heroStatValue}>
+                        {stat.value}
+                      </AppText>
+                      <AppText style={styles.heroStatLabel}>
+                        {stat.label}
+                      </AppText>
+                    </Pressable>
+                  ))}
+                </View>
               </View>
 
               <Pressable
@@ -146,7 +184,7 @@ export default function PersonalProfileScreen() {
                 <Ionicons
                   name="create-outline"
                   size={16}
-                  color={colors.primaryGreen}
+                  color={colors.textMuted}
                 />
                 <AppText style={styles.editButtonText}>Edit profile</AppText>
               </Pressable>
@@ -168,34 +206,6 @@ export default function PersonalProfileScreen() {
           </View>
         }
       />
-      <View style={styles.summaryBackground}>
-        <View style={styles.profileSummaryCard}>
-          <View style={styles.statsRow}>
-            {profileStats.map((stat, index) => (
-              <React.Fragment key={stat.id}>
-                <Pressable
-                  style={styles.statItem}
-                  onPress={() => {
-                    if (stat.id === "following") {
-                      router.push("/profile/following");
-                      return;
-                    }
-
-                    router.push("/profile/reviews");
-                  }}
-                >
-                  <AppText style={styles.statValue}>{stat.value}</AppText>
-                  <AppText style={styles.statLabel}>{stat.label}</AppText>
-                </Pressable>
-
-                {index !== profileStats.length - 1 ? (
-                  <View style={styles.statDivider} />
-                ) : null}
-              </React.Fragment>
-            ))}
-          </View>
-        </View>
-      </View>
       <ScrollView
         ref={scrollViewRef}
         showsVerticalScrollIndicator={false}
@@ -560,10 +570,37 @@ function createStyles(colors: AppColors) {
     },
 
     heroName: {
-      fontSize: 22,
-      lineHeight: 27,
+      fontSize: 20,
+      lineHeight: 24,
       fontWeight: "800",
       color: colors.textPrimary,
+    },
+
+    heroStatsRow: {
+      marginTop: spacing.md,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      width: "100%",
+    },
+
+    heroStatItem: {
+      alignItems: "flex-start",
+    },
+
+    heroStatValue: {
+      fontSize: 20,
+      lineHeight: 24,
+      fontWeight: "800",
+      color: colors.textPrimary,
+    },
+
+    heroStatLabel: {
+      marginTop: 1,
+      fontSize: 11,
+      lineHeight: 14,
+      fontWeight: "700",
+      color: colors.textSecondary,
     },
 
     heroUsername: {
@@ -575,7 +612,7 @@ function createStyles(colors: AppColors) {
     },
 
     heroActionsRow: {
-      marginTop: spacing.sm,
+      marginTop: spacing.md,
       flexDirection: "row",
       gap: spacing.sm,
     },
@@ -591,9 +628,9 @@ function createStyles(colors: AppColors) {
     },
 
     editButton: {
-      backgroundColor: colors.primaryGreenSoft,
+      backgroundColor: colors.surface,
       borderWidth: 1,
-      borderColor: colors.primaryGreenSoft,
+      borderColor: colors.border,
     },
 
     switchButton: {
@@ -605,7 +642,7 @@ function createStyles(colors: AppColors) {
     editButtonText: {
       fontSize: 12,
       fontWeight: "700",
-      color: colors.primaryGreen,
+      color: colors.textMuted,
     },
 
     switchButtonText: {
