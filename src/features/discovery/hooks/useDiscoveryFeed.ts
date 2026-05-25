@@ -26,14 +26,14 @@ type UseDiscoveryFeedParams = {
 };
 
 export function useDiscoveryFeed({
-  businesses,
-  sort,
-  category,
-  cuisines,
-  rating,
-  distance,
-  customDistance,
-}: UseDiscoveryFeedParams) {
+                                   businesses,
+                                   sort,
+                                   category,
+                                   cuisines,
+                                   rating,
+                                   distance,
+                                   customDistance,
+                                 }: UseDiscoveryFeedParams) {
   const selectedDistanceKm =
     distance === "custom" ? Number(customDistance || 0) : distanceMap[distance];
 
@@ -72,14 +72,14 @@ export function useDiscoveryFeed({
           ? cuisines.length > 0
             ? cuisines.includes(businessCategory)
             : [
-                "American",
-                "Chinese",
-                "Italian",
-                "Japanese",
-                "Mediterranean",
-                "Mexican",
-                "Vegan",
-              ].includes(businessCategory)
+              "American",
+              "Chinese",
+              "Italian",
+              "Japanese",
+              "Mediterranean",
+              "Mexican",
+              "Vegan",
+            ].includes(businessCategory)
           : businessCategory === category);
 
       const ratingMatch =
