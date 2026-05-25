@@ -1,3 +1,4 @@
+import { BookingPreviewCard } from "@/src/components/bookings";
 import FollowButton from "@/src/components/business/FollowButton/FollowButton";
 import ScreenHeader from "@/src/components/common/ScreenHeader/ScreenHeader";
 import AppAvatar from "@/src/components/ui/AppAvatar";
@@ -6,6 +7,7 @@ import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
 import AppText from "@/src/components/ui/AppText/AppText";
 import { AppColors } from "@/src/constants/colors";
 import { spacing } from "@/src/constants/spacing";
+import { BookingStatus } from "@/src/features/bookings/types/booking.types";
 import { getMyReviews } from "@/src/features/reviews/services/review.service";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { businessesMock } from "@/src/mocks/businesses.mock";
@@ -29,6 +31,12 @@ import {
   View,
 } from "react-native";
 
+const ACTIVE_BOOKING_STATUSES: BookingStatus[] = [
+  "pending",
+  "confirmed",
+  "active",
+];
+
 export default function PersonalProfileScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
@@ -41,7 +49,15 @@ export default function PersonalProfileScreen() {
     setRefreshing(false);
   };
   const profile = useProfileStore((state) => state.profile);
-  const upcomingBookings = useBookingsStore((state) => state.upcomingBookings);
+  const bookings = useBookingsStore((state) => state.bookings);
+
+  const upcomingBookings = useMemo(
+    () =>
+      bookings.filter((booking) =>
+        ACTIVE_BOOKING_STATUSES.includes(booking.status),
+      ),
+    [bookings],
+  );
 
   const [myReviews, setMyReviews] = useState<PersonalProfileReview[]>([]);
   const scrollViewRef = useRef<ScrollView | null>(null);
@@ -150,7 +166,10 @@ export default function PersonalProfileScreen() {
                           return;
                         }
 
-                        // Later this can open the bookings screen with filters.
+                        if (stat.id === "bookings") {
+                          router.push({ pathname: "/bookings/index" });
+                          return;
+                        }
                       }}
                     >
                       <AppText style={styles.heroStatValue}>
@@ -217,6 +236,12 @@ export default function PersonalProfileScreen() {
         <View style={styles.appointmentsSection}>
           <View style={styles.sectionHeaderRow}>
             <AppText style={styles.sectionTitle}>Upcoming appointments</AppText>
+
+            <Pressable
+              onPress={() => router.push({ pathname: "/bookings/index" })}
+            >
+              <AppText style={styles.seeAllText}>See all</AppText>
+            </Pressable>
           </View>
 
           {upcomingBookings.length === 0 ? (
@@ -242,52 +267,22 @@ export default function PersonalProfileScreen() {
           ) : (
             <View style={styles.appointmentsList}>
               {upcomingBookings.map((booking) => (
-                <Pressable
+                <BookingPreviewCard
                   key={booking.id}
-                  style={styles.appointmentCard}
+                  businessName={booking.businessName}
+                  serviceName={booking.serviceName}
+                  specialistName={booking.specialistName}
+                  date={booking.date}
+                  time={booking.time}
+                  price={booking.price}
+                  status={booking.status}
                   onPress={() =>
                     router.push({
                       pathname: "/bookings/[bookingId]",
                       params: { bookingId: booking.id },
                     })
                   }
-                >
-                  <View style={styles.appointmentIconBox}>
-                    <Ionicons
-                      name="calendar-outline"
-                      size={20}
-                      color={colors.primaryGreen}
-                    />
-                  </View>
-
-                  <View style={styles.appointmentTextWrap}>
-                    <AppText style={styles.appointmentTitle} numberOfLines={1}>
-                      {booking.businessName}
-                    </AppText>
-
-                    <AppText style={styles.appointmentDescription}>
-                      {booking.serviceName} · {booking.date} at {booking.time}
-                    </AppText>
-
-                    <View style={styles.appointmentMetaRow}>
-                      <AppText style={styles.appointmentMeta}>
-                        {booking.specialistName} · {booking.price}
-                      </AppText>
-
-                      <View style={styles.appointmentStatusBadge}>
-                        <AppText style={styles.appointmentStatusText}>
-                          {booking.status}
-                        </AppText>
-                      </View>
-                    </View>
-                  </View>
-
-                  <Ionicons
-                    name="chevron-forward"
-                    size={18}
-                    color={colors.textSecondary}
-                  />
-                </Pressable>
+                />
               ))}
             </View>
           )}
@@ -650,36 +645,7 @@ function createStyles(colors: AppColors) {
       fontWeight: "700",
       color: colors.textMuted,
     },
-    statsRow: {
-      marginTop: spacing.md,
-      paddingVertical: 10,
-      borderRadius: 16,
-      backgroundColor: colors.surface,
-      borderWidth: 1,
-      borderColor: colors.border,
-      flexDirection: "row",
-      alignItems: "center",
-    },
-    statItem: {
-      flex: 1,
-      alignItems: "center",
-    },
-    statValue: {
-      fontSize: 19,
-      fontWeight: "800",
-      color: colors.textPrimary,
-    },
-    statLabel: {
-      marginTop: 2,
-      fontSize: 12,
-      fontWeight: "600",
-      color: colors.textSecondary,
-    },
-    statDivider: {
-      width: 1,
-      height: 34,
-      backgroundColor: colors.border,
-    },
+
     appointmentsSection: {
       marginBottom: spacing.xl,
     },
@@ -721,31 +687,7 @@ function createStyles(colors: AppColors) {
       color: colors.textSecondary,
     },
     appointmentsList: {
-      gap: 6,
-    },
-    appointmentMeta: {
-      fontSize: 12,
-      fontWeight: "700",
-      color: colors.textMuted,
-    },
-    appointmentMetaRow: {
-      marginTop: 4,
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-      gap: spacing.sm,
-    },
-    appointmentStatusBadge: {
-      paddingHorizontal: spacing.sm,
-      paddingVertical: 3,
-      borderRadius: 999,
-      backgroundColor: colors.primaryGreenSoft,
-    },
-    appointmentStatusText: {
-      fontSize: 11,
-      fontWeight: "800",
-      color: colors.primaryGreen,
-      textTransform: "capitalize",
+      gap: spacing.cardGap,
     },
     sectionHeaderRow: {
       flexDirection: "row",
@@ -877,13 +819,6 @@ function createStyles(colors: AppColors) {
       fontSize: 13,
       fontWeight: "700",
       color: colors.primaryGreen,
-    },
-    profileSummaryCard: {
-      paddingHorizontal: spacing.lg,
-    },
-    summaryBackground: {
-      backgroundColor: colors.background,
-      paddingBottom: spacing.sm,
     },
     emptyStateWrap: {
       paddingVertical: spacing.lg,

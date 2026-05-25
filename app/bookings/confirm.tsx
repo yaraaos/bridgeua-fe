@@ -22,9 +22,7 @@ export default function BookingConfirmScreen() {
 
   const { business } = useBusinessDetails(params.businessId);
   const { submitBooking, isCreating, error } = useCreateBooking();
-  const addUpcomingBooking = useBookingsStore(
-    (state) => state.addUpcomingBooking,
-  );
+  const addBooking = useBookingsStore((state) => state.addBooking);
 
   const selectedService = business?.services.find(
     (service) => service.id === params.serviceId,
@@ -71,7 +69,7 @@ export default function BookingConfirmScreen() {
 
     if (!booking) return;
 
-    addUpcomingBooking({
+    addBooking({
       ...booking,
       businessName: business?.name ?? "Selected business",
       serviceName,

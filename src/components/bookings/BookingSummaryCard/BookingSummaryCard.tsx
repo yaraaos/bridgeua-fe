@@ -1,4 +1,5 @@
 import AppText from "@/src/components/ui/AppText/AppText";
+import type { BookingStatus } from "@/src/features/bookings/types/booking.types";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import React from "react";
 import { View } from "react-native";
@@ -13,7 +14,7 @@ type Props = {
   price: string;
   customerName: string;
   phoneNumber: string;
-  status?: "pending" | "confirmed" | "cancelled";
+  status?: BookingStatus;
 };
 
 export default function BookingSummaryCard({

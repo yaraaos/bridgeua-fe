@@ -4,7 +4,7 @@ import { createJSONStorage, persist } from "zustand/middleware";
 
 import type { Booking } from "@/src/features/bookings/types/booking.types";
 
-export type UpcomingBooking = Booking & {
+export type StoredBooking = Booking & {
   businessName: string;
   serviceName: string;
   specialistName: string;
@@ -12,24 +12,24 @@ export type UpcomingBooking = Booking & {
 };
 
 type BookingsState = {
-  upcomingBookings: UpcomingBooking[];
-  addUpcomingBooking: (booking: UpcomingBooking) => void;
+  bookings: StoredBooking[];
+  addBooking: (booking: StoredBooking) => void;
   clearBookings: () => void;
 };
 
 export const useBookingsStore = create<BookingsState>()(
   persist(
     (set) => ({
-      upcomingBookings: [],
+      bookings: [],
 
-      addUpcomingBooking: (booking) =>
+      addBooking: (booking) =>
         set((state) => ({
-          upcomingBookings: [booking, ...state.upcomingBookings],
+          bookings: [booking, ...state.bookings],
         })),
 
       clearBookings: () =>
         set({
-          upcomingBookings: [],
+          bookings: [],
         }),
     }),
     {
