@@ -44,6 +44,7 @@ export default function ConfirmCodeScreen() {
   const profile = useProfileStore((state) => state.profile);
   const loadProfile = useProfileStore((state) => state.loadProfile);
   const resetFollowing = useFollowingStore((state) => state.resetFollowing);
+  const syncFollowing = useFollowingStore((state) => state.syncWithServer);
 
   const clearReviews = useReviewsStore((state) => state.clearReviews);
 
@@ -93,6 +94,7 @@ export default function ConfirmCodeScreen() {
         name: profile.displayName,
       });
       await loadProfile();
+      await syncFollowing();
 
       router.replace("/(tabs)/home");
     }

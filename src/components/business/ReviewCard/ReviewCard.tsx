@@ -178,6 +178,7 @@ export default function ReviewCard({
       pathname: "/business/review/[reviewId]",
       params: {
         reviewId: review.id,
+        reviewData: JSON.stringify(review),
       },
     });
   };

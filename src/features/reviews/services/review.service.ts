@@ -1,5 +1,6 @@
 import { apiClient } from "@/src/services/api/client";
 import { ENDPOINTS } from "@/src/services/api/endpoints";
+import type { PersonalProfileReview } from "@/src/types/profile";
 import type {
   GetReviewsParams,
   GetReviewsResponse,
@@ -7,6 +8,7 @@ import type {
   SubmitReviewPayload,
   UpdateReviewPayload,
 } from "../types/review.types";
+
 
 export const getReviews = async ({
   businessId,
@@ -59,73 +61,7 @@ export const deleteReview = async (
   await apiClient.delete(ENDPOINTS.REVIEW_BY_ID(businessId, reviewId));
 };
 
-export const getReviewById = async (
-  reviewId: string,
-): Promise<Review | null> => {
-  const submittedReview = useReviewsStore
-    .getState()
-    .submittedReviews.find((review) => review.id === reviewId);
-
-  if (submittedReview) {
-    return Promise.resolve(submittedReview);
-  }
-
-  const mockReview = businessDetailsMock
-    .flatMap((business) =>
-      business.reviews.map((review) => ({
-        ...review,
-        businessId: business.id,
-      })),
-    )
-    .find((review) => review.id === reviewId);
-
-  return Promise.resolve(mockReview ?? null);
-};
-
 export const getMyReviews = async (): Promise<PersonalProfileReview[]> => {
-  const profile = useProfileStore.getState().profile;
-
-  const currentUserNames = [profile.displayName];
-
-  const mockReviews = businessDetailsMock.flatMap((business) =>
-    business.reviews
-      .filter((review) => currentUserNames.includes(review.authorName))
-      .map((review) => ({
-        id: review.id,
-        businessId: business.id,
-        businessName: business.name,
-        businessImageUrl: business.images[0]?.url ?? "",
-        rating: review.rating,
-        likesCount: review.likesCount,
-        commentsCount: review.commentsCount,
-        likedByMe: review.likedByMe,
-        text: review.text,
-        createdAt: review.createdAt,
-        photos: review.photos,
-      })),
-  );
-
-  const submittedReviews = useReviewsStore
-    .getState()
-    .submittedReviews.map((review) => {
-      const business = businessDetailsMock.find(
-        (item) => item.id === review.businessId,
-      );
-
-      return {
-        id: review.id,
-        businessId: review.businessId,
-        businessName: business?.name ?? "Business",
-        businessImageUrl: business?.images[0]?.url ?? "",
-        rating: review.rating,
-        likesCount: review.likesCount,
-        commentsCount: review.commentsCount,
-        likedByMe: review.likedByMe,
-        text: review.text,
-        createdAt: review.createdAt,
-        photos: review.photos,
-      };
-    });
-
-  return Promise.resolve([...submittedReviews, ...mockReviews]);
+  const res = await apiClient.get<PersonalProfileReview[]>(ENDPOINTS.USERS_ME_REVIEWS);
+  return res.data;
 };

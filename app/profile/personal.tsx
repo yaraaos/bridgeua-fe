@@ -9,8 +9,8 @@ import { AppColors } from "@/src/constants/colors";
 import { spacing } from "@/src/constants/spacing";
 import { BookingStatus } from "@/src/features/bookings/types/booking.types";
 import { getMyReviews } from "@/src/features/reviews/services/review.service";
+import { getBusinesses } from "@/src/features/businesses/services/business.service";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
-import { businessesMock } from "@/src/mocks/businesses.mock";
 import { useBookingsStore } from "@/src/store/bookings.store";
 import { useFollowingStore } from "@/src/store/following.store";
 import { useProfileStore } from "@/src/store/profile.store";
@@ -74,20 +74,23 @@ export default function PersonalProfileScreen() {
       const currentFollowedBusinessIds =
         useFollowingStore.getState().followedBusinessIds;
 
-      const mappedBusinesses = businessesMock
-        .filter((business) =>
-          currentFollowedBusinessIds.includes(String(business.id)),
-        )
-        .map((business) => ({
-          id: String(business.id),
-          name: business.name,
-          imageUrl: business.image,
-          rating: business.rating,
-          category: business.category,
-          location: business.location,
-        }));
+      getBusinesses().then((allBusinesses) => {
+        const mappedBusinesses = allBusinesses
+          .filter((business) =>
+            currentFollowedBusinessIds.includes(String(business.id)),
+          )
+          .map((business) => ({
+            id: String(business.id),
+            name: business.name,
+            imageUrl: business.image,
+            rating: business.rating,
+            category: business.category,
+            location: business.location,
+          }));
 
-      setPreviewFollowedBusinesses(mappedBusinesses);
+        setPreviewFollowedBusinesses(mappedBusinesses);
+      }).catch(() => {});
+
     }, []),
   );
 

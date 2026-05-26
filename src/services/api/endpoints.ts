@@ -15,6 +15,8 @@ export const ENDPOINTS = {
   // Users
   USERS_ME: "/api/users/me",
   USERS_ME_AVATAR: "/api/users/me/avatar",
+  USERS_ME_REVIEWS: "/api/users/me/reviews",
+  USERS_ME_FOLLOWING: "/api/users/me/following",
 
   // Categories
   CATEGORIES: "/api/categories",
@@ -28,6 +30,7 @@ export const ENDPOINTS = {
   BUSINESS_REVIEWS: (id: string) => `/api/businesses/${id}/reviews`,
   REVIEW_BY_ID: (businessId: string, reviewId: string) =>
     `/api/businesses/${businessId}/reviews/${reviewId}`,
+  BUSINESS_FOLLOW: (id: string) => `/api/businesses/${id}/follow`,
 
   // Bookings
   BOOKINGS: "/api/bookings",
