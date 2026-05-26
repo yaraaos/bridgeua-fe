@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
-import { Pressable, StyleSheet, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import AppInput from "@/src/components/ui/AppInput/AppInput";
 import AppText from "@/src/components/ui/AppText/AppText";
@@ -44,7 +44,9 @@ export default function EditBusinessServiceCard({
 
       <View style={styles.fieldsRow}>
         <View style={styles.fieldWrap}>
-          <AppText style={styles.fieldLabel}>Duration (min)</AppText>
+          <AppText style={styles.fieldLabel}>
+            Duration (min)<Text style={styles.requiredMark}> *</Text>
+          </AppText>
           <AppInput
             value={service.duration}
             onChangeText={onDurationChange}
@@ -58,7 +60,9 @@ export default function EditBusinessServiceCard({
         </View>
 
         <View style={styles.fieldWrap}>
-          <AppText style={styles.fieldLabel}>Price ($)</AppText>
+          <AppText style={styles.fieldLabel}>
+            Price ($)<Text style={styles.requiredMark}> *</Text>
+          </AppText>
           <AppInput
             value={service.price}
             onChangeText={onPriceChange}
@@ -112,6 +116,11 @@ function createStyles(colors: AppColors) {
       fontSize: 12,
       fontWeight: "600",
       color: colors.textSecondary,
+    },
+    requiredMark: {
+      fontSize: 12,
+      fontWeight: "700",
+      color: colors.error,
     },
     errorText: {
       fontSize: 11,

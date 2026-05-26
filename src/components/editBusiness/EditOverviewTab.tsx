@@ -373,7 +373,7 @@ function createStyles(colors: AppColors) {
     avatarEditBtn: {
       position: "absolute",
       bottom: 0,
-      left: 0,
+      right: 0,
       width: 28,
       height: 28,
       borderRadius: 14,

@@ -46,6 +46,10 @@ function TimeInput({ value, onChange, placeholder = "09:00" }: TimeInputProps) {
 
   function handleChange(text: string) {
     const digits = text.replace(/\D/g, "").slice(0, 4);
+
+    if (digits.length >= 2 && parseInt(digits.slice(0, 2), 10) > 23) return;
+    if (digits.length === 4 && parseInt(digits.slice(2, 4), 10) > 59) return;
+
     setRaw(digits);
     onChange(digits.length === 4 ? `${digits.slice(0, 2)}:${digits.slice(2)}` : "");
   }
@@ -58,7 +62,6 @@ function TimeInput({ value, onChange, placeholder = "09:00" }: TimeInputProps) {
   }
 
   const displayValue = formatDigits(raw);
-  const isInvalid = displayValue !== "" && raw.length !== 4;
 
   return (
     <TextInput
@@ -71,7 +74,7 @@ function TimeInput({ value, onChange, placeholder = "09:00" }: TimeInputProps) {
       maxLength={5}
       style={[
         styles.timeInput,
-        { borderColor: isInvalid ? colors.error : colors.border },
+        { borderColor: colors.border },
         { color: colors.textPrimary, backgroundColor: colors.surface },
       ]}
     />
