@@ -189,6 +189,7 @@ export default function EditGalleryTab() {
                   styles.cell,
                   styles.photoCell,
                   isDefault && styles.photoCellDefault,
+                  isMenuOpen && styles.photoCellMenuOpen,
                 ]}
               >
                 <View style={styles.photoClip}>
@@ -235,104 +236,104 @@ export default function EditGalleryTab() {
                       color={colors.primaryGreen}
                     />
                   </Pressable>
+                </View>
 
-                  {isMenuOpen ? (
-                    <View
-                      style={[
-                        styles.photoActionsMenu,
-                        isLeftColumn
-                          ? styles.photoActionsMenuLeft
-                          : styles.photoActionsMenuRight,
-                      ]}
-                    >
-                      {isDefault ? (
-                        <Pressable
-                          style={styles.photoActionsMenuItem}
-                          onPress={(event) => {
-                            event.stopPropagation();
-                            handleRemoveDefault();
-                          }}
-                        >
-                          <Ionicons
-                            name="star-outline"
-                            size={16}
-                            color={colors.textSecondary}
-                          />
-                          <AppText style={styles.photoActionsMenuText}>
-                            Remove default
-                          </AppText>
-                        </Pressable>
-                      ) : (
-                        <Pressable
-                          style={[
-                            styles.photoActionsMenuItem,
-                            setDefaultDisabled &&
-                              styles.photoActionsMenuItemDisabled,
-                          ]}
-                          onPress={(event) => {
-                            event.stopPropagation();
-
-                            if (canSetDefault) {
-                              handleSetDefault();
-                              return;
-                            }
-
-                            if (setDefaultDisabled) {
-                              handleDisabledSetDefaultPress();
-                            }
-                          }}
-                        >
-                          <Ionicons
-                            name="star-outline"
-                            size={16}
-                            color={
-                              canSetDefault
-                                ? colors.primaryGreen
-                                : colors.textMuted
-                            }
-                          />
-                          <AppText
-                            style={[
-                              styles.photoActionsMenuText,
-                              setDefaultDisabled &&
-                                styles.photoActionsMenuTextDisabled,
-                            ]}
-                          >
-                            Set default
-                          </AppText>
-                        </Pressable>
-                      )}
-
-                      {photoMenuMessage ? (
-                        <AppText style={styles.photoActionsMenuMessage}>
-                          {photoMenuMessage}
-                        </AppText>
-                      ) : null}
-
+                {isMenuOpen ? (
+                  <View
+                    style={[
+                      styles.photoActionsMenu,
+                      isLeftColumn
+                        ? styles.photoActionsMenuLeft
+                        : styles.photoActionsMenuRight,
+                    ]}
+                  >
+                    {isDefault ? (
                       <Pressable
                         style={styles.photoActionsMenuItem}
                         onPress={(event) => {
                           event.stopPropagation();
-                          handleDeleteRequest();
+                          handleRemoveDefault();
                         }}
                       >
                         <Ionicons
-                          name="trash-outline"
+                          name="star-outline"
                           size={16}
-                          color={colors.error}
+                          color={colors.textSecondary}
+                        />
+                        <AppText style={styles.photoActionsMenuText}>
+                          Remove default
+                        </AppText>
+                      </Pressable>
+                    ) : (
+                      <Pressable
+                        style={[
+                          styles.photoActionsMenuItem,
+                          setDefaultDisabled &&
+                            styles.photoActionsMenuItemDisabled,
+                        ]}
+                        onPress={(event) => {
+                          event.stopPropagation();
+
+                          if (canSetDefault) {
+                            handleSetDefault();
+                            return;
+                          }
+
+                          if (setDefaultDisabled) {
+                            handleDisabledSetDefaultPress();
+                          }
+                        }}
+                      >
+                        <Ionicons
+                          name="star-outline"
+                          size={16}
+                          color={
+                            canSetDefault
+                              ? colors.primaryGreen
+                              : colors.textMuted
+                          }
                         />
                         <AppText
                           style={[
                             styles.photoActionsMenuText,
-                            styles.photoActionsMenuDeleteText,
+                            setDefaultDisabled &&
+                              styles.photoActionsMenuTextDisabled,
                           ]}
                         >
-                          Delete photo
+                          Set default
                         </AppText>
                       </Pressable>
-                    </View>
-                  ) : null}
-                </View>
+                    )}
+
+                    {photoMenuMessage ? (
+                      <AppText style={styles.photoActionsMenuMessage}>
+                        {photoMenuMessage}
+                      </AppText>
+                    ) : null}
+
+                    <Pressable
+                      style={styles.photoActionsMenuItem}
+                      onPress={(event) => {
+                        event.stopPropagation();
+                        handleDeleteRequest();
+                      }}
+                    >
+                      <Ionicons
+                        name="trash-outline"
+                        size={16}
+                        color={colors.error}
+                      />
+                      <AppText
+                        style={[
+                          styles.photoActionsMenuText,
+                          styles.photoActionsMenuDeleteText,
+                        ]}
+                      >
+                        Delete photo
+                      </AppText>
+                    </Pressable>
+                  </View>
+                ) : null}
               </View>
             );
           })}
@@ -414,6 +415,10 @@ function createStyles(colors: AppColors) {
       borderWidth: 2,
       borderColor: colors.accentOrange,
     },
+    photoCellMenuOpen: {
+      zIndex: 100,
+      elevation: 100,
+    },
     photoClip: {
       ...StyleSheet.absoluteFillObject,
       borderRadius: radius.md,
@@ -468,7 +473,7 @@ function createStyles(colors: AppColors) {
     },
     photoActionsMenu: {
       position: "absolute",
-      top: 30,
+      top: 34,
       width: 180,
       paddingVertical: spacing.xs,
       borderWidth: 1,
@@ -486,10 +491,10 @@ function createStyles(colors: AppColors) {
       },
     },
     photoActionsMenuRight: {
-      right: 0,
+      right: 4,
     },
     photoActionsMenuLeft: {
-      left: 0,
+      left: 4,
     },
     photoActionsMenuItem: {
       minHeight: 40,
