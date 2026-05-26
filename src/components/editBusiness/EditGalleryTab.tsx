@@ -46,9 +46,25 @@ export default function EditGalleryTab() {
   const [actionSheetPhoto, setActionSheetPhoto] = useState<GalleryPhoto | null>(
     null,
   );
+  const [photoMenuMessage, setPhotoMenuMessage] = useState<string | null>(null);
   const successTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const { photos, defaultPhotoIds } = galleryDraft;
+
+  function togglePhotoMenu(photo: GalleryPhoto) {
+    setPhotoMenuMessage(null);
+
+    setActionSheetPhoto((current) => (current?.id === photo.id ? null : photo));
+  }
+
+  function closePhotoMenu() {
+    setPhotoMenuMessage(null);
+    setActionSheetPhoto(null);
+  }
+
+  function handleDisabledSetDefaultPress() {
+    setPhotoMenuMessage("Maximum 3 default photos selected");
+  }
 
   async function pickImages() {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -89,7 +105,7 @@ export default function EditGalleryTab() {
     });
 
     markDirty("gallery");
-    setActionSheetPhoto(null);
+    closePhotoMenu();
   }
 
   function handleRemoveDefault() {
@@ -102,12 +118,12 @@ export default function EditGalleryTab() {
     });
 
     markDirty("gallery");
-    setActionSheetPhoto(null);
+    closePhotoMenu();
   }
 
   function handleDeleteRequest() {
     const photoToDelete = actionSheetPhoto;
-    setActionSheetPhoto(null);
+    closePhotoMenu();
     if (!photoToDelete) return;
     Alert.alert("Delete Photo", "This photo will be permanently removed.", [
       { text: "Cancel", style: "cancel" },
@@ -144,7 +160,12 @@ export default function EditGalleryTab() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.grid}>
+        <Pressable
+          style={styles.grid}
+          onPress={() => {
+            if (actionSheetPhoto) closePhotoMenu();
+          }}
+        >
           <Pressable
             style={[styles.cell, styles.uploadCell]}
             onPress={pickImages}
@@ -152,10 +173,11 @@ export default function EditGalleryTab() {
             <Ionicons name="add-outline" size={32} color={colors.textMuted} />
           </Pressable>
 
-          {photos.map((photo) => {
+          {photos.map((photo, index) => {
             const isDefault = defaultPhotoIds.includes(photo.id);
             const isLoading = loadingIds.has(photo.id);
             const isMenuOpen = actionSheetPhoto?.id === photo.id;
+            const isLeftColumn = (index + 1) % NUM_COLS === 0;
             const setDefaultDisabled =
               !isDefault && defaultPhotoIds.length >= 3;
             const canSetDefault = !isDefault && defaultPhotoIds.length < 3;
@@ -201,9 +223,10 @@ export default function EditGalleryTab() {
                       styles.settingsButton,
                       isMenuOpen && styles.settingsButtonActive,
                     ]}
-                    onPress={() =>
-                      setActionSheetPhoto(isMenuOpen ? null : photo)
-                    }
+                    onPress={(event) => {
+                      event.stopPropagation();
+                      togglePhotoMenu(photo);
+                    }}
                     hitSlop={4}
                   >
                     <Ionicons
@@ -214,11 +237,21 @@ export default function EditGalleryTab() {
                   </Pressable>
 
                   {isMenuOpen ? (
-                    <View style={styles.photoActionsMenu}>
+                    <View
+                      style={[
+                        styles.photoActionsMenu,
+                        isLeftColumn
+                          ? styles.photoActionsMenuLeft
+                          : styles.photoActionsMenuRight,
+                      ]}
+                    >
                       {isDefault ? (
                         <Pressable
                           style={styles.photoActionsMenuItem}
-                          onPress={handleRemoveDefault}
+                          onPress={(event) => {
+                            event.stopPropagation();
+                            handleRemoveDefault();
+                          }}
                         >
                           <Ionicons
                             name="star-outline"
@@ -236,21 +269,33 @@ export default function EditGalleryTab() {
                             setDefaultDisabled &&
                               styles.photoActionsMenuItemDisabled,
                           ]}
-                          onPress={canSetDefault ? handleSetDefault : undefined}
+                          onPress={(event) => {
+                            event.stopPropagation();
+
+                            if (canSetDefault) {
+                              handleSetDefault();
+                              return;
+                            }
+
+                            if (setDefaultDisabled) {
+                              handleDisabledSetDefaultPress();
+                            }
+                          }}
                         >
                           <Ionicons
                             name="star-outline"
                             size={16}
                             color={
                               canSetDefault
-                                ? colors.accentOrange
+                                ? colors.primaryGreen
                                 : colors.textMuted
                             }
                           />
                           <AppText
                             style={[
                               styles.photoActionsMenuText,
-                              !canSetDefault && { color: colors.textMuted },
+                              setDefaultDisabled &&
+                                styles.photoActionsMenuTextDisabled,
                             ]}
                           >
                             Set default
@@ -258,9 +303,18 @@ export default function EditGalleryTab() {
                         </Pressable>
                       )}
 
+                      {photoMenuMessage ? (
+                        <AppText style={styles.photoActionsMenuMessage}>
+                          {photoMenuMessage}
+                        </AppText>
+                      ) : null}
+
                       <Pressable
                         style={styles.photoActionsMenuItem}
-                        onPress={handleDeleteRequest}
+                        onPress={(event) => {
+                          event.stopPropagation();
+                          handleDeleteRequest();
+                        }}
                       >
                         <Ionicons
                           name="trash-outline"
@@ -270,7 +324,7 @@ export default function EditGalleryTab() {
                         <AppText
                           style={[
                             styles.photoActionsMenuText,
-                            { color: colors.error },
+                            styles.photoActionsMenuDeleteText,
                           ]}
                         >
                           Delete photo
@@ -282,7 +336,7 @@ export default function EditGalleryTab() {
               </View>
             );
           })}
-        </View>
+        </Pressable>
 
         {photos.length === 0 && (
           <View style={styles.emptyState}>
@@ -343,6 +397,7 @@ function createStyles(colors: AppColors) {
       width: CELL_SIZE,
       height: CELL_SIZE,
       borderRadius: radius.md,
+      zIndex: 2,
     },
     uploadCell: {
       borderWidth: 1.5,
@@ -405,24 +460,23 @@ function createStyles(colors: AppColors) {
     },
     photoActionsWrap: {
       position: "absolute",
-      top: 1,
-      right: 1,
-      zIndex: 20,
-      elevation: 20,
+      top: 4,
+      right: 4,
+      zIndex: 50,
+      elevation: 50,
       alignItems: "flex-end",
     },
     photoActionsMenu: {
       position: "absolute",
       top: 30,
-      right: 4,
-      width: 164,
+      width: 180,
       paddingVertical: spacing.xs,
       borderWidth: 1,
       borderColor: colors.border,
       borderRadius: radius.lg,
       backgroundColor: colors.surface,
-      zIndex: 999,
-      elevation: 999,
+      zIndex: 40,
+      elevation: 40,
       shadowColor: "#000",
       shadowOpacity: 0.14,
       shadowRadius: 12,
@@ -430,6 +484,12 @@ function createStyles(colors: AppColors) {
         width: 0,
         height: 6,
       },
+    },
+    photoActionsMenuRight: {
+      right: 0,
+    },
+    photoActionsMenuLeft: {
+      left: 0,
     },
     photoActionsMenuItem: {
       minHeight: 40,
@@ -444,7 +504,20 @@ function createStyles(colors: AppColors) {
     photoActionsMenuText: {
       fontSize: 13,
       fontWeight: "700",
-      color: colors.accentOrange,
+      color: colors.primaryGreen,
+    },
+    photoActionsMenuTextDisabled: {
+      color: colors.textMuted,
+    },
+    photoActionsMenuDeleteText: {
+      color: colors.error,
+    },
+    photoActionsMenuMessage: {
+      paddingHorizontal: spacing.md,
+      paddingBottom: spacing.sm,
+      fontSize: 12,
+      fontWeight: "600",
+      color: colors.error,
     },
     emptyState: {
       alignItems: "center",
