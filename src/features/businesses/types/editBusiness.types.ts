@@ -75,3 +75,15 @@ export type UpdateBusinessServicesPayload = {
     price: number;
   }[];
 };
+
+export type EditBusinessAboutDraft = {
+  description: string;
+  languages: string[];
+  amenities: string[];
+};
+
+export type UpdateBusinessAboutPayload = {
+  description: string;
+  languages: string[];
+  amenities: string[];
+};

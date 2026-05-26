@@ -3,6 +3,7 @@ import { router } from "expo-router";
 import React from "react";
 import { Alert, Pressable, StyleSheet, View } from "react-native";
 
+import EditAboutTab from "@/src/components/editBusiness/EditAboutTab";
 import EditOverviewTab from "@/src/components/editBusiness/EditOverviewTab";
 import EditServicesTab from "@/src/components/editBusiness/EditServicesTab";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
@@ -98,7 +99,7 @@ export default function EditBusinessScreen() {
         {activeTab === "overview" && <EditOverviewTab />}
         {activeTab === "gallery" && <TabPlaceholder label="Gallery" />}
         {activeTab === "services" && <EditServicesTab />}
-        {activeTab === "about" && <TabPlaceholder label="About" />}
+        {activeTab === "about" && <EditAboutTab />}
       </View>
     </AppScreen>
   );

@@ -4,6 +4,7 @@ import type {
   BusinessHourEntry,
   ConfiguredService,
   DayOfWeek,
+  EditBusinessAboutDraft,
   EditBusinessOverviewDraft,
   EditBusinessServicesDraft,
   EditBusinessTab,
@@ -46,6 +47,7 @@ type EditBusinessState = {
   dirty: DirtyMap;
   overviewDraft: EditBusinessOverviewDraft;
   servicesDraft: EditBusinessServicesDraft;
+  aboutDraft: EditBusinessAboutDraft;
   setActiveTab: (tab: EditBusinessTab) => void;
   markDirty: (tab: EditBusinessTab) => void;
   markSaved: (tab: EditBusinessTab) => void;
@@ -55,6 +57,7 @@ type EditBusinessState = {
   addConfiguredServices: (items: ConfiguredService[]) => void;
   updateConfiguredService: (id: string, patch: Partial<ConfiguredService>) => void;
   removeConfiguredService: (id: string) => void;
+  setAboutDraft: (patch: Partial<EditBusinessAboutDraft>) => void;
   resetAll: () => void;
 };
 
@@ -78,6 +81,7 @@ export const useEditBusinessStore = create<EditBusinessState>((set) => ({
   dirty: { ...defaultDirty },
   overviewDraft: cloneDefaultOverview(),
   servicesDraft: { services: [] },
+  aboutDraft: { description: "", languages: [], amenities: [] },
   setActiveTab: (tab) => set({ activeTab: tab }),
   markDirty: (tab) => set((s) => ({ dirty: { ...s.dirty, [tab]: true } })),
   markSaved: (tab) => set((s) => ({ dirty: { ...s.dirty, [tab]: false } })),
@@ -113,11 +117,14 @@ export const useEditBusinessStore = create<EditBusinessState>((set) => ({
         services: s.servicesDraft.services.filter((svc) => svc.id !== id),
       },
     })),
+  setAboutDraft: (patch) =>
+    set((s) => ({ aboutDraft: { ...s.aboutDraft, ...patch } })),
   resetAll: () =>
     set({
       activeTab: "overview",
       dirty: { ...defaultDirty },
       overviewDraft: cloneDefaultOverview(),
       servicesDraft: { services: [] },
+      aboutDraft: { description: "", languages: [], amenities: [] },
     }),
 }));

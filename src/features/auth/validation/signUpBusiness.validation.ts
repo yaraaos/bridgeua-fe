@@ -3,7 +3,10 @@ import { z } from "zod";
 export const signUpBusinessSchema = z
   .object({
     businessName: z.string().trim().min(1, "Business name is required"),
-    ownerName: z.string().trim().min(2, "Full name must be at least 2 characters"),
+    ownerName: z
+      .string()
+      .trim()
+      .min(2, "Full name must be at least 2 characters"),
     email: z
       .string()
       .trim()
