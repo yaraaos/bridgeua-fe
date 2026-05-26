@@ -28,6 +28,7 @@ export default function SignInScreen() {
   const setUser = useAuthStore((state) => state.setUser);
   const enterGuestMode = useAuthStore((state) => state.enterGuestMode);
   const resetFollowing = useFollowingStore((state) => state.resetFollowing);
+  const syncFollowing = useFollowingStore((state) => state.syncWithServer);
   const loadProfile = useProfileStore((state) => state.loadProfile);
   const clearReviews = useReviewsStore((state) => state.clearReviews);
 
@@ -55,6 +56,7 @@ export default function SignInScreen() {
 
       setUser(response.user);
       await loadProfile();
+      await syncFollowing();
 
       router.replace("/(tabs)/home");
     }
