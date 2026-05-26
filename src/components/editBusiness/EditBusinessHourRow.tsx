@@ -6,75 +6,59 @@ import { AppColors } from "@/src/constants/colors";
 import { spacing } from "@/src/constants/spacing";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 
+function parseDigits(formatted: string): string {
+  return formatted.replace(/\D/g, "").slice(0, 4).padStart(4, "0");
+}
+
 type TimeInputProps = {
   value: string;
   onChange: (v: string) => void;
-  placeholder?: string;
+  hasError: boolean;
+  onFocus: () => void;
+  onBlur: () => void;
 };
 
-function TimeInput({ value, onChange, placeholder = "09:00" }: TimeInputProps) {
+function TimeInput({ value, onChange, hasError, onFocus, onBlur }: TimeInputProps) {
   const { colors } = useAppTheme();
 
-  function toRaw(formatted: string): string {
-    return formatted.replace(/\D/g, "").slice(0, 4);
-  }
-
-  function formatDigits(digits: string): string {
-    switch (digits.length) {
-      case 0:
-        return "";
-      case 1:
-        return `${digits[0]}:`;
-      case 2:
-        return `${digits}:`;
-      case 3:
-        return `${digits.slice(0, 2)}:${digits[2]}`;
-      default:
-        return `${digits.slice(0, 2)}:${digits.slice(2, 4)}`;
-    }
-  }
-
-  const [raw, setRaw] = useState(() => toRaw(value));
+  const [digits, setDigits] = useState(() => parseDigits(value));
   const prevProp = useRef(value);
 
   useEffect(() => {
     if (value !== prevProp.current) {
       prevProp.current = value;
-      setRaw(toRaw(value));
+      setDigits(parseDigits(value));
     }
   }, [value]);
 
-  function handleChange(text: string) {
-    const digits = text.replace(/\D/g, "").slice(0, 4);
+  const displayValue = `${digits.slice(0, 2)}:${digits.slice(2, 4)}`;
 
-    if (digits.length >= 2 && parseInt(digits.slice(0, 2), 10) > 23) return;
-    if (digits.length === 4 && parseInt(digits.slice(2, 4), 10) > 59) return;
-
-    setRaw(digits);
-    onChange(digits.length === 4 ? `${digits.slice(0, 2)}:${digits.slice(2)}` : "");
-  }
-
-  function handleBlur() {
-    if (raw.length < 4) {
-      setRaw("");
-      onChange("");
+  function handleKeyPress({ nativeEvent: { key } }: { nativeEvent: { key: string } }) {
+    let newDigits: string;
+    if (key === "Backspace") {
+      newDigits = "0" + digits.slice(0, 3);
+    } else if (/^[0-9]$/.test(key)) {
+      newDigits = digits.slice(1) + key;
+      if (parseInt(newDigits.slice(0, 2), 10) > 23) return;
+      if (parseInt(newDigits.slice(2, 4), 10) > 59) return;
+    } else {
+      return;
     }
+    setDigits(newDigits);
+    onChange(`${newDigits.slice(0, 2)}:${newDigits.slice(2, 4)}`);
   }
-
-  const displayValue = formatDigits(raw);
 
   return (
     <TextInput
       value={displayValue}
-      onChangeText={handleChange}
-      onBlur={handleBlur}
-      placeholder={placeholder}
-      placeholderTextColor={colors.textMuted}
+      onChangeText={() => {}}
+      onKeyPress={handleKeyPress}
+      onFocus={onFocus}
+      onBlur={onBlur}
       keyboardType="number-pad"
-      maxLength={5}
       style={[
         styles.timeInput,
-        { borderColor: colors.border },
+        { borderColor: hasError ? colors.error : colors.border },
         { color: colors.textPrimary, backgroundColor: colors.surface },
       ]}
     />
@@ -100,6 +84,7 @@ type Props = {
   closeTime: string;
   onOpenTimeChange: (value: string) => void;
   onCloseTimeChange: (value: string) => void;
+  onValidationChange: (isValid: boolean) => void;
 };
 
 export default function EditBusinessHourRow({
@@ -110,9 +95,27 @@ export default function EditBusinessHourRow({
   closeTime,
   onOpenTimeChange,
   onCloseTimeChange,
+  onValidationChange,
 }: Props) {
   const { colors } = useAppTheme();
   const rowStyles = createRowStyles(colors);
+
+  const [openTimeError, setOpenTimeError] = useState(false);
+  const [closeTimeError, setCloseTimeError] = useState(false);
+
+  const isValid = !isOpen || (openTime !== "" && closeTime !== "");
+
+  useEffect(() => {
+    if (!isOpen) {
+      setOpenTimeError(false);
+      setCloseTimeError(false);
+    }
+  }, [isOpen]);
+
+  // Notify parent whenever validity changes; intentionally excludes onValidationChange
+  // from deps since it is recreated on every parent render but its behavior is stable.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => { onValidationChange(isValid); }, [isValid]);
 
   return (
     <View style={rowStyles.row}>
@@ -130,13 +133,17 @@ export default function EditBusinessHourRow({
           <TimeInput
             value={openTime}
             onChange={onOpenTimeChange}
-            placeholder="09:00"
+            hasError={openTimeError}
+            onBlur={() => { if (openTime === "") setOpenTimeError(true); }}
+            onFocus={() => setOpenTimeError(false)}
           />
           <AppText style={rowStyles.timeSep}>–</AppText>
           <TimeInput
             value={closeTime}
             onChange={onCloseTimeChange}
-            placeholder="18:00"
+            hasError={closeTimeError}
+            onBlur={() => { if (closeTime === "") setCloseTimeError(true); }}
+            onFocus={() => setCloseTimeError(false)}
           />
         </View>
       ) : (

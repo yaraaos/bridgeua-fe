@@ -78,6 +78,14 @@ export default function EditOverviewTab() {
 
   const scrollRef = useRef<ScrollView>(null);
   const fieldPositions = useRef<Record<string, number>>({});
+  const hoursValidity = useRef<Record<string, boolean>>(
+    Object.fromEntries(
+      draft.hours.map((h) => [
+        h.day,
+        !h.isOpen || (h.openTime !== "" && h.closeTime !== ""),
+      ])
+    )
+  );
 
   const { saveOverview, isSaving, saveError } = useEditBusiness();
   const { showError, errorMessage, triggerError, clearError } = useFormValidation();
@@ -134,7 +142,9 @@ export default function EditOverviewTab() {
       city: draft.city.trim() === "",
       state: draft.state.trim() === "",
     };
-    if (Object.values(newErrors).some(Boolean)) {
+    const allHoursValid = Object.values(hoursValidity.current).every(Boolean);
+
+    if (Object.values(newErrors).some(Boolean) || !allHoursValid) {
       setErrors(newErrors);
       triggerError("Fill in the required fields");
       const firstInvalidKey = (
@@ -352,6 +362,9 @@ export default function EditOverviewTab() {
                 closeTime={entry.closeTime}
                 onOpenTimeChange={(v) => onHourTime(entry.day, "openTime", v)}
                 onCloseTimeChange={(v) => onHourTime(entry.day, "closeTime", v)}
+                onValidationChange={(isValid) => {
+                  hoursValidity.current[entry.day] = isValid;
+                }}
               />
             ))}
           </View>

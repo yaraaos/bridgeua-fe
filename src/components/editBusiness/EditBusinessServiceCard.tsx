@@ -45,7 +45,10 @@ export default function EditBusinessServiceCard({
       <View style={styles.fieldsRow}>
         <View style={styles.fieldWrap}>
           <AppText style={styles.fieldLabel}>
-            Duration (min)<Text style={styles.requiredMark}> *</Text>
+            Duration (min)
+            {service.duration.trim() === "" && (
+              <Text style={styles.requiredMark}> *</Text>
+            )}
           </AppText>
           <AppInput
             value={service.duration}
@@ -61,7 +64,10 @@ export default function EditBusinessServiceCard({
 
         <View style={styles.fieldWrap}>
           <AppText style={styles.fieldLabel}>
-            Price ($)<Text style={styles.requiredMark}> *</Text>
+            Price ($)
+            {service.price.trim() === "" && (
+              <Text style={styles.requiredMark}> *</Text>
+            )}
           </AppText>
           <AppInput
             value={service.price}
@@ -70,9 +76,7 @@ export default function EditBusinessServiceCard({
             placeholder="45.00"
             error={priceError}
           />
-          {priceError && (
-            <AppText style={styles.errorText}>Required</AppText>
-          )}
+          {priceError && <AppText style={styles.errorText}>Required</AppText>}
         </View>
       </View>
     </View>
