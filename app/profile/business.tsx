@@ -72,6 +72,9 @@ const quickActions = [
   { id: "add-promo", label: "Add promotions", icon: "megaphone-outline" },
 ] as const;
 
+const mockCity = "Beverly Hills";
+const mockState = "California";
+
 export default function BusinessProfileScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
@@ -119,7 +122,7 @@ export default function BusinessProfileScreen() {
                 </View>
 
                 <AppText style={styles.heroSubInfo} numberOfLines={1}>
-                  Beverly Hills / California
+                  {mockCity}, {mockState}
                 </AppText>
               </View>
 
