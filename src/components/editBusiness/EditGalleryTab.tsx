@@ -1,8 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
-import * as ImagePicker from "expo-image-picker"; 
+import * as ImagePicker from "expo-image-picker";
 import React, { useRef, useState } from "react";
 import {
-  ActivityIndicator,
   Alert,
   Dimensions,
   Image,
@@ -11,6 +10,8 @@ import {
   StyleSheet,
   View,
 } from "react-native";
+
+import AppButton from "@/src/components/ui/AppButton/AppButton";
 
 import GalleryPhotoActionSheet from "@/src/components/editBusiness/GalleryPhotoActionSheet";
 import AppText from "@/src/components/ui/AppText/AppText";
@@ -26,7 +27,8 @@ const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const PADDING = spacing.lg;
 const GAP = spacing.cardGap;
 const NUM_COLS = 3;
-const CELL_SIZE = (SCREEN_WIDTH - 2 * PADDING - (NUM_COLS - 1) * GAP) / NUM_COLS;
+const CELL_SIZE =
+  (SCREEN_WIDTH - 2 * PADDING - (NUM_COLS - 1) * GAP) / NUM_COLS;
 
 export default function EditGalleryTab() {
   const { colors } = useAppTheme();
@@ -37,11 +39,14 @@ export default function EditGalleryTab() {
   const markDirty = useEditBusinessStore((s) => s.markDirty);
   const setGalleryDraft = useEditBusinessStore((s) => s.setGalleryDraft);
 
-  const { saveGallery, isSavingGallery, hasGalleryError, saveError } = useEditBusiness();
+  const { saveGallery, isSavingGallery, hasGalleryError, saveError } =
+    useEditBusiness();
 
   const [showSuccess, setShowSuccess] = useState(false);
   const [loadingIds, setLoadingIds] = useState<Set<string>>(new Set());
-  const [actionSheetPhoto, setActionSheetPhoto] = useState<GalleryPhoto | null>(null);
+  const [actionSheetPhoto, setActionSheetPhoto] = useState<GalleryPhoto | null>(
+    null,
+  );
   const successTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const { photos, defaultPhotoIds } = galleryDraft;
@@ -79,14 +84,18 @@ export default function EditGalleryTab() {
 
   function handleSetDefault() {
     if (!actionSheetPhoto || defaultPhotoIds.length >= 3) return;
-    setGalleryDraft({ defaultPhotoIds: [...defaultPhotoIds, actionSheetPhoto.id] });
+    setGalleryDraft({
+      defaultPhotoIds: [...defaultPhotoIds, actionSheetPhoto.id],
+    });
     markDirty("gallery");
   }
 
   function handleRemoveDefault() {
     if (!actionSheetPhoto) return;
     setGalleryDraft({
-      defaultPhotoIds: defaultPhotoIds.filter((id) => id !== actionSheetPhoto.id),
+      defaultPhotoIds: defaultPhotoIds.filter(
+        (id) => id !== actionSheetPhoto.id,
+      ),
     });
     markDirty("gallery");
   }
@@ -95,27 +104,23 @@ export default function EditGalleryTab() {
     const photoToDelete = actionSheetPhoto;
     setActionSheetPhoto(null);
     if (!photoToDelete) return;
-    Alert.alert(
-      "Delete Photo",
-      "This photo will be permanently removed.",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: () => {
-            const { galleryDraft: current } = useEditBusinessStore.getState();
-            setGalleryDraft({
-              photos: current.photos.filter((p) => p.id !== photoToDelete.id),
-              defaultPhotoIds: current.defaultPhotoIds.filter(
-                (id) => id !== photoToDelete.id
-              ),
-            });
-            markDirty("gallery");
-          },
+    Alert.alert("Delete Photo", "This photo will be permanently removed.", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Delete",
+        style: "destructive",
+        onPress: () => {
+          const { galleryDraft: current } = useEditBusinessStore.getState();
+          setGalleryDraft({
+            photos: current.photos.filter((p) => p.id !== photoToDelete.id),
+            defaultPhotoIds: current.defaultPhotoIds.filter(
+              (id) => id !== photoToDelete.id,
+            ),
+          });
+          markDirty("gallery");
         },
-      ]
-    );
+      },
+    ]);
   }
 
   async function handleSave() {
@@ -139,7 +144,10 @@ export default function EditGalleryTab() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.grid}>
-          <Pressable style={[styles.cell, styles.uploadCell]} onPress={pickImages}>
+          <Pressable
+            style={[styles.cell, styles.uploadCell]}
+            onPress={pickImages}
+          >
             <Ionicons name="add-outline" size={32} color={colors.textMuted} />
           </Pressable>
 
@@ -157,7 +165,9 @@ export default function EditGalleryTab() {
                 ]}
               >
                 {isLoading && (
-                  <View style={[StyleSheet.absoluteFill, styles.imagePlaceholder]} />
+                  <View
+                    style={[StyleSheet.absoluteFill, styles.imagePlaceholder]}
+                  />
                 )}
                 <Image
                   source={{ uri: photo.url }}
@@ -167,7 +177,11 @@ export default function EditGalleryTab() {
                 />
                 {isDefault && (
                   <View style={styles.defaultBadge}>
-                    <Ionicons name="star-outline" size={10} color={colors.white} />
+                    <Ionicons
+                      name="star-outline"
+                      size={10}
+                      color={colors.white}
+                    />
                     <AppText style={styles.defaultBadgeText}>Default</AppText>
                   </View>
                 )}
@@ -189,7 +203,11 @@ export default function EditGalleryTab() {
 
         {photos.length === 0 && (
           <View style={styles.emptyState}>
-            <Ionicons name="images-outline" size={48} color={colors.textMuted} />
+            <Ionicons
+              name="images-outline"
+              size={48}
+              color={colors.textMuted}
+            />
             <AppText style={styles.emptyTitle}>No photos yet</AppText>
             <AppText style={styles.emptyCaption}>
               Add photos to showcase your business
@@ -213,16 +231,11 @@ export default function EditGalleryTab() {
             </AppText>
           </View>
         )}
-        <Pressable
-          style={[styles.saveButton, !isDirty && styles.saveButtonDisabled]}
-          onPress={!isSavingGallery ? handleSave : undefined}
-        >
-          {isSavingGallery ? (
-            <ActivityIndicator color="#fff" size="small" />
-          ) : (
-            <AppText style={styles.saveButtonText}>Save changes</AppText>
-          )}
-        </Pressable>
+        <AppButton
+          title={isSavingGallery ? "Saving..." : "Save changes"}
+          onPress={handleSave}
+          disabled={!isDirty || isSavingGallery}
+        />
       </View>
 
       <GalleryPhotoActionSheet
@@ -329,11 +342,9 @@ function createStyles(colors: AppColors) {
     footer: {
       paddingHorizontal: spacing.lg,
       paddingTop: spacing.sm,
-      paddingBottom: spacing.lg,
+      paddingBottom: spacing.xxl,
       gap: spacing.sm,
       backgroundColor: colors.background,
-      borderTopWidth: StyleSheet.hairlineWidth,
-      borderTopColor: colors.border,
     },
     saveButton: {
       height: 50,
@@ -343,7 +354,7 @@ function createStyles(colors: AppColors) {
       justifyContent: "center",
     },
     saveButtonDisabled: {
-      backgroundColor: colors.textMuted,
+      opacity: 0.5,
     },
     saveButtonText: {
       fontSize: 16,

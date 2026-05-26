@@ -1,7 +1,8 @@
 import { Ionicons } from "@expo/vector-icons";
+import * as ImagePicker from "expo-image-picker";
 import React, { useRef, useState } from "react";
 import {
-  ActivityIndicator,
+  Alert,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -9,6 +10,8 @@ import {
   StyleSheet,
   View,
 } from "react-native";
+
+import AppButton from "@/src/components/ui/AppButton/AppButton";
 
 import AppAvatar from "@/src/components/ui/AppAvatar/AppAvatar";
 import AppInput from "@/src/components/ui/AppInput/AppInput";
@@ -83,15 +86,45 @@ export default function EditOverviewTab() {
       draft.hours.map((h) => [
         h.day,
         !h.isOpen || (h.openTime !== "" && h.closeTime !== ""),
-      ])
-    )
+      ]),
+    ),
   );
 
   const { saveOverview, isSaving, saveError } = useEditBusiness();
-  const { showError, errorMessage, triggerError, clearError } = useFormValidation();
+  const { showError, errorMessage, triggerError, clearError } =
+    useFormValidation();
   const [errors, setErrors] = useState<OverviewErrors>(NO_ERRORS);
   const [showSuccess, setShowSuccess] = useState(false);
   const successTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const displayedAvatarUrl = draft.avatarUrl || account.avatarUrl;
+
+  async function handlePickAvatar() {
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (!permission.granted) {
+      Alert.alert(
+        "Permission needed",
+        "Please allow photo access to change your business profile picture.",
+      );
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images"],
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    });
+
+    if (result.canceled) return;
+
+    const nextAvatarUrl = result.assets[0]?.uri;
+    if (!nextAvatarUrl) return;
+
+    setOverviewDraft({ avatarUrl: nextAvatarUrl });
+    markDirty("overview");
+  }
 
   const mandatoryFilled =
     draft.address.trim() !== "" &&
@@ -100,9 +133,7 @@ export default function EditOverviewTab() {
     draft.state.trim() !== "";
   const canSave = isDirty && mandatoryFilled;
 
-  function onField(
-    key: keyof Omit<typeof draft, "socialLinks" | "hours">
-  ) {
+  function onField(key: keyof Omit<typeof draft, "socialLinks" | "hours">) {
     return (value: string) => {
       setOverviewDraft({ [key]: value });
       markDirty("overview");
@@ -128,7 +159,7 @@ export default function EditOverviewTab() {
   function onHourTime(
     day: DayOfWeek,
     field: "openTime" | "closeTime",
-    value: string
+    value: string,
   ) {
     updateOverviewHour(day, { [field]: value });
     markDirty("overview");
@@ -172,7 +203,7 @@ export default function EditOverviewTab() {
     <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
-      keyboardVerticalOffset={Platform.OS === "ios" ? 160 : 0}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 96 : 0}
     >
       <ScrollView
         ref={scrollRef}
@@ -186,14 +217,11 @@ export default function EditOverviewTab() {
         <View style={styles.avatarSection}>
           <View style={styles.avatarContainer}>
             <AppAvatar
-              imageUrl={account.avatarUrl}
+              imageUrl={displayedAvatarUrl}
               name={account.displayName}
               size="lg"
             />
-            <Pressable
-              style={styles.avatarEditBtn}
-              onPress={() => console.log("pick image")}
-            >
+            <Pressable style={styles.avatarEditBtn} onPress={handlePickAvatar}>
               <Ionicons name="camera-outline" size={14} color={colors.white} />
             </Pressable>
           </View>
@@ -252,7 +280,9 @@ export default function EditOverviewTab() {
                 error={errors.address}
               />
               {errors.address && (
-                <AppText style={styles.errorText}>This field is required</AppText>
+                <AppText style={styles.errorText}>
+                  This field is required
+                </AppText>
               )}
             </View>
             <View
@@ -290,7 +320,9 @@ export default function EditOverviewTab() {
                 error={errors.city}
               />
               {errors.city && (
-                <AppText style={styles.errorText}>This field is required</AppText>
+                <AppText style={styles.errorText}>
+                  This field is required
+                </AppText>
               )}
             </View>
             <View
@@ -307,7 +339,9 @@ export default function EditOverviewTab() {
                 error={errors.state}
               />
               {errors.state && (
-                <AppText style={styles.errorText}>This field is required</AppText>
+                <AppText style={styles.errorText}>
+                  This field is required
+                </AppText>
               )}
             </View>
           </View>
@@ -334,7 +368,9 @@ export default function EditOverviewTab() {
             {SOCIAL_ROWS.map((item, index) => (
               <View
                 key={item.key}
-                style={index === SOCIAL_ROWS.length - 1 ? styles.lastRow : undefined}
+                style={
+                  index === SOCIAL_ROWS.length - 1 ? styles.lastRow : undefined
+                }
               >
                 <EditBusinessSocialRow
                   icon={item.icon}
@@ -388,16 +424,11 @@ export default function EditOverviewTab() {
           <AppText style={styles.validationError}>{errorMessage}</AppText>
         )}
 
-        <Pressable
-          style={[styles.saveButton, !canSave && styles.saveButtonDisabled]}
-          onPress={!isSaving ? handleSave : undefined}
-        >
-          {isSaving ? (
-            <ActivityIndicator color="#fff" size="small" />
-          ) : (
-            <AppText style={styles.saveButtonText}>Save changes</AppText>
-          )}
-        </Pressable>
+        <AppButton
+          title={isSaving ? "Saving..." : "Save changes"}
+          onPress={handleSave}
+          disabled={!canSave || isSaving}
+        />
       </View>
     </KeyboardAvoidingView>
   );
@@ -530,11 +561,9 @@ function createStyles(colors: AppColors) {
     footer: {
       paddingHorizontal: spacing.lg,
       paddingTop: spacing.sm,
-      paddingBottom: spacing.lg,
+      paddingBottom: spacing.xxl,
       gap: spacing.sm,
       backgroundColor: colors.background,
-      borderTopWidth: StyleSheet.hairlineWidth,
-      borderTopColor: colors.border,
     },
     saveButton: {
       height: 50,
@@ -544,7 +573,7 @@ function createStyles(colors: AppColors) {
       justifyContent: "center",
     },
     saveButtonDisabled: {
-      backgroundColor: colors.textMuted,
+      opacity: 0.5,
     },
     saveButtonText: {
       fontSize: 16,

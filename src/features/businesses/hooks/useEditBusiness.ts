@@ -1,14 +1,14 @@
 import { useState } from "react";
 
+import type {
+    EditBusinessTab,
+    UpdateBusinessAboutPayload,
+    UpdateBusinessGalleryPayload,
+    UpdateBusinessOverviewPayload,
+    UpdateBusinessServicesPayload,
+} from "@/src/features/businesses/types/editBusiness.types";
 import { apiClient } from "@/src/services/api/client";
 import { useEditBusinessStore } from "@/src/store/editBusiness.store";
-import type {
-  EditBusinessTab,
-  UpdateBusinessAboutPayload,
-  UpdateBusinessGalleryPayload,
-  UpdateBusinessOverviewPayload,
-  UpdateBusinessServicesPayload,
-} from "@/src/features/businesses/types/editBusiness.types";
 
 export function useEditBusiness() {
   const [savingTab, setSavingTab] = useState<EditBusinessTab | null>(null);
@@ -26,10 +26,31 @@ export function useEditBusiness() {
     setErrorTab(null);
     setSaveError(null);
 
+    let finalAvatarUrl = overviewDraft.avatarUrl;
+
+    if (overviewDraft.avatarUrl?.startsWith("file")) {
+      const formData = new FormData();
+
+      formData.append("avatar", {
+        uri: overviewDraft.avatarUrl,
+        name: "business-avatar.jpg",
+        type: "image/jpeg",
+      } as unknown as Blob);
+
+      const avatarRes = await apiClient.post<{ avatarUrl: string }>(
+        "/api/businesses/me/avatar",
+        formData,
+      );
+
+      finalAvatarUrl = avatarRes.data.avatarUrl;
+    }
+
     const payload: UpdateBusinessOverviewPayload = {
       name: overviewDraft.name,
       category: overviewDraft.category,
+      avatarUrl: finalAvatarUrl,
       address: overviewDraft.address,
+      postalCode: overviewDraft.postalCode,
       city: overviewDraft.city,
       state: overviewDraft.state,
       phone: overviewDraft.phone,
@@ -40,7 +61,7 @@ export function useEditBusiness() {
     try {
       await apiClient.patch(
         "/api/businesses/me/overview",
-        payload as unknown as Record<string, unknown>
+        payload as unknown as Record<string, unknown>,
       );
       markSaved("overview");
       setSavingTab(null);
@@ -61,15 +82,19 @@ export function useEditBusiness() {
     setSaveError(null);
 
     const payload: UpdateBusinessGalleryPayload = {
-      newPhotoUris: galleryDraft.photos.filter((p) => p.isLocal).map((p) => p.url),
-      existingPhotoIds: galleryDraft.photos.filter((p) => !p.isLocal).map((p) => p.id),
+      newPhotoUris: galleryDraft.photos
+        .filter((p) => p.isLocal)
+        .map((p) => p.url),
+      existingPhotoIds: galleryDraft.photos
+        .filter((p) => !p.isLocal)
+        .map((p) => p.id),
       defaultPhotoIds: galleryDraft.defaultPhotoIds,
     };
 
     try {
       await apiClient.post(
         "/api/businesses/me/gallery",
-        payload as unknown as Record<string, unknown>
+        payload as unknown as Record<string, unknown>,
       );
       markSaved("gallery");
       setSavingTab(null);
@@ -101,7 +126,7 @@ export function useEditBusiness() {
     try {
       await apiClient.patch(
         "/api/businesses/me/services",
-        payload as unknown as Record<string, unknown>
+        payload as unknown as Record<string, unknown>,
       );
       markSaved("services");
       setSavingTab(null);
@@ -130,7 +155,7 @@ export function useEditBusiness() {
     try {
       await apiClient.patch(
         "/api/businesses/me/about",
-        payload as unknown as Record<string, unknown>
+        payload as unknown as Record<string, unknown>,
       );
       markSaved("about");
       setSavingTab(null);

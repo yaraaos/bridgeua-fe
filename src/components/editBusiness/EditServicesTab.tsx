@@ -1,7 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import React, { useRef, useState } from "react";
 import {
-  ActivityIndicator,
   KeyboardAvoidingView,
   Linking,
   Platform,
@@ -11,6 +10,8 @@ import {
   Text,
   View,
 } from "react-native";
+
+import AppButton from "@/src/components/ui/AppButton/AppButton";
 
 import AppText from "@/src/components/ui/AppText/AppText";
 import { AppColors } from "@/src/constants/colors";
@@ -33,13 +34,13 @@ export default function EditServicesTab() {
   const isDirty = useEditBusinessStore((s) => s.dirty.services);
   const markDirty = useEditBusinessStore((s) => s.markDirty);
   const addConfiguredServices = useEditBusinessStore(
-    (s) => s.addConfiguredServices
+    (s) => s.addConfiguredServices,
   );
   const updateConfiguredService = useEditBusinessStore(
-    (s) => s.updateConfiguredService
+    (s) => s.updateConfiguredService,
   );
   const removeConfiguredService = useEditBusinessStore(
-    (s) => s.removeConfiguredService
+    (s) => s.removeConfiguredService,
   );
 
   const { saveServices, isSavingServices, hasServicesError, saveError } =
@@ -48,7 +49,8 @@ export default function EditServicesTab() {
   const scrollRef = useRef<ScrollView>(null);
   const cardPositions = useRef<Record<string, number>>({});
 
-  const { showError, errorMessage, triggerError, clearError } = useFormValidation();
+  const { showError, errorMessage, triggerError, clearError } =
+    useFormValidation();
 
   const [libraryOpen, setLibraryOpen] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -58,11 +60,11 @@ export default function EditServicesTab() {
 
   const configuredIds = new Set(services.map((s) => s.id));
   const availableLibraryItems = BEAUTY_SERVICES.filter(
-    (item) => !configuredIds.has(item.id)
+    (item) => !configuredIds.has(item.id),
   );
 
   const allValid = services.every(
-    (s) => s.duration.trim() !== "" && s.price.trim() !== ""
+    (s) => s.duration.trim() !== "" && s.price.trim() !== "",
   );
   const canSave = isDirty && allValid;
 
@@ -80,8 +82,13 @@ export default function EditServicesTab() {
 
   function handleAddSelected() {
     const newServices: ConfiguredService[] = BEAUTY_SERVICES.filter((item) =>
-      selectedIds.has(item.id)
-    ).map((item) => ({ id: item.id, name: item.name, duration: "", price: "" }));
+      selectedIds.has(item.id),
+    ).map((item) => ({
+      id: item.id,
+      name: item.name,
+      duration: "",
+      price: "",
+    }));
     addConfiguredServices(newServices);
     markDirty("services");
     setSelectedIds(new Set());
@@ -94,7 +101,7 @@ export default function EditServicesTab() {
       setShowValidation(true);
       triggerError("Fill in the required fields");
       const firstInvalidId = services.find(
-        (s) => s.duration.trim() === "" || s.price.trim() === ""
+        (s) => s.duration.trim() === "" || s.price.trim() === "",
       )?.id;
       if (firstInvalidId !== undefined) {
         scrollRef.current?.scrollTo({
@@ -203,13 +210,17 @@ export default function EditServicesTab() {
                     ]}
                     onPress={() => toggleLibraryItem(item.id)}
                   >
-                    <AppText style={styles.libraryItemName}>{item.name}</AppText>
+                    <AppText style={styles.libraryItemName}>
+                      {item.name}
+                    </AppText>
                     <Ionicons
                       name={
                         isSelected ? "checkmark-circle" : "add-circle-outline"
                       }
                       size={22}
-                      color={isSelected ? colors.primaryGreen : colors.textMuted}
+                      color={
+                        isSelected ? colors.primaryGreen : colors.textMuted
+                      }
                     />
                   </Pressable>
                 );
@@ -221,12 +232,10 @@ export default function EditServicesTab() {
         {/* Can't find a service footer */}
         <View style={styles.contactFooter}>
           <Text style={styles.contactText}>
-            Can't find a service you need?{" "}
+            Can&apos;t find a service you need?{" "}
             <Text
               style={styles.contactLink}
-              onPress={() =>
-                Linking.openURL("mailto:support@bridgeua.com")
-              }
+              onPress={() => Linking.openURL("mailto:support@bridgeua.com")}
             >
               Contact us
             </Text>
@@ -265,16 +274,11 @@ export default function EditServicesTab() {
           <AppText style={styles.validationError}>{errorMessage}</AppText>
         )}
 
-        <Pressable
-          style={[styles.saveButton, !canSave && styles.saveButtonDisabled]}
-          onPress={!isSavingServices ? handleSave : undefined}
-        >
-          {isSavingServices ? (
-            <ActivityIndicator color="#fff" size="small" />
-          ) : (
-            <AppText style={styles.saveButtonText}>Save changes</AppText>
-          )}
-        </Pressable>
+        <AppButton
+          title={isSavingServices ? "Saving..." : "Save changes"}
+          onPress={handleSave}
+          disabled={!canSave || isSavingServices}
+        />
       </View>
     </KeyboardAvoidingView>
   );
@@ -389,11 +393,9 @@ function createStyles(colors: AppColors) {
     footer: {
       paddingHorizontal: spacing.lg,
       paddingTop: spacing.sm,
-      paddingBottom: spacing.lg,
+      paddingBottom: spacing.xxl,
       gap: spacing.sm,
       backgroundColor: colors.background,
-      borderTopWidth: StyleSheet.hairlineWidth,
-      borderTopColor: colors.border,
     },
     saveButton: {
       height: 50,
@@ -403,7 +405,7 @@ function createStyles(colors: AppColors) {
       justifyContent: "center",
     },
     saveButtonDisabled: {
-      backgroundColor: colors.textMuted,
+      opacity: 0.5,
     },
     saveButtonText: {
       fontSize: 16,

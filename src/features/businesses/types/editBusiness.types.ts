@@ -27,6 +27,7 @@ export type EditBusinessSocialLinks = {
 export type EditBusinessOverviewDraft = {
   name: string;
   category: string;
+  avatarUrl?: string;
   address: string;
   postalCode: string;
   city: string;
@@ -39,6 +40,7 @@ export type EditBusinessOverviewDraft = {
 export type UpdateBusinessOverviewPayload = {
   name: string;
   category: string;
+  avatarUrl?: string;
   address: string;
   postalCode: string;
   city: string;

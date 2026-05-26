@@ -1,15 +1,15 @@
 import { Ionicons } from "@expo/vector-icons";
 import React, { useRef, useState } from "react";
 import {
-  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
-  Pressable,
   ScrollView,
   StyleSheet,
   TextInput,
   View,
 } from "react-native";
+
+import AppButton from "@/src/components/ui/AppButton/AppButton";
 
 import AppText from "@/src/components/ui/AppText/AppText";
 import { AppColors } from "@/src/constants/colors";
@@ -51,7 +51,11 @@ const AMENITIES: {
   { id: "parking", label: "Parking", icon: "car-outline" },
   { id: "ac", label: "Air Conditioning", icon: "snow-outline" },
   { id: "pet", label: "Pet Friendly", icon: "paw-outline" },
-  { id: "accessibility", label: "Wheelchair Accessible", icon: "accessibility-outline" },
+  {
+    id: "accessibility",
+    label: "Wheelchair Accessible",
+    icon: "accessibility-outline",
+  },
   { id: "coffee", label: "Coffee & Drinks", icon: "cafe-outline" },
   { id: "tv", label: "TV", icon: "tv-outline" },
   { id: "outdoor", label: "Outdoor Seating", icon: "umbrella-outline" },
@@ -66,7 +70,8 @@ export default function EditAboutTab() {
   const markDirty = useEditBusinessStore((s) => s.markDirty);
   const setAboutDraft = useEditBusinessStore((s) => s.setAboutDraft);
 
-  const { saveAbout, isSavingAbout, hasAboutError, saveError } = useEditBusiness();
+  const { saveAbout, isSavingAbout, hasAboutError, saveError } =
+    useEditBusiness();
 
   const [showSuccess, setShowSuccess] = useState(false);
   const successTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -187,16 +192,11 @@ export default function EditAboutTab() {
           </View>
         )}
 
-        <Pressable
-          style={[styles.saveButton, !isDirty && styles.saveButtonDisabled]}
-          onPress={!isSavingAbout ? handleSave : undefined}
-        >
-          {isSavingAbout ? (
-            <ActivityIndicator color="#fff" size="small" />
-          ) : (
-            <AppText style={styles.saveButtonText}>Save changes</AppText>
-          )}
-        </Pressable>
+        <AppButton
+          title={isSavingAbout ? "Saving..." : "Save changes"}
+          onPress={handleSave}
+          disabled={!isDirty || isSavingAbout}
+        />
       </View>
     </KeyboardAvoidingView>
   );
@@ -252,11 +252,9 @@ function createStyles(colors: AppColors) {
     footer: {
       paddingHorizontal: spacing.lg,
       paddingTop: spacing.sm,
-      paddingBottom: spacing.lg,
+      paddingBottom: spacing.xxl,
       gap: spacing.sm,
       backgroundColor: colors.background,
-      borderTopWidth: StyleSheet.hairlineWidth,
-      borderTopColor: colors.border,
     },
     saveButton: {
       height: 50,
@@ -266,7 +264,7 @@ function createStyles(colors: AppColors) {
       justifyContent: "center",
     },
     saveButtonDisabled: {
-      backgroundColor: colors.textMuted,
+      opacity: 0.5,
     },
     saveButtonText: {
       fontSize: 16,

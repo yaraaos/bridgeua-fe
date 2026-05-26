@@ -1,14 +1,14 @@
 import { create } from "zustand";
 
 import type {
-  BusinessHourEntry,
-  ConfiguredService,
-  DayOfWeek,
-  EditBusinessAboutDraft,
-  EditBusinessGalleryDraft,
-  EditBusinessOverviewDraft,
-  EditBusinessServicesDraft,
-  EditBusinessTab,
+    BusinessHourEntry,
+    ConfiguredService,
+    DayOfWeek,
+    EditBusinessAboutDraft,
+    EditBusinessGalleryDraft,
+    EditBusinessOverviewDraft,
+    EditBusinessServicesDraft,
+    EditBusinessTab,
 } from "@/src/features/businesses/types/editBusiness.types";
 
 export type { EditBusinessTab };
@@ -26,6 +26,7 @@ const defaultHours: BusinessHourEntry[] = [
 const defaultOverviewDraft: EditBusinessOverviewDraft = {
   name: "",
   category: "",
+  avatarUrl: undefined,
   address: "",
   postalCode: "",
   city: "",
@@ -54,11 +55,17 @@ type EditBusinessState = {
   markDirty: (tab: EditBusinessTab) => void;
   markSaved: (tab: EditBusinessTab) => void;
   setOverviewDraft: (patch: Partial<EditBusinessOverviewDraft>) => void;
-  updateOverviewHour: (day: DayOfWeek, patch: Partial<BusinessHourEntry>) => void;
+  updateOverviewHour: (
+    day: DayOfWeek,
+    patch: Partial<BusinessHourEntry>,
+  ) => void;
   setGalleryDraft: (patch: Partial<EditBusinessGalleryDraft>) => void;
   setServicesDraft: (draft: EditBusinessServicesDraft) => void;
   addConfiguredServices: (items: ConfiguredService[]) => void;
-  updateConfiguredService: (id: string, patch: Partial<ConfiguredService>) => void;
+  updateConfiguredService: (
+    id: string,
+    patch: Partial<ConfiguredService>,
+  ) => void;
   removeConfiguredService: (id: string) => void;
   setAboutDraft: (patch: Partial<EditBusinessAboutDraft>) => void;
   resetAll: () => void;
@@ -98,7 +105,7 @@ export const useEditBusinessStore = create<EditBusinessState>((set) => ({
       overviewDraft: {
         ...s.overviewDraft,
         hours: s.overviewDraft.hours.map((h) =>
-          h.day === day ? { ...h, ...patch } : h
+          h.day === day ? { ...h, ...patch } : h,
         ),
       },
     })),
@@ -113,7 +120,7 @@ export const useEditBusinessStore = create<EditBusinessState>((set) => ({
     set((s) => ({
       servicesDraft: {
         services: s.servicesDraft.services.map((svc) =>
-          svc.id === id ? { ...svc, ...patch } : svc
+          svc.id === id ? { ...svc, ...patch } : svc,
         ),
       },
     })),
