@@ -16,7 +16,12 @@ export function useRegisterBusiness() {
       setIsLoading(true);
       setApiError(null);
 
-      return await registerBusiness(payload);
+      // address, zipCode, city, state are not yet supported by BE — strip them
+      // before the request. The caller stores them in editBusiness store separately.
+      // Remove this destructuring once BE adds support for these fields.
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { address, zipCode, city, state, ...apiPayload } = payload;
+      return await registerBusiness(apiPayload as RegisterBusinessPayload);
     } catch (error) {
       setApiError(
         error instanceof Error ? error.message : "Something went wrong"

@@ -3,7 +3,7 @@ import { z } from "zod";
 export const signUpBusinessSchema = z
   .object({
     businessName: z.string().trim().min(1, "Business name is required"),
-    ownerName: z.string().trim().min(1, "Owner name is required"),
+    ownerName: z.string().trim().min(2, "Full name must be at least 2 characters"),
     email: z
       .string()
       .trim()
@@ -11,7 +11,11 @@ export const signUpBusinessSchema = z
       .email("Enter a valid email address"),
     password: z.string().trim().min(1, "Password is required"),
     confirmPassword: z.string().trim().min(1, "Confirm password is required"),
-    category: z.string().optional(),
+    category: z.string().trim().min(1, "Category is required"),
+    address: z.string().trim().min(1, "Address is required"),
+    zipCode: z.string().trim().min(1, "ZIP code is required"),
+    city: z.string().trim().min(1, "City is required"),
+    state: z.string().trim().min(1, "State is required"),
     agree: z.boolean().refine((value) => value, {
       message: "You must agree to continue",
     }),

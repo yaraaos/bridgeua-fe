@@ -39,7 +39,11 @@ export type RegisterBusinessPayload = {
   ownerName: string;
   email: string;
   password: string;
-  category?: string;
+  category: string;
+  address: string;
+  zipCode: string;
+  city: string;
+  state: string;
 };
 
 export type RegisterBusinessResponse = RegisterResponse;
