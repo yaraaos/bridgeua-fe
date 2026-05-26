@@ -8,6 +8,7 @@ type Props = {
   onPress?: () => void;
   variant?: "primary" | "secondary" | "ghost" | "accent";
   disabled?: boolean;
+  disabledPressable?: boolean;
 };
 
 export default function AppButton({
@@ -15,13 +16,14 @@ export default function AppButton({
   onPress,
   variant = "primary",
   disabled = false,
+  disabledPressable = false,
 }: Props) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
 
   return (
     <Pressable
-      onPress={disabled ? undefined : onPress}
+      onPress={disabled && !disabledPressable ? undefined : onPress}
       style={[
         styles.base,
         variant === "primary" && styles.primary,

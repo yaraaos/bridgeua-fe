@@ -441,6 +441,7 @@ export default function EditOverviewTab() {
           title={isSaving ? "Saving..." : "Save changes"}
           onPress={handleSave}
           disabled={!canSave || isSaving}
+          disabledPressable={isDirty && !isSaving}
         />
       </View>
     </View>

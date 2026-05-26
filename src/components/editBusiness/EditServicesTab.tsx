@@ -284,6 +284,7 @@ export default function EditServicesTab() {
           title={isSavingServices ? "Saving..." : "Save changes"}
           onPress={handleSave}
           disabled={!canSave || isSavingServices}
+          disabledPressable={isDirty && !isSavingServices}
         />
       </View>
     </View>
