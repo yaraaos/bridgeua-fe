@@ -13,7 +13,6 @@ import {
 
 import AppButton from "@/src/components/ui/AppButton/AppButton";
 
-import GalleryPhotoActionSheet from "@/src/components/editBusiness/GalleryPhotoActionSheet";
 import AppText from "@/src/components/ui/AppText/AppText";
 import { AppColors } from "@/src/constants/colors";
 import { radius } from "@/src/constants/radius";
@@ -84,20 +83,26 @@ export default function EditGalleryTab() {
 
   function handleSetDefault() {
     if (!actionSheetPhoto || defaultPhotoIds.length >= 3) return;
+
     setGalleryDraft({
       defaultPhotoIds: [...defaultPhotoIds, actionSheetPhoto.id],
     });
+
     markDirty("gallery");
+    setActionSheetPhoto(null);
   }
 
   function handleRemoveDefault() {
     if (!actionSheetPhoto) return;
+
     setGalleryDraft({
       defaultPhotoIds: defaultPhotoIds.filter(
         (id) => id !== actionSheetPhoto.id,
       ),
     });
+
     markDirty("gallery");
+    setActionSheetPhoto(null);
   }
 
   function handleDeleteRequest() {
@@ -133,10 +138,6 @@ export default function EditGalleryTab() {
     }
   }
 
-  const isActionPhotoDefault = actionSheetPhoto
-    ? defaultPhotoIds.includes(actionSheetPhoto.id)
-    : false;
-
   return (
     <View style={styles.container}>
       <ScrollView
@@ -154,6 +155,10 @@ export default function EditGalleryTab() {
           {photos.map((photo) => {
             const isDefault = defaultPhotoIds.includes(photo.id);
             const isLoading = loadingIds.has(photo.id);
+            const isMenuOpen = actionSheetPhoto?.id === photo.id;
+            const setDefaultDisabled =
+              !isDefault && defaultPhotoIds.length >= 3;
+            const canSetDefault = !isDefault && defaultPhotoIds.length < 3;
 
             return (
               <View
@@ -164,38 +169,116 @@ export default function EditGalleryTab() {
                   isDefault && styles.photoCellDefault,
                 ]}
               >
-                {isLoading && (
-                  <View
-                    style={[StyleSheet.absoluteFill, styles.imagePlaceholder]}
-                  />
-                )}
-                <Image
-                  source={{ uri: photo.url }}
-                  style={styles.photo}
-                  onLoadStart={() => handleImageLoadStart(photo.id)}
-                  onLoadEnd={() => handleImageLoadEnd(photo.id)}
-                />
-                {isDefault && (
-                  <View style={styles.defaultBadge}>
-                    <Ionicons
-                      name="star-outline"
-                      size={10}
-                      color={colors.white}
+                <View style={styles.photoClip}>
+                  {isLoading && (
+                    <View
+                      style={[StyleSheet.absoluteFill, styles.imagePlaceholder]}
                     />
-                    <AppText style={styles.defaultBadgeText}>Default</AppText>
-                  </View>
-                )}
-                <Pressable
-                  style={styles.settingsButton}
-                  onPress={() => setActionSheetPhoto(photo)}
-                  hitSlop={4}
-                >
-                  <Ionicons
-                    name="settings-outline"
-                    size={16}
-                    color={colors.textPrimary}
+                  )}
+
+                  <Image
+                    source={{ uri: photo.url }}
+                    style={styles.photo}
+                    onLoadStart={() => handleImageLoadStart(photo.id)}
+                    onLoadEnd={() => handleImageLoadEnd(photo.id)}
                   />
-                </Pressable>
+
+                  {isDefault && (
+                    <View style={styles.defaultBadge}>
+                      <Ionicons
+                        name="star-outline"
+                        size={10}
+                        color={colors.white}
+                      />
+                      <AppText style={styles.defaultBadgeText}>Default</AppText>
+                    </View>
+                  )}
+                </View>
+
+                <View style={styles.photoActionsWrap}>
+                  <Pressable
+                    style={[
+                      styles.settingsButton,
+                      isMenuOpen && styles.settingsButtonActive,
+                    ]}
+                    onPress={() =>
+                      setActionSheetPhoto(isMenuOpen ? null : photo)
+                    }
+                    hitSlop={4}
+                  >
+                    <Ionicons
+                      name="ellipsis-horizontal"
+                      size={16}
+                      color={colors.primaryGreen}
+                    />
+                  </Pressable>
+
+                  {isMenuOpen ? (
+                    <View style={styles.photoActionsMenu}>
+                      {isDefault ? (
+                        <Pressable
+                          style={styles.photoActionsMenuItem}
+                          onPress={handleRemoveDefault}
+                        >
+                          <Ionicons
+                            name="star-outline"
+                            size={16}
+                            color={colors.textSecondary}
+                          />
+                          <AppText style={styles.photoActionsMenuText}>
+                            Remove default
+                          </AppText>
+                        </Pressable>
+                      ) : (
+                        <Pressable
+                          style={[
+                            styles.photoActionsMenuItem,
+                            setDefaultDisabled &&
+                              styles.photoActionsMenuItemDisabled,
+                          ]}
+                          onPress={canSetDefault ? handleSetDefault : undefined}
+                        >
+                          <Ionicons
+                            name="star-outline"
+                            size={16}
+                            color={
+                              canSetDefault
+                                ? colors.accentOrange
+                                : colors.textMuted
+                            }
+                          />
+                          <AppText
+                            style={[
+                              styles.photoActionsMenuText,
+                              !canSetDefault && { color: colors.textMuted },
+                            ]}
+                          >
+                            Set default
+                          </AppText>
+                        </Pressable>
+                      )}
+
+                      <Pressable
+                        style={styles.photoActionsMenuItem}
+                        onPress={handleDeleteRequest}
+                      >
+                        <Ionicons
+                          name="trash-outline"
+                          size={16}
+                          color={colors.error}
+                        />
+                        <AppText
+                          style={[
+                            styles.photoActionsMenuText,
+                            { color: colors.error },
+                          ]}
+                        >
+                          Delete photo
+                        </AppText>
+                      </Pressable>
+                    </View>
+                  ) : null}
+                </View>
               </View>
             );
           })}
@@ -237,17 +320,6 @@ export default function EditGalleryTab() {
           disabled={!isDirty || isSavingGallery}
         />
       </View>
-
-      <GalleryPhotoActionSheet
-        visible={actionSheetPhoto !== null}
-        photo={actionSheetPhoto}
-        isDefault={isActionPhotoDefault}
-        defaultCount={defaultPhotoIds.length}
-        onClose={() => setActionSheetPhoto(null)}
-        onSetDefault={handleSetDefault}
-        onRemoveDefault={handleRemoveDefault}
-        onDelete={handleDeleteRequest}
-      />
     </View>
   );
 }
@@ -271,7 +343,6 @@ function createStyles(colors: AppColors) {
       width: CELL_SIZE,
       height: CELL_SIZE,
       borderRadius: radius.md,
-      overflow: "hidden",
     },
     uploadCell: {
       borderWidth: 1.5,
@@ -286,7 +357,12 @@ function createStyles(colors: AppColors) {
     },
     photoCellDefault: {
       borderWidth: 2,
-      borderColor: colors.primaryGreen,
+      borderColor: colors.accentOrange,
+    },
+    photoClip: {
+      ...StyleSheet.absoluteFillObject,
+      borderRadius: radius.md,
+      overflow: "hidden",
     },
     photo: {
       width: "100%",
@@ -303,7 +379,7 @@ function createStyles(colors: AppColors) {
       flexDirection: "row",
       alignItems: "center",
       gap: 2,
-      backgroundColor: colors.primaryGreen,
+      backgroundColor: colors.accentOrange,
       borderRadius: radius.sm,
       paddingHorizontal: 5,
       paddingVertical: 2,
@@ -323,6 +399,52 @@ function createStyles(colors: AppColors) {
       backgroundColor: colors.white,
       alignItems: "center",
       justifyContent: "center",
+    },
+    settingsButtonActive: {
+      backgroundColor: colors.primaryGreenSoft,
+    },
+    photoActionsWrap: {
+      position: "absolute",
+      top: 1,
+      right: 1,
+      zIndex: 20,
+      elevation: 20,
+      alignItems: "flex-end",
+    },
+    photoActionsMenu: {
+      position: "absolute",
+      top: 30,
+      right: 4,
+      width: 164,
+      paddingVertical: spacing.xs,
+      borderWidth: 1,
+      borderColor: colors.border,
+      borderRadius: radius.lg,
+      backgroundColor: colors.surface,
+      zIndex: 999,
+      elevation: 999,
+      shadowColor: "#000",
+      shadowOpacity: 0.14,
+      shadowRadius: 12,
+      shadowOffset: {
+        width: 0,
+        height: 6,
+      },
+    },
+    photoActionsMenuItem: {
+      minHeight: 40,
+      paddingHorizontal: spacing.md,
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.sm,
+    },
+    photoActionsMenuItemDisabled: {
+      opacity: 0.6,
+    },
+    photoActionsMenuText: {
+      fontSize: 13,
+      fontWeight: "700",
+      color: colors.accentOrange,
     },
     emptyState: {
       alignItems: "center",
