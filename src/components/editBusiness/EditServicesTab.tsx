@@ -3,10 +3,12 @@ import React, { useRef, useState } from "react";
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
+  Linking,
   Platform,
   Pressable,
   ScrollView,
   StyleSheet,
+  Text,
   View,
 } from "react-native";
 
@@ -105,15 +107,12 @@ export default function EditServicesTab() {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="interactive"
+        automaticallyAdjustKeyboardInsets
       >
         {/* Configured services list */}
         {services.length === 0 ? (
           <View style={styles.emptyState}>
-            <Ionicons
-              name="cut-outline"
-              size={40}
-              color={colors.textMuted}
-            />
+            <Ionicons name="cut-outline" size={40} color={colors.textMuted} />
             <AppText style={styles.emptyTitle}>No services yet</AppText>
             <AppText style={styles.emptySubtitle}>
               Browse the library below to add services
@@ -190,18 +189,36 @@ export default function EditServicesTab() {
                 );
               })
             )}
-
-            {selectedIds.size > 0 && (
-              <Pressable style={styles.addCta} onPress={handleAddSelected}>
-                <AppText style={styles.addCtaText}>
-                  Add {selectedIds.size} service
-                  {selectedIds.size > 1 ? "s" : ""}
-                </AppText>
-              </Pressable>
-            )}
           </View>
         )}
+
+        {/* Can't find a service footer */}
+        <View style={styles.contactFooter}>
+          <Text style={styles.contactText}>
+            Can't find a service you need?{" "}
+            <Text
+              style={styles.contactLink}
+              onPress={() =>
+                Linking.openURL("mailto:support@bridgeua.com")
+              }
+            >
+              Contact us
+            </Text>
+          </Text>
+        </View>
       </ScrollView>
+
+      {/* Floating "Add selected" button — shown above save bar */}
+      {selectedIds.size > 0 && (
+        <View style={styles.floatingBar}>
+          <Pressable style={styles.floatingButton} onPress={handleAddSelected}>
+            <AppText style={styles.floatingButtonText}>
+              Add {selectedIds.size} service
+              {selectedIds.size > 1 ? "s" : ""}
+            </AppText>
+          </Pressable>
+        </View>
+      )}
 
       <View style={styles.footer}>
         {showSuccess && (
@@ -310,14 +327,34 @@ function createStyles(colors: AppColors) {
       textAlign: "center",
       paddingVertical: spacing.xl,
     },
-    addCta: {
-      backgroundColor: colors.primaryGreen,
-      paddingVertical: spacing.md,
+    contactFooter: {
+      paddingVertical: spacing.lg,
       alignItems: "center",
     },
-    addCtaText: {
+    contactText: {
+      fontSize: 13,
+      color: colors.textMuted,
+      textAlign: "center",
+    },
+    contactLink: {
+      color: colors.primaryGreen,
+      fontWeight: "700",
+    },
+    floatingBar: {
+      paddingHorizontal: spacing.lg,
+      paddingVertical: spacing.sm,
+      backgroundColor: colors.background,
+    },
+    floatingButton: {
+      height: 48,
+      backgroundColor: colors.primaryGreen,
+      borderRadius: radius.md,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    floatingButtonText: {
       fontSize: 15,
-      fontWeight: "800",
+      fontWeight: "700",
       color: colors.white,
     },
     footer: {

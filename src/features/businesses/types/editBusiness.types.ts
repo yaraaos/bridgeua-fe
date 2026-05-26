@@ -28,6 +28,7 @@ export type EditBusinessOverviewDraft = {
   name: string;
   category: string;
   address: string;
+  postalCode: string;
   city: string;
   state: string;
   phone: string;
@@ -39,6 +40,7 @@ export type UpdateBusinessOverviewPayload = {
   name: string;
   category: string;
   address: string;
+  postalCode: string;
   city: string;
   state: string;
   phone: string;

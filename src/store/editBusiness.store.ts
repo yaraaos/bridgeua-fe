@@ -25,6 +25,7 @@ const defaultOverviewDraft: EditBusinessOverviewDraft = {
   name: "",
   category: "",
   address: "",
+  postalCode: "",
   city: "",
   state: "",
   phone: "",

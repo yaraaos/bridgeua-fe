@@ -1,10 +1,93 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { StyleSheet, Switch, TextInput, View } from "react-native";
 
 import AppText from "@/src/components/ui/AppText/AppText";
 import { AppColors } from "@/src/constants/colors";
 import { spacing } from "@/src/constants/spacing";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
+
+type TimeInputProps = {
+  value: string;
+  onChange: (v: string) => void;
+  placeholder?: string;
+};
+
+function TimeInput({ value, onChange, placeholder = "09:00" }: TimeInputProps) {
+  const { colors } = useAppTheme();
+
+  function toRaw(formatted: string): string {
+    return formatted.replace(/\D/g, "").slice(0, 4);
+  }
+
+  function formatDigits(digits: string): string {
+    switch (digits.length) {
+      case 0:
+        return "";
+      case 1:
+        return `${digits[0]}:`;
+      case 2:
+        return `${digits}:`;
+      case 3:
+        return `${digits.slice(0, 2)}:${digits[2]}`;
+      default:
+        return `${digits.slice(0, 2)}:${digits.slice(2, 4)}`;
+    }
+  }
+
+  const [raw, setRaw] = useState(() => toRaw(value));
+  const prevProp = useRef(value);
+
+  useEffect(() => {
+    if (value !== prevProp.current) {
+      prevProp.current = value;
+      setRaw(toRaw(value));
+    }
+  }, [value]);
+
+  function handleChange(text: string) {
+    const digits = text.replace(/\D/g, "").slice(0, 4);
+    setRaw(digits);
+    onChange(digits.length === 4 ? `${digits.slice(0, 2)}:${digits.slice(2)}` : "");
+  }
+
+  function handleBlur() {
+    if (raw.length < 4) {
+      setRaw("");
+      onChange("");
+    }
+  }
+
+  const displayValue = formatDigits(raw);
+  const isInvalid = displayValue !== "" && raw.length !== 4;
+
+  return (
+    <TextInput
+      value={displayValue}
+      onChangeText={handleChange}
+      onBlur={handleBlur}
+      placeholder={placeholder}
+      placeholderTextColor={colors.textMuted}
+      keyboardType="number-pad"
+      maxLength={5}
+      style={[
+        styles.timeInput,
+        { borderColor: isInvalid ? colors.error : colors.border },
+        { color: colors.textPrimary, backgroundColor: colors.surface },
+      ]}
+    />
+  );
+}
+
+const styles = StyleSheet.create({
+  timeInput: {
+    width: 54,
+    height: 36,
+    borderWidth: 1,
+    borderRadius: 8,
+    textAlign: "center",
+    fontSize: 13,
+  },
+});
 
 type Props = {
   label: string;
@@ -26,11 +109,11 @@ export default function EditBusinessHourRow({
   onCloseTimeChange,
 }: Props) {
   const { colors } = useAppTheme();
-  const styles = createStyles(colors);
+  const rowStyles = createRowStyles(colors);
 
   return (
-    <View style={styles.row}>
-      <AppText style={styles.dayLabel}>{label}</AppText>
+    <View style={rowStyles.row}>
+      <AppText style={rowStyles.dayLabel}>{label}</AppText>
 
       <Switch
         value={isOpen}
@@ -40,35 +123,27 @@ export default function EditBusinessHourRow({
       />
 
       {isOpen ? (
-        <View style={styles.timesRow}>
-          <TextInput
-            style={styles.timeInput}
+        <View style={rowStyles.timesRow}>
+          <TimeInput
             value={openTime}
-            onChangeText={onOpenTimeChange}
+            onChange={onOpenTimeChange}
             placeholder="09:00"
-            placeholderTextColor={colors.textMuted}
-            keyboardType="numbers-and-punctuation"
-            maxLength={5}
           />
-          <AppText style={styles.timeSep}>–</AppText>
-          <TextInput
-            style={styles.timeInput}
+          <AppText style={rowStyles.timeSep}>–</AppText>
+          <TimeInput
             value={closeTime}
-            onChangeText={onCloseTimeChange}
+            onChange={onCloseTimeChange}
             placeholder="18:00"
-            placeholderTextColor={colors.textMuted}
-            keyboardType="numbers-and-punctuation"
-            maxLength={5}
           />
         </View>
       ) : (
-        <AppText style={styles.closedText}>Closed</AppText>
+        <AppText style={rowStyles.closedText}>Closed</AppText>
       )}
     </View>
   );
 }
 
-function createStyles(colors: AppColors) {
+function createRowStyles(colors: AppColors) {
   return StyleSheet.create({
     row: {
       flexDirection: "row",
@@ -87,17 +162,6 @@ function createStyles(colors: AppColors) {
       flexDirection: "row",
       alignItems: "center",
       gap: spacing.xs,
-    },
-    timeInput: {
-      width: 54,
-      height: 36,
-      backgroundColor: colors.surface,
-      borderWidth: 1,
-      borderColor: colors.border,
-      borderRadius: 8,
-      textAlign: "center",
-      fontSize: 13,
-      color: colors.textPrimary,
     },
     timeSep: {
       fontSize: 14,

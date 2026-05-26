@@ -10,6 +10,7 @@ import {
   View,
 } from "react-native";
 
+import AppAvatar from "@/src/components/ui/AppAvatar/AppAvatar";
 import AppInput from "@/src/components/ui/AppInput/AppInput";
 import AppText from "@/src/components/ui/AppText/AppText";
 import { AppColors } from "@/src/constants/colors";
@@ -21,6 +22,7 @@ import type {
   EditBusinessSocialLinks,
 } from "@/src/features/businesses/types/editBusiness.types";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { useActiveAccount } from "@/src/store/account.store";
 import { useEditBusinessStore } from "@/src/store/editBusiness.store";
 
 import EditBusinessHourRow from "./EditBusinessHourRow";
@@ -48,9 +50,24 @@ const SOCIAL_ROWS: {
   { key: "whatsapp", icon: "logo-whatsapp", label: "WhatsApp" },
 ];
 
+type OverviewErrors = {
+  address: boolean;
+  postalCode: boolean;
+  city: boolean;
+  state: boolean;
+};
+
+const NO_ERRORS: OverviewErrors = {
+  address: false,
+  postalCode: false,
+  city: false,
+  state: false,
+};
+
 export default function EditOverviewTab() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+  const account = useActiveAccount();
 
   const draft = useEditBusinessStore((s) => s.overviewDraft);
   const isDirty = useEditBusinessStore((s) => s.dirty.overview);
@@ -59,16 +76,26 @@ export default function EditOverviewTab() {
   const updateOverviewHour = useEditBusinessStore((s) => s.updateOverviewHour);
 
   const { saveOverview, isSaving, saveError } = useEditBusiness();
-  const [hoursExpanded, setHoursExpanded] = useState(false);
+  const [errors, setErrors] = useState<OverviewErrors>(NO_ERRORS);
   const [showSuccess, setShowSuccess] = useState(false);
   const successTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  const mandatoryFilled =
+    draft.address.trim() !== "" &&
+    draft.postalCode.trim() !== "" &&
+    draft.city.trim() !== "" &&
+    draft.state.trim() !== "";
+  const canSave = isDirty && mandatoryFilled;
+
   function onField(
-    key: "name" | "category" | "address" | "city" | "state" | "phone"
+    key: keyof Omit<typeof draft, "socialLinks" | "hours">
   ) {
     return (value: string) => {
       setOverviewDraft({ [key]: value });
       markDirty("overview");
+      if (key in NO_ERRORS) {
+        setErrors((prev) => ({ ...prev, [key]: false }));
+      }
     };
   }
 
@@ -94,6 +121,18 @@ export default function EditOverviewTab() {
   }
 
   async function handleSave() {
+    if (!isDirty) return;
+    const newErrors: OverviewErrors = {
+      address: draft.address.trim() === "",
+      postalCode: draft.postalCode.trim() === "",
+      city: draft.city.trim() === "",
+      state: draft.state.trim() === "",
+    };
+    if (Object.values(newErrors).some(Boolean)) {
+      setErrors(newErrors);
+      return;
+    }
+    setErrors(NO_ERRORS);
     const result = await saveOverview();
     if (result.ok) {
       if (successTimer.current) clearTimeout(successTimer.current);
@@ -106,60 +145,122 @@ export default function EditOverviewTab() {
     <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 160 : 0}
     >
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="interactive"
+        automaticallyAdjustKeyboardInsets
       >
+        {/* Business Profile Photo */}
+        <View style={styles.avatarSection}>
+          <View style={styles.avatarContainer}>
+            <AppAvatar
+              imageUrl={account.avatarUrl}
+              name={account.displayName}
+              size="lg"
+            />
+            <Pressable
+              style={styles.avatarEditBtn}
+              onPress={() => console.log("pick image")}
+            >
+              <Ionicons name="camera-outline" size={14} color={colors.white} />
+            </Pressable>
+          </View>
+        </View>
+
         {/* Business Information */}
         <View style={styles.section}>
           <AppText style={styles.sectionTitle}>Business Information</AppText>
 
           <View style={styles.fieldGroup}>
             <AppText style={styles.fieldLabel}>Business Name</AppText>
-            <AppInput
-              value={draft.name}
-              onChangeText={onField("name")}
-              placeholder="e.g. Zelenska Beauty"
-            />
+            <View style={styles.readOnlyField}>
+              <AppText style={styles.readOnlyValue} numberOfLines={1}>
+                {account.displayName}
+              </AppText>
+              <Ionicons
+                name="lock-closed-outline"
+                size={14}
+                color={colors.textMuted}
+              />
+            </View>
+            <AppText style={styles.readOnlyCaption}>
+              Set during registration. Contact support to change.
+            </AppText>
           </View>
 
           <View style={styles.fieldGroup}>
             <AppText style={styles.fieldLabel}>Category</AppText>
-            <AppInput
-              value={draft.category}
-              onChangeText={onField("category")}
-              placeholder="e.g. Beauty & Wellness"
-            />
+            <View style={styles.readOnlyField}>
+              <AppText style={styles.readOnlyValue} numberOfLines={1}>
+                {draft.category || "—"}
+              </AppText>
+              <Ionicons
+                name="lock-closed-outline"
+                size={14}
+                color={colors.textMuted}
+              />
+            </View>
+            <AppText style={styles.readOnlyCaption}>
+              Set during registration. Contact support to change.
+            </AppText>
           </View>
 
-          <View style={styles.fieldGroup}>
-            <AppText style={styles.fieldLabel}>Address</AppText>
-            <AppInput
-              value={draft.address}
-              onChangeText={onField("address")}
-              placeholder="Street address"
-            />
+          <View style={styles.addressRow}>
+            <View style={[styles.fieldGroup, styles.addressField]}>
+              <AppText style={styles.fieldLabel}>Address</AppText>
+              <AppInput
+                value={draft.address}
+                onChangeText={onField("address")}
+                placeholder="Street address"
+                error={errors.address}
+              />
+              {errors.address && (
+                <AppText style={styles.errorText}>This field is required</AppText>
+              )}
+            </View>
+            <View style={[styles.fieldGroup, styles.postalField]}>
+              <AppText style={styles.fieldLabel}>Postal Code</AppText>
+              <AppInput
+                value={draft.postalCode}
+                onChangeText={onField("postalCode")}
+                placeholder="10001"
+                keyboardType="numeric"
+                error={errors.postalCode}
+              />
+              {errors.postalCode && (
+                <AppText style={styles.errorText}>Required</AppText>
+              )}
+            </View>
           </View>
 
           <View style={styles.halfRow}>
-            <View style={styles.halfField}>
+            <View style={[styles.fieldGroup, styles.halfField]}>
               <AppText style={styles.fieldLabel}>City</AppText>
               <AppInput
                 value={draft.city}
                 onChangeText={onField("city")}
                 placeholder="City"
+                error={errors.city}
               />
+              {errors.city && (
+                <AppText style={styles.errorText}>This field is required</AppText>
+              )}
             </View>
-            <View style={styles.halfField}>
+            <View style={[styles.fieldGroup, styles.halfField]}>
               <AppText style={styles.fieldLabel}>State / Region</AppText>
               <AppInput
                 value={draft.state}
                 onChangeText={onField("state")}
                 placeholder="State"
+                error={errors.state}
               />
+              {errors.state && (
+                <AppText style={styles.errorText}>This field is required</AppText>
+              )}
             </View>
           </View>
 
@@ -185,7 +286,7 @@ export default function EditOverviewTab() {
             {SOCIAL_ROWS.map((item, index) => (
               <View
                 key={item.key}
-                style={index === SOCIAL_ROWS.length - 1 && styles.lastRow}
+                style={index === SOCIAL_ROWS.length - 1 ? styles.lastRow : undefined}
               >
                 <EditBusinessSocialRow
                   icon={item.icon}
@@ -199,40 +300,23 @@ export default function EditOverviewTab() {
           </View>
         </View>
 
-        {/* Business Hours */}
+        {/* Business Hours — always visible */}
         <View style={styles.section}>
-          <Pressable
-            style={styles.sectionHeaderRow}
-            onPress={() => setHoursExpanded((v) => !v)}
-          >
-            <AppText style={styles.sectionTitle}>Business Hours</AppText>
-            <Ionicons
-              name={hoursExpanded ? "chevron-up" : "chevron-down"}
-              size={18}
-              color={colors.textSecondary}
-            />
-          </Pressable>
-
-          {hoursExpanded && (
-            <View style={styles.card}>
-              {draft.hours.map((entry) => (
-                <EditBusinessHourRow
-                  key={entry.day}
-                  label={DAY_LABELS[entry.day]}
-                  isOpen={entry.isOpen}
-                  onToggle={(v) => onHourToggle(entry.day, v)}
-                  openTime={entry.openTime}
-                  closeTime={entry.closeTime}
-                  onOpenTimeChange={(v) =>
-                    onHourTime(entry.day, "openTime", v)
-                  }
-                  onCloseTimeChange={(v) =>
-                    onHourTime(entry.day, "closeTime", v)
-                  }
-                />
-              ))}
-            </View>
-          )}
+          <AppText style={styles.sectionTitle}>Business Hours</AppText>
+          <View style={styles.card}>
+            {draft.hours.map((entry) => (
+              <EditBusinessHourRow
+                key={entry.day}
+                label={DAY_LABELS[entry.day]}
+                isOpen={entry.isOpen}
+                onToggle={(v) => onHourToggle(entry.day, v)}
+                openTime={entry.openTime}
+                closeTime={entry.closeTime}
+                onOpenTimeChange={(v) => onHourTime(entry.day, "openTime", v)}
+                onCloseTimeChange={(v) => onHourTime(entry.day, "closeTime", v)}
+              />
+            ))}
+          </View>
         </View>
       </ScrollView>
 
@@ -251,11 +335,8 @@ export default function EditOverviewTab() {
         )}
 
         <Pressable
-          style={[
-            styles.saveButton,
-            (!isDirty || isSaving) && styles.saveButtonDisabled,
-          ]}
-          onPress={isDirty && !isSaving ? handleSave : undefined}
+          style={[styles.saveButton, !canSave && styles.saveButtonDisabled]}
+          onPress={!isSaving ? handleSave : undefined}
         >
           {isSaving ? (
             <ActivityIndicator color="#fff" size="small" />
@@ -279,6 +360,31 @@ function createStyles(colors: AppColors) {
       paddingBottom: spacing.xl,
       gap: spacing.xl,
     },
+
+    // Avatar
+    avatarSection: {
+      alignItems: "center",
+      paddingTop: spacing.sm,
+    },
+    avatarContainer: {
+      width: 96,
+      height: 96,
+    },
+    avatarEditBtn: {
+      position: "absolute",
+      bottom: 0,
+      left: 0,
+      width: 28,
+      height: 28,
+      borderRadius: 14,
+      backgroundColor: colors.accentOrange,
+      alignItems: "center",
+      justifyContent: "center",
+      borderWidth: 2,
+      borderColor: colors.background,
+    },
+
+    // Sections
     section: {
       gap: spacing.md,
     },
@@ -292,11 +398,8 @@ function createStyles(colors: AppColors) {
       color: colors.textMuted,
       marginTop: -spacing.xs,
     },
-    sectionHeaderRow: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-    },
+
+    // Fields
     fieldGroup: {
       gap: spacing.xs,
     },
@@ -305,14 +408,59 @@ function createStyles(colors: AppColors) {
       fontWeight: "600",
       color: colors.textSecondary,
     },
+    errorText: {
+      fontSize: 11,
+      fontWeight: "600",
+      color: colors.error,
+      marginTop: 2,
+    },
+
+    // Read-only field (mimics disabled AppInput)
+    readOnlyField: {
+      height: 50,
+      backgroundColor: colors.background,
+      borderWidth: 1,
+      borderColor: colors.border,
+      borderRadius: radius.md,
+      paddingHorizontal: 14,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+    },
+    readOnlyValue: {
+      flex: 1,
+      fontSize: 15,
+      color: colors.textMuted,
+      marginRight: spacing.sm,
+    },
+    readOnlyCaption: {
+      fontSize: 11,
+      color: colors.textMuted,
+    },
+
+    // Address + postal row
+    addressRow: {
+      flexDirection: "row",
+      gap: spacing.md,
+      alignItems: "flex-start",
+    },
+    addressField: {
+      flex: 2,
+    },
+    postalField: {
+      flex: 1,
+    },
+
+    // City + state row
     halfRow: {
       flexDirection: "row",
       gap: spacing.md,
     },
     halfField: {
       flex: 1,
-      gap: spacing.xs,
     },
+
+    // Card
     card: {
       backgroundColor: colors.surface,
       borderRadius: radius.md,
@@ -323,6 +471,8 @@ function createStyles(colors: AppColors) {
     lastRow: {
       borderBottomWidth: 0,
     },
+
+    // Footer
     footer: {
       paddingHorizontal: spacing.lg,
       paddingTop: spacing.sm,
