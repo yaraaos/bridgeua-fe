@@ -6,7 +6,6 @@ import AppEmptyState from "@/src/components/ui/AppEmptyState";
 import AppLoader from "@/src/components/ui/AppLoader/AppLoader";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
 import { AuthRequiredModal, useRequireAuth } from "@/src/features/auth";
-import { getReviewById } from "@/src/features/reviews/services/review.service";
 import { useReviewCommentsStore } from "@/src/features/reviews/store/review-comments.store";
 import { ReviewComment } from "@/src/features/reviews/types/review-comment.types";
 import type { Review } from "@/src/features/reviews/types/review.types";
@@ -30,7 +29,7 @@ export default function ReviewThreadScreen() {
   const { colors } = useAppTheme();
   const { isAuthModalVisible, closeAuthModal, confirmAuthModal, requireAuth } =
     useRequireAuth();
-  const { reviewId } = useLocalSearchParams<{ reviewId: string }>();
+  const { reviewId, reviewData } = useLocalSearchParams<{ reviewId: string; reviewData: string }>();
 
   const [review, setReview] = useState<Review | null>(null);
   const [expandedReplies, setExpandedReplies] = useState<
@@ -92,22 +91,20 @@ export default function ReviewThreadScreen() {
   }, [comments, reviewId]);
 
   useEffect(() => {
-    const loadReview = async () => {
-      if (!reviewId) {
-        setIsLoading(false);
-        return;
-      }
-
-      setIsLoading(true);
-
-      const data = await getReviewById(reviewId);
-
-      setReview(data);
+    if (!reviewId) {
       setIsLoading(false);
-    };
+      return;
+    }
 
-    loadReview();
-  }, [reviewId]);
+    try {
+      const parsed = reviewData ? JSON.parse(reviewData) : null;
+      setReview(parsed as Review);
+    } catch {
+      setReview(null);
+    }
+
+    setIsLoading(false);
+  }, [reviewId, reviewData]);
 
   const toggleReplies = (commentId: string) => {
     setExpandedReplies((current) => ({

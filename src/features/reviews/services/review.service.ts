@@ -1,5 +1,6 @@
 import { apiClient } from "@/src/services/api/client";
 import { ENDPOINTS } from "@/src/services/api/endpoints";
+import type { PersonalProfileReview } from "@/src/types/profile";
 import type {
   GetReviewsParams,
   GetReviewsResponse,
@@ -58,4 +59,9 @@ export const deleteReview = async (
   businessId: string,
 ): Promise<void> => {
   await apiClient.delete(ENDPOINTS.REVIEW_BY_ID(businessId, reviewId));
+};
+
+export const getMyReviews = async (): Promise<PersonalProfileReview[]> => {
+  const res = await apiClient.get<PersonalProfileReview[]>(ENDPOINTS.USERS_ME_REVIEWS);
+  return res.data;
 };
