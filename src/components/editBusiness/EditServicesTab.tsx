@@ -20,6 +20,7 @@ import { BEAUTY_SERVICES } from "@/src/features/businesses/data/beautyServices";
 import { useEditBusiness } from "@/src/features/businesses/hooks/useEditBusiness";
 import type { ConfiguredService } from "@/src/features/businesses/types/editBusiness.types";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { useFormValidation } from "@/src/hooks/useFormValidation";
 import { useEditBusinessStore } from "@/src/store/editBusiness.store";
 
 import EditBusinessServiceCard from "./EditBusinessServiceCard";
@@ -43,6 +44,11 @@ export default function EditServicesTab() {
 
   const { saveServices, isSavingServices, hasServicesError, saveError } =
     useEditBusiness();
+
+  const scrollRef = useRef<ScrollView>(null);
+  const cardPositions = useRef<Record<string, number>>({});
+
+  const { showError, errorMessage, triggerError, clearError } = useFormValidation();
 
   const [libraryOpen, setLibraryOpen] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -86,11 +92,22 @@ export default function EditServicesTab() {
     if (!isDirty) return;
     if (!allValid) {
       setShowValidation(true);
+      triggerError("Fill in the required fields");
+      const firstInvalidId = services.find(
+        (s) => s.duration.trim() === "" || s.price.trim() === ""
+      )?.id;
+      if (firstInvalidId !== undefined) {
+        scrollRef.current?.scrollTo({
+          y: (cardPositions.current[firstInvalidId] ?? 0) - spacing.lg,
+          animated: true,
+        });
+      }
       return;
     }
     const result = await saveServices();
     if (result.ok) {
       setShowValidation(false);
+      clearError();
       if (successTimer.current) clearTimeout(successTimer.current);
       setShowSuccess(true);
       successTimer.current = setTimeout(() => setShowSuccess(false), 3000);
@@ -103,6 +120,7 @@ export default function EditServicesTab() {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <ScrollView
+        ref={scrollRef}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
@@ -121,23 +139,31 @@ export default function EditServicesTab() {
         ) : (
           <View style={styles.servicesList}>
             {services.map((svc) => (
-              <EditBusinessServiceCard
+              <View
                 key={svc.id}
-                service={svc}
-                showValidation={showValidation}
-                onRemove={() => {
-                  removeConfiguredService(svc.id);
-                  markDirty("services");
+                onLayout={(e) => {
+                  cardPositions.current[svc.id] = e.nativeEvent.layout.y;
                 }}
-                onDurationChange={(v) => {
-                  updateConfiguredService(svc.id, { duration: v });
-                  markDirty("services");
-                }}
-                onPriceChange={(v) => {
-                  updateConfiguredService(svc.id, { price: v });
-                  markDirty("services");
-                }}
-              />
+              >
+                <EditBusinessServiceCard
+                  service={svc}
+                  showValidation={showValidation}
+                  onRemove={() => {
+                    removeConfiguredService(svc.id);
+                    markDirty("services");
+                  }}
+                  onDurationChange={(v) => {
+                    updateConfiguredService(svc.id, { duration: v });
+                    markDirty("services");
+                    clearError();
+                  }}
+                  onPriceChange={(v) => {
+                    updateConfiguredService(svc.id, { price: v });
+                    markDirty("services");
+                    clearError();
+                  }}
+                />
+              </View>
             ))}
           </View>
         )}
@@ -234,6 +260,9 @@ export default function EditServicesTab() {
               {saveError ?? "Failed to save changes"}
             </AppText>
           </View>
+        )}
+        {showError && !showSuccess && (
+          <AppText style={styles.validationError}>{errorMessage}</AppText>
         )}
 
         <Pressable
@@ -404,6 +433,13 @@ function createStyles(colors: AppColors) {
       fontSize: 14,
       fontWeight: "600",
       color: colors.error,
+    },
+    validationError: {
+      fontSize: 13,
+      fontWeight: "700",
+      color: colors.error,
+      textAlign: "center",
+      marginBottom: spacing.sm,
     },
   });
 }

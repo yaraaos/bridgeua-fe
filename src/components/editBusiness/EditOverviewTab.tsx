@@ -22,6 +22,7 @@ import type {
   EditBusinessSocialLinks,
 } from "@/src/features/businesses/types/editBusiness.types";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { useFormValidation } from "@/src/hooks/useFormValidation";
 import { useActiveAccount } from "@/src/store/account.store";
 import { useEditBusinessStore } from "@/src/store/editBusiness.store";
 
@@ -75,7 +76,11 @@ export default function EditOverviewTab() {
   const setOverviewDraft = useEditBusinessStore((s) => s.setOverviewDraft);
   const updateOverviewHour = useEditBusinessStore((s) => s.updateOverviewHour);
 
+  const scrollRef = useRef<ScrollView>(null);
+  const fieldPositions = useRef<Record<string, number>>({});
+
   const { saveOverview, isSaving, saveError } = useEditBusiness();
+  const { showError, errorMessage, triggerError, clearError } = useFormValidation();
   const [errors, setErrors] = useState<OverviewErrors>(NO_ERRORS);
   const [showSuccess, setShowSuccess] = useState(false);
   const successTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -95,6 +100,7 @@ export default function EditOverviewTab() {
       markDirty("overview");
       if (key in NO_ERRORS) {
         setErrors((prev) => ({ ...prev, [key]: false }));
+        clearError();
       }
     };
   }
@@ -130,11 +136,22 @@ export default function EditOverviewTab() {
     };
     if (Object.values(newErrors).some(Boolean)) {
       setErrors(newErrors);
+      triggerError("Fill in the required fields");
+      const firstInvalidKey = (
+        ["address", "postalCode", "city", "state"] as const
+      ).find((k) => newErrors[k]);
+      if (firstInvalidKey !== undefined) {
+        scrollRef.current?.scrollTo({
+          y: (fieldPositions.current[firstInvalidKey] ?? 0) - spacing.lg,
+          animated: true,
+        });
+      }
       return;
     }
     setErrors(NO_ERRORS);
     const result = await saveOverview();
     if (result.ok) {
+      clearError();
       if (successTimer.current) clearTimeout(successTimer.current);
       setShowSuccess(true);
       successTimer.current = setTimeout(() => setShowSuccess(false), 3000);
@@ -148,6 +165,7 @@ export default function EditOverviewTab() {
       keyboardVerticalOffset={Platform.OS === "ios" ? 160 : 0}
     >
       <ScrollView
+        ref={scrollRef}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
@@ -210,7 +228,12 @@ export default function EditOverviewTab() {
           </View>
 
           <View style={styles.addressRow}>
-            <View style={[styles.fieldGroup, styles.addressField]}>
+            <View
+              style={[styles.fieldGroup, styles.addressField]}
+              onLayout={(e) => {
+                fieldPositions.current["address"] = e.nativeEvent.layout.y;
+              }}
+            >
               <AppText style={styles.fieldLabel}>Address</AppText>
               <AppInput
                 value={draft.address}
@@ -222,7 +245,12 @@ export default function EditOverviewTab() {
                 <AppText style={styles.errorText}>This field is required</AppText>
               )}
             </View>
-            <View style={[styles.fieldGroup, styles.postalField]}>
+            <View
+              style={[styles.fieldGroup, styles.postalField]}
+              onLayout={(e) => {
+                fieldPositions.current["postalCode"] = e.nativeEvent.layout.y;
+              }}
+            >
               <AppText style={styles.fieldLabel}>Postal Code</AppText>
               <AppInput
                 value={draft.postalCode}
@@ -238,7 +266,12 @@ export default function EditOverviewTab() {
           </View>
 
           <View style={styles.halfRow}>
-            <View style={[styles.fieldGroup, styles.halfField]}>
+            <View
+              style={[styles.fieldGroup, styles.halfField]}
+              onLayout={(e) => {
+                fieldPositions.current["city"] = e.nativeEvent.layout.y;
+              }}
+            >
               <AppText style={styles.fieldLabel}>City</AppText>
               <AppInput
                 value={draft.city}
@@ -250,7 +283,12 @@ export default function EditOverviewTab() {
                 <AppText style={styles.errorText}>This field is required</AppText>
               )}
             </View>
-            <View style={[styles.fieldGroup, styles.halfField]}>
+            <View
+              style={[styles.fieldGroup, styles.halfField]}
+              onLayout={(e) => {
+                fieldPositions.current["state"] = e.nativeEvent.layout.y;
+              }}
+            >
               <AppText style={styles.fieldLabel}>State / Region</AppText>
               <AppInput
                 value={draft.state}
@@ -332,6 +370,9 @@ export default function EditOverviewTab() {
           <View style={styles.bannerError}>
             <AppText style={styles.bannerErrorText}>{saveError}</AppText>
           </View>
+        )}
+        {showError && !showSuccess && (
+          <AppText style={styles.validationError}>{errorMessage}</AppText>
         )}
 
         <Pressable
@@ -520,6 +561,13 @@ function createStyles(colors: AppColors) {
       fontSize: 14,
       fontWeight: "600",
       color: colors.error,
+    },
+    validationError: {
+      fontSize: 13,
+      fontWeight: "700",
+      color: colors.error,
+      textAlign: "center",
+      marginBottom: spacing.sm,
     },
   });
 }
