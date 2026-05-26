@@ -214,202 +214,213 @@ export default function EditOverviewTab() {
           keyboardDismissMode="interactive"
           automaticallyAdjustKeyboardInsets
         >
-        {/* Business Profile Photo */}
-        <View style={styles.avatarSection}>
-          <View style={styles.avatarContainer}>
-            <AppAvatar
-              imageUrl={displayedAvatarUrl}
-              name={account.displayName}
-              size="lg"
-            />
-            <Pressable style={styles.avatarEditBtn} onPress={handlePickAvatar}>
-              <Ionicons name="camera-outline" size={14} color={colors.white} />
-            </Pressable>
-          </View>
-        </View>
-
-        {/* Business Information */}
-        <View style={styles.section}>
-          <AppText style={styles.sectionTitle}>Business Information</AppText>
-
-          <View style={styles.fieldGroup}>
-            <AppText style={styles.fieldLabel}>Business Name</AppText>
-            <View style={styles.readOnlyField}>
-              <AppText style={styles.readOnlyValue} numberOfLines={1}>
-                {account.displayName}
-              </AppText>
-              <Ionicons
-                name="lock-closed-outline"
-                size={14}
-                color={colors.textMuted}
+          {/* Business Profile Photo */}
+          <View style={styles.avatarSection}>
+            <View style={styles.avatarContainer}>
+              <AppAvatar
+                imageUrl={displayedAvatarUrl}
+                name={account.displayName}
+                size="lg"
               />
-            </View>
-            <AppText style={styles.readOnlyCaption}>
-              Set during registration. Contact support to change.
-            </AppText>
-          </View>
-
-          <View style={styles.fieldGroup}>
-            <AppText style={styles.fieldLabel}>Category</AppText>
-            <View style={styles.readOnlyField}>
-              <AppText style={styles.readOnlyValue} numberOfLines={1}>
-                {draft.category || "—"}
-              </AppText>
-              <Ionicons
-                name="lock-closed-outline"
-                size={14}
-                color={colors.textMuted}
-              />
-            </View>
-            <AppText style={styles.readOnlyCaption}>
-              Set during registration. Contact support to change.
-            </AppText>
-          </View>
-
-          <View style={styles.addressRow}>
-            <View
-              style={[styles.fieldGroup, styles.addressField]}
-              onLayout={(e) => {
-                fieldPositions.current["address"] = e.nativeEvent.layout.y;
-              }}
-            >
-              <AppText style={styles.fieldLabel}>Address</AppText>
-              <AppInput
-                value={draft.address}
-                onChangeText={onField("address")}
-                placeholder="Street address"
-                error={errors.address}
-              />
-              {errors.address && (
-                <AppText style={styles.errorText}>
-                  This field is required
-                </AppText>
-              )}
-            </View>
-            <View
-              style={[styles.fieldGroup, styles.postalField]}
-              onLayout={(e) => {
-                fieldPositions.current["postalCode"] = e.nativeEvent.layout.y;
-              }}
-            >
-              <AppText style={styles.fieldLabel}>Postal Code</AppText>
-              <AppInput
-                value={draft.postalCode}
-                onChangeText={onField("postalCode")}
-                placeholder="10001"
-                keyboardType="numeric"
-                error={errors.postalCode}
-              />
-              {errors.postalCode && (
-                <AppText style={styles.errorText}>Required</AppText>
-              )}
-            </View>
-          </View>
-
-          <View style={styles.halfRow}>
-            <View
-              style={[styles.fieldGroup, styles.halfField]}
-              onLayout={(e) => {
-                fieldPositions.current["city"] = e.nativeEvent.layout.y;
-              }}
-            >
-              <AppText style={styles.fieldLabel}>City</AppText>
-              <AppInput
-                value={draft.city}
-                onChangeText={onField("city")}
-                placeholder="City"
-                error={errors.city}
-              />
-              {errors.city && (
-                <AppText style={styles.errorText}>
-                  This field is required
-                </AppText>
-              )}
-            </View>
-            <View
-              style={[styles.fieldGroup, styles.halfField]}
-              onLayout={(e) => {
-                fieldPositions.current["state"] = e.nativeEvent.layout.y;
-              }}
-            >
-              <AppText style={styles.fieldLabel}>State / Region</AppText>
-              <AppInput
-                value={draft.state}
-                onChangeText={onField("state")}
-                placeholder="State"
-                error={errors.state}
-              />
-              {errors.state && (
-                <AppText style={styles.errorText}>
-                  This field is required
-                </AppText>
-              )}
-            </View>
-          </View>
-
-          <View style={styles.fieldGroup}>
-            <AppText style={styles.fieldLabel}>Phone Number</AppText>
-            <AppInput
-              value={draft.phone}
-              onChangeText={onField("phone")}
-              placeholder="+1 (555) 000-0000"
-              keyboardType="phone-pad"
-            />
-          </View>
-        </View>
-
-        {/* Social Links */}
-        <View style={styles.section}>
-          <AppText style={styles.sectionTitle}>Social Links</AppText>
-          <AppText style={styles.sectionNote}>
-            Empty fields are hidden on your public page
-          </AppText>
-
-          <View style={styles.card}>
-            {SOCIAL_ROWS.map((item, index) => (
-              <View
-                key={item.key}
-                style={
-                  index === SOCIAL_ROWS.length - 1 ? styles.lastRow : undefined
-                }
+              <Pressable
+                style={styles.avatarEditBtn}
+                onPress={handlePickAvatar}
               >
-                <EditBusinessSocialRow
-                  icon={item.icon}
-                  label={item.label}
-                  value={draft.socialLinks[item.key]}
-                  onChangeText={onSocialField(item.key)}
-                  placeholder={`Your ${item.label.toLowerCase()}`}
+                <Ionicons
+                  name="camera-outline"
+                  size={14}
+                  color={colors.white}
+                />
+              </Pressable>
+            </View>
+          </View>
+
+          {/* Business Information */}
+          <View style={styles.section}>
+            <AppText style={styles.sectionTitle}>Business Information</AppText>
+
+            <View style={styles.fieldGroup}>
+              <AppText style={styles.fieldLabel}>Business Name</AppText>
+              <View style={styles.readOnlyField}>
+                <AppText style={styles.readOnlyValue} numberOfLines={1}>
+                  {account.displayName}
+                </AppText>
+                <Ionicons
+                  name="lock-closed-outline"
+                  size={14}
+                  color={colors.textMuted}
                 />
               </View>
-            ))}
-          </View>
-        </View>
+              <AppText style={styles.readOnlyCaption}>
+                Set during registration. Contact support to change.
+              </AppText>
+            </View>
 
-        {/* Business Hours — always visible */}
-        <View style={styles.section}>
-          <AppText style={styles.sectionTitle}>Business Hours</AppText>
-          <View style={styles.card}>
-            {draft.hours.map((entry) => (
-              <EditBusinessHourRow
-                key={entry.day}
-                label={DAY_LABELS[entry.day]}
-                isOpen={entry.isOpen}
-                onToggle={(v) => onHourToggle(entry.day, v)}
-                openTime={entry.openTime}
-                closeTime={entry.closeTime}
-                onOpenTimeChange={(v) => onHourTime(entry.day, "openTime", v)}
-                onCloseTimeChange={(v) => onHourTime(entry.day, "closeTime", v)}
-                onValidationChange={(isValid) => {
-                  hoursValidity.current[entry.day] = isValid;
+            <View style={styles.fieldGroup}>
+              <AppText style={styles.fieldLabel}>Category</AppText>
+              <View style={styles.readOnlyField}>
+                <AppText style={styles.readOnlyValue} numberOfLines={1}>
+                  {draft.category || "—"}
+                </AppText>
+                <Ionicons
+                  name="lock-closed-outline"
+                  size={14}
+                  color={colors.textMuted}
+                />
+              </View>
+              <AppText style={styles.readOnlyCaption}>
+                Set during registration. Contact support to change.
+              </AppText>
+            </View>
+
+            <View style={styles.addressRow}>
+              <View
+                style={[styles.fieldGroup, styles.addressField]}
+                onLayout={(e) => {
+                  fieldPositions.current["address"] = e.nativeEvent.layout.y;
                 }}
-              />
-            ))}
-          </View>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+              >
+                <AppText style={styles.fieldLabel}>Address</AppText>
+                <AppInput
+                  value={draft.address}
+                  onChangeText={onField("address")}
+                  placeholder="Street address"
+                  error={errors.address}
+                />
+                {errors.address && (
+                  <AppText style={styles.errorText}>
+                    This field is required
+                  </AppText>
+                )}
+              </View>
+              <View
+                style={[styles.fieldGroup, styles.postalField]}
+                onLayout={(e) => {
+                  fieldPositions.current["postalCode"] = e.nativeEvent.layout.y;
+                }}
+              >
+                <AppText style={styles.fieldLabel}>Postal Code</AppText>
+                <AppInput
+                  value={draft.postalCode}
+                  onChangeText={onField("postalCode")}
+                  placeholder="10001"
+                  keyboardType="numeric"
+                  error={errors.postalCode}
+                />
+                {errors.postalCode && (
+                  <AppText style={styles.errorText}>Required</AppText>
+                )}
+              </View>
+            </View>
 
-    <View style={styles.footer}>
+            <View style={styles.halfRow}>
+              <View
+                style={[styles.fieldGroup, styles.halfField]}
+                onLayout={(e) => {
+                  fieldPositions.current["city"] = e.nativeEvent.layout.y;
+                }}
+              >
+                <AppText style={styles.fieldLabel}>City</AppText>
+                <AppInput
+                  value={draft.city}
+                  onChangeText={onField("city")}
+                  placeholder="City"
+                  error={errors.city}
+                />
+                {errors.city && (
+                  <AppText style={styles.errorText}>
+                    This field is required
+                  </AppText>
+                )}
+              </View>
+              <View
+                style={[styles.fieldGroup, styles.halfField]}
+                onLayout={(e) => {
+                  fieldPositions.current["state"] = e.nativeEvent.layout.y;
+                }}
+              >
+                <AppText style={styles.fieldLabel}>State / Region</AppText>
+                <AppInput
+                  value={draft.state}
+                  onChangeText={onField("state")}
+                  placeholder="State"
+                  error={errors.state}
+                />
+                {errors.state && (
+                  <AppText style={styles.errorText}>
+                    This field is required
+                  </AppText>
+                )}
+              </View>
+            </View>
+
+            <View style={styles.fieldGroup}>
+              <AppText style={styles.fieldLabel}>Phone Number</AppText>
+              <AppInput
+                value={draft.phone}
+                onChangeText={onField("phone")}
+                placeholder="+1 (555) 000-0000"
+                keyboardType="phone-pad"
+              />
+            </View>
+          </View>
+
+          {/* Social Links */}
+          <View style={styles.section}>
+            <AppText style={styles.sectionTitle}>Social Links</AppText>
+            <AppText style={styles.sectionNote}>
+              Empty fields are hidden on your public page
+            </AppText>
+
+            <View style={styles.card}>
+              {SOCIAL_ROWS.map((item, index) => (
+                <View
+                  key={item.key}
+                  style={
+                    index === SOCIAL_ROWS.length - 1
+                      ? styles.lastRow
+                      : undefined
+                  }
+                >
+                  <EditBusinessSocialRow
+                    icon={item.icon}
+                    label={item.label}
+                    value={draft.socialLinks[item.key]}
+                    onChangeText={onSocialField(item.key)}
+                    placeholder={`Your ${item.label.toLowerCase()}`}
+                  />
+                </View>
+              ))}
+            </View>
+          </View>
+
+          {/* Business Hours — always visible */}
+          <View style={styles.section}>
+            <AppText style={styles.sectionTitle}>Business Hours</AppText>
+            <View style={styles.card}>
+              {draft.hours.map((entry) => (
+                <EditBusinessHourRow
+                  key={entry.day}
+                  label={DAY_LABELS[entry.day]}
+                  isOpen={entry.isOpen}
+                  onToggle={(v) => onHourToggle(entry.day, v)}
+                  openTime={entry.openTime}
+                  closeTime={entry.closeTime}
+                  onOpenTimeChange={(v) => onHourTime(entry.day, "openTime", v)}
+                  onCloseTimeChange={(v) =>
+                    onHourTime(entry.day, "closeTime", v)
+                  }
+                  onValidationChange={(isValid) => {
+                    hoursValidity.current[entry.day] = isValid;
+                  }}
+                />
+              ))}
+            </View>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+
+      <View style={styles.footer}>
         {showSuccess && (
           <View style={styles.bannerSuccess}>
             <AppText style={styles.bannerSuccessText}>

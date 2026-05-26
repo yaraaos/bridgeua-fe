@@ -135,119 +135,123 @@ export default function EditServicesTab() {
           keyboardDismissMode="interactive"
           automaticallyAdjustKeyboardInsets
         >
-        {/* Configured services list */}
-        {services.length === 0 ? (
-          <View style={styles.emptyState}>
-            <Ionicons name="cut-outline" size={40} color={colors.textMuted} />
-            <AppText style={styles.emptyTitle}>No services yet</AppText>
-            <AppText style={styles.emptySubtitle}>
-              Browse the library below to add services
-            </AppText>
-          </View>
-        ) : (
-          <View style={styles.servicesList}>
-            {services.map((svc) => (
-              <View
-                key={svc.id}
-                onLayout={(e) => {
-                  cardPositions.current[svc.id] = e.nativeEvent.layout.y;
-                }}
-              >
-                <EditBusinessServiceCard
-                  service={svc}
-                  showValidation={showValidation}
-                  onRemove={() => {
-                    removeConfiguredService(svc.id);
-                    markDirty("services");
-                  }}
-                  onDurationChange={(v) => {
-                    updateConfiguredService(svc.id, { duration: v });
-                    markDirty("services");
-                    clearError();
-                  }}
-                  onPriceChange={(v) => {
-                    updateConfiguredService(svc.id, { price: v });
-                    markDirty("services");
-                    clearError();
-                  }}
-                />
-              </View>
-            ))}
-          </View>
-        )}
-
-        {/* Browse service library toggle */}
-        <Pressable
-          style={styles.libraryToggle}
-          onPress={() => setLibraryOpen((v) => !v)}
-        >
-          <Ionicons name="grid-outline" size={16} color={colors.primaryGreen} />
-          <AppText style={styles.libraryToggleText}>
-            Browse service library
-          </AppText>
-          <Ionicons
-            name={libraryOpen ? "chevron-up" : "chevron-down"}
-            size={16}
-            color={colors.primaryGreen}
-          />
-        </Pressable>
-
-        {/* Library section */}
-        {libraryOpen && (
-          <View style={styles.librarySection}>
-            {availableLibraryItems.length === 0 ? (
-              <AppText style={styles.libraryAllAdded}>
-                All available services have been added
+          {/* Configured services list */}
+          {services.length === 0 ? (
+            <View style={styles.emptyState}>
+              <Ionicons name="cut-outline" size={40} color={colors.textMuted} />
+              <AppText style={styles.emptyTitle}>No services yet</AppText>
+              <AppText style={styles.emptySubtitle}>
+                Browse the library below to add services
               </AppText>
-            ) : (
-              availableLibraryItems.map((item) => {
-                const isSelected = selectedIds.has(item.id);
-                return (
-                  <Pressable
-                    key={item.id}
-                    style={[
-                      styles.libraryItem,
-                      isSelected && styles.libraryItemSelected,
-                    ]}
-                    onPress={() => toggleLibraryItem(item.id)}
-                  >
-                    <AppText style={styles.libraryItemName}>
-                      {item.name}
-                    </AppText>
-                    <Ionicons
-                      name={
-                        isSelected ? "checkmark-circle" : "add-circle-outline"
-                      }
-                      size={22}
-                      color={
-                        isSelected ? colors.primaryGreen : colors.textMuted
-                      }
-                    />
-                  </Pressable>
-                );
-              })
-            )}
-          </View>
-        )}
+            </View>
+          ) : (
+            <View style={styles.servicesList}>
+              {services.map((svc) => (
+                <View
+                  key={svc.id}
+                  onLayout={(e) => {
+                    cardPositions.current[svc.id] = e.nativeEvent.layout.y;
+                  }}
+                >
+                  <EditBusinessServiceCard
+                    service={svc}
+                    showValidation={showValidation}
+                    onRemove={() => {
+                      removeConfiguredService(svc.id);
+                      markDirty("services");
+                    }}
+                    onDurationChange={(v) => {
+                      updateConfiguredService(svc.id, { duration: v });
+                      markDirty("services");
+                      clearError();
+                    }}
+                    onPriceChange={(v) => {
+                      updateConfiguredService(svc.id, { price: v });
+                      markDirty("services");
+                      clearError();
+                    }}
+                  />
+                </View>
+              ))}
+            </View>
+          )}
 
-        {/* Can't find a service footer */}
-        <View style={styles.contactFooter}>
-          <Text style={styles.contactText}>
-            Can&apos;t find a service you need?{" "}
-            <Text
-              style={styles.contactLink}
-              onPress={() => Linking.openURL("mailto:support@bridgeua.com")}
-            >
-              Contact us
+          {/* Browse service library toggle */}
+          <Pressable
+            style={styles.libraryToggle}
+            onPress={() => setLibraryOpen((v) => !v)}
+          >
+            <Ionicons
+              name="grid-outline"
+              size={16}
+              color={colors.primaryGreen}
+            />
+            <AppText style={styles.libraryToggleText}>
+              Browse service library
+            </AppText>
+            <Ionicons
+              name={libraryOpen ? "chevron-up" : "chevron-down"}
+              size={16}
+              color={colors.primaryGreen}
+            />
+          </Pressable>
+
+          {/* Library section */}
+          {libraryOpen && (
+            <View style={styles.librarySection}>
+              {availableLibraryItems.length === 0 ? (
+                <AppText style={styles.libraryAllAdded}>
+                  All available services have been added
+                </AppText>
+              ) : (
+                availableLibraryItems.map((item) => {
+                  const isSelected = selectedIds.has(item.id);
+                  return (
+                    <Pressable
+                      key={item.id}
+                      style={[
+                        styles.libraryItem,
+                        isSelected && styles.libraryItemSelected,
+                      ]}
+                      onPress={() => toggleLibraryItem(item.id)}
+                    >
+                      <AppText style={styles.libraryItemName}>
+                        {item.name}
+                      </AppText>
+                      <Ionicons
+                        name={
+                          isSelected ? "checkmark-circle" : "add-circle-outline"
+                        }
+                        size={22}
+                        color={
+                          isSelected ? colors.primaryGreen : colors.textMuted
+                        }
+                      />
+                    </Pressable>
+                  );
+                })
+              )}
+            </View>
+          )}
+
+          {/* Can't find a service footer */}
+          <View style={styles.contactFooter}>
+            <Text style={styles.contactText}>
+              Can&apos;t find a service you need?{" "}
+              <Text
+                style={styles.contactLink}
+                onPress={() => Linking.openURL("mailto:support@bridgeua.com")}
+              >
+                Contact us
+              </Text>
             </Text>
-          </Text>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
 
-    {/* Floating "Add selected" button — shown above save bar */}
-    {selectedIds.size > 0 && (
-      <View style={styles.floatingBar}>
+      {/* Floating "Add selected" button — shown above save bar */}
+      {selectedIds.size > 0 && (
+        <View style={styles.floatingBar}>
           <Pressable style={styles.floatingButton} onPress={handleAddSelected}>
             <AppText style={styles.floatingButtonText}>
               Add {selectedIds.size} service
@@ -255,9 +259,9 @@ export default function EditServicesTab() {
             </AppText>
           </Pressable>
         </View>
-    )}
+      )}
 
-    <View style={styles.footer}>
+      <View style={styles.footer}>
         {showSuccess && (
           <View style={styles.bannerSuccess}>
             <AppText style={styles.bannerSuccessText}>
