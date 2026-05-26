@@ -5,6 +5,7 @@ import { useEditBusinessStore } from "@/src/store/editBusiness.store";
 import type {
   EditBusinessTab,
   UpdateBusinessAboutPayload,
+  UpdateBusinessGalleryPayload,
   UpdateBusinessOverviewPayload,
   UpdateBusinessServicesPayload,
 } from "@/src/features/businesses/types/editBusiness.types";
@@ -16,6 +17,7 @@ export function useEditBusiness() {
 
   const markSaved = useEditBusinessStore((s) => s.markSaved);
   const overviewDraft = useEditBusinessStore((s) => s.overviewDraft);
+  const galleryDraft = useEditBusinessStore((s) => s.galleryDraft);
   const servicesDraft = useEditBusinessStore((s) => s.servicesDraft);
   const aboutDraft = useEditBusinessStore((s) => s.aboutDraft);
 
@@ -48,6 +50,35 @@ export function useEditBusiness() {
         err instanceof Error ? err.message : "Failed to save changes";
       setSaveError(message);
       setErrorTab("overview");
+      setSavingTab(null);
+      return { ok: false };
+    }
+  }
+
+  async function saveGallery(): Promise<{ ok: boolean }> {
+    setSavingTab("gallery");
+    setErrorTab(null);
+    setSaveError(null);
+
+    const payload: UpdateBusinessGalleryPayload = {
+      newPhotoUris: galleryDraft.photos.filter((p) => p.isLocal).map((p) => p.url),
+      existingPhotoIds: galleryDraft.photos.filter((p) => !p.isLocal).map((p) => p.id),
+      defaultPhotoIds: galleryDraft.defaultPhotoIds,
+    };
+
+    try {
+      await apiClient.post(
+        "/api/businesses/me/gallery",
+        payload as unknown as Record<string, unknown>
+      );
+      markSaved("gallery");
+      setSavingTab(null);
+      return { ok: true };
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Failed to save changes";
+      setSaveError(message);
+      setErrorTab("gallery");
       setSavingTab(null);
       return { ok: false };
     }
@@ -116,12 +147,15 @@ export function useEditBusiness() {
 
   return {
     saveOverview,
+    saveGallery,
     saveServices,
     saveAbout,
     isSaving: savingTab === "overview",
+    isSavingGallery: savingTab === "gallery",
     isSavingServices: savingTab === "services",
     isSavingAbout: savingTab === "about",
     hasError: errorTab === "overview",
+    hasGalleryError: errorTab === "gallery",
     hasServicesError: errorTab === "services",
     hasAboutError: errorTab === "about",
     saveError,

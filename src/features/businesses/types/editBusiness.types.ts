@@ -87,3 +87,20 @@ export type UpdateBusinessAboutPayload = {
   languages: string[];
   amenities: string[];
 };
+
+export type GalleryPhoto = {
+  id: string;
+  url: string;
+  isLocal: boolean;
+};
+
+export type EditBusinessGalleryDraft = {
+  photos: GalleryPhoto[];
+  defaultPhotoIds: string[];
+};
+
+export type UpdateBusinessGalleryPayload = {
+  newPhotoUris: string[];
+  existingPhotoIds: string[];
+  defaultPhotoIds: string[];
+};

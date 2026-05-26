@@ -5,6 +5,7 @@ import type {
   ConfiguredService,
   DayOfWeek,
   EditBusinessAboutDraft,
+  EditBusinessGalleryDraft,
   EditBusinessOverviewDraft,
   EditBusinessServicesDraft,
   EditBusinessTab,
@@ -46,6 +47,7 @@ type EditBusinessState = {
   activeTab: EditBusinessTab;
   dirty: DirtyMap;
   overviewDraft: EditBusinessOverviewDraft;
+  galleryDraft: EditBusinessGalleryDraft;
   servicesDraft: EditBusinessServicesDraft;
   aboutDraft: EditBusinessAboutDraft;
   setActiveTab: (tab: EditBusinessTab) => void;
@@ -53,6 +55,7 @@ type EditBusinessState = {
   markSaved: (tab: EditBusinessTab) => void;
   setOverviewDraft: (patch: Partial<EditBusinessOverviewDraft>) => void;
   updateOverviewHour: (day: DayOfWeek, patch: Partial<BusinessHourEntry>) => void;
+  setGalleryDraft: (patch: Partial<EditBusinessGalleryDraft>) => void;
   setServicesDraft: (draft: EditBusinessServicesDraft) => void;
   addConfiguredServices: (items: ConfiguredService[]) => void;
   updateConfiguredService: (id: string, patch: Partial<ConfiguredService>) => void;
@@ -80,6 +83,7 @@ export const useEditBusinessStore = create<EditBusinessState>((set) => ({
   activeTab: "overview",
   dirty: { ...defaultDirty },
   overviewDraft: cloneDefaultOverview(),
+  galleryDraft: { photos: [], defaultPhotoIds: [] },
   servicesDraft: { services: [] },
   aboutDraft: { description: "", languages: [], amenities: [] },
   setActiveTab: (tab) => set({ activeTab: tab }),
@@ -87,6 +91,8 @@ export const useEditBusinessStore = create<EditBusinessState>((set) => ({
   markSaved: (tab) => set((s) => ({ dirty: { ...s.dirty, [tab]: false } })),
   setOverviewDraft: (patch) =>
     set((s) => ({ overviewDraft: { ...s.overviewDraft, ...patch } })),
+  setGalleryDraft: (patch) =>
+    set((s) => ({ galleryDraft: { ...s.galleryDraft, ...patch } })),
   updateOverviewHour: (day, patch) =>
     set((s) => ({
       overviewDraft: {
@@ -124,6 +130,7 @@ export const useEditBusinessStore = create<EditBusinessState>((set) => ({
       activeTab: "overview",
       dirty: { ...defaultDirty },
       overviewDraft: cloneDefaultOverview(),
+      galleryDraft: { photos: [], defaultPhotoIds: [] },
       servicesDraft: { services: [] },
       aboutDraft: { description: "", languages: [], amenities: [] },
     }),

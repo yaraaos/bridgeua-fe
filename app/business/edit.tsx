@@ -4,6 +4,7 @@ import React from "react";
 import { Alert, Pressable, StyleSheet, View } from "react-native";
 
 import EditAboutTab from "@/src/components/editBusiness/EditAboutTab";
+import EditGalleryTab from "@/src/components/editBusiness/EditGalleryTab";
 import EditOverviewTab from "@/src/components/editBusiness/EditOverviewTab";
 import EditServicesTab from "@/src/components/editBusiness/EditServicesTab";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
@@ -97,7 +98,7 @@ export default function EditBusinessScreen() {
 
       <View style={styles.content}>
         {activeTab === "overview" && <EditOverviewTab />}
-        {activeTab === "gallery" && <TabPlaceholder label="Gallery" />}
+        {activeTab === "gallery" && <EditGalleryTab />}
         {activeTab === "services" && <EditServicesTab />}
         {activeTab === "about" && <EditAboutTab />}
       </View>
@@ -105,25 +106,6 @@ export default function EditBusinessScreen() {
   );
 }
 
-function TabPlaceholder({ label }: { label: string }) {
-  return (
-    <View style={placeholderStyles.container}>
-      <AppText style={placeholderStyles.text}>{label}</AppText>
-    </View>
-  );
-}
-
-const placeholderStyles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  text: {
-    fontSize: 16,
-    fontWeight: "600",
-  },
-});
 
 function createStyles(colors: AppColors) {
   return StyleSheet.create({
