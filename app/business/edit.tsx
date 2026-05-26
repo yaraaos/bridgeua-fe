@@ -3,6 +3,7 @@ import { router } from "expo-router";
 import React from "react";
 import { Alert, Pressable, StyleSheet, View } from "react-native";
 
+import EditOverviewTab from "@/src/components/editBusiness/EditOverviewTab";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
 import AppTabsPills, {
   type AppTabPillItem,
@@ -93,7 +94,7 @@ export default function EditBusinessScreen() {
       </View>
 
       <View style={styles.content}>
-        {activeTab === "overview" && <TabPlaceholder label="Overview" />}
+        {activeTab === "overview" && <EditOverviewTab />}
         {activeTab === "gallery" && <TabPlaceholder label="Gallery" />}
         {activeTab === "services" && <TabPlaceholder label="Services" />}
         {activeTab === "about" && <TabPlaceholder label="About" />}
