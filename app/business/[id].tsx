@@ -31,6 +31,7 @@ import type {
 import { useReviews } from "@/src/features/reviews/hooks/useReviews";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { useAuthStore } from "@/src/store/auth.store";
+import { useProfileStore } from "@/src/store/profile.store";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -87,6 +88,7 @@ export default function BusinessDetailsScreen() {
     useRequireAuth();
 
   const isGuest = useAuthStore((state) => state.isGuest);
+  const currentUserId = useProfileStore((state) => state.profile.id);
 
   const {
     id,
@@ -252,7 +254,9 @@ export default function BusinessDetailsScreen() {
         gradientColors={DISCOVERY_GRADIENT}
         onPressShare={handleShareBusiness}
         rightSlot={
-          <FollowButton businessId={business.id} size="icon" variant="soft" />
+          business.ownerId && business.ownerId === currentUserId ? null : (
+            <FollowButton businessId={business.id} size="icon" variant="soft" />
+          )
         }
       />
 

@@ -108,6 +108,7 @@ export type BusinessDetailsImage = {
 
 export type BusinessDetails = {
   id: string;
+  ownerId: string | null;
   name: string;
   category: string;
   location: string;
