@@ -45,3 +45,31 @@ export type UpdateBusinessOverviewPayload = {
   socialLinks: EditBusinessSocialLinks;
   hours: BusinessHourEntry[];
 };
+
+export type ServiceCategory = "beauty";
+
+export type ServiceLibraryItem = {
+  id: string;
+  name: string;
+  category: ServiceCategory;
+};
+
+export type ConfiguredService = {
+  id: string;
+  name: string;
+  duration: string;
+  price: string;
+};
+
+export type EditBusinessServicesDraft = {
+  services: ConfiguredService[];
+};
+
+export type UpdateBusinessServicesPayload = {
+  services: {
+    id: string;
+    name: string;
+    durationMinutes: number;
+    price: number;
+  }[];
+};

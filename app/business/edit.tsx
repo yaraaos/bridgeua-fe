@@ -4,6 +4,7 @@ import React from "react";
 import { Alert, Pressable, StyleSheet, View } from "react-native";
 
 import EditOverviewTab from "@/src/components/editBusiness/EditOverviewTab";
+import EditServicesTab from "@/src/components/editBusiness/EditServicesTab";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
 import AppTabsPills, {
   type AppTabPillItem,
@@ -96,7 +97,7 @@ export default function EditBusinessScreen() {
       <View style={styles.content}>
         {activeTab === "overview" && <EditOverviewTab />}
         {activeTab === "gallery" && <TabPlaceholder label="Gallery" />}
-        {activeTab === "services" && <TabPlaceholder label="Services" />}
+        {activeTab === "services" && <EditServicesTab />}
         {activeTab === "about" && <TabPlaceholder label="About" />}
       </View>
     </AppScreen>

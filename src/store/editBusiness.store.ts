@@ -2,8 +2,10 @@ import { create } from "zustand";
 
 import type {
   BusinessHourEntry,
+  ConfiguredService,
   DayOfWeek,
   EditBusinessOverviewDraft,
+  EditBusinessServicesDraft,
   EditBusinessTab,
 } from "@/src/features/businesses/types/editBusiness.types";
 
@@ -42,11 +44,16 @@ type EditBusinessState = {
   activeTab: EditBusinessTab;
   dirty: DirtyMap;
   overviewDraft: EditBusinessOverviewDraft;
+  servicesDraft: EditBusinessServicesDraft;
   setActiveTab: (tab: EditBusinessTab) => void;
   markDirty: (tab: EditBusinessTab) => void;
   markSaved: (tab: EditBusinessTab) => void;
   setOverviewDraft: (patch: Partial<EditBusinessOverviewDraft>) => void;
   updateOverviewHour: (day: DayOfWeek, patch: Partial<BusinessHourEntry>) => void;
+  setServicesDraft: (draft: EditBusinessServicesDraft) => void;
+  addConfiguredServices: (items: ConfiguredService[]) => void;
+  updateConfiguredService: (id: string, patch: Partial<ConfiguredService>) => void;
+  removeConfiguredService: (id: string) => void;
   resetAll: () => void;
 };
 
@@ -69,6 +76,7 @@ export const useEditBusinessStore = create<EditBusinessState>((set) => ({
   activeTab: "overview",
   dirty: { ...defaultDirty },
   overviewDraft: cloneDefaultOverview(),
+  servicesDraft: { services: [] },
   setActiveTab: (tab) => set({ activeTab: tab }),
   markDirty: (tab) => set((s) => ({ dirty: { ...s.dirty, [tab]: true } })),
   markSaved: (tab) => set((s) => ({ dirty: { ...s.dirty, [tab]: false } })),
@@ -83,10 +91,32 @@ export const useEditBusinessStore = create<EditBusinessState>((set) => ({
         ),
       },
     })),
+  setServicesDraft: (draft) => set({ servicesDraft: draft }),
+  addConfiguredServices: (items) =>
+    set((s) => ({
+      servicesDraft: {
+        services: [...s.servicesDraft.services, ...items],
+      },
+    })),
+  updateConfiguredService: (id, patch) =>
+    set((s) => ({
+      servicesDraft: {
+        services: s.servicesDraft.services.map((svc) =>
+          svc.id === id ? { ...svc, ...patch } : svc
+        ),
+      },
+    })),
+  removeConfiguredService: (id) =>
+    set((s) => ({
+      servicesDraft: {
+        services: s.servicesDraft.services.filter((svc) => svc.id !== id),
+      },
+    })),
   resetAll: () =>
     set({
       activeTab: "overview",
       dirty: { ...defaultDirty },
       overviewDraft: cloneDefaultOverview(),
+      servicesDraft: { services: [] },
     }),
 }));

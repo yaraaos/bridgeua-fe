@@ -5,6 +5,7 @@ import { useEditBusinessStore } from "@/src/store/editBusiness.store";
 import type {
   EditBusinessTab,
   UpdateBusinessOverviewPayload,
+  UpdateBusinessServicesPayload,
 } from "@/src/features/businesses/types/editBusiness.types";
 
 export function useEditBusiness() {
@@ -14,6 +15,7 @@ export function useEditBusiness() {
 
   const markSaved = useEditBusinessStore((s) => s.markSaved);
   const overviewDraft = useEditBusinessStore((s) => s.overviewDraft);
+  const servicesDraft = useEditBusinessStore((s) => s.servicesDraft);
 
   async function saveOverview(): Promise<{ ok: boolean }> {
     setSavingTab("overview");
@@ -49,10 +51,45 @@ export function useEditBusiness() {
     }
   }
 
+  async function saveServices(): Promise<{ ok: boolean }> {
+    setSavingTab("services");
+    setErrorTab(null);
+    setSaveError(null);
+
+    const payload: UpdateBusinessServicesPayload = {
+      services: servicesDraft.services.map((svc) => ({
+        id: svc.id,
+        name: svc.name,
+        durationMinutes: parseInt(svc.duration, 10),
+        price: parseFloat(svc.price),
+      })),
+    };
+
+    try {
+      await apiClient.patch(
+        "/api/businesses/me/services",
+        payload as unknown as Record<string, unknown>
+      );
+      markSaved("services");
+      setSavingTab(null);
+      return { ok: true };
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Failed to save changes";
+      setSaveError(message);
+      setErrorTab("services");
+      setSavingTab(null);
+      return { ok: false };
+    }
+  }
+
   return {
     saveOverview,
+    saveServices,
     isSaving: savingTab === "overview",
+    isSavingServices: savingTab === "services",
     hasError: errorTab === "overview",
+    hasServicesError: errorTab === "services",
     saveError,
   };
 }
