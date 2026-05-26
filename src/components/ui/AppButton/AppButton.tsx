@@ -1,6 +1,6 @@
+import { useAppTheme } from "@/src/hooks/useAppTheme";
 import React from "react";
 import { Pressable, Text } from "react-native";
-import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { createStyles } from "./AppButton.styles";
 
 type Props = {
