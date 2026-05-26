@@ -73,6 +73,7 @@ export default function EditAboutTab() {
   const { saveAbout, isSavingAbout, hasAboutError, saveError } =
     useEditBusiness();
 
+  const scrollRef = useRef<ScrollView>(null);
   const [showSuccess, setShowSuccess] = useState(false);
   const successTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -109,72 +110,75 @@ export default function EditAboutTab() {
   }
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      keyboardVerticalOffset={Platform.OS === "ios" ? 160 : 0}
-    >
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
-        keyboardDismissMode="interactive"
-        automaticallyAdjustKeyboardInsets
+    <View style={styles.container}>
+      <KeyboardAvoidingView
+        style={styles.keyboardContent}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 160 : 0}
       >
-        {/* Description */}
-        <View style={styles.section}>
-          <AppText style={styles.sectionTitle}>Description</AppText>
-          <View style={styles.textareaWrapper}>
-            <TextInput
-              style={[styles.textarea, { color: colors.textPrimary }]}
-              value={aboutDraft.description}
-              onChangeText={handleDescriptionChange}
-              placeholder="Tell customers about your business…"
-              placeholderTextColor={colors.textMuted}
-              multiline
-              textAlignVertical="top"
-              maxLength={DESCRIPTION_LIMIT}
-            />
-            <AppText style={styles.charCounter}>
-              {aboutDraft.description.length}/{DESCRIPTION_LIMIT}
-            </AppText>
-          </View>
-        </View>
-
-        {/* Languages */}
-        <View style={styles.section}>
-          <AppText style={styles.sectionTitle}>Languages</AppText>
-          {aboutDraft.languages.length === 0 && (
-            <AppText style={styles.emptyHint}>No languages selected</AppText>
-          )}
-          <View style={styles.chipRow}>
-            {LANGUAGES.map((lang) => (
-              <SelectableChip
-                key={lang}
-                label={lang}
-                selected={aboutDraft.languages.includes(lang)}
-                onPress={() => toggleLanguage(lang)}
+        <ScrollView
+          ref={scrollRef}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="interactive"
+          automaticallyAdjustKeyboardInsets
+        >
+          {/* Description */}
+          <View style={styles.section}>
+            <AppText style={styles.sectionTitle}>Description</AppText>
+            <View style={styles.textareaWrapper}>
+              <TextInput
+                style={[styles.textarea, { color: colors.textPrimary }]}
+                value={aboutDraft.description}
+                onChangeText={handleDescriptionChange}
+                placeholder="Tell customers about your business…"
+                placeholderTextColor={colors.textMuted}
+                multiline
+                textAlignVertical="top"
+                maxLength={DESCRIPTION_LIMIT}
               />
-            ))}
+              <AppText style={styles.charCounter}>
+                {aboutDraft.description.length}/{DESCRIPTION_LIMIT}
+              </AppText>
+            </View>
           </View>
-        </View>
 
-        {/* Amenities */}
-        <View style={styles.section}>
-          <AppText style={styles.sectionTitle}>Amenities</AppText>
-          <View style={styles.chipRow}>
-            {AMENITIES.map((amenity) => (
-              <SelectableChip
-                key={amenity.id}
-                label={amenity.label}
-                icon={amenity.icon}
-                selected={aboutDraft.amenities.includes(amenity.id)}
-                onPress={() => toggleAmenity(amenity.id)}
-              />
-            ))}
+          {/* Languages */}
+          <View style={styles.section}>
+            <AppText style={styles.sectionTitle}>Languages</AppText>
+            {aboutDraft.languages.length === 0 && (
+              <AppText style={styles.emptyHint}>No languages selected</AppText>
+            )}
+            <View style={styles.chipRow}>
+              {LANGUAGES.map((lang) => (
+                <SelectableChip
+                  key={lang}
+                  label={lang}
+                  selected={aboutDraft.languages.includes(lang)}
+                  onPress={() => toggleLanguage(lang)}
+                />
+              ))}
+            </View>
           </View>
-        </View>
-      </ScrollView>
+
+          {/* Amenities */}
+          <View style={styles.section}>
+            <AppText style={styles.sectionTitle}>Amenities</AppText>
+            <View style={styles.chipRow}>
+              {AMENITIES.map((amenity) => (
+                <SelectableChip
+                  key={amenity.id}
+                  label={amenity.label}
+                  icon={amenity.icon}
+                  selected={aboutDraft.amenities.includes(amenity.id)}
+                  onPress={() => toggleAmenity(amenity.id)}
+                />
+              ))}
+            </View>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
 
       <View style={styles.footer}>
         {showSuccess && (
@@ -198,7 +202,7 @@ export default function EditAboutTab() {
           disabled={!isDirty || isSavingAbout}
         />
       </View>
-    </KeyboardAvoidingView>
+    </View>
   );
 }
 
@@ -207,6 +211,9 @@ function createStyles(colors: AppColors) {
     container: {
       flex: 1,
       backgroundColor: colors.background,
+    },
+    keyboardContent: {
+      flex: 1,
     },
     scrollContent: {
       padding: spacing.lg,

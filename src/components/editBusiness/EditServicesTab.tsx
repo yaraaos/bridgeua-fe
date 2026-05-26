@@ -122,18 +122,19 @@ export default function EditServicesTab() {
   }
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-    >
-      <ScrollView
-        ref={scrollRef}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
-        keyboardDismissMode="interactive"
-        automaticallyAdjustKeyboardInsets
+    <View style={styles.container}>
+      <KeyboardAvoidingView
+        style={styles.keyboardContent}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
+        <ScrollView
+          ref={scrollRef}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="interactive"
+          automaticallyAdjustKeyboardInsets
+        >
         {/* Configured services list */}
         {services.length === 0 ? (
           <View style={styles.emptyState}>
@@ -242,10 +243,11 @@ export default function EditServicesTab() {
           </Text>
         </View>
       </ScrollView>
+    </KeyboardAvoidingView>
 
-      {/* Floating "Add selected" button — shown above save bar */}
-      {selectedIds.size > 0 && (
-        <View style={styles.floatingBar}>
+    {/* Floating "Add selected" button — shown above save bar */}
+    {selectedIds.size > 0 && (
+      <View style={styles.floatingBar}>
           <Pressable style={styles.floatingButton} onPress={handleAddSelected}>
             <AppText style={styles.floatingButtonText}>
               Add {selectedIds.size} service
@@ -253,9 +255,9 @@ export default function EditServicesTab() {
             </AppText>
           </Pressable>
         </View>
-      )}
+    )}
 
-      <View style={styles.footer}>
+    <View style={styles.footer}>
         {showSuccess && (
           <View style={styles.bannerSuccess}>
             <AppText style={styles.bannerSuccessText}>
@@ -280,7 +282,7 @@ export default function EditServicesTab() {
           disabled={!canSave || isSavingServices}
         />
       </View>
-    </KeyboardAvoidingView>
+    </View>
   );
 }
 
@@ -289,6 +291,9 @@ function createStyles(colors: AppColors) {
     container: {
       flex: 1,
       backgroundColor: colors.background,
+    },
+    keyboardContent: {
+      flex: 1,
     },
     scrollContent: {
       padding: spacing.lg,

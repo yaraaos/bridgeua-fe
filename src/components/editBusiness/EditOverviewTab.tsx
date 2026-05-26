@@ -200,19 +200,20 @@ export default function EditOverviewTab() {
   }
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      keyboardVerticalOffset={Platform.OS === "ios" ? 96 : 0}
-    >
-      <ScrollView
-        ref={scrollRef}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
-        keyboardDismissMode="interactive"
-        automaticallyAdjustKeyboardInsets
+    <View style={styles.container}>
+      <KeyboardAvoidingView
+        style={styles.keyboardContent}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 96 : 0}
       >
+        <ScrollView
+          ref={scrollRef}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="interactive"
+          automaticallyAdjustKeyboardInsets
+        >
         {/* Business Profile Photo */}
         <View style={styles.avatarSection}>
           <View style={styles.avatarContainer}>
@@ -406,8 +407,9 @@ export default function EditOverviewTab() {
           </View>
         </View>
       </ScrollView>
+    </KeyboardAvoidingView>
 
-      <View style={styles.footer}>
+    <View style={styles.footer}>
         {showSuccess && (
           <View style={styles.bannerSuccess}>
             <AppText style={styles.bannerSuccessText}>
@@ -430,7 +432,7 @@ export default function EditOverviewTab() {
           disabled={!canSave || isSaving}
         />
       </View>
-    </KeyboardAvoidingView>
+    </View>
   );
 }
 
@@ -439,6 +441,9 @@ function createStyles(colors: AppColors) {
     container: {
       flex: 1,
       backgroundColor: colors.background,
+    },
+    keyboardContent: {
+      flex: 1,
     },
     scrollContent: {
       padding: spacing.lg,
