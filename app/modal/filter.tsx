@@ -3,11 +3,11 @@
 import ActiveFiltersSummary from "@/src/components/filters/ActiveFiltersSummary";
 import { AppColors } from "@/src/constants/colors";
 import {
-    BUSINESS_CATEGORY_OPTIONS,
     CUISINE_OPTIONS,
     FOOD_CATEGORY_VALUE,
     SORT_OPTIONS,
 } from "@/src/constants/filters";
+import { useCategories } from "@/src/features/categories/hooks/useCategories";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { useFilterStore } from "@/src/store/filter.store";
 import { Feather } from "@expo/vector-icons";
@@ -75,6 +75,9 @@ export default function FilterModalScreen() {
     setCustomDistance,
     reset,
   } = useFilterStore();
+
+  const { categories } = useCategories();
+  const categoryOptions = categories.map((c) => ({ label: c.name, value: c.name }));
 
   // ─── Open animation ───────────────────────────────────────────────────
   useEffect(() => {
@@ -203,7 +206,7 @@ export default function FilterModalScreen() {
         <FilterOptionList
           title="CATEGORIES"
           type="radio"
-          options={BUSINESS_CATEGORY_OPTIONS}
+          options={categoryOptions}
           selectedValue={category}
           onSelect={(value) => {
             setCategory(scope, value);

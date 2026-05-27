@@ -6,7 +6,7 @@ import HomePromotionModal from "@/src/components/home/HomePromotionModal/HomePro
 import AppEmptyState from "@/src/components/ui/AppEmptyState";
 import AppLoader from "@/src/components/ui/AppLoader/AppLoader";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
-import { HOME_CATEGORIES } from "@/src/constants/categories";
+import { useCategories } from "@/src/features/categories/hooks/useCategories";
 import {
   DEFAULT_LOCATION_OPTIONS,
   LocationOption,
@@ -22,7 +22,7 @@ import { useFilterStore } from "@/src/store/filter.store";
 import { Feather } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Alert,
   Animated,
@@ -51,9 +51,23 @@ export default function HomeScreen() {
   const { category, sort, cuisines, rating, distance, customDistance } =
     useFilterStore((state) => state.discoveryFilters);
 
-  const { businesses, isLoading } = useBusinesses();
+  // Серверные фильтры: category, sort, rating
+  const serverParams = useMemo(() => {
+    const params: Record<string, string | number> = {};
+    if (category) params.categoryName = category;
+    if (sort && sort !== "relevance" && sort !== "distance") params.sort = sort;
+    if (rating && rating !== "custom") params.minRating = Number(rating);
+    return params;
+  }, [category, sort, rating]);
+
+  const { businesses, isLoading } = useBusinesses(
+    Object.keys(serverParams).length > 0 ? serverParams : undefined,
+  );
 
   const isGuest = useAuthStore((state) => state.isGuest);
+
+  const { categories } = useCategories();
+  const categoryNames = ["All Categories", ...categories.map((c) => c.name)];
 
   useEffect(() => {
     const loadRecentSearches = async () => {
@@ -71,10 +85,11 @@ export default function HomeScreen() {
 
   const { filteredBusinesses: discoveryFilteredBusinesses } = useDiscoveryFeed({
     businesses,
-    category,
-    sort,
+    // category, sort, rating уже применены на сервере — передаём нейтральные значения
+    category: "",
+    sort: sort === "distance" ? "distance" : "relevance",
     cuisines,
-    rating,
+    rating: "",
     distance,
     customDistance,
   });
@@ -212,20 +227,10 @@ export default function HomeScreen() {
     });
   };
 
-  const selectedHomeCategory = !category
-    ? "All Categories"
-    : category === "Automotive"
-      ? "Auto"
-      : category;
+  const selectedHomeCategory = category || "All Categories";
 
   const handleSelectCategory = (selectedCategory: string) => {
-    const mappedCategory =
-      selectedCategory === "All Categories"
-        ? ""
-        : selectedCategory === "Auto"
-          ? "Automotive"
-          : selectedCategory;
-
+    const mappedCategory = selectedCategory === "All Categories" ? "" : selectedCategory;
     useFilterStore.getState().setCategory("discovery", mappedCategory);
   };
 
@@ -293,7 +298,7 @@ export default function HomeScreen() {
 
   const categoryBar = (
     <CategoryScroller
-      categories={HOME_CATEGORIES}
+      categories={categoryNames}
       selectedCategory={selectedHomeCategory}
       onSelectCategory={handleSelectCategory}
     />

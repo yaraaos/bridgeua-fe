@@ -7,8 +7,33 @@ import type {
 import { apiClient } from "@/src/services/api/client";
 import { ENDPOINTS } from "@/src/services/api/endpoints";
 
-export const getBusinesses = async (): Promise<Business[]> => {
-  const res = await apiClient.get<Business[]>(ENDPOINTS.BUSINESSES);
+export type GetBusinessesParams = {
+  categoryId?: string;
+  categoryName?: string;
+  sort?: string;
+  minRating?: number;
+  search?: string;
+  page?: number;
+  limit?: number;
+};
+
+export const getBusinesses = async (params?: GetBusinessesParams): Promise<Business[]> => {
+  let url = ENDPOINTS.BUSINESSES;
+
+  if (params) {
+    const query = new URLSearchParams();
+    if (params.categoryId) query.set("categoryId", params.categoryId);
+    if (params.categoryName) query.set("categoryName", params.categoryName);
+    if (params.sort && params.sort !== "relevance") query.set("sort", params.sort);
+    if (params.minRating) query.set("minRating", String(params.minRating));
+    if (params.search) query.set("search", params.search);
+    if (params.page) query.set("page", String(params.page));
+    if (params.limit) query.set("limit", String(params.limit));
+    const qs = query.toString();
+    if (qs) url = `${url}?${qs}`;
+  }
+
+  const res = await apiClient.get<Business[]>(url);
   return res.data;
 };
 

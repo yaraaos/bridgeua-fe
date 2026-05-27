@@ -1,4 +1,5 @@
 import { AppColors } from "@/src/constants/colors";
+import { useCategories } from "@/src/features/categories/hooks/useCategories";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { Feather } from "@expo/vector-icons";
 import { router } from "expo-router";
@@ -20,7 +21,6 @@ import {
 
 const CATEGORIES = [
   "Beauty",
-  "Restaurant",
   "Automotive",
   "Health & Medical",
   "Home & Repair",
@@ -34,6 +34,13 @@ export default function SignUpBusinessScreen() {
 
   const { submitRegisterBusiness, isLoading, apiError, setApiError } =
     useRegisterBusiness();
+
+  const { categories: apiCategories } = useCategories();
+  const categoryNames = apiCategories.length > 0
+    ? apiCategories.map((c) => c.name)
+    : CATEGORIES;
+
+  const { categories } = useCategories();
 
   const [businessName, setBusinessName] = useState("");
   const [ownerName, setOwnerName] = useState("");
@@ -151,7 +158,7 @@ export default function SignUpBusinessScreen() {
           <View>
             <Text style={styles.sectionLabel}>Category</Text>
             <View style={styles.categoriesWrap}>
-              {CATEGORIES.map((category) => {
+              {categoryNames.map((category) => {
                 const active = selectedCategory === category;
 
                 return (

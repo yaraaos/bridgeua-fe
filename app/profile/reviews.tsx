@@ -157,6 +157,7 @@ export default function ProfileReviewsScreen() {
 
     const updatedReview = await updateReview({
       reviewId: editingReview.id,
+      businessId: editingReview.businessId,
       rating: editedRating,
       text: trimmedText,
       photos: editedPhotos,
@@ -198,7 +199,7 @@ export default function ProfileReviewsScreen() {
           text: "Delete",
           style: "destructive",
           onPress: async () => {
-            await deleteReview(review.id);
+            await deleteReview(review.id, review.businessId);
 
             setReviews((currentReviews) =>
               currentReviews.filter((item) => item.id !== review.id),

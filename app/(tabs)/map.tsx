@@ -14,6 +14,7 @@ import {
 } from "@/src/constants/locations";
 import { useBusinesses } from "@/src/features/businesses";
 import { useDiscoveryFeed } from "@/src/features/discovery/hooks/useDiscoveryFeed";
+import { useCategories } from "@/src/features/categories/hooks/useCategories";
 import { useDiscoveryLocationStore } from "@/src/store/discovery-location";
 import { useFilterStore } from "@/src/store/filter.store";
 import { useFollowingStore } from "@/src/store/following.store";
@@ -238,22 +239,14 @@ export default function MapScreen() {
     });
   };
 
-  const selectedCategory = !category
-    ? "All Categories"
-    : category === "Automotive"
-      ? "Auto"
-      : category;
+  const { categories } = useCategories();
+  const categoryNames = ["All Categories", ...categories.map((c) => c.name)];
+
+  const selectedCategory = category || "All Categories";
 
   const handleSelectCategory = (selectedCategoryLabel: string) => {
     setSelectedBusinessId(null);
-
-    const mappedCategory =
-      selectedCategoryLabel === "All Categories"
-        ? ""
-        : selectedCategoryLabel === "Auto"
-          ? "Automotive"
-          : selectedCategoryLabel;
-
+    const mappedCategory = selectedCategoryLabel === "All Categories" ? "" : selectedCategoryLabel;
     useFilterStore.getState().setCategory("discovery", mappedCategory);
   };
 
@@ -335,7 +328,7 @@ export default function MapScreen() {
 
         <View style={styles.categoryWrap} pointerEvents="box-none">
           <CategoryScroller
-            categories={HOME_CATEGORIES}
+            categories={categoryNames}
             selectedCategory={selectedCategory}
             onSelectCategory={handleSelectCategory}
             overlay

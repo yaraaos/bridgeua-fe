@@ -30,6 +30,8 @@ export const ENDPOINTS = {
   BUSINESS_REVIEWS: (id: string) => `/api/businesses/${id}/reviews`,
   REVIEW_BY_ID: (businessId: string, reviewId: string) =>
     `/api/businesses/${businessId}/reviews/${reviewId}`,
+  REVIEW_LIKE: (businessId: string, reviewId: string) =>
+    `/api/businesses/${businessId}/reviews/${reviewId}/like`,
   BUSINESS_FOLLOW: (id: string) => `/api/businesses/${id}/follow`,
 
   // Bookings
