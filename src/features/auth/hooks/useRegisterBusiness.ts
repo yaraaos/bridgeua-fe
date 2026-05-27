@@ -16,7 +16,14 @@ export function useRegisterBusiness() {
       setIsLoading(true);
       setApiError(null);
 
-      return await registerBusiness(payload);
+      const response = await registerBusiness(payload);
+
+      console.log(
+        "[registerBusiness] confirmationCode:",
+        response.confirmationCode,
+      );
+
+      return response;
     } catch (error) {
       setApiError(
         error instanceof Error ? error.message : "Something went wrong",

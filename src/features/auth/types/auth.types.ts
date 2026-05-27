@@ -32,6 +32,7 @@ export type RegisterResponse = {
   userId: string;
   email: string;
   verificationRequired: boolean;
+  confirmationCode?: string;
 };
 
 export type RegisterBusinessPayload = {
