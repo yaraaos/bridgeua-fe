@@ -305,7 +305,10 @@ export default function BusinessDetailsScreen() {
             <>
               <BusinessOverviewCard business={business} />
 
-              <BusinessBookingCard businessId={business.id} />
+              {(business.services?.length ?? 0) > 0 && (
+                <BusinessBookingCard businessId={business.id} />
+              )}
+
               <BusinessRecommendedByPreview
                 recommendations={business.about.recommendedBy}
                 onPressViewAll={() =>
