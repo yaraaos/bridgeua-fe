@@ -3,13 +3,17 @@ import { useState } from "react";
 import type {
   EditBusinessTab,
   UpdateBusinessAboutPayload,
-  UpdateBusinessGalleryPayload,
   UpdateBusinessOverviewPayload,
-  UpdateBusinessServicesPayload,
+  UpdateBusinessServicesPayload
 } from "@/src/features/businesses/types/editBusiness.types";
 import { apiClient } from "@/src/services/api/client";
 import { useEditBusinessStore } from "@/src/store/editBusiness.store";
-import { updateBusinessOverview } from "../services/business.service";
+import {
+  deleteBusinessGalleryPhoto,
+  updateBusinessDefaultPhotos,
+  updateBusinessOverview,
+  uploadBusinessGalleryPhoto,
+} from "../services/business.service";
 
 export function useEditBusiness(businessId?: string) {
   const [savingTab, setSavingTab] = useState<EditBusinessTab | null>(null);
@@ -83,21 +87,59 @@ export function useEditBusiness(businessId?: string) {
     setErrorTab(null);
     setSaveError(null);
 
-    const payload: UpdateBusinessGalleryPayload = {
-      newPhotoUris: galleryDraft.photos
-        .filter((p) => p.isLocal)
-        .map((p) => p.url),
-      existingPhotoIds: galleryDraft.photos
-        .filter((p) => !p.isLocal)
-        .map((p) => p.id),
-      defaultPhotoIds: galleryDraft.defaultPhotoIds,
-    };
-
     try {
-      await apiClient.post(
-        "/api/businesses/me/gallery",
-        payload as unknown as Record<string, unknown>,
+      if (!businessId) {
+        throw new Error("Business profile is not loaded yet");
+      }
+
+      const currentPhotos = galleryDraft.photos;
+
+      const uploadedPhotos = await Promise.all(
+        currentPhotos
+          .filter((photo) => photo.isLocal)
+          .map((photo) => uploadBusinessGalleryPhoto(businessId, photo.url)),
       );
+
+      const existingPhotos = currentPhotos.filter((photo) => !photo.isLocal);
+
+      const deletedPhotoIds = galleryDraft.deletedPhotoIds ?? [];
+
+      await Promise.all(
+        deletedPhotoIds.map((photoId) =>
+          deleteBusinessGalleryPhoto(businessId, photoId),
+        ),
+      );
+
+      const idMap = new Map<string, string>();
+
+      currentPhotos
+        .filter((photo) => photo.isLocal)
+        .forEach((localPhoto, index) => {
+          const uploaded = uploadedPhotos[index];
+          if (uploaded) {
+            idMap.set(localPhoto.id, uploaded.id);
+          }
+        });
+
+      const finalDefaultPhotoIds = galleryDraft.defaultPhotoIds
+        .map((id) => idMap.get(id) ?? id)
+        .filter((id) =>
+          [...existingPhotos, ...uploadedPhotos].some(
+            (photo) => photo.id === id,
+          ),
+        );
+
+      const serverPhotos = await updateBusinessDefaultPhotos(
+        businessId,
+        finalDefaultPhotoIds,
+      );
+
+      useEditBusinessStore.getState().setGalleryDraft({
+        photos: serverPhotos,
+        defaultPhotoIds: finalDefaultPhotoIds,
+        deletedPhotoIds: [],
+      });
+
       markSaved("gallery");
       setSavingTab(null);
       return { ok: true };

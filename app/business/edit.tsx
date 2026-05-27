@@ -103,7 +103,9 @@ export default function EditBusinessScreen() {
         {activeTab === "overview" && (
           <EditOverviewTab business={business} businessId={business?.id} />
         )}
-        {activeTab === "gallery" && <EditGalleryTab />}
+        {activeTab === "gallery" && (
+          <EditGalleryTab business={business} businessId={business?.id} />
+        )}{" "}
         {activeTab === "services" && <EditServicesTab />}
         {activeTab === "about" && <EditAboutTab />}
       </View>

@@ -127,6 +127,8 @@ export type BusinessBookingAvailabilityDay = {
 export type BusinessDetailsImage = {
   id: string;
   url: string;
+  isDefault?: boolean;
+  sortOrder?: number;
 };
 
 export type BusinessDetails = {

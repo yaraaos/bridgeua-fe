@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Alert,
   Dimensions,
@@ -18,6 +18,7 @@ import { AppColors } from "@/src/constants/colors";
 import { radius } from "@/src/constants/radius";
 import { spacing } from "@/src/constants/spacing";
 import { useEditBusiness } from "@/src/features/businesses/hooks/useEditBusiness";
+import { BusinessDetails } from "@/src/features/businesses/types/business.types";
 import type { GalleryPhoto } from "@/src/features/businesses/types/editBusiness.types";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { useEditBusinessStore } from "@/src/store/editBusiness.store";
@@ -29,7 +30,15 @@ const NUM_COLS = 3;
 const CELL_SIZE =
   (SCREEN_WIDTH - 2 * PADDING - (NUM_COLS - 1) * GAP) / NUM_COLS;
 
-export default function EditGalleryTab() {
+type EditGalleryTabProps = {
+  business?: BusinessDetails | null;
+  businessId?: string;
+};
+
+export default function EditGalleryTab({
+  business,
+  businessId,
+}: EditGalleryTabProps) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
 
@@ -37,10 +46,39 @@ export default function EditGalleryTab() {
   const isDirty = useEditBusinessStore((s) => s.dirty.gallery);
   const markDirty = useEditBusinessStore((s) => s.markDirty);
   const setGalleryDraft = useEditBusinessStore((s) => s.setGalleryDraft);
+  const hydratedBusinessIdRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (!business) return;
+
+    const nextBusinessId = String(business.id ?? businessId ?? "");
+
+    if (
+      nextBusinessId !== "" &&
+      hydratedBusinessIdRef.current === nextBusinessId
+    ) {
+      return;
+    }
+
+    const images = business.images ?? [];
+
+    setGalleryDraft({
+      photos: images.map((image) => ({
+        id: image.id,
+        url: image.url,
+        isLocal: false,
+      })),
+      defaultPhotoIds: images
+        .filter((image) => image.isDefault)
+        .map((image) => image.id),
+      deletedPhotoIds: [],
+    });
+
+    hydratedBusinessIdRef.current = nextBusinessId;
+  }, [business, businessId, setGalleryDraft]);
 
   const { saveGallery, isSavingGallery, hasGalleryError, saveError } =
-    useEditBusiness();
-
+    useEditBusiness(businessId);
   const [showSuccess, setShowSuccess] = useState(false);
   const [loadingIds, setLoadingIds] = useState<Set<string>>(new Set());
   const [actionSheetPhoto, setActionSheetPhoto] = useState<GalleryPhoto | null>(
@@ -137,6 +175,9 @@ export default function EditGalleryTab() {
             defaultPhotoIds: current.defaultPhotoIds.filter(
               (id) => id !== photoToDelete.id,
             ),
+            deletedPhotoIds: photoToDelete.isLocal
+              ? current.deletedPhotoIds
+              : [...current.deletedPhotoIds, photoToDelete.id],
           });
           markDirty("gallery");
         },

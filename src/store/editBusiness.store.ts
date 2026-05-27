@@ -1,14 +1,14 @@
 import { create } from "zustand";
 
 import type {
-    BusinessHourEntry,
-    ConfiguredService,
-    DayOfWeek,
-    EditBusinessAboutDraft,
-    EditBusinessGalleryDraft,
-    EditBusinessOverviewDraft,
-    EditBusinessServicesDraft,
-    EditBusinessTab,
+  BusinessHourEntry,
+  ConfiguredService,
+  DayOfWeek,
+  EditBusinessAboutDraft,
+  EditBusinessGalleryDraft,
+  EditBusinessOverviewDraft,
+  EditBusinessServicesDraft,
+  EditBusinessTab,
 } from "@/src/features/businesses/types/editBusiness.types";
 
 export type { EditBusinessTab };
@@ -90,7 +90,7 @@ export const useEditBusinessStore = create<EditBusinessState>((set) => ({
   activeTab: "overview",
   dirty: { ...defaultDirty },
   overviewDraft: cloneDefaultOverview(),
-  galleryDraft: { photos: [], defaultPhotoIds: [] },
+  galleryDraft: { photos: [], defaultPhotoIds: [], deletedPhotoIds: [] },
   servicesDraft: { services: [] },
   aboutDraft: { description: "", languages: [], amenities: [] },
   setActiveTab: (tab) => set({ activeTab: tab }),
@@ -137,7 +137,7 @@ export const useEditBusinessStore = create<EditBusinessState>((set) => ({
       activeTab: "overview",
       dirty: { ...defaultDirty },
       overviewDraft: cloneDefaultOverview(),
-      galleryDraft: { photos: [], defaultPhotoIds: [] },
+      galleryDraft: { photos: [], defaultPhotoIds: [], deletedPhotoIds: [] },
       servicesDraft: { services: [] },
       aboutDraft: { description: "", languages: [], amenities: [] },
     }),

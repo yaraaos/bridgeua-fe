@@ -99,10 +99,5 @@ export type GalleryPhoto = {
 export type EditBusinessGalleryDraft = {
   photos: GalleryPhoto[];
   defaultPhotoIds: string[];
-};
-
-export type UpdateBusinessGalleryPayload = {
-  newPhotoUris: string[];
-  existingPhotoIds: string[];
-  defaultPhotoIds: string[];
+  deletedPhotoIds: string[];
 };

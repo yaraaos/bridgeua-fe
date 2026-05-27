@@ -6,7 +6,10 @@ import type {
 } from "@/src/features/businesses/types/business.types";
 import { apiClient } from "@/src/services/api/client";
 import { ENDPOINTS } from "@/src/services/api/endpoints";
-import { UpdateBusinessOverviewPayload } from "../types/editBusiness.types";
+import {
+  GalleryPhoto,
+  UpdateBusinessOverviewPayload,
+} from "../types/editBusiness.types";
 
 export type GetBusinessesParams = {
   categoryId?: string;
@@ -94,4 +97,58 @@ export const updateBusinessOverview = async (
   );
 
   return res.data;
+};
+
+export type BusinessGalleryPhotoResponse = {
+  id: string;
+  businessId: string;
+  imageUrl: string;
+  url: string;
+  isDefault: boolean;
+  sortOrder: number;
+};
+
+const toGalleryPhoto = (photo: BusinessGalleryPhotoResponse): GalleryPhoto => ({
+  id: photo.id,
+  url: photo.url ?? photo.imageUrl,
+  isLocal: false,
+});
+
+export const uploadBusinessGalleryPhoto = async (
+  businessId: string,
+  uri: string,
+): Promise<GalleryPhoto> => {
+  const formData = new FormData();
+
+  formData.append("photo", {
+    uri,
+    name: "business-gallery-photo.jpg",
+    type: "image/jpeg",
+  } as unknown as Blob);
+
+  const res = await apiClient.post<BusinessGalleryPhotoResponse>(
+    ENDPOINTS.BUSINESS_PHOTOS(businessId),
+    formData,
+  );
+
+  return toGalleryPhoto(res.data);
+};
+
+export const deleteBusinessGalleryPhoto = async (
+  businessId: string,
+  photoId: string,
+): Promise<void> => {
+  await apiClient.delete(ENDPOINTS.BUSINESS_PHOTO_BY_ID(businessId, photoId));
+};
+
+export const updateBusinessDefaultPhotos = async (
+  businessId: string,
+  defaultPhotoIds: string[],
+): Promise<GalleryPhoto[]> => {
+  const res = await apiClient.patch<BusinessGalleryPhotoResponse[]>(
+    `${ENDPOINTS.BUSINESS_PHOTOS(businessId)}/defaults`,
+    { defaultPhotoIds },
+  );
+
+  return res.data.map(toGalleryPhoto);
 };
