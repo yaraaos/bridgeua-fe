@@ -1,8 +1,8 @@
 import ScreenHeader from "@/src/components/common/ScreenHeader/ScreenHeader";
 import AppEmptyState from "@/src/components/ui/AppEmptyState";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
-import { HOME_CATEGORIES } from "@/src/constants/categories";
 import { AppColors } from "@/src/constants/colors";
+import { useCategories } from "@/src/features/categories/hooks/useCategories";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { router, useLocalSearchParams } from "expo-router";
 import { Pressable, StyleSheet, Text, View } from "react-native";
@@ -13,7 +13,8 @@ export default function SearchEmptyScreen() {
 
   const { query } = useLocalSearchParams<{ query?: string }>();
 
-  const popularCategories = HOME_CATEGORIES.slice(1, 6);
+  const { categories } = useCategories();
+  const popularCategories = categories.slice(0, 5).map((c) => c.name);
 
   return (
     <AppScreen withTopInset={false} style={styles.container}>

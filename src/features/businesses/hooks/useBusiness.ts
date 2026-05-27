@@ -7,17 +7,19 @@ import {
   getBusinessDetailsById,
   getBusinesses,
   getMyBusinessProfile,
+  type GetBusinessesParams,
 } from "../services/business.service";
 
-export const useBusinesses = () => {
+export const useBusinesses = (params?: GetBusinessesParams) => {
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const loadBusinesses = async () => {
+      setIsLoading(true);
       try {
-        const data = await getBusinesses();
+        const data = await getBusinesses(params);
         setBusinesses(data);
       } catch (e) {
         setError(e instanceof Error ? e.message : "Failed to load businesses");
@@ -27,7 +29,8 @@ export const useBusinesses = () => {
     };
 
     loadBusinesses();
-  }, []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [JSON.stringify(params)]);
 
   return { businesses, isLoading, error };
 };

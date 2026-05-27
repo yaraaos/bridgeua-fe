@@ -1,6 +1,7 @@
 import AppAvatar from "@/src/components/ui/AppAvatar";
 import { AuthRequiredModal, useRequireAuth } from "@/src/features/auth";
 import type { BusinessDetailsReview } from "@/src/features/businesses/types/business.types";
+import { likeReview, unlikeReview } from "@/src/features/reviews/services/review.service";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { useProfileStore } from "@/src/store/profile.store";
 import { useReviewsStore } from "@/src/store/reviews.store";
@@ -150,12 +151,28 @@ export default function ReviewCard({
 
     requireAuth(
       () => {
-        setIsLiked((currentValue) => !currentValue);
+        const businessId = review.businessId;
+        if (!businessId) return;
+
+        const newIsLiked = !isLiked;
+        setIsLiked(newIsLiked);
         setLikesCount((currentCount) =>
           isLiked ? Math.max(0, currentCount - 1) : currentCount + 1,
         );
-
         toggleReviewLike(review.id);
+
+        const apiCall = newIsLiked
+          ? likeReview(businessId, review.id)
+          : unlikeReview(businessId, review.id);
+
+        apiCall.catch(() => {
+          // rollback on error
+          setIsLiked(isLiked);
+          setLikesCount((currentCount) =>
+            newIsLiked ? Math.max(0, currentCount - 1) : currentCount + 1,
+          );
+          toggleReviewLike(review.id);
+        });
       },
       {
         action: "review",

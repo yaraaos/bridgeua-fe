@@ -65,3 +65,11 @@ export const getMyReviews = async (): Promise<PersonalProfileReview[]> => {
   const res = await apiClient.get<PersonalProfileReview[]>(ENDPOINTS.USERS_ME_REVIEWS);
   return res.data;
 };
+
+export const likeReview = async (businessId: string, reviewId: string): Promise<void> => {
+  await apiClient.post(ENDPOINTS.REVIEW_LIKE(businessId, reviewId));
+};
+
+export const unlikeReview = async (businessId: string, reviewId: string): Promise<void> => {
+  await apiClient.delete(ENDPOINTS.REVIEW_LIKE(businessId, reviewId));
+};

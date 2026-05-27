@@ -1,4 +1,5 @@
 import { AppColors } from "@/src/constants/colors";
+import { useCategories } from "@/src/features/categories/hooks/useCategories";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { useEditBusinessStore } from "@/src/store/editBusiness.store";
 import { Feather } from "@expo/vector-icons";
@@ -20,15 +21,15 @@ import {
   validateSignUpBusinessForm,
 } from "../../src/features/auth/validation/signUpBusiness.validation";
 
-const CATEGORY_OPTIONS: { label: string; value: string }[] = [
-  { label: "Beauty", value: "Beauty" },
-  { label: "Food", value: "Food" },
-  { label: "Auto", value: "Auto" },
-  { label: "Home & Repair", value: "Home & Repair" },
-  { label: "Education", value: "Education" },
-  { label: "Restaurant", value: "Restaurant" },
-  { label: "Medical", value: "Medical" },
-  { label: "Other", value: "Other" },
+const FALLBACK_CATEGORIES = [
+  "Beauty",
+  "Food",
+  "Auto",
+  "Home & Repair",
+  "Education",
+  "Health & Medical",
+  "Shopping",
+  "Entertainment",
 ];
 
 export default function SignUpBusinessScreen() {
@@ -38,6 +39,12 @@ export default function SignUpBusinessScreen() {
   const { submitRegisterBusiness, isLoading, apiError, setApiError } =
     useRegisterBusiness();
   const setOverviewDraft = useEditBusinessStore((s) => s.setOverviewDraft);
+
+  const { categories } = useCategories();
+  const categoryList = categories.length > 0
+    ? categories.map((c) => c.name)
+    : FALLBACK_CATEGORIES;
+  const categoryOptions = categoryList.map((name) => ({ label: name, value: name }));
 
   const [businessName, setBusinessName] = useState("");
   const [ownerName, setOwnerName] = useState("");
@@ -117,7 +124,7 @@ export default function SignUpBusinessScreen() {
   };
 
   const selectedCategoryLabel =
-    CATEGORY_OPTIONS.find((o) => o.value === selectedCategory)?.label ?? "";
+    categoryOptions.find((o) => o.value === selectedCategory)?.label ?? "";
 
   return (
     <AppScreen scroll style={styles.container}>
@@ -370,7 +377,7 @@ export default function SignUpBusinessScreen() {
         >
           <View style={styles.modalSheet}>
             <Text style={styles.modalTitle}>Select Category</Text>
-            {CATEGORY_OPTIONS.map((option) => (
+            {categoryOptions.map((option) => (
               <Pressable
                 key={option.value}
                 style={styles.modalOption}
