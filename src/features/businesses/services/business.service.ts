@@ -15,6 +15,14 @@ export const getBusinesses = async (): Promise<Business[]> => {
 export const getBusinessDetailsById = async (
   id: string,
 ): Promise<BusinessDetails | null> => {
-  const res = await apiClient.get<BusinessDetails>(ENDPOINTS.BUSINESS_BY_ID(id));
+  const res = await apiClient.get<BusinessDetails>(
+    ENDPOINTS.BUSINESS_BY_ID(id),
+  );
   return res.data;
 };
+
+export const getMyBusinessProfile =
+  async (): Promise<BusinessDetails | null> => {
+    const res = await apiClient.get<BusinessDetails>(ENDPOINTS.BUSINESSES_ME);
+    return res.data;
+  };

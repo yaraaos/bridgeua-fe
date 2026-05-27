@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import {
   getBusinessDetailsById,
   getBusinesses,
+  getMyBusinessProfile,
 } from "../services/business.service";
 
 export const useBusinesses = () => {
@@ -19,7 +20,7 @@ export const useBusinesses = () => {
         const data = await getBusinesses();
         setBusinesses(data);
       } catch (e) {
-        setError(e instanceof Error ? e.message : 'Failed to load businesses');
+        setError(e instanceof Error ? e.message : "Failed to load businesses");
       } finally {
         setIsLoading(false);
       }
@@ -49,7 +50,7 @@ export const useBusinessDetails = (id?: string) => {
         const data = await getBusinessDetailsById(id);
         setBusiness(data);
       } catch (e) {
-        setError(e instanceof Error ? e.message : 'Failed to load business');
+        setError(e instanceof Error ? e.message : "Failed to load business");
       } finally {
         setIsLoading(false);
       }
@@ -57,6 +58,34 @@ export const useBusinessDetails = (id?: string) => {
 
     loadBusiness();
   }, [id]);
+
+  return { business, isLoading, error };
+};
+
+export const useMyBusinessProfile = () => {
+  const [business, setBusiness] = useState<BusinessDetails | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadBusiness = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        const data = await getMyBusinessProfile();
+        setBusiness(data);
+      } catch (e) {
+        setError(
+          e instanceof Error ? e.message : "Failed to load business profile",
+        );
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadBusiness();
+  }, []);
 
   return { business, isLoading, error };
 };

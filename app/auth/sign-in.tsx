@@ -9,6 +9,7 @@ import { router } from "expo-router";
 import { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
+import { useAccountStore } from "@/src/store/account.store";
 import AppButton from "../../src/components/ui/AppButton/AppButton";
 import AppInput from "../../src/components/ui/AppInput/AppInput";
 import AppLoader from "../../src/components/ui/AppLoader/AppLoader";
@@ -31,6 +32,11 @@ export default function SignInScreen() {
   const syncFollowing = useFollowingStore((state) => state.syncWithServer);
   const loadProfile = useProfileStore((state) => state.loadProfile);
   const clearReviews = useReviewsStore((state) => state.clearReviews);
+
+  const accounts = useAccountStore((state) => state.accounts);
+  const setActiveAccountId = useAccountStore(
+    (state) => state.setActiveAccountId,
+  );
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -55,10 +61,20 @@ export default function SignInScreen() {
       await saveAuthTokens(response.accessToken, response.refreshToken);
 
       setUser(response.user);
+
+      const targetAccountKind = response.user.accountType ?? "personal";
+      const targetAccount = accounts.find(
+        (account) => account.kind === targetAccountKind,
+      );
+
+      if (targetAccount) {
+        setActiveAccountId(targetAccount.id);
+      }
+
       await loadProfile();
       await syncFollowing();
 
-      router.replace("/(tabs)/home");
+      router.replace("/(tabs)/profile");
     }
   };
 

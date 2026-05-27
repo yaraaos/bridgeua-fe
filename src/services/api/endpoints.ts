@@ -23,6 +23,7 @@ export const ENDPOINTS = {
 
   // Businesses
   BUSINESSES: "/api/businesses",
+  BUSINESSES_ME: "/api/businesses/me",
   BUSINESS_BY_ID: (id: string) => `/api/businesses/${id}`,
   BUSINESS_PHOTOS: (id: string) => `/api/businesses/${id}/photos`,
   BUSINESS_PHOTO_BY_ID: (id: string, photoId: string) =>

@@ -16,6 +16,8 @@ export type AuthUser = {
 };
 
 export type SignInResponse = {
+  accessToken: string;
+  refreshToken: string;
   user: AuthUser;
   token: string;
 };
