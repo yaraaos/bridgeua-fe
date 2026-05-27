@@ -68,7 +68,11 @@ const NO_ERRORS: OverviewErrors = {
   state: false,
 };
 
-export default function EditOverviewTab() {
+type EditOverviewTabProps = {
+  businessId?: string;
+};
+
+export default function EditOverviewTab({ businessId }: EditOverviewTabProps) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
   const account = useActiveAccount();
@@ -90,7 +94,7 @@ export default function EditOverviewTab() {
     ),
   );
 
-  const { saveOverview, isSaving, saveError } = useEditBusiness();
+  const { saveOverview, isSaving, saveError } = useEditBusiness(businessId);
   const { showError, errorMessage, triggerError, clearError } =
     useFormValidation();
   const [errors, setErrors] = useState<OverviewErrors>(NO_ERRORS);

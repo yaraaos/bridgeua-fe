@@ -1,16 +1,17 @@
 import { useState } from "react";
 
 import type {
-    EditBusinessTab,
-    UpdateBusinessAboutPayload,
-    UpdateBusinessGalleryPayload,
-    UpdateBusinessOverviewPayload,
-    UpdateBusinessServicesPayload,
+  EditBusinessTab,
+  UpdateBusinessAboutPayload,
+  UpdateBusinessGalleryPayload,
+  UpdateBusinessOverviewPayload,
+  UpdateBusinessServicesPayload,
 } from "@/src/features/businesses/types/editBusiness.types";
 import { apiClient } from "@/src/services/api/client";
 import { useEditBusinessStore } from "@/src/store/editBusiness.store";
+import { updateBusinessOverview } from "../services/business.service";
 
-export function useEditBusiness() {
+export function useEditBusiness(businessId?: string) {
   const [savingTab, setSavingTab] = useState<EditBusinessTab | null>(null);
   const [errorTab, setErrorTab] = useState<EditBusinessTab | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -59,10 +60,11 @@ export function useEditBusiness() {
     };
 
     try {
-      await apiClient.patch(
-        "/api/businesses/me/overview",
-        payload as unknown as Record<string, unknown>,
-      );
+      if (!businessId) {
+        throw new Error("Business profile is not loaded yet");
+      }
+
+      await updateBusinessOverview(businessId, payload);
       markSaved("overview");
       setSavingTab(null);
       return { ok: true };
