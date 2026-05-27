@@ -18,14 +18,17 @@ export type GetBusinessesParams = {
   limit?: number;
 };
 
-export const getBusinesses = async (params?: GetBusinessesParams): Promise<Business[]> => {
+export const getBusinesses = async (
+  params?: GetBusinessesParams,
+): Promise<Business[]> => {
   let url = ENDPOINTS.BUSINESSES;
 
   if (params) {
     const query = new URLSearchParams();
     if (params.categoryId) query.set("categoryId", params.categoryId);
     if (params.categoryName) query.set("categoryName", params.categoryName);
-    if (params.sort && params.sort !== "relevance") query.set("sort", params.sort);
+    if (params.sort && params.sort !== "relevance")
+      query.set("sort", params.sort);
     if (params.minRating) query.set("minRating", String(params.minRating));
     if (params.search) query.set("search", params.search);
     if (params.page) query.set("page", String(params.page));
@@ -53,6 +56,16 @@ export const getMyBusinessProfile =
     return res.data;
   };
 
+const DAY_TO_API_INDEX: Record<string, number> = {
+  sunday: 0,
+  monday: 1,
+  tuesday: 2,
+  wednesday: 3,
+  thursday: 4,
+  friday: 5,
+  saturday: 6,
+};
+
 export const updateBusinessOverview = async (
   businessId: string,
   payload: UpdateBusinessOverviewPayload,
@@ -60,12 +73,23 @@ export const updateBusinessOverview = async (
   const res = await apiClient.patch<BusinessDetails>(
     ENDPOINTS.BUSINESS_BY_ID(businessId),
     {
+      name: payload.name,
       address: payload.address,
       zipCode: payload.postalCode,
       city: payload.city,
       state: payload.state,
       phone: payload.phone,
       website: payload.socialLinks.website,
+      instagram: payload.socialLinks.instagram,
+      facebook: payload.socialLinks.facebook,
+      telegram: payload.socialLinks.telegram,
+      whatsapp: payload.socialLinks.whatsapp,
+      hours: payload.hours.map((hour) => ({
+        day: DAY_TO_API_INDEX[hour.day],
+        opensAt: hour.isOpen ? hour.openTime : null,
+        closesAt: hour.isOpen ? hour.closeTime : null,
+        isClosed: !hour.isOpen,
+      })),
     },
   );
 

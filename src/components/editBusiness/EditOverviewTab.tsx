@@ -22,6 +22,7 @@ import { spacing } from "@/src/constants/spacing";
 import { useEditBusiness } from "@/src/features/businesses/hooks/useEditBusiness";
 import type {
   DayOfWeek,
+  EditBusinessOverviewDraft,
   EditBusinessSocialLinks,
 } from "@/src/features/businesses/types/editBusiness.types";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
@@ -74,6 +75,42 @@ type EditOverviewTabProps = {
   businessId?: string;
 };
 
+const API_DAY_TO_DRAFT_DAY: Record<number, DayOfWeek> = {
+  0: "sunday",
+  1: "monday",
+  2: "tuesday",
+  3: "wednesday",
+  4: "thursday",
+  5: "friday",
+  6: "saturday",
+};
+
+function mapBusinessHoursToDraftHours(
+  businessHours: BusinessDetails["businessHours"],
+  fallbackHours: EditBusinessOverviewDraft["hours"],
+): EditBusinessOverviewDraft["hours"] {
+  if (!businessHours || businessHours.length === 0) {
+    return fallbackHours;
+  }
+
+  return fallbackHours.map((fallbackHour) => {
+    const apiHour = businessHours.find(
+      (hour) => API_DAY_TO_DRAFT_DAY[hour.day] === fallbackHour.day,
+    );
+
+    if (!apiHour) {
+      return fallbackHour;
+    }
+
+    return {
+      day: fallbackHour.day,
+      isOpen: !apiHour.isClosed,
+      openTime: apiHour.opensAt ?? fallbackHour.openTime,
+      closeTime: apiHour.closesAt ?? fallbackHour.closeTime,
+    };
+  });
+}
+
 export default function EditOverviewTab({
   business,
   businessId,
@@ -86,29 +123,42 @@ export default function EditOverviewTab({
   const isDirty = useEditBusinessStore((s) => s.dirty.overview);
   const markDirty = useEditBusinessStore((s) => s.markDirty);
   const setOverviewDraft = useEditBusinessStore((s) => s.setOverviewDraft);
-  const hydratedBusinessIdRef = useRef<string | null>(null);
+  const updateOverviewHour = useEditBusinessStore((s) => s.updateOverviewHour);
   useEffect(() => {
-    if (!business) return;
+    if (!business) {
+      return;
+    }
 
-    if (hydratedBusinessIdRef.current === business.id) return;
-
-    hydratedBusinessIdRef.current = business.id;
+    const currentDraft = useEditBusinessStore.getState().overviewDraft;
 
     setOverviewDraft({
-      ...draft,
-      category: business.category ?? draft.category,
+      name: business.name ?? "",
+      category: business.category ?? "",
       address: business.address ?? "",
       postalCode: business.zipCode ?? "",
       city: business.city ?? "",
       state: business.state ?? "",
       phone: business.phone ?? "",
+
       socialLinks: {
-        ...draft.socialLinks,
-        website: business.website ?? "",
+        ...currentDraft.socialLinks,
+        website: business.socialLinks?.website ?? business.website ?? "",
+
+        instagram: business.socialLinks?.instagram ?? "",
+
+        facebook: business.socialLinks?.facebook ?? "",
+
+        telegram: business.socialLinks?.telegram ?? "",
+
+        whatsapp: business.socialLinks?.whatsapp ?? "",
       },
+
+      hours: mapBusinessHoursToDraftHours(
+        business.businessHours,
+        currentDraft.hours,
+      ),
     });
-  }, [business, draft, setOverviewDraft]);
-  const updateOverviewHour = useEditBusinessStore((s) => s.updateOverviewHour);
+  }, [business, setOverviewDraft]);
 
   const scrollRef = useRef<ScrollView>(null);
   const fieldPositions = useRef<Record<string, number>>({});

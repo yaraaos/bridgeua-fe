@@ -13,6 +13,21 @@ export type BusinessOpeningHour = {
   hours: string;
 };
 
+export type BusinessHour = {
+  day: number;
+  opensAt: string | null;
+  closesAt: string | null;
+  isClosed: boolean;
+};
+
+export type BusinessSocialLinks = {
+  website?: string;
+  instagram?: string;
+  facebook?: string;
+  telegram?: string;
+  whatsapp?: string;
+};
+
 export type BusinessContactItem = {
   id: string;
   type: BusinessContactType;
@@ -73,6 +88,7 @@ export type BusinessDetailsReview = {
   tags?: string[];
   photos?: BusinessReviewPhoto[];
 };
+
 export type BusinessDetailsService = {
   id: string;
   name: string;
@@ -119,6 +135,8 @@ export type BusinessDetails = {
   state?: string;
   phone?: string;
   website: string;
+  socialLinks?: BusinessSocialLinks;
+  businessHours?: BusinessHour[];
   rating: number;
   reviewCount: number;
   recommendedByCount: number;
