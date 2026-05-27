@@ -1,8 +1,8 @@
 // app/profile/business.tsx
 
 import { Feather, Ionicons } from "@expo/vector-icons";
-import { router } from "expo-router";
-import React from "react";
+import { router, useFocusEffect } from "expo-router";
+import React, { useCallback } from "react";
 import { Image, Pressable, ScrollView, StyleSheet, View } from "react-native";
 
 import ScreenHeader from "@/src/components/common/ScreenHeader/ScreenHeader";
@@ -78,7 +78,12 @@ export default function BusinessProfileScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
   const account = useActiveAccount();
-  const { business, isLoading, error } = useMyBusinessProfile();
+  const { business, isLoading, error, refetch } = useMyBusinessProfile();
+  useFocusEffect(
+    useCallback(() => {
+      void refetch();
+    }, [refetch]),
+  );
 
   const businessName = business?.name || "";
   const handle = business?.category ?? account.handle;

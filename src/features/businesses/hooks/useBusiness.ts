@@ -2,7 +2,7 @@ import type {
   Business,
   BusinessDetails,
 } from "@/src/features/businesses/types/business.types";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   getBusinessDetailsById,
   getBusinesses,
@@ -34,32 +34,34 @@ export const useBusinesses = () => {
 
 export const useBusinessDetails = (id?: string) => {
   const [business, setBusiness] = useState<BusinessDetails | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(Boolean(id));
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const loadBusiness = async () => {
-      if (!id) {
-        setBusiness(null);
-        setIsLoading(false);
-        return;
-      }
+  const loadBusiness = useCallback(async () => {
+    if (!id) {
+      setBusiness(null);
+      setIsLoading(false);
+      return;
+    }
 
-      try {
-        setIsLoading(true);
-        const data = await getBusinessDetailsById(id);
-        setBusiness(data);
-      } catch (e) {
-        setError(e instanceof Error ? e.message : "Failed to load business");
-      } finally {
-        setIsLoading(false);
-      }
-    };
+    try {
+      setIsLoading(true);
+      setError(null);
 
-    loadBusiness();
+      const data = await getBusinessDetailsById(id);
+      setBusiness(data);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to load business");
+    } finally {
+      setIsLoading(false);
+    }
   }, [id]);
 
-  return { business, isLoading, error };
+  useEffect(() => {
+    void loadBusiness();
+  }, [loadBusiness]);
+
+  return { business, isLoading, error, refetch: loadBusiness };
 };
 
 export const useMyBusinessProfile = () => {
@@ -67,25 +69,25 @@ export const useMyBusinessProfile = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const loadBusiness = useCallback(async () => {
+    try {
+      setIsLoading((current) => (business ? current : true));
+      setError(null);
+
+      const data = await getMyBusinessProfile();
+      setBusiness(data);
+    } catch (e) {
+      setError(
+        e instanceof Error ? e.message : "Failed to load business profile",
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  }, [business]);
+
   useEffect(() => {
-    const loadBusiness = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
+    void loadBusiness();
+  }, [loadBusiness]);
 
-        const data = await getMyBusinessProfile();
-        setBusiness(data);
-      } catch (e) {
-        setError(
-          e instanceof Error ? e.message : "Failed to load business profile",
-        );
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadBusiness();
-  }, []);
-
-  return { business, isLoading, error };
+  return { business, isLoading, error, refetch: loadBusiness };
 };

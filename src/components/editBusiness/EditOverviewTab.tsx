@@ -86,8 +86,13 @@ export default function EditOverviewTab({
   const isDirty = useEditBusinessStore((s) => s.dirty.overview);
   const markDirty = useEditBusinessStore((s) => s.markDirty);
   const setOverviewDraft = useEditBusinessStore((s) => s.setOverviewDraft);
+  const hydratedBusinessIdRef = useRef<string | null>(null);
   useEffect(() => {
     if (!business) return;
+
+    if (hydratedBusinessIdRef.current === business.id) return;
+
+    hydratedBusinessIdRef.current = business.id;
 
     setOverviewDraft({
       ...draft,
@@ -102,7 +107,7 @@ export default function EditOverviewTab({
         website: business.website ?? "",
       },
     });
-  }, [business]);
+  }, [business, draft, setOverviewDraft]);
   const updateOverviewHour = useEditBusinessStore((s) => s.updateOverviewHour);
 
   const scrollRef = useRef<ScrollView>(null);
