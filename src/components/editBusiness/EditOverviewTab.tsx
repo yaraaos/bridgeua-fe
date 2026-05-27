@@ -124,41 +124,49 @@ export default function EditOverviewTab({
   const markDirty = useEditBusinessStore((s) => s.markDirty);
   const setOverviewDraft = useEditBusinessStore((s) => s.setOverviewDraft);
   const updateOverviewHour = useEditBusinessStore((s) => s.updateOverviewHour);
+  const hydratedBusinessIdRef = useRef<string | null>(null);
   useEffect(() => {
-    if (!business) {
-      return;
-    }
+  if (!business) {
+    return;
+  }
 
-    const currentDraft = useEditBusinessStore.getState().overviewDraft;
+  const nextBusinessId = String(business.id ?? businessId ?? "");
 
-    setOverviewDraft({
-      name: business.name ?? "",
-      category: business.category ?? "",
-      address: business.address ?? "",
-      postalCode: business.zipCode ?? "",
-      city: business.city ?? "",
-      state: business.state ?? "",
-      phone: business.phone ?? "",
+  if (
+    nextBusinessId !== "" &&
+    hydratedBusinessIdRef.current === nextBusinessId
+  ) {
+    return;
+  }
 
-      socialLinks: {
-        ...currentDraft.socialLinks,
-        website: business.socialLinks?.website ?? business.website ?? "",
+  const currentDraft = useEditBusinessStore.getState().overviewDraft;
 
-        instagram: business.socialLinks?.instagram ?? "",
+  setOverviewDraft({
+    name: business.name ?? "",
+    category: business.category ?? "",
+    address: business.address ?? "",
+    postalCode: business.zipCode ?? "",
+    city: business.city ?? "",
+    state: business.state ?? "",
+    phone: business.phone ?? "",
 
-        facebook: business.socialLinks?.facebook ?? "",
+    socialLinks: {
+      ...currentDraft.socialLinks,
+      website: business.socialLinks?.website ?? business.website ?? "",
+      instagram: business.socialLinks?.instagram ?? "",
+      facebook: business.socialLinks?.facebook ?? "",
+      telegram: business.socialLinks?.telegram ?? "",
+      whatsapp: business.socialLinks?.whatsapp ?? "",
+    },
 
-        telegram: business.socialLinks?.telegram ?? "",
+    hours: mapBusinessHoursToDraftHours(
+      business.businessHours,
+      currentDraft.hours,
+    ),
+  });
 
-        whatsapp: business.socialLinks?.whatsapp ?? "",
-      },
-
-      hours: mapBusinessHoursToDraftHours(
-        business.businessHours,
-        currentDraft.hours,
-      ),
-    });
-  }, [business, setOverviewDraft]);
+  hydratedBusinessIdRef.current = nextBusinessId;
+}, [business, businessId, setOverviewDraft]);
 
   const scrollRef = useRef<ScrollView>(null);
   const fieldPositions = useRef<Record<string, number>>({});
