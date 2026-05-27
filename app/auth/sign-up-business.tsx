@@ -1,10 +1,11 @@
 import { AppColors } from "@/src/constants/colors";
 import { useCategories } from "@/src/features/categories/hooks/useCategories";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { useEditBusinessStore } from "@/src/store/editBusiness.store";
 import { Feather } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
 
 import { useNotificationsStore } from "@/src/store/notifications.store";
 import { AccountTypeSwitch } from "../../src/components/auth";
@@ -13,19 +14,22 @@ import AppInput from "../../src/components/ui/AppInput/AppInput";
 import AppLoader from "../../src/components/ui/AppLoader/AppLoader";
 import AppPasswordInput from "../../src/components/ui/AppPasswordInput/AppPasswordInput";
 import AppScreen from "../../src/components/ui/AppScreen/AppScreen";
+import AppSelect from "../../src/components/ui/AppSelect/AppSelect";
 import { useRegisterBusiness } from "../../src/features/auth/hooks/useRegisterBusiness";
 import {
   SignUpBusinessFormErrors,
   validateSignUpBusinessForm,
 } from "../../src/features/auth/validation/signUpBusiness.validation";
 
-const CATEGORIES = [
+const FALLBACK_CATEGORIES = [
   "Beauty",
-  "Automotive",
-  "Health & Medical",
+  "Food",
+  "Auto",
   "Home & Repair",
   "Education",
-  "Other",
+  "Health & Medical",
+  "Shopping",
+  "Entertainment",
 ];
 
 export default function SignUpBusinessScreen() {
@@ -34,22 +38,27 @@ export default function SignUpBusinessScreen() {
 
   const { submitRegisterBusiness, isLoading, apiError, setApiError } =
     useRegisterBusiness();
-
-  const { categories: apiCategories } = useCategories();
-  const categoryNames = apiCategories.length > 0
-    ? apiCategories.map((c) => c.name)
-    : CATEGORIES;
+  const setOverviewDraft = useEditBusinessStore((s) => s.setOverviewDraft);
 
   const { categories } = useCategories();
+  const categoryList = categories.length > 0
+    ? categories.map((c) => c.name)
+    : FALLBACK_CATEGORIES;
+  const categoryOptions = categoryList.map((name) => ({ label: name, value: name }));
 
   const [businessName, setBusinessName] = useState("");
   const [ownerName, setOwnerName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [address, setAddress] = useState("");
+  const [zipCode, setZipCode] = useState("");
+  const [city, setCity] = useState("");
+  const [state, setState] = useState("");
+  const [categoryModalVisible, setCategoryModalVisible] = useState(false);
 
   const [agree, setAgree] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<string>("Beauty");
   const [errors, setErrors] = useState<SignUpBusinessFormErrors>({});
 
   const clearFieldError = (field: keyof SignUpBusinessFormErrors) => {
@@ -58,11 +67,12 @@ export default function SignUpBusinessScreen() {
   };
 
   const setNotificationsAccountType = useNotificationsStore(
-    (state) => state.setActiveAccountType,
+    (s) => s.setActiveAccountType,
   );
 
   const handleSubmit = async () => {
     if (isLoading) return;
+
     const values = {
       businessName,
       ownerName,
@@ -70,6 +80,10 @@ export default function SignUpBusinessScreen() {
       password,
       confirmPassword,
       category: selectedCategory,
+      address,
+      zipCode,
+      city,
+      state,
       agree,
     };
 
@@ -86,9 +100,21 @@ export default function SignUpBusinessScreen() {
       email,
       password,
       category: selectedCategory,
+      address,
+      zipCode,
+      city,
+      state,
     });
 
     if (response) {
+      setOverviewDraft({
+        name: businessName,
+        category: selectedCategory,
+        address,
+        city,
+        state,
+        postalCode: zipCode,
+      });
       setNotificationsAccountType("business");
       router.push({
         pathname: "/auth/confirm-code",
@@ -96,6 +122,9 @@ export default function SignUpBusinessScreen() {
       });
     }
   };
+
+  const selectedCategoryLabel =
+    categoryOptions.find((o) => o.value === selectedCategory)?.label ?? "";
 
   return (
     <AppScreen scroll style={styles.container}>
@@ -136,12 +165,14 @@ export default function SignUpBusinessScreen() {
             />
             {errors.businessName ? (
               <Text style={styles.errorText}>{errors.businessName}</Text>
-            ) : null}
+            ) : (
+              <Text style={styles.helperText}>Cannot be changed later</Text>
+            )}
           </View>
 
           <View>
             <AppInput
-              placeholder="Owner name"
+              placeholder="Your full name"
               value={ownerName}
               onChangeText={(value) => {
                 setOwnerName(value);
@@ -156,36 +187,85 @@ export default function SignUpBusinessScreen() {
           </View>
 
           <View>
-            <Text style={styles.sectionLabel}>Category</Text>
-            <View style={styles.categoriesWrap}>
-              {categoryNames.map((category) => {
-                const active = selectedCategory === category;
+            <AppSelect
+              placeholder="Select category"
+              value={selectedCategoryLabel}
+              disabled={isLoading}
+              error={Boolean(errors.category)}
+              onPress={() => setCategoryModalVisible(true)}
+            />
+            {errors.category ? (
+              <Text style={styles.errorText}>{errors.category}</Text>
+            ) : (
+              <Text style={styles.helperText}>Cannot be changed later</Text>
+            )}
+          </View>
 
-                return (
-                  <Pressable
-                    key={category}
-                    onPress={() => {
-                      setSelectedCategory(category);
-                      clearFieldError("category");
-                    }}
-                    disabled={isLoading}
-                    style={[
-                      styles.categoryChip,
-                      active && styles.categoryChipActive,
-                    ]}
-                  >
-                    <Text
-                      style={[
-                        styles.categoryChipText,
-                        active && styles.categoryChipTextActive,
-                      ]}
-                    >
-                      {category}
-                    </Text>
-                  </Pressable>
-                );
-              })}
+          <View>
+            <AppInput
+              placeholder="Address"
+              value={address}
+              onChangeText={(value) => {
+                setAddress(value);
+                clearFieldError("address");
+              }}
+              disabled={isLoading}
+              error={Boolean(errors.address)}
+            />
+            {errors.address ? (
+              <Text style={styles.errorText}>{errors.address}</Text>
+            ) : null}
+          </View>
+
+          <View style={styles.addressRow}>
+            <View style={styles.addressZip}>
+              <AppInput
+                placeholder="ZIP Code"
+                value={zipCode}
+                onChangeText={(value) => {
+                  setZipCode(value);
+                  clearFieldError("zipCode");
+                }}
+                keyboardType="numeric"
+                disabled={isLoading}
+                error={Boolean(errors.zipCode)}
+              />
+              {errors.zipCode ? (
+                <Text style={styles.errorText}>{errors.zipCode}</Text>
+              ) : null}
             </View>
+
+            <View style={styles.addressCity}>
+              <AppInput
+                placeholder="City"
+                value={city}
+                onChangeText={(value) => {
+                  setCity(value);
+                  clearFieldError("city");
+                }}
+                disabled={isLoading}
+                error={Boolean(errors.city)}
+              />
+              {errors.city ? (
+                <Text style={styles.errorText}>{errors.city}</Text>
+              ) : null}
+            </View>
+          </View>
+
+          <View>
+            <AppInput
+              placeholder="State / Region"
+              value={state}
+              onChangeText={(value) => {
+                setState(value);
+                clearFieldError("state");
+              }}
+              disabled={isLoading}
+              error={Boolean(errors.state)}
+            />
+            {errors.state ? (
+              <Text style={styles.errorText}>{errors.state}</Text>
+            ) : null}
           </View>
 
           <View>
@@ -284,6 +364,46 @@ export default function SignUpBusinessScreen() {
           </Text>
         </View>
       </View>
+
+      <Modal
+        visible={categoryModalVisible}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setCategoryModalVisible(false)}
+      >
+        <Pressable
+          style={styles.modalOverlay}
+          onPress={() => setCategoryModalVisible(false)}
+        >
+          <View style={styles.modalSheet}>
+            <Text style={styles.modalTitle}>Select Category</Text>
+            {categoryOptions.map((option) => (
+              <Pressable
+                key={option.value}
+                style={styles.modalOption}
+                onPress={() => {
+                  setSelectedCategory(option.value);
+                  clearFieldError("category");
+                  setCategoryModalVisible(false);
+                }}
+              >
+                <Text
+                  style={[
+                    styles.modalOptionText,
+                    selectedCategory === option.value &&
+                      styles.modalOptionTextActive,
+                  ]}
+                >
+                  {option.label}
+                </Text>
+                {selectedCategory === option.value && (
+                  <Feather name="check" size={16} color={colors.primaryGreen} />
+                )}
+              </Pressable>
+            ))}
+          </View>
+        </Pressable>
+      </Modal>
     </AppScreen>
   );
 }
@@ -326,43 +446,23 @@ function createStyles(colors: AppColors) {
       gap: 12,
     },
 
-    sectionLabel: {
-      fontSize: 13,
-      fontWeight: "700",
-      color: colors.textPrimary,
-      marginBottom: 6,
+    helperText: {
+      marginTop: 4,
+      fontSize: 12,
+      color: colors.textMuted,
     },
 
-    categoriesWrap: {
+    addressRow: {
       flexDirection: "row",
-      flexWrap: "wrap",
       gap: 8,
     },
 
-    categoryChip: {
-      minHeight: 32,
-      paddingHorizontal: 12,
-      borderRadius: 10,
-      backgroundColor: colors.background,
-      borderWidth: 1,
-      borderColor: colors.border,
-      alignItems: "center",
-      justifyContent: "center",
+    addressZip: {
+      flex: 1,
     },
 
-    categoryChipActive: {
-      backgroundColor: colors.primaryGreenSoft,
-      borderColor: colors.primaryGreen,
-    },
-
-    categoryChipText: {
-      fontSize: 12,
-      fontWeight: "600",
-      color: colors.textPrimary,
-    },
-
-    categoryChipTextActive: {
-      color: colors.primaryGreenDark,
+    addressCity: {
+      flex: 2,
     },
 
     checkboxRow: {
@@ -424,6 +524,46 @@ function createStyles(colors: AppColors) {
 
     footerLink: {
       color: colors.textPrimary,
+      fontWeight: "700",
+    },
+
+    modalOverlay: {
+      flex: 1,
+      backgroundColor: "rgba(0,0,0,0.5)",
+      justifyContent: "flex-end",
+    },
+
+    modalSheet: {
+      backgroundColor: colors.surface,
+      borderTopLeftRadius: 20,
+      borderTopRightRadius: 20,
+      padding: 20,
+      paddingBottom: 32,
+    },
+
+    modalTitle: {
+      fontSize: 16,
+      fontWeight: "700",
+      color: colors.textPrimary,
+      marginBottom: 12,
+    },
+
+    modalOption: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingVertical: 14,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+    },
+
+    modalOptionText: {
+      fontSize: 15,
+      color: colors.textPrimary,
+    },
+
+    modalOptionTextActive: {
+      color: colors.primaryGreen,
       fontWeight: "700",
     },
   });

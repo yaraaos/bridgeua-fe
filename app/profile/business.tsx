@@ -1,17 +1,19 @@
 // app/profile/business.tsx
 
 import { Feather, Ionicons } from "@expo/vector-icons";
-import { router } from "expo-router";
-import React from "react";
+import { router, useFocusEffect } from "expo-router";
+import React, { useCallback } from "react";
 import { Image, Pressable, ScrollView, StyleSheet, View } from "react-native";
 
 import ScreenHeader from "@/src/components/common/ScreenHeader/ScreenHeader";
 import BusinessDashboardStats from "@/src/components/profile/BusinessDashboardStats/BusinessDashboardStats";
 import AppAvatar from "@/src/components/ui/AppAvatar";
+import AppLoader from "@/src/components/ui/AppLoader/AppLoader";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
 import AppText from "@/src/components/ui/AppText/AppText";
 import { AppColors } from "@/src/constants/colors";
 import { spacing } from "@/src/constants/spacing";
+import { useMyBusinessProfile } from "@/src/features/businesses/hooks/useBusiness";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { useActiveAccount } from "@/src/store/account.store";
 
@@ -76,10 +78,40 @@ export default function BusinessProfileScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
   const account = useActiveAccount();
+  const { business, isLoading, error, refetch } = useMyBusinessProfile();
+  useFocusEffect(
+    useCallback(() => {
+      void refetch();
+    }, [refetch]),
+  );
 
-  const businessName = account.displayName;
-  const handle = account.handle;
-  const avatarUrl = account.avatarUrl;
+  const businessName = business?.name || "";
+  const handle = business?.category ?? account.handle;
+  const avatarUrl = business?.images?.[0]?.url ?? account.avatarUrl;
+  const businessLocation = business?.location ?? "";
+  const businessRating = business?.rating ?? 0;
+  const businessReviewCount = business?.reviewCount ?? 0;
+  const publicBusinessId = business?.id ?? account.id;
+
+  if (isLoading) {
+    return (
+      <AppScreen style={styles.container} withTopInset={false}>
+        <View style={styles.centerState}>
+          <AppLoader />
+        </View>
+      </AppScreen>
+    );
+  }
+
+  if (error) {
+    return (
+      <AppScreen style={styles.container} withTopInset={false}>
+        <View style={styles.centerState}>
+          <AppText style={styles.errorText}>{error}</AppText>
+        </View>
+      </AppScreen>
+    );
+  }
 
   return (
     <AppScreen style={styles.container} withTopInset={false}>
@@ -114,12 +146,16 @@ export default function BusinessProfileScreen() {
                       />
                     );
                   })}
-                  <AppText style={styles.heroRatingValue}>4.5</AppText>
-                  <AppText style={styles.heroRatingCount}>(28 reviews)</AppText>
+                  <AppText style={styles.heroRatingValue}>
+                    {businessRating.toFixed(1)}
+                  </AppText>
+                  <AppText style={styles.heroRatingCount}>
+                    ({businessReviewCount} reviews)
+                  </AppText>
                 </View>
 
                 <AppText style={styles.heroSubInfo} numberOfLines={1}>
-                  Beverly Hills / California
+                  {businessLocation || "Location not added yet"}
                 </AppText>
               </View>
 
@@ -169,7 +205,7 @@ export default function BusinessProfileScreen() {
                 onPress={() =>
                   router.push({
                     pathname: "/business/[id]",
-                    params: { id: account.id },
+                    params: { id: publicBusinessId },
                   })
                 }
               >
@@ -424,6 +460,18 @@ function createStyles(colors: AppColors) {
     container: {
       padding: 0,
       backgroundColor: colors.background,
+    },
+    centerState: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+      paddingHorizontal: spacing.lg,
+    },
+    errorText: {
+      textAlign: "center",
+      color: colors.error,
+      fontSize: 14,
+      fontWeight: "600",
     },
     content: {
       paddingHorizontal: spacing.lg,

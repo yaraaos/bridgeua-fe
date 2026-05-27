@@ -11,6 +11,8 @@ export type BusinessProfileHeaderProps = {
   businessName: string;
   category: string;
   location: string;
+  city?: string;
+  state?: string;
   avatarUrl?: string;
   followersCount: number;
   followingCount: number;
@@ -27,6 +29,8 @@ export default function BusinessProfileHeader({
   businessName,
   category,
   location,
+  city,
+  state,
   avatarUrl,
   followersCount,
   followingCount,
@@ -66,7 +70,7 @@ export default function BusinessProfileHeader({
         <View style={styles.info}>
           <Text style={styles.businessName}>{businessName}</Text>
           <Text style={styles.subInfo}>
-            {category} / {location}
+            {category} / {city && state ? `${city}, ${state}` : location}
           </Text>
         </View>
       </View>

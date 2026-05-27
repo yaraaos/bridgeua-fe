@@ -9,6 +9,7 @@ import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
+import { useAccountStore } from "@/src/store/account.store";
 import AppButton from "../../src/components/ui/AppButton/AppButton";
 import AppLoader from "../../src/components/ui/AppLoader/AppLoader";
 import AppOtpInput from "../../src/components/ui/AppOtpInput/AppOtpInput";
@@ -47,6 +48,11 @@ export default function ConfirmCodeScreen() {
   const syncFollowing = useFollowingStore((state) => state.syncWithServer);
 
   const clearReviews = useReviewsStore((state) => state.clearReviews);
+
+  const accounts = useAccountStore((state) => state.accounts);
+  const setActiveAccountId = useAccountStore(
+    (state) => state.setActiveAccountId,
+  );
 
   const [code, setCode] = useState("");
   const [timer, setTimer] = useState(RESEND_SECONDS);
@@ -88,15 +94,32 @@ export default function ConfirmCodeScreen() {
         await saveAuthTokens(response.accessToken, response.refreshToken);
       }
 
-      setUser({
-        id: profile.id,
-        email: profile.email ?? email,
-        name: profile.displayName,
-      });
+      const confirmedUser = response.user;
+
+      if (confirmedUser) {
+        setUser(confirmedUser);
+      } else {
+        setUser({
+          id: profile.id,
+          email: profile.email ?? email,
+          name: profile.displayName,
+        });
+      }
+
+      const targetAccountKind = confirmedUser?.accountType ?? "personal";
+
+      const targetAccount = accounts.find(
+        (account) => account.kind === targetAccountKind,
+      );
+
+      if (targetAccount) {
+        setActiveAccountId(targetAccount.id);
+      }
+
       await loadProfile();
       await syncFollowing();
 
-      router.replace("/(tabs)/home");
+      router.replace("/(tabs)/profile");
     }
   };
 

@@ -9,6 +9,7 @@ import {
   startGuestSession,
 } from "../services/auth/session";
 import { clearAuthTokens, getRefreshToken } from "../services/auth/tokens";
+import { useAccountStore } from "./account.store";
 import { useFollowingStore } from "./following.store";
 import { useProfileStore } from "./profile.store";
 import { useReviewsStore } from "./reviews.store";
@@ -34,6 +35,10 @@ export const useAuthStore = create<AuthState>((set) => ({
   setUser: (user) => {
     void clearGuestSession();
 
+    useAccountStore
+      .getState()
+      .setActiveAccountKind(user.accountType ?? "personal");
+
     set({
       user,
       isAuthenticated: true,
@@ -48,7 +53,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     useFollowingStore.getState().resetFollowing();
     useReviewsStore.getState().clearReviews();
     useProfileStore.getState().clearProfile();
-
+    useAccountStore.getState().setActiveAccountKind("personal");
     set({
       user: null,
       isAuthenticated: false,
@@ -74,7 +79,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     useFollowingStore.getState().resetFollowing();
     useReviewsStore.getState().clearReviews();
     useProfileStore.getState().clearProfile();
-
+    useAccountStore.getState().setActiveAccountKind("personal");
     set({
       user: null,
       isAuthenticated: false,
@@ -110,6 +115,10 @@ export const useAuthStore = create<AuthState>((set) => ({
       }
 
       const res = await apiClient.get<AuthUser>(ENDPOINTS.AUTH_ME);
+
+      useAccountStore
+        .getState()
+        .setActiveAccountKind(res.data.accountType ?? "personal");
 
       set({
         user: res.data,
