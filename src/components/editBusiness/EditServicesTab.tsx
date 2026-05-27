@@ -1,5 +1,6 @@
+import { getCategoryIcon } from "@/src/features/businesses/utils/categoryIcons";
 import { Ionicons } from "@expo/vector-icons";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   KeyboardAvoidingView,
   Linking,
@@ -17,18 +18,34 @@ import AppText from "@/src/components/ui/AppText/AppText";
 import { AppColors } from "@/src/constants/colors";
 import { radius } from "@/src/constants/radius";
 import { spacing } from "@/src/constants/spacing";
-import { BEAUTY_SERVICES } from "@/src/features/businesses/data/beautyServices";
 import { useEditBusiness } from "@/src/features/businesses/hooks/useEditBusiness";
-import type { ConfiguredService } from "@/src/features/businesses/types/editBusiness.types";
+import type { BusinessDetails } from "@/src/features/businesses/types/business.types";
+import type {
+  ConfiguredService,
+  ServiceLibraryItem,
+} from "@/src/features/businesses/types/editBusiness.types";
+
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { useFormValidation } from "@/src/hooks/useFormValidation";
 import { useEditBusinessStore } from "@/src/store/editBusiness.store";
 
+import { getBusinessServiceLibrary } from "@/src/features/businesses/services/business.service";
 import EditBusinessServiceCard from "./EditBusinessServiceCard";
 
-export default function EditServicesTab() {
+type EditServicesTabProps = {
+  business?: BusinessDetails | null;
+  businessId?: string;
+};
+
+export default function EditServicesTab({
+  business,
+  businessId,
+}: EditServicesTabProps) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+  const [libraryItems, setLibraryItems] = useState<ServiceLibraryItem[]>([]);
+  const [isLibraryLoading, setIsLibraryLoading] = useState(false);
+  const hydratedBusinessIdRef = useRef<string | null>(null);
 
   const services = useEditBusinessStore((s) => s.servicesDraft.services);
   const isDirty = useEditBusinessStore((s) => s.dirty.services);
@@ -44,7 +61,7 @@ export default function EditServicesTab() {
   );
 
   const { saveServices, isSavingServices, hasServicesError, saveError } =
-    useEditBusiness();
+    useEditBusiness(businessId);
 
   const scrollRef = useRef<ScrollView>(null);
   const cardPositions = useRef<Record<string, number>>({});
@@ -59,14 +76,39 @@ export default function EditServicesTab() {
   const successTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const configuredIds = new Set(services.map((s) => s.id));
-  const availableLibraryItems = BEAUTY_SERVICES.filter(
-    (item) => !configuredIds.has(item.id),
+  const availableLibraryItems = libraryItems.filter(
+    (item) => !configuredIds.has(item.serviceId),
   );
 
   const allValid = services.every(
     (s) => s.duration.trim() !== "" && s.price.trim() !== "",
   );
   const canSave = isDirty && allValid;
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadLibrary = async () => {
+      try {
+        setIsLibraryLoading(true);
+        const items = await getBusinessServiceLibrary();
+
+        if (isMounted) {
+          setLibraryItems(items);
+        }
+      } finally {
+        if (isMounted) {
+          setIsLibraryLoading(false);
+        }
+      }
+    };
+
+    void loadLibrary();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   function toggleLibraryItem(id: string) {
     setSelectedIds((prev) => {
@@ -80,15 +122,42 @@ export default function EditServicesTab() {
     });
   }
 
+  useEffect(() => {
+    if (!business) return;
+
+    const nextBusinessId = String(business.id ?? businessId ?? "");
+
+    if (
+      nextBusinessId !== "" &&
+      hydratedBusinessIdRef.current === nextBusinessId
+    ) {
+      return;
+    }
+
+    useEditBusinessStore.getState().setServicesDraft({
+      services: (business.services ?? []).map((service) => ({
+        id: service.serviceId ?? service.id,
+        name: service.name,
+        duration:
+          service.durationMinutes != null
+            ? String(service.durationMinutes)
+            : "",
+        price: service.price != null ? String(service.price) : "",
+      })),
+    });
+
+    hydratedBusinessIdRef.current = nextBusinessId;
+  }, [business, businessId]);
+
   function handleAddSelected() {
-    const newServices: ConfiguredService[] = BEAUTY_SERVICES.filter((item) =>
-      selectedIds.has(item.id),
-    ).map((item) => ({
-      id: item.id,
-      name: item.name,
-      duration: "",
-      price: "",
-    }));
+    const newServices: ConfiguredService[] = libraryItems
+      .filter((item) => selectedIds.has(item.serviceId))
+      .map((item) => ({
+        id: item.serviceId,
+        name: item.name,
+        duration: "",
+        price: "",
+      }));
     addConfiguredServices(newServices);
     markDirty("services");
     setSelectedIds(new Set());
@@ -138,7 +207,13 @@ export default function EditServicesTab() {
           {/* Configured services list */}
           {services.length === 0 ? (
             <View style={styles.emptyState}>
-              <Ionicons name="cut-outline" size={40} color={colors.textMuted} />
+              <Ionicons
+                name={getCategoryIcon(
+                  business?.category?.toLowerCase().replace(/\s+/g, "-"),
+                )}
+                size={40}
+                color={colors.textMuted}
+              />
               <AppText style={styles.emptyTitle}>No services yet</AppText>
               <AppText style={styles.emptySubtitle}>
                 Browse the library below to add services
@@ -199,21 +274,25 @@ export default function EditServicesTab() {
           {/* Library section */}
           {libraryOpen && (
             <View style={styles.librarySection}>
-              {availableLibraryItems.length === 0 ? (
+              {isLibraryLoading ? (
+                <AppText style={styles.libraryAllAdded}>
+                  Loading services...
+                </AppText>
+              ) : availableLibraryItems.length === 0 ? (
                 <AppText style={styles.libraryAllAdded}>
                   All available services have been added
                 </AppText>
               ) : (
                 availableLibraryItems.map((item) => {
-                  const isSelected = selectedIds.has(item.id);
+                  const isSelected = selectedIds.has(item.serviceId);
                   return (
                     <Pressable
-                      key={item.id}
+                      key={item.serviceId}
                       style={[
                         styles.libraryItem,
                         isSelected && styles.libraryItemSelected,
                       ]}
-                      onPress={() => toggleLibraryItem(item.id)}
+                      onPress={() => toggleLibraryItem(item.serviceId)}
                     >
                       <AppText style={styles.libraryItemName}>
                         {item.name}

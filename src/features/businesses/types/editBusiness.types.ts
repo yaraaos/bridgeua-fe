@@ -50,12 +50,10 @@ export type UpdateBusinessOverviewPayload = {
   hours: BusinessHourEntry[];
 };
 
-export type ServiceCategory = "beauty";
-
 export type ServiceLibraryItem = {
-  id: string;
+  serviceId: string;
+  categoryId: string;
   name: string;
-  category: ServiceCategory;
 };
 
 export type ConfiguredService = {
@@ -71,8 +69,7 @@ export type EditBusinessServicesDraft = {
 
 export type UpdateBusinessServicesPayload = {
   services: {
-    id: string;
-    name: string;
+    serviceId: string;
     durationMinutes: number;
     price: number;
   }[];
