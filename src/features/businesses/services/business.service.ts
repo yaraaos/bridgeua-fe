@@ -1,12 +1,15 @@
 // src/features/businesses/services/business.service.ts
-
 import type {
   Business,
   BusinessDetails,
 } from "@/src/features/businesses/types/business.types";
 import { apiClient } from "@/src/services/api/client";
+import { API_BASE_URL } from "@/src/services/api/config";
 import { ENDPOINTS } from "@/src/services/api/endpoints";
-import { UpdateBusinessOverviewPayload } from "../types/editBusiness.types";
+import {
+  GalleryPhoto,
+  UpdateBusinessOverviewPayload,
+} from "../types/editBusiness.types";
 
 export type GetBusinessesParams = {
   categoryId?: string;
@@ -16,6 +19,30 @@ export type GetBusinessesParams = {
   search?: string;
   page?: number;
   limit?: number;
+};
+
+const getAbsoluteImageUrl = (url: string) => {
+  if (!url) return "";
+
+  if (url.startsWith("http://") || url.startsWith("https://")) {
+    return url;
+  }
+
+  return `${API_BASE_URL}${url}`;
+};
+
+const normalizeBusinessDetailsImages = (
+  business: BusinessDetails | null,
+): BusinessDetails | null => {
+  if (!business) return business;
+
+  return {
+    ...business,
+    images: business.images.map((image) => ({
+      ...image,
+      url: getAbsoluteImageUrl(image.url),
+    })),
+  };
 };
 
 export const getBusinesses = async (
@@ -33,6 +60,7 @@ export const getBusinesses = async (
     if (params.search) query.set("search", params.search);
     if (params.page) query.set("page", String(params.page));
     if (params.limit) query.set("limit", String(params.limit));
+
     const qs = query.toString();
     if (qs) url = `${url}?${qs}`;
   }
@@ -47,13 +75,15 @@ export const getBusinessDetailsById = async (
   const res = await apiClient.get<BusinessDetails>(
     ENDPOINTS.BUSINESS_BY_ID(id),
   );
-  return res.data;
+
+  return normalizeBusinessDetailsImages(res.data);
 };
 
 export const getMyBusinessProfile =
   async (): Promise<BusinessDetails | null> => {
     const res = await apiClient.get<BusinessDetails>(ENDPOINTS.BUSINESSES_ME);
-    return res.data;
+
+    return normalizeBusinessDetailsImages(res.data);
   };
 
 const DAY_TO_API_INDEX: Record<string, number> = {
@@ -93,5 +123,59 @@ export const updateBusinessOverview = async (
     },
   );
 
-  return res.data;
+  return normalizeBusinessDetailsImages(res.data) as BusinessDetails;
+};
+
+export type BusinessGalleryPhotoResponse = {
+  id: string;
+  businessId: string;
+  imageUrl: string;
+  url: string;
+  isDefault: boolean;
+  sortOrder: number;
+};
+
+const toGalleryPhoto = (photo: BusinessGalleryPhotoResponse): GalleryPhoto => ({
+  id: photo.id,
+  url: getAbsoluteImageUrl(photo.url ?? photo.imageUrl),
+  isLocal: false,
+});
+
+export const uploadBusinessGalleryPhoto = async (
+  businessId: string,
+  uri: string,
+): Promise<GalleryPhoto> => {
+  const formData = new FormData();
+
+  formData.append("photo", {
+    uri,
+    name: "business-gallery-photo.jpg",
+    type: "image/jpeg",
+  } as unknown as Blob);
+
+  const res = await apiClient.post<BusinessGalleryPhotoResponse>(
+    ENDPOINTS.BUSINESS_PHOTOS(businessId),
+    formData,
+  );
+
+  return toGalleryPhoto(res.data);
+};
+
+export const deleteBusinessGalleryPhoto = async (
+  businessId: string,
+  photoId: string,
+): Promise<void> => {
+  await apiClient.delete(ENDPOINTS.BUSINESS_PHOTO_BY_ID(businessId, photoId));
+};
+
+export const updateBusinessDefaultPhotos = async (
+  businessId: string,
+  defaultPhotoIds: string[],
+): Promise<GalleryPhoto[]> => {
+  const res = await apiClient.patch<BusinessGalleryPhotoResponse[]>(
+    `${ENDPOINTS.BUSINESS_PHOTOS(businessId)}/defaults`,
+    { defaultPhotoIds },
+  );
+
+  return res.data.map(toGalleryPhoto);
 };
