@@ -39,7 +39,15 @@ export type BusinessContactItem = {
 export type BusinessAmenity = {
   id: string;
   label: string;
-  icon: "wifi" | "parking" | "pet" | "accessibility" | "coffee";
+  icon:
+    | "wifi"
+    | "parking"
+    | "ac"
+    | "pet"
+    | "accessibility"
+    | "coffee"
+    | "tv"
+    | "outdoor";
 };
 
 export type BusinessSocialLink = {

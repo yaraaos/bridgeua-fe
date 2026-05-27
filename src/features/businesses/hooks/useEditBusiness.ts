@@ -4,12 +4,13 @@ import type {
   EditBusinessTab,
   UpdateBusinessAboutPayload,
   UpdateBusinessOverviewPayload,
-  UpdateBusinessServicesPayload
+  UpdateBusinessServicesPayload,
 } from "@/src/features/businesses/types/editBusiness.types";
 import { apiClient } from "@/src/services/api/client";
 import { useEditBusinessStore } from "@/src/store/editBusiness.store";
 import {
   deleteBusinessGalleryPhoto,
+  updateBusinessAbout,
   updateBusinessDefaultPhotos,
   updateBusinessOverview,
   uploadBusinessGalleryPhoto,
@@ -197,10 +198,7 @@ export function useEditBusiness(businessId?: string) {
     };
 
     try {
-      await apiClient.patch(
-        "/api/businesses/me/about",
-        payload as unknown as Record<string, unknown>,
-      );
+      await updateBusinessAbout(payload);
       markSaved("about");
       setSavingTab(null);
       return { ok: true };
