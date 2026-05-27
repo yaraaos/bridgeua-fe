@@ -57,6 +57,7 @@ export type ConfirmCodePayload = {
 export type ConfirmCodeResponse = {
   verified: boolean;
   accessToken?: string;
+  refreshToken?: string;
   user?: AuthUser;
 };
 
