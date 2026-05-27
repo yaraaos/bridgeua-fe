@@ -21,9 +21,10 @@ export const ENDPOINTS = {
   // Categories
   CATEGORIES: "/api/categories",
 
-  // Businesses
+  // Businessessrc/features/businesses/types/business.types.ts
   BUSINESSES: "/api/businesses",
   BUSINESSES_ME: "/api/businesses/me",
+  BUSINESSES_ME_ABOUT: "/api/businesses/me/about",
   BUSINESS_BY_ID: (id: string) => `/api/businesses/${id}`,
   BUSINESS_PHOTOS: (id: string) => `/api/businesses/${id}/photos`,
   BUSINESS_PHOTO_BY_ID: (id: string, photoId: string) =>

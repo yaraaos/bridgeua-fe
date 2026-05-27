@@ -8,6 +8,7 @@ import { API_BASE_URL } from "@/src/services/api/config";
 import { ENDPOINTS } from "@/src/services/api/endpoints";
 import {
   GalleryPhoto,
+  UpdateBusinessAboutPayload,
   UpdateBusinessOverviewPayload,
 } from "../types/editBusiness.types";
 
@@ -120,6 +121,21 @@ export const updateBusinessOverview = async (
         closesAt: hour.isOpen ? hour.closeTime : null,
         isClosed: !hour.isOpen,
       })),
+    },
+  );
+
+  return normalizeBusinessDetailsImages(res.data) as BusinessDetails;
+};
+
+export const updateBusinessAbout = async (
+  payload: UpdateBusinessAboutPayload,
+): Promise<BusinessDetails> => {
+  const res = await apiClient.patch<BusinessDetails>(
+    ENDPOINTS.BUSINESSES_ME_ABOUT,
+    {
+      description: payload.description,
+      languages: payload.languages,
+      amenities: payload.amenities,
     },
   );
 

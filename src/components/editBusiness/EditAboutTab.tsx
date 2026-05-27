@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
@@ -19,6 +19,7 @@ import { useEditBusiness } from "@/src/features/businesses/hooks/useEditBusiness
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { useEditBusinessStore } from "@/src/store/editBusiness.store";
 
+import { BusinessDetails } from "@/src/features/businesses/types/business.types";
 import SelectableChip from "./SelectableChip";
 
 const DESCRIPTION_LIMIT = 1000;
@@ -61,7 +62,11 @@ const AMENITIES: {
   { id: "outdoor", label: "Outdoor Seating", icon: "umbrella-outline" },
 ];
 
-export default function EditAboutTab() {
+type EditAboutTabProps = {
+  business?: BusinessDetails | null;
+};
+
+export default function EditAboutTab({ business }: EditAboutTabProps) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
 
@@ -69,9 +74,31 @@ export default function EditAboutTab() {
   const isDirty = useEditBusinessStore((s) => s.dirty.about);
   const markDirty = useEditBusinessStore((s) => s.markDirty);
   const setAboutDraft = useEditBusinessStore((s) => s.setAboutDraft);
+  const hydratedBusinessIdRef = useRef<string | null>(null);
 
   const { saveAbout, isSavingAbout, hasAboutError, saveError } =
     useEditBusiness();
+
+  useEffect(() => {
+    if (!business) return;
+
+    const nextBusinessId = String(business.id ?? "");
+
+    if (
+      nextBusinessId !== "" &&
+      hydratedBusinessIdRef.current === nextBusinessId
+    ) {
+      return;
+    }
+
+    setAboutDraft({
+      description: business.about.description ?? "",
+      languages: business.about.languages ?? [],
+      amenities: (business.about.amenities ?? []).map((amenity) => amenity.id),
+    });
+
+    hydratedBusinessIdRef.current = nextBusinessId;
+  }, [business, setAboutDraft]);
 
   const scrollRef = useRef<ScrollView>(null);
   const [showSuccess, setShowSuccess] = useState(false);
