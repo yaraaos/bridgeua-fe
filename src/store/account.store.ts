@@ -34,12 +34,25 @@ type AccountState = {
   accounts: AccountSummary[];
   activeAccountId: string;
   setActiveAccountId: (id: string) => void;
+  setActiveAccountKind: (kind: AccountKind) => void;
 };
 
 export const useAccountStore = create<AccountState>((set) => ({
   accounts: [personalMockAccount, businessMockAccount],
   activeAccountId: personalMockAccount.id,
+
   setActiveAccountId: (id) => set({ activeAccountId: id }),
+
+  setActiveAccountKind: (kind) =>
+    set((state) => {
+      const targetAccount = state.accounts.find(
+        (account) => account.kind === kind,
+      );
+
+      if (!targetAccount) return state;
+
+      return { activeAccountId: targetAccount.id };
+    }),
 }));
 
 export function useActiveAccount(): AccountSummary {

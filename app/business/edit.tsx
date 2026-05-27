@@ -14,6 +14,7 @@ import AppTabsPills, {
 import AppText from "@/src/components/ui/AppText/AppText";
 import { AppColors } from "@/src/constants/colors";
 import { spacing } from "@/src/constants/spacing";
+import { useMyBusinessProfile } from "@/src/features/businesses";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { useActiveAccount } from "@/src/store/account.store";
 import {
@@ -32,6 +33,8 @@ export default function EditBusinessScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
   const account = useActiveAccount();
+
+  const { business } = useMyBusinessProfile();
 
   const activeTab = useEditBusinessStore((s) => s.activeTab);
   const dirty = useEditBusinessStore((s) => s.dirty);
@@ -55,7 +58,7 @@ export default function EditBusinessScreen() {
               router.back();
             },
           },
-        ]
+        ],
       );
     } else {
       resetAll();
@@ -97,7 +100,9 @@ export default function EditBusinessScreen() {
       </View>
 
       <View style={styles.content}>
-        {activeTab === "overview" && <EditOverviewTab />}
+        {activeTab === "overview" && (
+          <EditOverviewTab business={business} businessId={business?.id} />
+        )}
         {activeTab === "gallery" && <EditGalleryTab />}
         {activeTab === "services" && <EditServicesTab />}
         {activeTab === "about" && <EditAboutTab />}
@@ -105,7 +110,6 @@ export default function EditBusinessScreen() {
     </AppScreen>
   );
 }
-
 
 function createStyles(colors: AppColors) {
   return StyleSheet.create({

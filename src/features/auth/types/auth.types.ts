@@ -16,6 +16,8 @@ export type AuthUser = {
 };
 
 export type SignInResponse = {
+  accessToken: string;
+  refreshToken: string;
   user: AuthUser;
   token: string;
 };
@@ -32,6 +34,7 @@ export type RegisterResponse = {
   userId: string;
   email: string;
   verificationRequired: boolean;
+  confirmationCode?: string;
 };
 
 export type RegisterBusinessPayload = {
@@ -56,6 +59,7 @@ export type ConfirmCodePayload = {
 export type ConfirmCodeResponse = {
   verified: boolean;
   accessToken?: string;
+  refreshToken?: string;
   user?: AuthUser;
 };
 

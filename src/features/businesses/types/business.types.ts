@@ -113,6 +113,10 @@ export type BusinessDetails = {
   category: string;
   location: string;
   address: string;
+  zipCode?: string;
+  city?: string;
+  state?: string;
+  phone?: string;
   website: string;
   rating: number;
   reviewCount: number;

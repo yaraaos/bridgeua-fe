@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Alert,
   KeyboardAvoidingView,
@@ -29,6 +29,7 @@ import { useFormValidation } from "@/src/hooks/useFormValidation";
 import { useActiveAccount } from "@/src/store/account.store";
 import { useEditBusinessStore } from "@/src/store/editBusiness.store";
 
+import { BusinessDetails } from "@/src/features/businesses/types/business.types";
 import EditBusinessHourRow from "./EditBusinessHourRow";
 import EditBusinessSocialRow from "./EditBusinessSocialRow";
 
@@ -68,7 +69,15 @@ const NO_ERRORS: OverviewErrors = {
   state: false,
 };
 
-export default function EditOverviewTab() {
+type EditOverviewTabProps = {
+  business?: BusinessDetails | null;
+  businessId?: string;
+};
+
+export default function EditOverviewTab({
+  business,
+  businessId,
+}: EditOverviewTabProps) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
   const account = useActiveAccount();
@@ -77,6 +86,28 @@ export default function EditOverviewTab() {
   const isDirty = useEditBusinessStore((s) => s.dirty.overview);
   const markDirty = useEditBusinessStore((s) => s.markDirty);
   const setOverviewDraft = useEditBusinessStore((s) => s.setOverviewDraft);
+  const hydratedBusinessIdRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!business) return;
+
+    if (hydratedBusinessIdRef.current === business.id) return;
+
+    hydratedBusinessIdRef.current = business.id;
+
+    setOverviewDraft({
+      ...draft,
+      category: business.category ?? draft.category,
+      address: business.address ?? "",
+      postalCode: business.zipCode ?? "",
+      city: business.city ?? "",
+      state: business.state ?? "",
+      phone: business.phone ?? "",
+      socialLinks: {
+        ...draft.socialLinks,
+        website: business.website ?? "",
+      },
+    });
+  }, [business, draft, setOverviewDraft]);
   const updateOverviewHour = useEditBusinessStore((s) => s.updateOverviewHour);
 
   const scrollRef = useRef<ScrollView>(null);
@@ -90,7 +121,7 @@ export default function EditOverviewTab() {
     ),
   );
 
-  const { saveOverview, isSaving, saveError } = useEditBusiness();
+  const { saveOverview, isSaving, saveError } = useEditBusiness(businessId);
   const { showError, errorMessage, triggerError, clearError } =
     useFormValidation();
   const [errors, setErrors] = useState<OverviewErrors>(NO_ERRORS);
@@ -219,7 +250,7 @@ export default function EditOverviewTab() {
             <View style={styles.avatarContainer}>
               <AppAvatar
                 imageUrl={displayedAvatarUrl}
-                name={account.displayName}
+                name={business?.name || "Loading..."}
                 size="lg"
               />
               <Pressable
@@ -243,7 +274,7 @@ export default function EditOverviewTab() {
               <AppText style={styles.fieldLabel}>Business Name</AppText>
               <View style={styles.readOnlyField}>
                 <AppText style={styles.readOnlyValue} numberOfLines={1}>
-                  {account.displayName}
+                  {business?.name || "Loading..."}{" "}
                 </AppText>
                 <Ionicons
                   name="lock-closed-outline"

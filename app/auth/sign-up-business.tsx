@@ -20,13 +20,14 @@ import {
   validateSignUpBusinessForm,
 } from "../../src/features/auth/validation/signUpBusiness.validation";
 
-const CATEGORY_OPTIONS: Array<{ label: string; value: string }> = [
+const CATEGORY_OPTIONS: { label: string; value: string }[] = [
   { label: "Beauty", value: "Beauty" },
-  { label: "Restaurant", value: "Restaurant" },
-  { label: "Automotive", value: "Automotive" },
-  { label: "Health & Medical", value: "Health & Medical" },
+  { label: "Food", value: "Food" },
+  { label: "Auto", value: "Auto" },
   { label: "Home & Repair", value: "Home & Repair" },
   { label: "Education", value: "Education" },
+  { label: "Restaurant", value: "Restaurant" },
+  { label: "Medical", value: "Medical" },
   { label: "Other", value: "Other" },
 ];
 

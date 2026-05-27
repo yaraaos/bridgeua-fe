@@ -10,16 +10,20 @@ export function useRegisterPersonal() {
   const [apiError, setApiError] = useState<string | null>(null);
 
   const submitRegisterPersonal = async (
-    payload: RegisterPersonalPayload
+    payload: RegisterPersonalPayload,
   ): Promise<RegisterResponse | null> => {
     try {
       setIsLoading(true);
       setApiError(null);
 
-      return await registerPersonal(payload);
+      const response = await registerPersonal(payload);
+
+      console.log("[register] confirmationCode:", response.confirmationCode);
+
+      return response;
     } catch (error) {
       setApiError(
-        error instanceof Error ? error.message : "Something went wrong"
+        error instanceof Error ? error.message : "Something went wrong",
       );
 
       return null;
