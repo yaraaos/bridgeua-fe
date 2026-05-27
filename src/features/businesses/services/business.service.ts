@@ -1,10 +1,10 @@
 // src/features/businesses/services/business.service.ts
-
 import type {
   Business,
   BusinessDetails,
 } from "@/src/features/businesses/types/business.types";
 import { apiClient } from "@/src/services/api/client";
+import { API_BASE_URL } from "@/src/services/api/config";
 import { ENDPOINTS } from "@/src/services/api/endpoints";
 import {
   GalleryPhoto,
@@ -108,9 +108,19 @@ export type BusinessGalleryPhotoResponse = {
   sortOrder: number;
 };
 
+const getAbsoluteImageUrl = (url: string) => {
+  if (!url) return "";
+
+  if (url.startsWith("http://") || url.startsWith("https://")) {
+    return url;
+  }
+
+  return `${API_BASE_URL}${url}`;
+};
+
 const toGalleryPhoto = (photo: BusinessGalleryPhotoResponse): GalleryPhoto => ({
   id: photo.id,
-  url: photo.url ?? photo.imageUrl,
+  url: getAbsoluteImageUrl(photo.url ?? photo.imageUrl),
   isLocal: false,
 });
 

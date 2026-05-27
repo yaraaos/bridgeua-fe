@@ -21,6 +21,7 @@ import { useEditBusiness } from "@/src/features/businesses/hooks/useEditBusiness
 import { BusinessDetails } from "@/src/features/businesses/types/business.types";
 import type { GalleryPhoto } from "@/src/features/businesses/types/editBusiness.types";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { API_BASE_URL } from "@/src/services/api/config";
 import { useEditBusinessStore } from "@/src/store/editBusiness.store";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
@@ -29,6 +30,16 @@ const GAP = spacing.cardGap;
 const NUM_COLS = 3;
 const CELL_SIZE =
   (SCREEN_WIDTH - 2 * PADDING - (NUM_COLS - 1) * GAP) / NUM_COLS;
+
+const getAbsoluteImageUrl = (url: string) => {
+  if (!url) return "";
+
+  if (url.startsWith("http://") || url.startsWith("https://")) {
+    return url;
+  }
+
+  return `${API_BASE_URL}${url}`;
+};
 
 type EditGalleryTabProps = {
   business?: BusinessDetails | null;
@@ -65,7 +76,7 @@ export default function EditGalleryTab({
     setGalleryDraft({
       photos: images.map((image) => ({
         id: image.id,
-        url: image.url,
+        url: getAbsoluteImageUrl(image.url),
         isLocal: false,
       })),
       defaultPhotoIds: images
