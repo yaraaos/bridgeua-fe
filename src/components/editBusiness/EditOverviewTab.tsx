@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Alert,
   KeyboardAvoidingView,
@@ -29,6 +29,7 @@ import { useFormValidation } from "@/src/hooks/useFormValidation";
 import { useActiveAccount } from "@/src/store/account.store";
 import { useEditBusinessStore } from "@/src/store/editBusiness.store";
 
+import { BusinessDetails } from "@/src/features/businesses/types/business.types";
 import EditBusinessHourRow from "./EditBusinessHourRow";
 import EditBusinessSocialRow from "./EditBusinessSocialRow";
 
@@ -69,10 +70,14 @@ const NO_ERRORS: OverviewErrors = {
 };
 
 type EditOverviewTabProps = {
+  business?: BusinessDetails | null;
   businessId?: string;
 };
 
-export default function EditOverviewTab({ businessId }: EditOverviewTabProps) {
+export default function EditOverviewTab({
+  business,
+  businessId,
+}: EditOverviewTabProps) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
   const account = useActiveAccount();
@@ -81,6 +86,23 @@ export default function EditOverviewTab({ businessId }: EditOverviewTabProps) {
   const isDirty = useEditBusinessStore((s) => s.dirty.overview);
   const markDirty = useEditBusinessStore((s) => s.markDirty);
   const setOverviewDraft = useEditBusinessStore((s) => s.setOverviewDraft);
+  useEffect(() => {
+    if (!business) return;
+
+    setOverviewDraft({
+      ...draft,
+      category: business.category ?? draft.category,
+      address: business.address ?? "",
+      postalCode: business.zipCode ?? "",
+      city: business.city ?? "",
+      state: business.state ?? "",
+      phone: business.phone ?? "",
+      socialLinks: {
+        ...draft.socialLinks,
+        website: business.website ?? "",
+      },
+    });
+  }, [business]);
   const updateOverviewHour = useEditBusinessStore((s) => s.updateOverviewHour);
 
   const scrollRef = useRef<ScrollView>(null);
@@ -223,7 +245,7 @@ export default function EditOverviewTab({ businessId }: EditOverviewTabProps) {
             <View style={styles.avatarContainer}>
               <AppAvatar
                 imageUrl={displayedAvatarUrl}
-                name={account.displayName}
+                name={business?.name ?? account.displayName}
                 size="lg"
               />
               <Pressable
@@ -247,7 +269,7 @@ export default function EditOverviewTab({ businessId }: EditOverviewTabProps) {
               <AppText style={styles.fieldLabel}>Business Name</AppText>
               <View style={styles.readOnlyField}>
                 <AppText style={styles.readOnlyValue} numberOfLines={1}>
-                  {account.displayName}
+                  {business?.name ?? account.displayName}{" "}
                 </AppText>
                 <Ionicons
                   name="lock-closed-outline"
