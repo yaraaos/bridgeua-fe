@@ -45,7 +45,13 @@ export type BusinessAmenity = {
 export type BusinessSocialLink = {
   id: string;
   label: string;
-  icon: "instagram" | "telegram" | "tiktok" | "whatsapp" | "website";
+  icon:
+    | "instagram"
+    | "facebook"
+    | "telegram"
+    | "tiktok"
+    | "whatsapp"
+    | "website";
   url: string;
 };
 
