@@ -245,7 +245,7 @@ export default function EditOverviewTab({
             <View style={styles.avatarContainer}>
               <AppAvatar
                 imageUrl={displayedAvatarUrl}
-                name={business?.name ?? account.displayName}
+                name={business?.name || "Loading..."}
                 size="lg"
               />
               <Pressable
@@ -269,7 +269,7 @@ export default function EditOverviewTab({
               <AppText style={styles.fieldLabel}>Business Name</AppText>
               <View style={styles.readOnlyField}>
                 <AppText style={styles.readOnlyValue} numberOfLines={1}>
-                  {business?.name ?? account.displayName}{" "}
+                  {business?.name || "Loading..."}{" "}
                 </AppText>
                 <Ionicons
                   name="lock-closed-outline"

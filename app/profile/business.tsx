@@ -80,7 +80,7 @@ export default function BusinessProfileScreen() {
   const account = useActiveAccount();
   const { business, isLoading, error } = useMyBusinessProfile();
 
-  const businessName = business?.name ?? account.displayName;
+  const businessName = business?.name || "";
   const handle = business?.category ?? account.handle;
   const avatarUrl = business?.images?.[0]?.url ?? account.avatarUrl;
   const businessLocation = business?.location ?? "";
