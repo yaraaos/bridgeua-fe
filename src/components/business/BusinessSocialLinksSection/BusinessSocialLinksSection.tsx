@@ -17,6 +17,7 @@ const socialIcons: Record<
   tiktok: "musical-notes-outline",
   whatsapp: "logo-whatsapp",
   website: "globe-outline",
+  facebook: "logo-facebook",
 };
 
 export default function BusinessSocialLinksSection({ socialLinks }: Props) {
