@@ -13,21 +13,6 @@ import { router, useLocalSearchParams } from "expo-router";
 import React, { useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 
-const fallbackBookingServices = [
-  {
-    id: "mock-service-1",
-    name: "Consultation",
-    duration: "30 min",
-    priceFrom: "Free",
-  },
-  {
-    id: "mock-service-2",
-    name: "Standard appointment",
-    duration: "60 min",
-    priceFrom: "Price on request",
-  },
-];
-
 export default function ChooseServiceScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
@@ -40,14 +25,12 @@ export default function ChooseServiceScreen() {
       promoCode?: string;
     }>();
 
-  const { business } = useBusinessDetails(businessId);
+  const { business, isLoading } = useBusinessDetails(businessId);
   const [selectedServiceId, setSelectedServiceId] = useState<string | null>(
     serviceId ?? null,
   );
 
-  const services = business?.services?.length
-    ? business.services
-    : fallbackBookingServices;
+  const services = business?.services ?? [];
 
   const selectedService = services.find(
     (service) => service.id === selectedServiceId,
@@ -85,16 +68,24 @@ export default function ChooseServiceScreen() {
           contentContainerStyle={styles.list}
           showsVerticalScrollIndicator={false}
         >
-          {services.map((service) => (
-            <ServiceSelectionCard
-              key={service.id}
-              title={service.name}
-              duration={service.duration ?? "Duration varies"}
-              price={service.priceFrom ?? "Price on request"}
-              isSelected={selectedServiceId === service.id}
-              onPress={() => setSelectedServiceId(service.id)}
-            />
-          ))}
+          {isLoading ? (
+            <AppText style={styles.emptyText}>Loading services...</AppText>
+          ) : services.length === 0 ? (
+            <AppText style={styles.emptyText}>
+              This business has not added bookable services yet.
+            </AppText>
+          ) : (
+            services.map((service) => (
+              <ServiceSelectionCard
+                key={service.id}
+                title={service.name}
+                duration={service.duration ?? "Duration varies"}
+                price={service.priceFrom ?? "Price on request"}
+                isSelected={selectedServiceId === service.id}
+                onPress={() => setSelectedServiceId(service.id)}
+              />
+            ))
+          )}
         </ScrollView>
       </View>
 

@@ -45,20 +45,6 @@ import {
 } from "react-native";
 
 const TOP_REVIEWS_LIMIT = 3;
-const fallbackBusinessServices = [
-  {
-    id: "mock-service-1",
-    name: "Consultation",
-    duration: "30 min",
-    priceFrom: "Free",
-  },
-  {
-    id: "mock-service-2",
-    name: "Standard appointment",
-    duration: "60 min",
-    priceFrom: "Price on request",
-  },
-];
 
 function getTopReviews(reviews: BusinessDetailsReview[]) {
   return [...reviews]
@@ -235,9 +221,7 @@ export default function BusinessDetailsScreen() {
 
   const topReviews = getTopReviews(reviews);
 
-  const services = business.services?.length
-    ? business.services
-    : fallbackBusinessServices;
+  const services = business.services ?? [];
 
   return (
     <AppScreen withTopInset={false} style={styles.container}>
