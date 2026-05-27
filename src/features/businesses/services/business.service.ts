@@ -21,6 +21,30 @@ export type GetBusinessesParams = {
   limit?: number;
 };
 
+const getAbsoluteImageUrl = (url: string) => {
+  if (!url) return "";
+
+  if (url.startsWith("http://") || url.startsWith("https://")) {
+    return url;
+  }
+
+  return `${API_BASE_URL}${url}`;
+};
+
+const normalizeBusinessDetailsImages = (
+  business: BusinessDetails | null,
+): BusinessDetails | null => {
+  if (!business) return business;
+
+  return {
+    ...business,
+    images: business.images.map((image) => ({
+      ...image,
+      url: getAbsoluteImageUrl(image.url),
+    })),
+  };
+};
+
 export const getBusinesses = async (
   params?: GetBusinessesParams,
 ): Promise<Business[]> => {
@@ -36,6 +60,7 @@ export const getBusinesses = async (
     if (params.search) query.set("search", params.search);
     if (params.page) query.set("page", String(params.page));
     if (params.limit) query.set("limit", String(params.limit));
+
     const qs = query.toString();
     if (qs) url = `${url}?${qs}`;
   }
@@ -50,13 +75,15 @@ export const getBusinessDetailsById = async (
   const res = await apiClient.get<BusinessDetails>(
     ENDPOINTS.BUSINESS_BY_ID(id),
   );
-  return res.data;
+
+  return normalizeBusinessDetailsImages(res.data);
 };
 
 export const getMyBusinessProfile =
   async (): Promise<BusinessDetails | null> => {
     const res = await apiClient.get<BusinessDetails>(ENDPOINTS.BUSINESSES_ME);
-    return res.data;
+
+    return normalizeBusinessDetailsImages(res.data);
   };
 
 const DAY_TO_API_INDEX: Record<string, number> = {
@@ -96,7 +123,7 @@ export const updateBusinessOverview = async (
     },
   );
 
-  return res.data;
+  return normalizeBusinessDetailsImages(res.data) as BusinessDetails;
 };
 
 export type BusinessGalleryPhotoResponse = {
@@ -106,16 +133,6 @@ export type BusinessGalleryPhotoResponse = {
   url: string;
   isDefault: boolean;
   sortOrder: number;
-};
-
-const getAbsoluteImageUrl = (url: string) => {
-  if (!url) return "";
-
-  if (url.startsWith("http://") || url.startsWith("https://")) {
-    return url;
-  }
-
-  return `${API_BASE_URL}${url}`;
 };
 
 const toGalleryPhoto = (photo: BusinessGalleryPhotoResponse): GalleryPhoto => ({
