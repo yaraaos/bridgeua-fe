@@ -8,8 +8,10 @@ import { API_BASE_URL } from "@/src/services/api/config";
 import { ENDPOINTS } from "@/src/services/api/endpoints";
 import {
   GalleryPhoto,
+  ServiceLibraryItem,
   UpdateBusinessAboutPayload,
   UpdateBusinessOverviewPayload,
+  UpdateBusinessServicesPayload,
 } from "../types/editBusiness.types";
 
 export type GetBusinessesParams = {
@@ -137,6 +139,27 @@ export const updateBusinessAbout = async (
       languages: payload.languages,
       amenities: payload.amenities,
     },
+  );
+
+  return normalizeBusinessDetailsImages(res.data) as BusinessDetails;
+};
+
+export const getBusinessServiceLibrary = async (): Promise<
+  ServiceLibraryItem[]
+> => {
+  const res = await apiClient.get<ServiceLibraryItem[]>(
+    ENDPOINTS.BUSINESSES_ME_SERVICE_LIBRARY,
+  );
+
+  return res.data;
+};
+
+export const updateBusinessServices = async (
+  payload: UpdateBusinessServicesPayload,
+): Promise<BusinessDetails> => {
+  const res = await apiClient.patch<BusinessDetails>(
+    ENDPOINTS.BUSINESSES_ME_SERVICES,
+    payload,
   );
 
   return normalizeBusinessDetailsImages(res.data) as BusinessDetails;

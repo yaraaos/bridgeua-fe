@@ -105,7 +105,11 @@ export type BusinessDetailsReview = {
 
 export type BusinessDetailsService = {
   id: string;
+  serviceId?: string;
+  categoryId?: string | null;
   name: string;
+  durationMinutes?: number;
+  price?: number;
   priceFrom?: string;
   duration?: string;
 };

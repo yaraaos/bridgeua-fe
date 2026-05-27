@@ -13,6 +13,7 @@ import {
   updateBusinessAbout,
   updateBusinessDefaultPhotos,
   updateBusinessOverview,
+  updateBusinessServices,
   uploadBusinessGalleryPhoto,
 } from "../services/business.service";
 
@@ -161,18 +162,14 @@ export function useEditBusiness(businessId?: string) {
 
     const payload: UpdateBusinessServicesPayload = {
       services: servicesDraft.services.map((svc) => ({
-        id: svc.id,
-        name: svc.name,
+        serviceId: svc.id,
         durationMinutes: parseInt(svc.duration, 10),
         price: parseFloat(svc.price),
       })),
     };
 
     try {
-      await apiClient.patch(
-        "/api/businesses/me/services",
-        payload as unknown as Record<string, unknown>,
-      );
+      await updateBusinessServices(payload);
       markSaved("services");
       setSavingTab(null);
       return { ok: true };
