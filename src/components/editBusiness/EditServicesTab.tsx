@@ -1,3 +1,4 @@
+import { getCategoryIcon } from "@/src/features/businesses/utils/categoryIcons";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useRef, useState } from "react";
 import {
@@ -42,7 +43,6 @@ export default function EditServicesTab({
 }: EditServicesTabProps) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
-
   const [libraryItems, setLibraryItems] = useState<ServiceLibraryItem[]>([]);
   const [isLibraryLoading, setIsLibraryLoading] = useState(false);
   const hydratedBusinessIdRef = useRef<string | null>(null);
@@ -207,7 +207,13 @@ export default function EditServicesTab({
           {/* Configured services list */}
           {services.length === 0 ? (
             <View style={styles.emptyState}>
-              <Ionicons name="cut-outline" size={40} color={colors.textMuted} />
+              <Ionicons
+                name={getCategoryIcon(
+                  business?.category?.toLowerCase().replace(/\s+/g, "-"),
+                )}
+                size={40}
+                color={colors.textMuted}
+              />
               <AppText style={styles.emptyTitle}>No services yet</AppText>
               <AppText style={styles.emptySubtitle}>
                 Browse the library below to add services

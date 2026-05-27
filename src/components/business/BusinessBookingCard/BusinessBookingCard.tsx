@@ -1,4 +1,5 @@
 import { AuthRequiredModal, useRequireAuth } from "@/src/features/auth";
+import { getCategoryIcon } from "@/src/features/businesses/utils/categoryIcons";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
@@ -8,6 +9,7 @@ import { createStyles } from "./BusinessBookingCard.styles";
 
 type Props = {
   businessId: string;
+  category?: string;
 };
 
 type BookingAction = {
@@ -43,7 +45,7 @@ const BOOKING_ACTIONS: BookingAction[] = [
   },
 ];
 
-export default function BusinessBookingCard({ businessId }: Props) {
+export default function BusinessBookingCard({ businessId, category }: Props) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
 
@@ -80,7 +82,9 @@ export default function BusinessBookingCard({ businessId }: Props) {
           >
             <View style={styles.iconBox}>
               <Ionicons
-                name={action.icon}
+                name={getCategoryIcon(
+                  category?.toLowerCase().replace(/\s+/g, "-"),
+                )}
                 size={18}
                 color={colors.primaryGreen}
               />

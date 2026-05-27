@@ -290,7 +290,10 @@ export default function BusinessDetailsScreen() {
               <BusinessOverviewCard business={business} />
 
               {(business.services?.length ?? 0) > 0 && (
-                <BusinessBookingCard businessId={business.id} />
+                <BusinessBookingCard
+                  businessId={business.id}
+                  category={business.category}
+                />
               )}
 
               <BusinessRecommendedByPreview
