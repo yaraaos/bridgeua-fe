@@ -1,6 +1,6 @@
 import ReviewCard from "@/src/components/business/ReviewCard";
-import { useAppTheme } from "@/src/hooks/useAppTheme";
 import type { BusinessDetailsReview } from "@/src/features/businesses/types/business.types";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { FlatList, Pressable, Text, View } from "react-native";

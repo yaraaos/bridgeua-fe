@@ -7,7 +7,10 @@ export type QuickActionId =
   | "view-bookings"
   | "view-reviews"
   | "share-business"
-  | "view-public-profile";
+  | "view-public-profile"
+  | "edit-team"
+  | "view-recommends"
+  | "view-recommended-by";
 
 export type QuickActionItem = {
   id: QuickActionId;
