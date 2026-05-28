@@ -73,7 +73,12 @@ export default function MapBusinessCallout({
       </Pressable>
 
       <Pressable style={styles.body} onPress={onPressDetails}>
-        <Image source={{ uri: business.image }} style={styles.image} />
+        <Image
+          source={{
+            uri: business.avatarUrl ?? business.image,
+          }}
+          style={styles.image}
+        />
 
         <View style={styles.textContent}>
           <Text style={styles.name} numberOfLines={1}>

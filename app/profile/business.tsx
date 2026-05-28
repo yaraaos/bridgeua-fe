@@ -87,7 +87,8 @@ export default function BusinessProfileScreen() {
 
   const businessName = business?.name || "";
   const handle = business?.category ?? account.handle;
-  const avatarUrl = business?.images?.[0]?.url ?? account.avatarUrl;
+  const avatarUrl =
+    business?.avatarUrl ?? business?.images?.[0]?.url ?? account.avatarUrl;
   const businessLocation = business?.location ?? "";
   const businessRating = business?.rating ?? 0;
   const businessReviewCount = business?.reviewCount ?? 0;
