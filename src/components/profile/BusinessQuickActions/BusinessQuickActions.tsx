@@ -1,5 +1,6 @@
+import { apiClient } from "@/src/services/api/client";
+import { useMyBusinessProfile } from "@/src/features/businesses/hooks/useBusiness";
 import { Ionicons } from "@expo/vector-icons";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useEffect, useState } from "react";
 import { Modal, Pressable, View } from "react-native";
 
@@ -30,7 +31,7 @@ export default function BusinessQuickActions({
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
 
-  const storageKey = `business-quick-actions-${businessId}`;
+  const { business } = useMyBusinessProfile();
 
   const [selectedActions, setSelectedActions] = useState<QuickActionId[]>(
     DEFAULT_SELECTED_ACTIONS,
@@ -41,16 +42,11 @@ export default function BusinessQuickActions({
   const [isEditOpen, setIsEditOpen] = useState(false);
 
   useEffect(() => {
-    const loadSelectedActions = async () => {
-      const stored = await AsyncStorage.getItem(storageKey);
-
-      if (stored) {
-        setSelectedActions(JSON.parse(stored));
-      }
-    };
-
-    loadSelectedActions();
-  }, [storageKey]);
+    if (business?.quickActions) {
+      setSelectedActions(business.quickActions as QuickActionId[]);
+      setDraftActions(business.quickActions as QuickActionId[]);
+    }
+  }, [business?.quickActions]);
 
   const visibleActions = QUICK_ACTIONS.filter((action) =>
     selectedActions.includes(action.id),
@@ -74,10 +70,12 @@ export default function BusinessQuickActions({
     );
   };
 
-  const saveActions = async () => {
+  const handleSave = async () => {
     setSelectedActions(draftActions);
-    await AsyncStorage.setItem(storageKey, JSON.stringify(draftActions));
     setIsEditOpen(false);
+    void apiClient
+      .patch('/api/businesses/me/quick-actions', { quickActions: draftActions })
+      .catch(() => {});
   };
 
   const ITEMS_PER_ROW = 5;
@@ -181,7 +179,7 @@ export default function BusinessQuickActions({
               </View>
 
               <View style={styles.modalButton}>
-                <AppButton title="Save" onPress={saveActions} />
+                <AppButton title="Save" onPress={handleSave} />
               </View>
             </View>
           </View>

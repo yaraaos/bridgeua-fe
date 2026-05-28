@@ -46,4 +46,19 @@ export const QUICK_ACTIONS: QuickActionItem[] = [
     label: "Public profile",
     icon: "eye-outline",
   },
+  {
+    id: "edit-team",
+    label: "My Team",
+    icon: "people-outline",
+  },
+  {
+    id: "view-recommends",
+    label: "Recommends",
+    icon: "thumbs-up-outline",
+  },
+  {
+    id: "view-recommended-by",
+    label: "Recommended by",
+    icon: "star-outline",
+  },
 ];
