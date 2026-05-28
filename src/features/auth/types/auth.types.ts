@@ -13,6 +13,18 @@ export type AuthUser = {
   name?: string;
   accountType?: "personal" | "business";
   isEmailConfirmed?: boolean;
+  ownedBusinessIds?: string[];
+  activeBusinessId?: string | null;
+  ownedBusiness?: {
+    id: string;
+    categoryId: string;
+    categorySlug?: string | null;
+    categoryName?: string | null;
+    city?: string | null;
+    state?: string | null;
+    latitude?: number | null;
+    longitude?: number | null;
+  } | null;
 };
 
 export type SignInResponse = {
