@@ -13,6 +13,7 @@ import {
   type BusinessDetailsTab,
 } from "@/src/components/business";
 import BusinessGalleryGrid from "@/src/components/business/BusinessGalleryGrid";
+import RecommendButton from "@/src/components/business/RecommendButton";
 import ScreenHeader from "@/src/components/common/ScreenHeader/ScreenHeader";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
 import { AppColors } from "@/src/constants/colors";
@@ -23,8 +24,7 @@ import {
   GuestBusinessCtaBanner,
   useRequireAuth,
 } from "@/src/features/auth";
-import { useBusinessDetails, useMyBusinessProfile } from "@/src/features/businesses/hooks/useBusiness";
-import RecommendButton from "@/src/components/business/RecommendButton";
+import { useBusinessDetails } from "@/src/features/businesses/hooks/useBusiness";
 import type {
   BusinessDetailsReview,
   BusinessRecommendation,
@@ -75,6 +75,8 @@ export default function BusinessDetailsScreen() {
     useRequireAuth();
 
   const isGuest = useAuthStore((state) => state.isGuest);
+  const accountType = useAuthStore((state) => state.user?.accountType);
+  const isBusinessOwner = accountType === "business";
   const currentUserId = useProfileStore((state) => state.profile.id);
 
   const {
@@ -97,10 +99,6 @@ export default function BusinessDetailsScreen() {
   const reviewsListYRef = useRef(0);
 
   const { business, isLoading } = useBusinessDetails(id);
-  const { business: myBusiness, isLoading: isMyBusinessLoading } = useMyBusinessProfile();
-  const isBusinessOwner = !!myBusiness?.id;
-  console.log('[rightSlot]', { isMyBusinessLoading, isBusinessOwner, myBusinessId: myBusiness?.id });
-
   const {
     reviews,
     reviewCount,
@@ -242,13 +240,12 @@ export default function BusinessDetailsScreen() {
         gradientColors={DISCOVERY_GRADIENT}
         onPressShare={handleShareBusiness}
         rightSlot={
-          business.ownerId && business.ownerId === currentUserId
-            ? null
-            : isMyBusinessLoading
-            ? null
-            : isBusinessOwner
-            ? <RecommendButton businessId={business.id} />
-            : <FollowButton businessId={business.id} size="icon" variant="soft" />
+          business.ownerId &&
+          business.ownerId === currentUserId ? null : isBusinessOwner ? (
+            <RecommendButton businessId={business.id} />
+          ) : (
+            <FollowButton businessId={business.id} size="icon" variant="soft" />
+          )
         }
       />
 

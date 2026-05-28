@@ -1,8 +1,7 @@
-import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { apiClient } from "@/src/services/api/client";
 import { useRecommendationsStore } from "@/src/store/recommendations.store";
 import { Ionicons } from "@expo/vector-icons";
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { Pressable, StyleProp, StyleSheet, ViewStyle } from "react-native";
 
 type Props = {
@@ -11,21 +10,24 @@ type Props = {
 };
 
 export default function RecommendButton({ businessId, style }: Props) {
-  const { colors } = useAppTheme();
-  const styles = createStyles(colors);
+  const hasFetched = useRef(false);
 
-  const { isRecommended, addRecommendation, removeRecommendation, setRecommendations } =
-    useRecommendationsStore();
+  const isRecommended = useRecommendationsStore((s) => s.isRecommended);
+  const addRecommendation = useRecommendationsStore((s) => s.addRecommendation);
+  const removeRecommendation = useRecommendationsStore((s) => s.removeRecommendation);
+  const setRecommendations = useRecommendationsStore((s) => s.setRecommendations);
 
   const normalizedId = String(businessId);
   const isActive = isRecommended(normalizedId);
 
   useEffect(() => {
+    if (hasFetched.current) return;
+    hasFetched.current = true;
     void apiClient
       .get("/api/recommendations/mine")
       .then((res) => {
         const data = res.data as string[] | { data: string[] };
-        setRecommendations(Array.isArray(data) ? data : data.data);
+        setRecommendations(Array.isArray(data) ? data.map(String) : data.data.map(String));
       })
       .catch(() => {});
   }, []);
@@ -49,21 +51,19 @@ export default function RecommendButton({ businessId, style }: Props) {
       <Ionicons
         name={isActive ? "thumbs-up" : "thumbs-up-outline"}
         size={16}
-        color={colors.white}
+        color="#FFFFFF"
       />
     </Pressable>
   );
 }
 
-function createStyles(colors: ReturnType<typeof useAppTheme>["colors"]) {
-  return StyleSheet.create({
-    iconButton: {
-      width: 36,
-      height: 36,
-      borderRadius: 10,
-      backgroundColor: colors.accentOrange,
-      alignItems: "center",
-      justifyContent: "center",
-    },
-  });
-}
+const styles = StyleSheet.create({
+  iconButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    backgroundColor: "#F79A2E",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+});
