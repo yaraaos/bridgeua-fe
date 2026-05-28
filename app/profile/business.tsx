@@ -99,7 +99,9 @@ export default function BusinessProfileScreen() {
                   ? m.photoUrl
                   : `${API_BASE_URL}${m.photoUrl}`
                 : undefined,
-              serviceIds: Array.isArray(m.serviceIds) ? m.serviceIds.map(String) : [],
+              serviceIds: Array.isArray(m.serviceIds)
+                ? m.serviceIds.map(String)
+                : [],
             })),
           );
         })
@@ -168,10 +170,7 @@ export default function BusinessProfileScreen() {
     }
 
     if (actionId === "view-reviews") {
-      router.push({
-        pathname: "/business/[id]",
-        params: { id: publicBusinessId, tab: "reviews" },
-      });
+      router.push("/business/reviews");
       return;
     }
 

@@ -97,11 +97,7 @@ export default function BusinessQuickActions({
           <AppText style={styles.cardTitle}>Quick actions</AppText>
 
           <Pressable style={styles.editButton} onPress={openEdit}>
-            <Ionicons
-              name="create-outline"
-              size={18}
-              color={colors.primaryGreen}
-            />
+            <AppText style={styles.editText}>Edit</AppText>
           </Pressable>
         </View>
 

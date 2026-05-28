@@ -32,7 +32,12 @@ export function createStyles(colors: AppColors) {
       borderRadius: 10,
       alignItems: "center",
       justifyContent: "center",
-      backgroundColor: colors.primaryGreenSoft,
+    },
+
+    editText: {
+      color: colors.primaryGreen,
+      fontSize: 14,
+      fontWeight: "700",
     },
 
     actionsGrid: {
