@@ -1,7 +1,7 @@
 import { apiClient } from "@/src/services/api/client";
 import { useMyBusinessProfile } from "@/src/features/businesses/hooks/useBusiness";
 import { Ionicons } from "@expo/vector-icons";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Modal, Pressable, View } from "react-native";
 
 import AppButton from "@/src/components/ui/AppButton/AppButton";
@@ -41,8 +41,11 @@ export default function BusinessQuickActions({
   );
   const [isEditOpen, setIsEditOpen] = useState(false);
 
+  const hasLoaded = useRef(false);
+
   useEffect(() => {
-    if (business?.quickActions) {
+    if (business?.quickActions && !hasLoaded.current) {
+      hasLoaded.current = true;
       setSelectedActions(business.quickActions as QuickActionId[]);
       setDraftActions(business.quickActions as QuickActionId[]);
     }
