@@ -1,7 +1,6 @@
-import { useMyBusinessProfile } from "@/src/features/businesses/hooks/useBusiness";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { apiClient } from "@/src/services/api/client";
 import { useRecommendationsStore } from "@/src/store/recommendations.store";
-import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect } from "react";
 import { Pressable, StyleProp, StyleSheet, ViewStyle } from "react-native";
@@ -13,24 +12,24 @@ type Props = {
 
 export default function RecommendButton({ businessId, style }: Props) {
   const { colors } = useAppTheme();
+  const styles = createStyles(colors);
 
-  const isRecommended = useRecommendationsStore((state) => state.isRecommended);
-  const addRecommendation = useRecommendationsStore((state) => state.addRecommendation);
-  const removeRecommendation = useRecommendationsStore((state) => state.removeRecommendation);
-  const setRecommendations = useRecommendationsStore((state) => state.setRecommendations);
-
-  const { business: myBusiness } = useMyBusinessProfile();
+  const {
+    isRecommended,
+    addRecommendation,
+    removeRecommendation,
+    setRecommendations,
+  } = useRecommendationsStore();
 
   const normalizedId = String(businessId);
   const isActive = isRecommended(normalizedId);
 
   useEffect(() => {
-    apiClient
+    void apiClient
       .get("/api/recommendations/mine")
-      .then((res: any) => {
-        if (Array.isArray(res?.data)) {
-          setRecommendations(res.data.map(String));
-        }
+      .then((res) => {
+        const data = res.data as string[] | { data: string[] };
+        setRecommendations(Array.isArray(data) ? data : data.data);
       })
       .catch(() => {});
   }, []);
@@ -38,23 +37,16 @@ export default function RecommendButton({ businessId, style }: Props) {
   const handlePress = () => {
     if (!isActive) {
       addRecommendation(normalizedId);
-      apiClient.post("/api/recommendations", { businessId: normalizedId }).catch(() => {});
+      void apiClient
+        .post("/api/recommendations", { businessId: normalizedId })
+        .catch(() => removeRecommendation(normalizedId));
     } else {
       removeRecommendation(normalizedId);
-      apiClient.delete(`/api/recommendations/${normalizedId}`).catch(() => {});
+      void apiClient
+        .delete(`/api/recommendations/${normalizedId}`)
+        .catch(() => addRecommendation(normalizedId));
     }
   };
-
-  const styles = StyleSheet.create({
-    iconButton: {
-      width: 36,
-      height: 36,
-      borderRadius: 10,
-      backgroundColor: colors.accentOrange,
-      alignItems: "center",
-      justifyContent: "center",
-    },
-  });
 
   return (
     <Pressable onPress={handlePress} style={[styles.iconButton, style]}>
@@ -65,4 +57,17 @@ export default function RecommendButton({ businessId, style }: Props) {
       />
     </Pressable>
   );
+}
+
+function createStyles(colors: ReturnType<typeof useAppTheme>["colors"]) {
+  return StyleSheet.create({
+    iconButton: {
+      width: 36,
+      height: 36,
+      borderRadius: 10,
+      backgroundColor: colors.accentOrange,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+  });
 }
