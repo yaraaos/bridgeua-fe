@@ -1,30 +1,96 @@
 import ScreenHeader from "@/src/components/common/ScreenHeader/ScreenHeader";
 import AppEmptyState from "@/src/components/ui/AppEmptyState";
+import AppLoader from "@/src/components/ui/AppLoader/AppLoader";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
+import AppTabsPills from "@/src/components/ui/AppTabsPills";
+import type { AppTabPillItem } from "@/src/components/ui/AppTabsPills/AppTabsPills";
 import AppText from "@/src/components/ui/AppText/AppText";
 import { AppColors } from "@/src/constants/colors";
+import { spacing } from "@/src/constants/spacing";
 import { useMyBusinessProfile } from "@/src/features/businesses/hooks/useBusiness";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { apiClient } from "@/src/services/api/client";
+import { API_BASE_URL } from "@/src/services/api/config";
 import { useTeamStore } from "@/src/store/team.store";
-import { router, useLocalSearchParams } from "expo-router";
-import { useState } from "react";
-import { FlatList, Pressable, StyleSheet, View } from "react-native";
+import type { TeamMember } from "@/src/types/team";
+import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
+import { useCallback, useState } from "react";
+import { FlatList, StyleSheet, View } from "react-native";
+
+const MEMBER_TABS = [
+  { label: "Services", value: "services" },
+  { label: "Bookings", value: "bookings" },
+  { label: "Reviews", value: "reviews" },
+] satisfies AppTabPillItem<"services" | "bookings" | "reviews">[];
 
 export default function TeamMemberScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
   const { memberId } = useLocalSearchParams<{ memberId?: string }>();
-  const { members } = useTeamStore();
+  const { members, setMembers } = useTeamStore();
   const { business } = useMyBusinessProfile();
-  const [activeTab, setActiveTab] = useState<"services" | "bookings" | "reviews">("services");
+  const businessId = business?.id;
+  const [activeTab, setActiveTab] = useState<
+    "services" | "bookings" | "reviews"
+  >("services");
+  const [isFetching, setIsFetching] = useState(false);
 
-  const member = members.find((m) => m.id === memberId);
+  useFocusEffect(
+    useCallback(() => {
+      if (members.find((m) => String(m.id) === String(memberId))) return;
+      if (!businessId) return;
+      setIsFetching(true);
+      void apiClient
+        .get<TeamMember[]>(`/api/businesses/${businessId}/team`)
+        .then((res) => {
+          const currentMembers = useTeamStore.getState().members;
+          setMembers(
+            res.data.map((m) => {
+              const existing = currentMembers.find(
+                (c) => String(c.id) === String(m.id),
+              );
+              return {
+                ...m,
+                photoUrl: m.photoUrl
+                  ? m.photoUrl.startsWith("http")
+                    ? m.photoUrl
+                    : `${API_BASE_URL}${m.photoUrl}`
+                  : undefined,
+                serviceIds: existing?.serviceIds ?? [],
+              };
+            }),
+          );
+        })
+        .catch(() => {})
+        .finally(() => {
+          setIsFetching(false);
+        });
+    }, [memberId, businessId, members, setMembers]),
+  );
+
+  const member = members.find((m) => String(m.id) === String(memberId));
+
+  if (isFetching || (!member && !business)) {
+    return (
+      <AppScreen withTopInset={false} style={{ padding: 0 }}>
+        <View
+          style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+        >
+          <AppLoader />
+        </View>
+      </AppScreen>
+    );
+  }
 
   if (!member) {
     return (
       <AppScreen withTopInset={false} style={{ padding: 0 }}>
         <AppText
-          style={{ color: colors.textMuted, textAlign: "center", marginTop: 40 }}
+          style={{
+            color: colors.textMuted,
+            textAlign: "center",
+            marginTop: 40,
+          }}
         >
           Team member not found.
         </AppText>
@@ -36,8 +102,6 @@ export default function TeamMemberScreen() {
     (s) => member.serviceIds?.includes(s.id) ?? false,
   );
 
-  const tabs = ["services", "bookings", "reviews"] as const;
-
   return (
     <AppScreen withTopInset={false} style={{ padding: 0 }}>
       <ScreenHeader
@@ -46,23 +110,12 @@ export default function TeamMemberScreen() {
         onBack={() => router.back()}
       />
 
-      <View style={styles.tabRow}>
-        {tabs.map((tab) => (
-          <Pressable
-            key={tab}
-            style={[styles.tabItem, activeTab === tab && styles.tabItemActive]}
-            onPress={() => setActiveTab(tab)}
-          >
-            <AppText
-              style={[
-                styles.tabText,
-                activeTab === tab ? styles.tabTextActive : styles.tabTextInactive,
-              ]}
-            >
-              {tab.charAt(0).toUpperCase() + tab.slice(1)}
-            </AppText>
-          </Pressable>
-        ))}
+      <View style={{ paddingHorizontal: spacing.lg, paddingTop: spacing.md }}>
+        <AppTabsPills
+          tabs={MEMBER_TABS}
+          activeTab={activeTab}
+          onChange={setActiveTab}
+        />
       </View>
 
       {activeTab === "services" ? (
@@ -110,37 +163,6 @@ export default function TeamMemberScreen() {
 
 function createStyles(colors: AppColors) {
   return StyleSheet.create({
-    tabRow: {
-      flexDirection: "row",
-      marginHorizontal: 16,
-      marginTop: 12,
-      marginBottom: 4,
-      borderRadius: 14,
-      overflow: "hidden",
-      borderWidth: 1,
-      borderColor: colors.border,
-      backgroundColor: colors.surface,
-    },
-    tabItem: {
-      flex: 1,
-      paddingVertical: 10,
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    tabItemActive: {
-      backgroundColor: colors.primaryGreen,
-    },
-    tabText: {
-      fontSize: 13,
-    },
-    tabTextActive: {
-      fontWeight: "800",
-      color: "#FFFFFF",
-    },
-    tabTextInactive: {
-      fontWeight: "700",
-      color: colors.textSecondary,
-    },
     serviceRow: {
       padding: 16,
       borderBottomWidth: 1,

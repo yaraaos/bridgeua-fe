@@ -7,8 +7,8 @@ import type { TeamMember } from "@/src/types/team";
 type TeamState = {
   members: TeamMember[];
   addMember: (member: TeamMember) => void;
-  removeMember: (id: string) => void;
-  updateMember: (id: string, updates: Partial<TeamMember>) => void;
+  removeMember: (id: string | number) => void;
+  updateMember: (id: string | number, updates: Partial<TeamMember>) => void;
   setMembers: (members: TeamMember[]) => void;
 };
 
@@ -24,13 +24,13 @@ export const useTeamStore = create<TeamState>()(
 
       removeMember: (id) =>
         set((state) => ({
-          members: state.members.filter((m) => m.id !== id),
+          members: state.members.filter((m) => String(m.id) !== String(id)),
         })),
 
       updateMember: (id, updates) =>
         set((state) => ({
           members: state.members.map((m) =>
-            m.id === id ? { ...m, ...updates } : m,
+            String(m.id) === String(id) ? { ...m, ...updates } : m,
           ),
         })),
 
