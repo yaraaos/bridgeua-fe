@@ -9,6 +9,7 @@ type TeamState = {
   addMember: (member: TeamMember) => void;
   removeMember: (id: string) => void;
   updateMember: (id: string, updates: Partial<TeamMember>) => void;
+  setMembers: (members: TeamMember[]) => void;
 };
 
 export const useTeamStore = create<TeamState>()(
@@ -32,6 +33,8 @@ export const useTeamStore = create<TeamState>()(
             m.id === id ? { ...m, ...updates } : m,
           ),
         })),
+
+      setMembers: (members) => set({ members }),
     }),
     {
       name: "team-storage",

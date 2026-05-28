@@ -1,6 +1,7 @@
 import ScreenHeader from "@/src/components/common/ScreenHeader/ScreenHeader";
 import TeamMemberCard from "@/src/components/profile/TeamMemberCard/TeamMemberCard";
 import AppEmptyState from "@/src/components/ui/AppEmptyState";
+import AppLoader from "@/src/components/ui/AppLoader/AppLoader";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
 import AppText from "@/src/components/ui/AppText/AppText";
 import { AppColors } from "@/src/constants/colors";
@@ -24,6 +25,7 @@ import {
   Modal,
   Platform,
   Pressable,
+  RefreshControl,
   StyleSheet,
   TextInput,
   View,
@@ -51,17 +53,63 @@ export default function TeamScreen() {
   );
   const canEditSave = editFirstName.trim().length > 0;
 
+  const [isLoading, setIsLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
+
   useFocusEffect(
     useCallback(() => {
       if (!businessId) return;
+      setIsLoading(true);
+      setFetchError(null);
       void apiClient
         .get<TeamMember[]>(`/api/businesses/${businessId}/team`)
         .then((res) => {
-          useTeamStore.setState({ members: res.data });
+          useTeamStore.setState({
+            members: res.data.map((m) => ({
+              ...m,
+              photoUrl: m.photoUrl
+                ? m.photoUrl.startsWith("http")
+                  ? m.photoUrl
+                  : `${API_BASE_URL}${m.photoUrl}`
+                : undefined,
+            })),
+          });
         })
-        .catch(() => {});
+        .catch(() => {
+          setFetchError("Failed to load team members. Pull down to refresh.");
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
     }, [businessId]),
   );
+
+  const handleRefresh = useCallback(() => {
+    if (!businessId) return;
+    setRefreshing(true);
+    setFetchError(null);
+    void apiClient
+      .get<TeamMember[]>(`/api/businesses/${businessId}/team`)
+      .then((res) => {
+        useTeamStore.setState({
+          members: res.data.map((m) => ({
+            ...m,
+            photoUrl: m.photoUrl
+              ? m.photoUrl.startsWith("http")
+                ? m.photoUrl
+                : `${API_BASE_URL}${m.photoUrl}`
+              : undefined,
+          })),
+        });
+      })
+      .catch(() => {
+        setFetchError("Failed to load team members. Pull down to refresh.");
+      })
+      .finally(() => {
+        setRefreshing(false);
+      });
+  }, [businessId]);
 
   const resetModal = () => {
     setFirstName("");
@@ -198,6 +246,11 @@ export default function TeamScreen() {
         onBack={() => router.back()}
       />
 
+      {isLoading ? (
+        <View style={styles.centerState}>
+          <AppLoader />
+        </View>
+      ) : (
       <FlatList
         data={members}
         keyExtractor={(item) => item.id}
@@ -205,12 +258,19 @@ export default function TeamScreen() {
         contentContainerStyle={styles.listContent}
         ListHeaderComponent={addCard}
         ListEmptyComponent={
-          <AppEmptyState
-            title="No team members yet"
-            description="Add your first team member to get started."
-          />
+          fetchError ? (
+            <AppText style={styles.errorText}>{fetchError}</AppText>
+          ) : (
+            <AppEmptyState
+              title="No team members yet"
+              description="Add your first team member to get started."
+            />
+          )
         }
         ItemSeparatorComponent={() => <View style={styles.separator} />}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+        }
         renderItem={({ item }) => (
           <View>
             <TeamMemberCard
@@ -287,6 +347,7 @@ export default function TeamScreen() {
           </View>
         )}
       />
+      )}
 
       <Modal
         visible={modalVisible}
@@ -487,6 +548,17 @@ export default function TeamScreen() {
 
 function createStyles(colors: AppColors) {
   return StyleSheet.create({
+    centerState: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    errorText: {
+      color: colors.error,
+      fontSize: 14,
+      textAlign: "center",
+      paddingHorizontal: 24,
+    },
     listContent: {
       paddingHorizontal: 16,
       paddingTop: 16,

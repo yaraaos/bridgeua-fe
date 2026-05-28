@@ -15,8 +15,11 @@ import { AppColors } from "@/src/constants/colors";
 import { spacing } from "@/src/constants/spacing";
 import { useMyBusinessProfile } from "@/src/features/businesses/hooks/useBusiness";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { apiClient } from "@/src/services/api/client";
+import { API_BASE_URL } from "@/src/services/api/config";
 import { useActiveAccount } from "@/src/store/account.store";
 import { useTeamStore } from "@/src/store/team.store";
+import type { TeamMember } from "@/src/types/team";
 
 type UpcomingBooking = {
   id: string;
@@ -80,11 +83,32 @@ export default function BusinessProfileScreen() {
   const styles = createStyles(colors);
   const account = useActiveAccount();
   const { business, isLoading, error, refetch } = useMyBusinessProfile();
-  const { members: teamMembers } = useTeamStore();
+  const { members: teamMembers, setMembers } = useTeamStore();
   useFocusEffect(
     useCallback(() => {
       void refetch();
     }, [refetch]),
+  );
+
+  useFocusEffect(
+    useCallback(() => {
+      if (!business?.id) return;
+      void apiClient
+        .get<TeamMember[]>(`/api/businesses/${business.id}/team`)
+        .then((res) => {
+          setMembers(
+            res.data.map((m) => ({
+              ...m,
+              photoUrl: m.photoUrl
+                ? m.photoUrl.startsWith("http")
+                  ? m.photoUrl
+                  : `${API_BASE_URL}${m.photoUrl}`
+                : undefined,
+            })),
+          );
+        })
+        .catch(() => {});
+    }, [business?.id, setMembers]),
   );
 
   const businessName = business?.name || "";
@@ -368,7 +392,7 @@ export default function BusinessProfileScreen() {
                 No team members yet
               </AppText>
             ) : (
-              teamMembers.slice(0, 3).map((member) => (
+              teamMembers.map((member) => (
                 <View key={member.id} style={{ alignItems: "center", gap: 4 }}>
                   <AppAvatar
                     name={`${member.firstName} ${member.lastName}`}
@@ -381,9 +405,8 @@ export default function BusinessProfileScreen() {
                       fontWeight: "700",
                       color: colors.textPrimary,
                       textAlign: "center",
-                      maxWidth: 56,
                     }}
-                    numberOfLines={1}
+                    numberOfLines={2}
                   >
                     {member.firstName} {member.lastName}
                   </AppText>
@@ -495,7 +518,7 @@ export default function BusinessProfileScreen() {
                     color={colors.primaryGreen}
                   />
                 </View>
-                <AppText style={styles.actionLabel} numberOfLines={1}>
+                <AppText style={styles.actionLabel} numberOfLines={2}>
                   {action.label}
                 </AppText>
               </Pressable>
