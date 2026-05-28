@@ -259,3 +259,7 @@ export const updateBusinessDefaultPhotos = async (
 
   return res.data.map(toGalleryPhoto);
 };
+
+export const deleteBusiness = async (businessId: string): Promise<void> => {
+  await apiClient.delete(ENDPOINTS.BUSINESS_BY_ID(businessId));
+};
