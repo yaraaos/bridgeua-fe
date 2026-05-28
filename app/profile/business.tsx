@@ -99,6 +99,7 @@ export default function BusinessProfileScreen() {
                   ? m.photoUrl
                   : `${API_BASE_URL}${m.photoUrl}`
                 : undefined,
+              serviceIds: Array.isArray(m.serviceIds) ? m.serviceIds.map(String) : [],
             })),
           );
         })

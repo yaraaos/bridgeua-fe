@@ -235,6 +235,7 @@ export default function EditServicesTab({
                   <EditBusinessServiceCard
                     service={svc}
                     showValidation={showValidation}
+                    dbServiceId={svc.id}
                     onRemove={() => {
                       removeConfiguredService(svc.id);
                       markDirty("services");
@@ -251,21 +252,33 @@ export default function EditServicesTab({
                     }}
                     members={members}
                     onToggleMember={(memberId) => {
-                      const member = members.find(
-                        (m) => String(m.id) === String(memberId),
-                      );
-                      if (!member) return;
-                      const currentIds = member.serviceIds ?? [];
-                      const updatedServiceIds = currentIds.includes(svc.id)
-                        ? currentIds.filter((id) => id !== svc.id)
-                        : [...currentIds, svc.id];
-                      updateMember(memberId, { serviceIds: updatedServiceIds });
-                      void apiClient
-                        .patch(
-                          `/api/businesses/${businessId}/team/${memberId}`,
-                          { serviceIds: updatedServiceIds },
+                      try {
+                        const member = members.find(
+                          (m) => String(m.id) === String(memberId),
+                        );
+                        if (!member) return;
+                        const realServiceId = svc.id;
+                        const currentIds = member.serviceIds?.map(String) ?? [];
+                        const updatedServiceIds = currentIds.includes(
+                          realServiceId,
                         )
-                        .catch(() => {});
+                          ? currentIds.filter((id) => id !== realServiceId)
+                          : [...currentIds, realServiceId];
+                        updateMember(memberId, {
+                          serviceIds: updatedServiceIds,
+                        });
+                        markDirty("services");
+                        if (businessId) {
+                          void apiClient
+                            .patch(
+                              `/api/businesses/${businessId}/team/${String(memberId)}`,
+                              { serviceIds: updatedServiceIds },
+                            )
+                            .catch(() => {});
+                        }
+                      } catch {
+                        // silent
+                      }
                     }}
                   />
                 </View>

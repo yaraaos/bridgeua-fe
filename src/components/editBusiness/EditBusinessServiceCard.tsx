@@ -20,6 +20,7 @@ type Props = {
   showValidation: boolean;
   members?: TeamMember[];
   onToggleMember?: (memberId: string | number) => void;
+  dbServiceId?: string;
 };
 
 export default function EditBusinessServiceCard({
@@ -30,6 +31,7 @@ export default function EditBusinessServiceCard({
   showValidation,
   members,
   onToggleMember,
+  dbServiceId,
 }: Props) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
@@ -92,8 +94,9 @@ export default function EditBusinessServiceCard({
           <AppText style={styles.specialistsLabel}>Specialists</AppText>
           <View style={styles.membersList}>
             {members.map((member) => {
+              const serviceIdToCheck = dbServiceId ?? String(service.id);
               const isAssigned =
-                member.serviceIds?.includes(service.id) ?? false;
+                member.serviceIds?.map(String).includes(serviceIdToCheck) ?? false;
               return (
                 <View key={String(member.id)} style={styles.memberRow}>
                   <View style={styles.memberLeft}>

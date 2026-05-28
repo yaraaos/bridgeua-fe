@@ -43,22 +43,16 @@ export default function TeamMemberScreen() {
       void apiClient
         .get<TeamMember[]>(`/api/businesses/${businessId}/team`)
         .then((res) => {
-          const currentMembers = useTeamStore.getState().members;
           setMembers(
-            res.data.map((m) => {
-              const existing = currentMembers.find(
-                (c) => String(c.id) === String(m.id),
-              );
-              return {
-                ...m,
-                photoUrl: m.photoUrl
-                  ? m.photoUrl.startsWith("http")
-                    ? m.photoUrl
-                    : `${API_BASE_URL}${m.photoUrl}`
-                  : undefined,
-                serviceIds: existing?.serviceIds ?? [],
-              };
-            }),
+            res.data.map((m) => ({
+              ...m,
+              photoUrl: m.photoUrl
+                ? m.photoUrl.startsWith("http")
+                  ? m.photoUrl
+                  : `${API_BASE_URL}${m.photoUrl}`
+                : undefined,
+              serviceIds: Array.isArray(m.serviceIds) ? m.serviceIds.map(String) : [],
+            })),
           );
         })
         .catch(() => {})
@@ -99,7 +93,7 @@ export default function TeamMemberScreen() {
   }
 
   const assignedServices = (business?.services ?? []).filter(
-    (s) => member.serviceIds?.includes(s.id) ?? false,
+    (s) => member.serviceIds?.map(String).includes(String(s.serviceId ?? s.id)) ?? false,
   );
 
   return (

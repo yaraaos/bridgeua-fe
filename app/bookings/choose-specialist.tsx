@@ -43,11 +43,11 @@ export default function ChooseSpecialistScreen() {
     }
     setIsLoadingSpecialists(true);
     void apiClient
-      .get<{ data: TeamMember[] }>(
+      .get<TeamMember[]>(
         `/api/businesses/${businessId}/team?serviceId=${serviceId}`,
       )
       .then((res) => {
-        const normalized = res.data.data.map((m) => ({
+        const normalized = res.data.map((m) => ({
           ...m,
           photoUrl: m.photoUrl
             ? m.photoUrl.startsWith("http")

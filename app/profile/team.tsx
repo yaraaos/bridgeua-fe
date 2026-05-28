@@ -71,6 +71,7 @@ export default function TeamScreen() {
       void apiClient
         .get<TeamMember[]>(`/api/businesses/${businessId}/team`)
         .then((res) => {
+          console.log('team response:', JSON.stringify(res.data));
           useTeamStore.setState({
             members: res.data.map((m) => ({
               ...m,
@@ -79,6 +80,7 @@ export default function TeamScreen() {
                   ? m.photoUrl
                   : `${API_BASE_URL}${m.photoUrl}`
                 : undefined,
+              serviceIds: Array.isArray(m.serviceIds) ? m.serviceIds.map(String) : [],
             })),
           });
         })
@@ -106,6 +108,7 @@ export default function TeamScreen() {
                 ? m.photoUrl
                 : `${API_BASE_URL}${m.photoUrl}`
               : undefined,
+            serviceIds: Array.isArray(m.serviceIds) ? m.serviceIds.map(String) : [],
           })),
         });
       })
@@ -501,7 +504,8 @@ export default function TeamScreen() {
               }}
             >
               {(business?.services ?? []).map((svc) => {
-                const isSelected = selectedServiceIds.includes(svc.id);
+                const svcSlug = svc.serviceId ?? svc.id;
+                const isSelected = selectedServiceIds.includes(svcSlug);
                 return (
                   <Pressable
                     key={svc.id}
@@ -519,9 +523,9 @@ export default function TeamScreen() {
                     }}
                     onPress={() => {
                       setSelectedServiceIds((prev) =>
-                        prev.includes(svc.id)
-                          ? prev.filter((id) => id !== svc.id)
-                          : [...prev, svc.id],
+                        prev.includes(svcSlug)
+                          ? prev.filter((id) => id !== svcSlug)
+                          : [...prev, svcSlug],
                       );
                     }}
                   >
