@@ -51,13 +51,15 @@ export default function RecommendButton({
         .then(() => onRecommendChange?.())
         .catch(() => removeRecommendation(normalizedId));
     } else {
+      removeRecommendation(normalizedId);
       void apiClient
         .delete(`/api/recommendations/${normalizedId}`)
         .then(() => {
-          removeRecommendation(normalizedId);
           onRecommendChange?.();
         })
-        .catch(() => {});
+        .catch(() => {
+          addRecommendation(normalizedId);
+        });
     }
   };
 
