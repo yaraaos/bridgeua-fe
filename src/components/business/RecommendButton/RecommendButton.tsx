@@ -48,6 +48,7 @@ export default function RecommendButton({
       addRecommendation(normalizedId);
       void apiClient
         .post("/api/recommendations", { businessId: normalizedId })
+        .then(() => onRecommendChange?.())
         .catch(() => removeRecommendation(normalizedId));
     } else {
       void apiClient
