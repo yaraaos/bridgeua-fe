@@ -21,6 +21,9 @@ import { useActiveAccount } from "@/src/store/account.store";
 import { useTeamStore } from "@/src/store/team.store";
 import type { TeamMember } from "@/src/types/team";
 
+import BusinessQuickActions from "@/src/components/profile/BusinessQuickActions/BusinessQuickActions";
+import type { QuickActionId } from "@/src/components/profile/BusinessQuickActions/types";
+
 type UpcomingBooking = {
   id: string;
   customerName: string;
@@ -69,14 +72,6 @@ const featuredReview = {
   postedAgo: "2 days ago",
   text: "I've been looking for a place I can truly trust — and I finally found it. Everything was explained clearly, th...",
 };
-
-const quickActions = [
-  { id: "edit-services", label: "Edit services", icon: "create-outline" },
-  { id: "manage-photos", label: "Manage photos", icon: "images-outline" },
-  { id: "business-info", label: "Business info", icon: "briefcase-outline" },
-  { id: "team", label: "Team", icon: "people-outline" },
-  { id: "add-promo", label: "Add promotions", icon: "megaphone-outline" },
-] as const;
 
 export default function BusinessProfileScreen() {
   const { colors } = useAppTheme();
@@ -139,6 +134,57 @@ export default function BusinessProfileScreen() {
       </AppScreen>
     );
   }
+
+  const handleQuickActionPress = (actionId: QuickActionId) => {
+    if (actionId === "add-promo") {
+      router.push("/business/promotions");
+      return;
+    }
+
+    if (actionId === "add-news") {
+      router.push("/business/promotions");
+      return;
+    }
+
+    if (actionId === "edit-business") {
+      router.push("/business/edit");
+      return;
+    }
+
+    if (actionId === "edit-services") {
+      router.push("/business/services");
+      return;
+    }
+
+    if (actionId === "edit-gallery") {
+      router.push("/business/photos");
+      return;
+    }
+
+    if (actionId === "view-bookings") {
+      router.push("/business/analytics");
+      return;
+    }
+
+    if (actionId === "view-reviews") {
+      router.push({
+        pathname: "/business/[id]",
+        params: { id: publicBusinessId, tab: "reviews" },
+      });
+      return;
+    }
+
+    if (actionId === "share-business") {
+      return;
+    }
+
+    if (actionId === "view-public-profile") {
+      router.push({
+        pathname: "/business/[id]",
+        params: { id: publicBusinessId },
+      });
+    }
+  };
 
   return (
     <AppScreen style={styles.container} withTopInset={false}>
@@ -488,43 +534,10 @@ export default function BusinessProfileScreen() {
             </View>
           </View>
         </View>
-
-        <View style={styles.card}>
-          <View style={styles.cardHeader}>
-            <AppText style={styles.cardTitle}>Quick actions</AppText>
-          </View>
-
-          <View style={styles.actionsGrid}>
-            {quickActions.map((action) => (
-              <Pressable
-                key={action.id}
-                style={styles.actionItem}
-                onPress={() => {
-                  if (action.id === "edit-services") {
-                    router.push("/business/services");
-                  } else if (action.id === "manage-photos") {
-                    router.push("/business/photos");
-                  } else if (action.id === "business-info") {
-                    router.push("/business/edit");
-                  } else if (action.id === "add-promo") {
-                    router.push("/business/promotions");
-                  }
-                }}
-              >
-                <View style={styles.actionIconWrap}>
-                  <Ionicons
-                    name={action.icon as keyof typeof Ionicons.glyphMap}
-                    size={20}
-                    color={colors.primaryGreen}
-                  />
-                </View>
-                <AppText style={styles.actionLabel} numberOfLines={2}>
-                  {action.label}
-                </AppText>
-              </Pressable>
-            ))}
-          </View>
-        </View>
+        <BusinessQuickActions
+          businessId={String(publicBusinessId)}
+          onActionPress={handleQuickActionPress}
+        />
       </ScrollView>
     </AppScreen>
   );
