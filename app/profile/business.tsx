@@ -16,6 +16,7 @@ import { spacing } from "@/src/constants/spacing";
 import { useMyBusinessProfile } from "@/src/features/businesses/hooks/useBusiness";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { useActiveAccount } from "@/src/store/account.store";
+import { useTeamStore } from "@/src/store/team.store";
 
 type UpcomingBooking = {
   id: string;
@@ -79,6 +80,7 @@ export default function BusinessProfileScreen() {
   const styles = createStyles(colors);
   const account = useActiveAccount();
   const { business, isLoading, error, refetch } = useMyBusinessProfile();
+  const { members: teamMembers } = useTeamStore();
   useFocusEffect(
     useCallback(() => {
       void refetch();
@@ -340,6 +342,55 @@ export default function BusinessProfileScreen() {
               color={colors.textPrimary}
             />
           </Pressable>
+        </View>
+
+        <View style={styles.card}>
+          <View style={styles.cardHeader}>
+            <AppText style={styles.cardTitle}>My Team</AppText>
+            <Pressable onPress={() => router.push("/profile/team")}>
+              <AppText style={styles.cardLink}>View all</AppText>
+            </Pressable>
+          </View>
+
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{ gap: 12 }}
+          >
+            {teamMembers.length === 0 ? (
+              <AppText
+                style={{
+                  color: colors.textMuted,
+                  fontSize: 13,
+                  fontStyle: "italic",
+                }}
+              >
+                No team members yet
+              </AppText>
+            ) : (
+              teamMembers.slice(0, 3).map((member) => (
+                <View key={member.id} style={{ alignItems: "center", gap: 4 }}>
+                  <AppAvatar
+                    name={`${member.firstName} ${member.lastName}`}
+                    imageUrl={member.photoUrl}
+                    size="md"
+                  />
+                  <AppText
+                    style={{
+                      fontSize: 11,
+                      fontWeight: "700",
+                      color: colors.textPrimary,
+                      textAlign: "center",
+                      maxWidth: 56,
+                    }}
+                    numberOfLines={1}
+                  >
+                    {member.firstName} {member.lastName}
+                  </AppText>
+                </View>
+              ))
+            )}
+          </ScrollView>
         </View>
 
         <View style={styles.card}>
