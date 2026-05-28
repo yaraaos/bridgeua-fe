@@ -7,15 +7,24 @@ import { Pressable, StyleProp, StyleSheet, ViewStyle } from "react-native";
 type Props = {
   businessId: string | number;
   style?: StyleProp<ViewStyle>;
+  onRecommendChange?: () => void;
 };
 
-export default function RecommendButton({ businessId, style }: Props) {
+export default function RecommendButton({
+  businessId,
+  style,
+  onRecommendChange,
+}: Props) {
   const hasFetched = useRef(false);
 
   const isRecommended = useRecommendationsStore((s) => s.isRecommended);
   const addRecommendation = useRecommendationsStore((s) => s.addRecommendation);
-  const removeRecommendation = useRecommendationsStore((s) => s.removeRecommendation);
-  const setRecommendations = useRecommendationsStore((s) => s.setRecommendations);
+  const removeRecommendation = useRecommendationsStore(
+    (s) => s.removeRecommendation,
+  );
+  const setRecommendations = useRecommendationsStore(
+    (s) => s.setRecommendations,
+  );
 
   const normalizedId = String(businessId);
   const isActive = isRecommended(normalizedId);
@@ -27,7 +36,9 @@ export default function RecommendButton({ businessId, style }: Props) {
       .get("/api/recommendations/mine")
       .then((res) => {
         const data = res.data as string[] | { data: string[] };
-        setRecommendations(Array.isArray(data) ? data.map(String) : data.data.map(String));
+        setRecommendations(
+          Array.isArray(data) ? data.map(String) : data.data.map(String),
+        );
       })
       .catch(() => {});
   }, []);
@@ -39,21 +50,26 @@ export default function RecommendButton({ businessId, style }: Props) {
         .post("/api/recommendations", { businessId: normalizedId })
         .catch(() => removeRecommendation(normalizedId));
     } else {
-      removeRecommendation(normalizedId);
       void apiClient
         .delete(`/api/recommendations/${normalizedId}`)
-        .catch(() => addRecommendation(normalizedId));
+        .then(() => {
+          removeRecommendation(normalizedId);
+          onRecommendChange?.();
+        })
+        .catch(() => {});
     }
   };
 
   return (
-    <Pressable onPress={handlePress} style={[styles.iconButton, style]}>
-      <Ionicons
-        name={isActive ? "thumbs-up" : "thumbs-up-outline"}
-        size={16}
-        color="#FFFFFF"
-      />
-    </Pressable>
+    <>
+      <Pressable onPress={handlePress} style={[styles.iconButton, style]}>
+        <Ionicons
+          name={isActive ? "thumbs-up" : "thumbs-up-outline"}
+          size={16}
+          color="#FFFFFF"
+        />
+      </Pressable>
+    </>
   );
 }
 

@@ -98,7 +98,7 @@ export default function BusinessDetailsScreen() {
   const reviewsSectionYRef = useRef(0);
   const reviewsListYRef = useRef(0);
 
-  const { business, isLoading } = useBusinessDetails(id);
+  const { business, isLoading, refetch } = useBusinessDetails(id);
   const {
     reviews,
     reviewCount,
@@ -242,7 +242,7 @@ export default function BusinessDetailsScreen() {
         rightSlot={
           business.ownerId &&
           business.ownerId === currentUserId ? null : isBusinessOwner ? (
-            <RecommendButton businessId={business.id} />
+            <RecommendButton businessId={business.id} onRecommendChange={() => void refetch()} />
           ) : (
             <FollowButton businessId={business.id} size="icon" variant="soft" />
           )
