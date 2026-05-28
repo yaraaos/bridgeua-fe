@@ -14,20 +14,7 @@ type TeamState = {
 export const useTeamStore = create<TeamState>()(
   persist(
     (set) => ({
-      members: [
-        {
-          id: "mock-member-1",
-          firstName: "Anna",
-          lastName: "Kovalenko",
-          photoUrl: "https://i.pravatar.cc/100?img=8",
-        },
-        {
-          id: "mock-member-2",
-          firstName: "Dmytro",
-          lastName: "Marchuk",
-          photoUrl: "https://i.pravatar.cc/100?img=15",
-        },
-      ],
+      members: [],
 
       addMember: (member) =>
         set((state) => ({
