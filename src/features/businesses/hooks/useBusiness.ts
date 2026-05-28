@@ -29,7 +29,7 @@ export const useBusinesses = (params?: GetBusinessesParams) => {
     };
 
     loadBusinesses();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(params)]);
 
   return { businesses, isLoading, error };

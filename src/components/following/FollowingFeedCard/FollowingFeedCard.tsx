@@ -8,28 +8,44 @@ import { createStyles } from "./FollowingFeedCard.styles";
 
 type FollowingFeedCardProps = {
   item: FollowingFeedCardItem;
+  onPress?: () => void;
 };
 
-export default function FollowingFeedCard({ item }: FollowingFeedCardProps) {
+export default function FollowingFeedCard({
+  item,
+  onPress,
+}: FollowingFeedCardProps) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
 
+  const handlePress = () => {
+    if (onPress) {
+      onPress();
+      return;
+    }
+
+    router.push({
+      pathname: item.type === "promotion" ? "/promotions/[id]" : "/news/[id]",
+      params: {
+        id:
+          item.type === "promotion"
+            ? (item.promotionId ?? item.id)
+            : (item.newsId ?? item.id),
+      },
+    });
+  };
+
+  const statusLabel =
+    item.status === "draft"
+      ? "Draft"
+      : item.status === "unpublished"
+        ? "Unpublished"
+        : item.status === "published"
+          ? "Published"
+          : null;
+
   return (
-    <Pressable
-      style={styles.feedCard}
-      onPress={() =>
-        router.push({
-          pathname:
-            item.type === "promotion" ? "/promotions/[id]" : "/news/[id]",
-          params: {
-            id:
-              item.type === "promotion"
-                ? (item.promotionId ?? item.id)
-                : (item.newsId ?? item.id),
-          },
-        })
-      }
-    >
+    <Pressable style={styles.feedCard} onPress={handlePress}>
       <View style={styles.feedHeader}>
         <View style={styles.feedContentRow}>
           <View style={styles.feedIcon}>
@@ -45,9 +61,17 @@ export default function FollowingFeedCard({ item }: FollowingFeedCardProps) {
           </View>
 
           <View style={styles.feedTextWrap}>
-            <Text style={styles.feedTitle} numberOfLines={2}>
-              {item.title}
-            </Text>
+            <View style={styles.titleRow}>
+              <Text style={styles.feedTitle} numberOfLines={2}>
+                {item.title}
+              </Text>
+
+              {statusLabel ? (
+                <View style={styles.statusBadge}>
+                  <Text style={styles.statusBadgeText}>{statusLabel}</Text>
+                </View>
+              ) : null}
+            </View>
 
             <Text style={styles.feedDescription} numberOfLines={3}>
               {item.description}
