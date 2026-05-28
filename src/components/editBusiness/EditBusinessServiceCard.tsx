@@ -2,6 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
+import AppAvatar from "@/src/components/ui/AppAvatar";
 import AppInput from "@/src/components/ui/AppInput/AppInput";
 import AppText from "@/src/components/ui/AppText/AppText";
 import { AppColors } from "@/src/constants/colors";
@@ -9,6 +10,7 @@ import { radius } from "@/src/constants/radius";
 import { spacing } from "@/src/constants/spacing";
 import type { ConfiguredService } from "@/src/features/businesses/types/editBusiness.types";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
+import type { TeamMember } from "@/src/types/team";
 
 type Props = {
   service: ConfiguredService;
@@ -16,6 +18,8 @@ type Props = {
   onDurationChange: (value: string) => void;
   onPriceChange: (value: string) => void;
   showValidation: boolean;
+  members?: TeamMember[];
+  onToggleMember?: (memberId: string | number) => void;
 };
 
 export default function EditBusinessServiceCard({
@@ -24,6 +28,8 @@ export default function EditBusinessServiceCard({
   onDurationChange,
   onPriceChange,
   showValidation,
+  members,
+  onToggleMember,
 }: Props) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
@@ -79,6 +85,43 @@ export default function EditBusinessServiceCard({
           {priceError && <AppText style={styles.errorText}>Required</AppText>}
         </View>
       </View>
+
+      {members && members.length > 0 && (
+        <>
+          <View style={styles.specialistsDivider} />
+          <AppText style={styles.specialistsLabel}>Specialists</AppText>
+          <View style={styles.membersList}>
+            {members.map((member) => {
+              const isAssigned =
+                member.serviceIds?.includes(service.id) ?? false;
+              return (
+                <View key={String(member.id)} style={styles.memberRow}>
+                  <View style={styles.memberLeft}>
+                    <AppAvatar
+                      name={`${member.firstName} ${member.lastName}`}
+                      imageUrl={member.photoUrl}
+                      size="sm"
+                    />
+                    <AppText style={styles.memberName}>
+                      {member.firstName} {member.lastName}
+                    </AppText>
+                  </View>
+                  <Pressable
+                    hitSlop={8}
+                    onPress={() => onToggleMember?.(member.id)}
+                  >
+                    <Ionicons
+                      name={isAssigned ? "checkmark-circle" : "ellipse-outline"}
+                      size={22}
+                      color={isAssigned ? colors.primaryGreen : colors.border}
+                    />
+                  </Pressable>
+                </View>
+              );
+            })}
+          </View>
+        </>
+      )}
     </View>
   );
 }
@@ -131,6 +174,36 @@ function createStyles(colors: AppColors) {
       fontWeight: "600",
       color: colors.error,
       marginTop: 2,
+    },
+    specialistsDivider: {
+      height: 1,
+      backgroundColor: colors.border,
+      marginTop: spacing.sm,
+    },
+    specialistsLabel: {
+      fontSize: 12,
+      fontWeight: "700",
+      color: colors.textSecondary,
+      marginTop: spacing.sm,
+    },
+    membersList: {
+      marginTop: spacing.sm,
+      gap: 10,
+    },
+    memberRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+    },
+    memberLeft: {
+      flexDirection: "row",
+      alignItems: "center",
+    },
+    memberName: {
+      fontSize: 13,
+      fontWeight: "700",
+      color: colors.textPrimary,
+      marginLeft: 8,
     },
   });
 }

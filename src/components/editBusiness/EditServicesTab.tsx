@@ -30,6 +30,8 @@ import { useFormValidation } from "@/src/hooks/useFormValidation";
 import { useEditBusinessStore } from "@/src/store/editBusiness.store";
 
 import { getBusinessServiceLibrary } from "@/src/features/businesses/services/business.service";
+import { apiClient } from "@/src/services/api/client";
+import { useTeamStore } from "@/src/store/team.store";
 import EditBusinessServiceCard from "./EditBusinessServiceCard";
 
 type EditServicesTabProps = {
@@ -62,6 +64,8 @@ export default function EditServicesTab({
 
   const { saveServices, isSavingServices, hasServicesError, saveError } =
     useEditBusiness(businessId);
+
+  const { members, updateMember } = useTeamStore();
 
   const scrollRef = useRef<ScrollView>(null);
   const cardPositions = useRef<Record<string, number>>({});
@@ -244,6 +248,24 @@ export default function EditServicesTab({
                       updateConfiguredService(svc.id, { price: v });
                       markDirty("services");
                       clearError();
+                    }}
+                    members={members}
+                    onToggleMember={(memberId) => {
+                      const member = members.find(
+                        (m) => String(m.id) === String(memberId),
+                      );
+                      if (!member) return;
+                      const currentIds = member.serviceIds ?? [];
+                      const updatedServiceIds = currentIds.includes(svc.id)
+                        ? currentIds.filter((id) => id !== svc.id)
+                        : [...currentIds, svc.id];
+                      updateMember(memberId, { serviceIds: updatedServiceIds });
+                      void apiClient
+                        .patch(
+                          `/api/businesses/${businessId}/team/${memberId}`,
+                          { serviceIds: updatedServiceIds },
+                        )
+                        .catch(() => {});
                     }}
                   />
                 </View>
