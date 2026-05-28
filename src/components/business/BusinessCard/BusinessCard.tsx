@@ -44,7 +44,9 @@ export default function BusinessCard({
       disabled={!onPress}
     >
       <Image
-        source={{ uri: business.image }}
+        source={{
+          uri: business.avatarUrl ?? business.image,
+        }}
         style={[
           styles.image,
           variant === "compact" && styles.imageCompact,

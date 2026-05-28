@@ -41,6 +41,9 @@ const normalizeBusinessDetailsImages = (
 
   return {
     ...business,
+    avatarUrl: business.avatarUrl
+      ? getAbsoluteImageUrl(business.avatarUrl)
+      : business.avatarUrl,
     images: business.images.map((image) => ({
       ...image,
       url: getAbsoluteImageUrl(image.url),
@@ -69,7 +72,16 @@ export const getBusinesses = async (
   }
 
   const res = await apiClient.get<Business[]>(url);
-  return res.data;
+
+  return res.data.map((business) => ({
+    ...business,
+    avatarUrl: business.avatarUrl
+      ? getAbsoluteImageUrl(business.avatarUrl)
+      : business.avatarUrl,
+    image: business.image
+      ? getAbsoluteImageUrl(business.image)
+      : business.image,
+  }));
 };
 
 export const getBusinessDetailsById = async (
@@ -127,6 +139,35 @@ export const updateBusinessOverview = async (
   );
 
   return normalizeBusinessDetailsImages(res.data) as BusinessDetails;
+};
+
+export type BusinessAvatarUploadResponse = {
+  avatarUrl: string;
+  business: BusinessDetails;
+};
+
+export const uploadBusinessAvatar = async (
+  uri: string,
+): Promise<BusinessAvatarUploadResponse> => {
+  const formData = new FormData();
+
+  formData.append("avatar", {
+    uri,
+    name: "business-avatar.jpg",
+    type: "image/jpeg",
+  } as unknown as Blob);
+
+  const res = await apiClient.post<BusinessAvatarUploadResponse>(
+    ENDPOINTS.BUSINESSES_ME_AVATAR,
+    formData,
+  );
+
+  return {
+    avatarUrl: getAbsoluteImageUrl(res.data.avatarUrl),
+    business: normalizeBusinessDetailsImages(
+      res.data.business,
+    ) as BusinessDetails,
+  };
 };
 
 export const updateBusinessAbout = async (

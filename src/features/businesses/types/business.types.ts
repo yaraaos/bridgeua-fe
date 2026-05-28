@@ -154,6 +154,7 @@ export type BusinessDetails = {
   city?: string;
   state?: string;
   phone?: string;
+  avatarUrl?: string;
   website: string;
   socialLinks?: BusinessSocialLinks;
   businessHours?: BusinessHour[];

@@ -6,7 +6,6 @@ import type {
   UpdateBusinessOverviewPayload,
   UpdateBusinessServicesPayload,
 } from "@/src/features/businesses/types/editBusiness.types";
-import { apiClient } from "@/src/services/api/client";
 import { useEditBusinessStore } from "@/src/store/editBusiness.store";
 import {
   deleteBusinessGalleryPhoto,
@@ -14,6 +13,7 @@ import {
   updateBusinessDefaultPhotos,
   updateBusinessOverview,
   updateBusinessServices,
+  uploadBusinessAvatar,
   uploadBusinessGalleryPhoto,
 } from "../services/business.service";
 
@@ -36,20 +36,8 @@ export function useEditBusiness(businessId?: string) {
     let finalAvatarUrl = overviewDraft.avatarUrl;
 
     if (overviewDraft.avatarUrl?.startsWith("file")) {
-      const formData = new FormData();
-
-      formData.append("avatar", {
-        uri: overviewDraft.avatarUrl,
-        name: "business-avatar.jpg",
-        type: "image/jpeg",
-      } as unknown as Blob);
-
-      const avatarRes = await apiClient.post<{ avatarUrl: string }>(
-        "/api/businesses/me/avatar",
-        formData,
-      );
-
-      finalAvatarUrl = avatarRes.data.avatarUrl;
+      const avatarRes = await uploadBusinessAvatar(overviewDraft.avatarUrl);
+      finalAvatarUrl = avatarRes.avatarUrl;
     }
 
     const payload: UpdateBusinessOverviewPayload = {

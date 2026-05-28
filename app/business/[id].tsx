@@ -228,7 +228,7 @@ export default function BusinessDetailsScreen() {
       <ScreenHeader
         variant="business"
         title={business.name}
-        imageUrl={business.images[0]?.url}
+        imageUrl={business.avatarUrl ?? business.images[0]?.url}
         rating={reviewsSummary?.rating ?? business.rating}
         reviewCount={reviewsSummary?.reviewCount ?? reviewCount}
         category={business.category}

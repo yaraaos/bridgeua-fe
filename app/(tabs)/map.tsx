@@ -7,14 +7,13 @@ import {
 } from "@/src/components/map";
 import AppLoader from "@/src/components/ui/AppLoader/AppLoader";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
-import { HOME_CATEGORIES } from "@/src/constants/categories";
 import {
   DEFAULT_LOCATION_OPTIONS,
   LocationOption,
 } from "@/src/constants/locations";
 import { useBusinesses } from "@/src/features/businesses";
-import { useDiscoveryFeed } from "@/src/features/discovery/hooks/useDiscoveryFeed";
 import { useCategories } from "@/src/features/categories/hooks/useCategories";
+import { useDiscoveryFeed } from "@/src/features/discovery/hooks/useDiscoveryFeed";
 import { useDiscoveryLocationStore } from "@/src/store/discovery-location";
 import { useFilterStore } from "@/src/store/filter.store";
 import { useFollowingStore } from "@/src/store/following.store";
@@ -22,7 +21,7 @@ import { Business } from "@/src/types/business";
 import { router } from "expo-router";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Alert, StyleSheet, View } from "react-native";
-import MapView, { Marker, MapMarkerProps, Region } from "react-native-maps";
+import MapView, { MapMarkerProps, Marker, Region } from "react-native-maps";
 
 const DEFAULT_REGION: Region = {
   latitude: 34.0549,
@@ -39,7 +38,11 @@ type BusinessMarkerProps = {
   onPress: NonNullable<MapMarkerProps["onPress"]>;
 };
 
-function BusinessMarker({ business, isFollowed, onPress }: BusinessMarkerProps) {
+function BusinessMarker({
+  business,
+  isFollowed,
+  onPress,
+}: BusinessMarkerProps) {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [followChangePending, setFollowChangePending] = useState(false);
   const isFirstFollowEffect = useRef(true);
@@ -62,7 +65,7 @@ function BusinessMarker({ business, isFollowed, onPress }: BusinessMarkerProps) 
       tracksViewChanges={!imageLoaded || followChangePending}
     >
       <MapMarkerPin
-        imageUrl={business.image}
+        imageUrl={business.avatarUrl ?? business.image}
         isFollowed={isFollowed}
         onImageLoad={() => setImageLoaded(true)}
       />
@@ -148,7 +151,10 @@ export default function MapScreen() {
   }, [filteredBusinesses]);
 
   const initialRegion: Region = useMemo(() => {
-    if (typeof locationLatitude === "number" && typeof locationLongitude === "number") {
+    if (
+      typeof locationLatitude === "number" &&
+      typeof locationLongitude === "number"
+    ) {
       return {
         latitude: locationLatitude,
         longitude: locationLongitude,
@@ -165,7 +171,8 @@ export default function MapScreen() {
   );
 
   const selectedBusiness: Business | undefined = useMemo(
-    () => mappableBusinesses.find((business) => business.id === selectedBusinessId),
+    () =>
+      mappableBusinesses.find((business) => business.id === selectedBusinessId),
     [mappableBusinesses, selectedBusinessId],
   );
 
@@ -246,7 +253,8 @@ export default function MapScreen() {
 
   const handleSelectCategory = (selectedCategoryLabel: string) => {
     setSelectedBusinessId(null);
-    const mappedCategory = selectedCategoryLabel === "All Categories" ? "" : selectedCategoryLabel;
+    const mappedCategory =
+      selectedCategoryLabel === "All Categories" ? "" : selectedCategoryLabel;
     useFilterStore.getState().setCategory("discovery", mappedCategory);
   };
 
@@ -336,10 +344,7 @@ export default function MapScreen() {
         </View>
 
         {selectedBusiness ? (
-          <View
-            style={styles.calloutWrap}
-            pointerEvents="box-none"
-          >
+          <View style={styles.calloutWrap} pointerEvents="box-none">
             <MapBusinessCallout
               business={selectedBusiness}
               onClose={() => setSelectedBusinessId(null)}

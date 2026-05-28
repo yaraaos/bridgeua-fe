@@ -7,6 +7,7 @@ export type Business = {
   recommendedByCount: number;
   rating: number;
   image: string;
+  avatarUrl?: string | null;
   distanceKm: number;
   priceLevel: number;
   coordinates: {
