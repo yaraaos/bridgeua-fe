@@ -23,7 +23,8 @@ import {
   GuestBusinessCtaBanner,
   useRequireAuth,
 } from "@/src/features/auth";
-import { useBusinessDetails } from "@/src/features/businesses/hooks/useBusiness";
+import { useBusinessDetails, useMyBusinessProfile } from "@/src/features/businesses/hooks/useBusiness";
+import RecommendButton from "@/src/components/business/RecommendButton";
 import type {
   BusinessDetailsReview,
   BusinessRecommendation,
@@ -96,6 +97,9 @@ export default function BusinessDetailsScreen() {
   const reviewsListYRef = useRef(0);
 
   const { business, isLoading } = useBusinessDetails(id);
+  const { business: myBusiness, isLoading: isMyBusinessLoading } = useMyBusinessProfile();
+  const isBusinessOwner = !!myBusiness?.id;
+  console.log('[rightSlot]', { isMyBusinessLoading, isBusinessOwner, myBusinessId: myBusiness?.id });
 
   const {
     reviews,
@@ -238,9 +242,13 @@ export default function BusinessDetailsScreen() {
         gradientColors={DISCOVERY_GRADIENT}
         onPressShare={handleShareBusiness}
         rightSlot={
-          business.ownerId && business.ownerId === currentUserId ? null : (
-            <FollowButton businessId={business.id} size="icon" variant="soft" />
-          )
+          business.ownerId && business.ownerId === currentUserId
+            ? null
+            : isMyBusinessLoading
+            ? null
+            : isBusinessOwner
+            ? <RecommendButton businessId={business.id} />
+            : <FollowButton businessId={business.id} size="icon" variant="soft" />
         }
       />
 
