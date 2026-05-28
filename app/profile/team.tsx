@@ -44,6 +44,9 @@ export default function TeamScreen() {
   const [photoUri, setPhotoUri] = useState<string | undefined>(undefined);
   const canSave = firstName.trim().length > 0;
 
+  const [pendingServiceMember, setPendingServiceMember] = useState<TeamMember | null>(null);
+  const [selectedServiceIds, setSelectedServiceIds] = useState<string[]>([]);
+
   const [openMenuMemberId, setOpenMenuMemberId] = useState<string | null>(null);
   const [editingMember, setEditingMember] = useState<TeamMember | null>(null);
   const [editFirstName, setEditFirstName] = useState("");
@@ -172,6 +175,7 @@ export default function TeamScreen() {
       addMember(res.data);
       setModalVisible(false);
       resetModal();
+      setPendingServiceMember(res.data);
     } catch {
       // silent
     }
@@ -273,14 +277,25 @@ export default function TeamScreen() {
         }
         renderItem={({ item }) => (
           <View>
-            <TeamMemberCard
-              member={item}
-              onPressMenu={() =>
-                setOpenMenuMemberId((prev) =>
-                  prev === item.id ? null : item.id,
-                )
-              }
-            />
+            <Pressable
+              onPress={() => {
+                if (openMenuMemberId === null) {
+                  router.push({
+                    pathname: "/profile/team-member",
+                    params: { memberId: item.id },
+                  });
+                }
+              }}
+            >
+              <TeamMemberCard
+                member={item}
+                onPressMenu={() =>
+                  setOpenMenuMemberId((prev) =>
+                    prev === item.id ? null : item.id,
+                  )
+                }
+              />
+            </Pressable>
             {openMenuMemberId === item.id && (
               <View style={styles.inlineMenu}>
                 <Pressable
@@ -441,6 +456,119 @@ export default function TeamScreen() {
             </Pressable>
           </View>
         </KeyboardAvoidingView>
+      </Modal>
+
+      <Modal
+        visible={pendingServiceMember !== null}
+        transparent
+        animationType="fade"
+        onRequestClose={() => {
+          setPendingServiceMember(null);
+          setSelectedServiceIds([]);
+        }}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalCard, { backgroundColor: colors.surface }]}>
+            <AppText
+              style={{ fontSize: 20, fontWeight: "800", color: colors.textPrimary }}
+            >
+              Which services does this teammate perform?
+            </AppText>
+            <AppText
+              style={{ fontSize: 13, color: colors.textSecondary, marginTop: 4 }}
+            >
+              Select all that apply.
+            </AppText>
+
+            <View
+              style={{
+                flexDirection: "row",
+                flexWrap: "wrap",
+                gap: 8,
+                marginTop: 16,
+              }}
+            >
+              {(business?.services ?? []).map((svc) => {
+                const isSelected = selectedServiceIds.includes(svc.id);
+                return (
+                  <Pressable
+                    key={svc.id}
+                    style={{
+                      paddingHorizontal: 14,
+                      paddingVertical: 8,
+                      borderRadius: 999,
+                      borderWidth: 1,
+                      backgroundColor: isSelected
+                        ? colors.primaryGreen
+                        : colors.surface,
+                      borderColor: isSelected
+                        ? colors.primaryGreen
+                        : colors.border,
+                    }}
+                    onPress={() => {
+                      setSelectedServiceIds((prev) =>
+                        prev.includes(svc.id)
+                          ? prev.filter((id) => id !== svc.id)
+                          : [...prev, svc.id],
+                      );
+                    }}
+                  >
+                    <AppText
+                      style={{
+                        fontSize: 13,
+                        fontWeight: "700",
+                        color: isSelected ? "#FFFFFF" : colors.textSecondary,
+                      }}
+                    >
+                      {svc.name}
+                    </AppText>
+                  </Pressable>
+                );
+              })}
+            </View>
+
+            <Pressable
+              style={[
+                styles.saveButton,
+                { backgroundColor: colors.primaryGreen },
+              ]}
+              onPress={() => {
+                if (!pendingServiceMember || !businessId) return;
+                updateMember(pendingServiceMember.id, {
+                  serviceIds: selectedServiceIds,
+                });
+                void apiClient
+                  .patch(
+                    `/api/businesses/${businessId}/team/${pendingServiceMember.id}`,
+                    { serviceIds: selectedServiceIds },
+                  )
+                  .catch(() => {});
+                setPendingServiceMember(null);
+                setSelectedServiceIds([]);
+              }}
+            >
+              <AppText style={styles.saveButtonText}>Save</AppText>
+            </Pressable>
+
+            <Pressable
+              style={{ alignSelf: "center", paddingVertical: 12 }}
+              onPress={() => {
+                setPendingServiceMember(null);
+                setSelectedServiceIds([]);
+              }}
+            >
+              <AppText
+                style={{
+                  fontSize: 14,
+                  fontWeight: "700",
+                  color: colors.textSecondary,
+                }}
+              >
+                Skip
+              </AppText>
+            </Pressable>
+          </View>
+        </View>
       </Modal>
 
       <Modal

@@ -6,6 +6,7 @@ import type { AppColors } from "@/src/constants/colors";
 import { spacing } from "@/src/constants/spacing";
 import { useBusinessDetails } from "@/src/features/businesses/hooks/useBusiness";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { useTeamStore } from "@/src/store/team.store";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
@@ -24,6 +25,12 @@ export default function ChooseSpecialistScreen() {
     }>();
 
   const { business } = useBusinessDetails(businessId);
+  const { members } = useTeamStore();
+
+  const assignedMembers = members.filter(
+    (m) => m.serviceIds?.includes(serviceId ?? "") ?? false,
+  );
+  const specialistsToShow = assignedMembers.length > 0 ? assignedMembers : members;
 
   const [selectedSpecialistId, setSelectedSpecialistId] = useState<
     string | null
@@ -73,17 +80,16 @@ export default function ChooseSpecialistScreen() {
             isSelected={selectedSpecialistId === "any"}
           />
 
-          {business?.bookingSpecialists?.map((specialist) => (
+          {specialistsToShow.map((member) => (
             <SpecialistCard
-              key={specialist.id}
-              name={specialist.name}
-              role={specialist.role}
-              rating={specialist.rating}
-              reviewsCount={specialist.reviewsCount}
-              description={specialist.description}
-              avatarUrl={specialist.avatarUrl}
-              onPress={() => setSelectedSpecialistId(specialist.id)}
-              isSelected={selectedSpecialistId === specialist.id}
+              key={member.id}
+              name={`${member.firstName} ${member.lastName}`}
+              role="Specialist"
+              rating={business?.rating ?? 5}
+              reviewsCount={business?.reviewCount ?? 0}
+              avatarUrl={member.photoUrl}
+              onPress={() => setSelectedSpecialistId(member.id)}
+              isSelected={selectedSpecialistId === member.id}
             />
           ))}
         </ScrollView>

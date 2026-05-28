@@ -3,4 +3,5 @@ export type TeamMember = {
   firstName: string;
   lastName: string;
   photoUrl?: string;
+  serviceIds?: string[];
 };
