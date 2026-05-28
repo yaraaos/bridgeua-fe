@@ -1,11 +1,11 @@
 import ScreenHeader from "@/src/components/common/ScreenHeader/ScreenHeader";
 import TeamMemberCard from "@/src/components/profile/TeamMemberCard/TeamMemberCard";
+import AppAddCard from "@/src/components/ui/AppAddCard/AppAddCard";
 import AppEmptyState from "@/src/components/ui/AppEmptyState";
 import AppLoader from "@/src/components/ui/AppLoader/AppLoader";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
 import AppText from "@/src/components/ui/AppText/AppText";
 import { AppColors } from "@/src/constants/colors";
-import { spacing } from "@/src/constants/spacing";
 import { useMyBusinessProfile } from "@/src/features/businesses/hooks/useBusiness";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { apiClient } from "@/src/services/api/client";
@@ -71,7 +71,7 @@ export default function TeamScreen() {
       void apiClient
         .get<TeamMember[]>(`/api/businesses/${businessId}/team`)
         .then((res) => {
-          console.log('team response:', JSON.stringify(res.data));
+          console.log("team response:", JSON.stringify(res.data));
           useTeamStore.setState({
             members: res.data.map((m) => ({
               ...m,
@@ -80,7 +80,9 @@ export default function TeamScreen() {
                   ? m.photoUrl
                   : `${API_BASE_URL}${m.photoUrl}`
                 : undefined,
-              serviceIds: Array.isArray(m.serviceIds) ? m.serviceIds.map(String) : [],
+              serviceIds: Array.isArray(m.serviceIds)
+                ? m.serviceIds.map(String)
+                : [],
             })),
           });
         })
@@ -108,7 +110,9 @@ export default function TeamScreen() {
                 ? m.photoUrl
                 : `${API_BASE_URL}${m.photoUrl}`
               : undefined,
-            serviceIds: Array.isArray(m.serviceIds) ? m.serviceIds.map(String) : [],
+            serviceIds: Array.isArray(m.serviceIds)
+              ? m.serviceIds.map(String)
+              : [],
           })),
         });
       })
@@ -240,12 +244,11 @@ export default function TeamScreen() {
   };
 
   const addCard = (
-    <Pressable style={styles.addCard} onPress={handleOpenModal}>
-      <View style={styles.addIconCircle}>
-        <Ionicons name="add" size={22} color={colors.primaryGreen} />
-      </View>
-      <AppText style={styles.addText}>Add team member</AppText>
-    </Pressable>
+    <AppAddCard
+      label="Add team member"
+      onPress={handleOpenModal}
+      style={{ marginBottom: 16 }}
+    />
   );
 
   return (
@@ -707,32 +710,6 @@ function createStyles(colors: AppColors) {
       paddingHorizontal: 16,
       paddingTop: 16,
       paddingBottom: 24,
-    },
-    addCard: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 12,
-      borderRadius: 18,
-      borderWidth: 1,
-      borderColor: colors.border,
-      backgroundColor: colors.surface,
-      padding: spacing.md,
-      marginBottom: 12,
-    },
-    addIconCircle: {
-      width: 40,
-      height: 40,
-      borderRadius: 999,
-      borderWidth: 1.5,
-      borderStyle: "dashed",
-      borderColor: colors.primaryGreen,
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    addText: {
-      fontSize: 14,
-      fontWeight: "700",
-      color: colors.primaryGreen,
     },
     separator: {
       height: 12,
