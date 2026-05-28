@@ -84,6 +84,7 @@ export type BusinessAbout = {
   amenities?: BusinessAmenity[];
   socialLinks?: BusinessSocialLink[];
   recommendedBy?: BusinessRecommendation[];
+  recommends?: BusinessRecommendation[];
 };
 
 export type BusinessDetailsReview = {

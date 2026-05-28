@@ -32,7 +32,7 @@ export default function BusinessAboutSection({ businessId, about }: Props) {
       </View>
 
       <BusinessRecommendedBySection
-        recommends={about.recommendedBy}
+        recommends={about.recommends}
         onPressSeeAll={() =>
           router.push({
             pathname: "/business/recommends",
