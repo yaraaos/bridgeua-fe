@@ -1,6 +1,7 @@
 import { AccountTypeSwitch } from "@/src/components/auth";
 import ScreenHeader from "@/src/components/common/ScreenHeader/ScreenHeader";
 import FollowingFeedCard from "@/src/components/following/FollowingFeedCard";
+import OwnerNewsEditor from "@/src/components/news/OwnerNewsEditor/OwnerNewsEditor";
 import OwnerPromotionEditor from "@/src/components/promotions/OwnerPromotionEditor/OwnerPromotionEditor";
 import AppAddCard from "@/src/components/ui/AppAddCard/AppAddCard";
 import AppEmptyState from "@/src/components/ui/AppEmptyState";
@@ -14,6 +15,7 @@ import {
 } from "@/src/constants/locations";
 import { useFollowingFeed } from "@/src/features/following";
 import type { FollowingFeedCardItem } from "@/src/features/following/types/following.types";
+import type { NewsDraft, NewsItem } from "@/src/features/news/types/news.types";
 import type {
   Promotion,
   PromotionDraft,
@@ -39,10 +41,15 @@ type FeedListItem =
       id: "add-promo";
     }
   | {
+      type: "add-news";
+      id: "add-news";
+    }
+  | {
       type: "feed-item";
       id: string;
       item: FollowingFeedCardItem;
       isOwnerPromotion?: boolean;
+      isOwnerNews?: boolean;
     };
 
 const BUSINESS_ID = "1";
@@ -58,6 +65,20 @@ const createPromotionFromDraft = (
     status,
     isActive: status === "published",
   } as Promotion;
+};
+
+const createNewsFromDraft = (
+  draft: NewsDraft,
+  status: "draft" | "published" | "unpublished",
+): NewsItem => {
+  return {
+    ...draft,
+    id: draft.id || `${Date.now()}`,
+    businessId: draft.businessId || BUSINESS_ID,
+    publishedAt: draft.publishedAt || new Date().toISOString(),
+    status,
+    isActive: status === "published",
+  };
 };
 
 export default function FollowingScreen() {
@@ -87,6 +108,10 @@ export default function FollowingScreen() {
   );
   const [isEditorOpen, setIsEditorOpen] = useState(false);
 
+  const [ownerNews, setOwnerNews] = useState<NewsItem[]>([]);
+  const [draftNews, setDraftNews] = useState<NewsDraft | null>(null);
+  const [isNewsEditorOpen, setIsNewsEditorOpen] = useState(false);
+
   const activeFilterCount = useMemo(() => {
     let count = 0;
 
@@ -114,6 +139,11 @@ export default function FollowingScreen() {
   const shouldShowOwnerPromoTools =
     isBusinessAccount && activeTab === "promotion";
 
+  const shouldShowOwnerNewsTools = isBusinessAccount && activeTab === "news";
+
+  const shouldShowOwnerTools =
+    shouldShowOwnerPromoTools || shouldShowOwnerNewsTools;
+
   const createEmptyDraft = (): PromotionDraft => ({
     id: "",
     businessId: BUSINESS_ID,
@@ -135,9 +165,28 @@ export default function FollowingScreen() {
     status: "draft",
   });
 
+  const createEmptyNewsDraft = (): NewsDraft => ({
+    id: "",
+    businessId: BUSINESS_ID,
+    title: "",
+    description: "",
+    content: "",
+    imageUrl: "https://images.unsplash.com/photo-1495020689067-958852a7765e",
+    categoryLabel: "News",
+    publishedAt: "",
+    ctaType: "view_business",
+    ctaLabel: "View Business",
+    status: "draft",
+  });
+
   const closeEditor = () => {
     setIsEditorOpen(false);
     setDraftPromotion(null);
+  };
+
+  const closeNewsEditor = () => {
+    setIsNewsEditorOpen(false);
+    setDraftNews(null);
   };
 
   const upsertOwnerPromotion = (promotion: Promotion) => {
@@ -154,9 +203,26 @@ export default function FollowingScreen() {
     });
   };
 
+  const upsertOwnerNews = (newsItem: NewsItem) => {
+    setOwnerNews((prev) => {
+      const exists = prev.some((item) => item.id === newsItem.id);
+
+      if (exists) {
+        return prev.map((item) => (item.id === newsItem.id ? newsItem : item));
+      }
+
+      return [newsItem, ...prev];
+    });
+  };
+
   const handleOpenCreate = () => {
     setDraftPromotion(createEmptyDraft());
     setIsEditorOpen(true);
+  };
+
+  const handleOpenCreateNews = () => {
+    setDraftNews(createEmptyNewsDraft());
+    setIsNewsEditorOpen(true);
   };
 
   const openOwnerPromotionEdit = (promotionId?: string) => {
@@ -189,6 +255,30 @@ export default function FollowingScreen() {
     });
 
     setIsEditorOpen(true);
+  };
+
+  const openOwnerNewsEdit = (newsId?: string) => {
+    if (!newsId) return;
+
+    const newsItem = ownerNews.find((item) => item.id === newsId);
+
+    if (!newsItem) return;
+
+    setDraftNews({
+      id: newsItem.id,
+      businessId: newsItem.businessId,
+      title: newsItem.title,
+      description: newsItem.description,
+      content: newsItem.content,
+      imageUrl: newsItem.imageUrl,
+      categoryLabel: newsItem.categoryLabel,
+      publishedAt: newsItem.publishedAt,
+      ctaType: newsItem.ctaType,
+      ctaLabel: newsItem.ctaLabel,
+      status: newsItem.status ?? "draft",
+    });
+
+    setIsNewsEditorOpen(true);
   };
 
   const handleSaveDraft = () => {
@@ -228,6 +318,41 @@ export default function FollowingScreen() {
     closeEditor();
   };
 
+  const handleSaveNewsDraft = () => {
+    if (!draftNews) return;
+
+    const newsItem = createNewsFromDraft(draftNews, "draft");
+
+    upsertOwnerNews(newsItem);
+    closeNewsEditor();
+  };
+
+  const handlePublishNews = () => {
+    if (!draftNews) return;
+
+    const newsItem = createNewsFromDraft(draftNews, "published");
+
+    upsertOwnerNews(newsItem);
+    closeNewsEditor();
+  };
+
+  const handleUnpublishNews = () => {
+    if (!draftNews) return;
+
+    const newsItem = createNewsFromDraft(draftNews, "unpublished");
+
+    upsertOwnerNews(newsItem);
+    closeNewsEditor();
+  };
+
+  const handleDeleteNews = () => {
+    if (!draftNews?.id) return;
+
+    setOwnerNews((prev) => prev.filter((item) => item.id !== draftNews.id));
+
+    closeNewsEditor();
+  };
+
   const ownerFeedItems = useMemo<FollowingFeedCardItem[]>(() => {
     return ownerPromotions.map((promotion) => ({
       id: `owner-promotion-${promotion.id}`,
@@ -252,31 +377,79 @@ export default function FollowingScreen() {
     }));
   }, [ownerPromotions]);
 
+  const ownerNewsFeedItems = useMemo<FollowingFeedCardItem[]>(() => {
+    return ownerNews.map((newsItem) => ({
+      id: `owner-news-${newsItem.id}`,
+      businessId: newsItem.businessId,
+      type: "news",
+      newsId: newsItem.id,
+      status: newsItem.status,
+      title: newsItem.title || "Untitled news",
+      description: newsItem.description || "No description added yet.",
+      createdAt: newsItem.publishedAt || new Date().toISOString(),
+      businessName: "Your Business",
+      businessCategory: "Business",
+      businessLocation: "California, USA",
+      businessImage: newsItem.imageUrl || "https://placehold.co/600x400",
+      businessRating: 0,
+      businessDistanceKm: 0,
+      businessPriceLevel: undefined,
+      distanceKm: 0,
+      priceLevel: undefined,
+      recommendedByPreview: [],
+      recommendedByCount: 0,
+    }));
+  }, [ownerNews]);
+
   const listData = useMemo<FeedListItem[]>(() => {
     const feedItems: FeedListItem[] = items.map((item) => ({
       type: "feed-item",
       id: item.id,
       item,
       isOwnerPromotion: false,
+      isOwnerNews: false,
     }));
 
-    if (!shouldShowOwnerPromoTools) {
-      return feedItems;
+    if (shouldShowOwnerPromoTools) {
+      const ownerItems: FeedListItem[] = ownerFeedItems.map((item) => ({
+        type: "feed-item",
+        id: item.id,
+        item,
+        isOwnerPromotion: true,
+        isOwnerNews: false,
+      }));
+
+      return [
+        { type: "add-promo", id: "add-promo" },
+        ...ownerItems,
+        ...feedItems,
+      ];
     }
 
-    const ownerItems: FeedListItem[] = ownerFeedItems.map((item) => ({
-      type: "feed-item",
-      id: item.id,
-      item,
-      isOwnerPromotion: true,
-    }));
+    if (shouldShowOwnerNewsTools) {
+      const ownerItems: FeedListItem[] = ownerNewsFeedItems.map((item) => ({
+        type: "feed-item",
+        id: item.id,
+        item,
+        isOwnerPromotion: false,
+        isOwnerNews: true,
+      }));
 
-    return [
-      { type: "add-promo", id: "add-promo" },
-      ...ownerItems,
-      ...feedItems,
-    ];
-  }, [items, ownerFeedItems, shouldShowOwnerPromoTools]);
+      return [
+        { type: "add-news", id: "add-news" },
+        ...ownerItems,
+        ...feedItems,
+      ];
+    }
+
+    return feedItems;
+  }, [
+    items,
+    ownerFeedItems,
+    ownerNewsFeedItems,
+    shouldShowOwnerPromoTools,
+    shouldShowOwnerNewsTools,
+  ]);
 
   const handleSelectLocationOption = (option: LocationOption) => {
     setManualLocation({
@@ -453,12 +626,12 @@ export default function FollowingScreen() {
         />
       </View>
 
-      {!hasFollowedBusinesses && !shouldShowOwnerPromoTools ? (
+      {!hasFollowedBusinesses && !shouldShowOwnerTools ? (
         <AppEmptyState
           title="You are not following anyone yet"
           description="Follow businesses to see their promotions and news here."
         />
-      ) : isEmpty && !shouldShowOwnerPromoTools ? (
+      ) : isEmpty && !shouldShowOwnerTools ? (
         <AppEmptyState
           title={`No ${
             activeTab === "promotion" ? "promotions" : "news"
@@ -488,13 +661,24 @@ export default function FollowingScreen() {
               );
             }
 
+            if (item.type === "add-news") {
+              return (
+                <AppAddCard
+                  label="Create news"
+                  onPress={handleOpenCreateNews}
+                />
+              );
+            }
+
             return (
               <FollowingFeedCard
                 item={item.item}
                 onPress={
                   item.isOwnerPromotion
                     ? () => openOwnerPromotionEdit(item.item.promotionId)
-                    : undefined
+                    : item.isOwnerNews
+                      ? () => openOwnerNewsEdit(item.item.newsId)
+                      : undefined
                 }
               />
             );
@@ -511,6 +695,17 @@ export default function FollowingScreen() {
         onPublish={handlePublish}
         onUnpublish={handleUnpublish}
         onDelete={handleDeletePromotion}
+      />
+
+      <OwnerNewsEditor
+        visible={isNewsEditorOpen}
+        draft={draftNews ?? createEmptyNewsDraft()}
+        onChangeDraft={setDraftNews}
+        onCancel={closeNewsEditor}
+        onSave={handleSaveNewsDraft}
+        onPublish={handlePublishNews}
+        onUnpublish={handleUnpublishNews}
+        onDelete={handleDeleteNews}
       />
     </AppScreen>
   );
