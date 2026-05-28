@@ -1,11 +1,11 @@
 import ScreenHeader from "@/src/components/common/ScreenHeader/ScreenHeader";
 import TeamMemberCard from "@/src/components/profile/TeamMemberCard/TeamMemberCard";
+import AppAddCard from "@/src/components/ui/AppAddCard/AppAddCard";
 import AppEmptyState from "@/src/components/ui/AppEmptyState";
 import AppLoader from "@/src/components/ui/AppLoader/AppLoader";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
 import AppText from "@/src/components/ui/AppText/AppText";
 import { AppColors } from "@/src/constants/colors";
-import { spacing } from "@/src/constants/spacing";
 import { useMyBusinessProfile } from "@/src/features/businesses/hooks/useBusiness";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { apiClient } from "@/src/services/api/client";
@@ -44,7 +44,13 @@ export default function TeamScreen() {
   const [photoUri, setPhotoUri] = useState<string | undefined>(undefined);
   const canSave = firstName.trim().length > 0;
 
-  const [openMenuMemberId, setOpenMenuMemberId] = useState<string | null>(null);
+  const [pendingServiceMember, setPendingServiceMember] =
+    useState<TeamMember | null>(null);
+  const [selectedServiceIds, setSelectedServiceIds] = useState<string[]>([]);
+
+  const [openMenuMemberId, setOpenMenuMemberId] = useState<
+    string | number | null
+  >(null);
   const [editingMember, setEditingMember] = useState<TeamMember | null>(null);
   const [editFirstName, setEditFirstName] = useState("");
   const [editLastName, setEditLastName] = useState("");
@@ -65,6 +71,7 @@ export default function TeamScreen() {
       void apiClient
         .get<TeamMember[]>(`/api/businesses/${businessId}/team`)
         .then((res) => {
+          console.log("team response:", JSON.stringify(res.data));
           useTeamStore.setState({
             members: res.data.map((m) => ({
               ...m,
@@ -73,6 +80,9 @@ export default function TeamScreen() {
                   ? m.photoUrl
                   : `${API_BASE_URL}${m.photoUrl}`
                 : undefined,
+              serviceIds: Array.isArray(m.serviceIds)
+                ? m.serviceIds.map(String)
+                : [],
             })),
           });
         })
@@ -100,6 +110,9 @@ export default function TeamScreen() {
                 ? m.photoUrl
                 : `${API_BASE_URL}${m.photoUrl}`
               : undefined,
+            serviceIds: Array.isArray(m.serviceIds)
+              ? m.serviceIds.map(String)
+              : [],
           })),
         });
       })
@@ -172,6 +185,7 @@ export default function TeamScreen() {
       addMember(res.data);
       setModalVisible(false);
       resetModal();
+      setPendingServiceMember(res.data);
     } catch {
       // silent
     }
@@ -200,7 +214,7 @@ export default function TeamScreen() {
         },
       );
       if (!res.ok) throw new Error("Failed");
-      updateMember(editingMember.id, {
+      updateMember(String(editingMember.id), {
         firstName: editFirstName.trim(),
         lastName: editLastName.trim(),
         photoUrl: editPhotoUrl,
@@ -230,12 +244,11 @@ export default function TeamScreen() {
   };
 
   const addCard = (
-    <Pressable style={styles.addCard} onPress={handleOpenModal}>
-      <View style={styles.addIconCircle}>
-        <Ionicons name="add" size={22} color={colors.primaryGreen} />
-      </View>
-      <AppText style={styles.addText}>Add team member</AppText>
-    </Pressable>
+    <AppAddCard
+      label="Add team member"
+      onPress={handleOpenModal}
+      style={{ marginBottom: 16 }}
+    />
   );
 
   return (
@@ -251,102 +264,114 @@ export default function TeamScreen() {
           <AppLoader />
         </View>
       ) : (
-      <FlatList
-        data={members}
-        keyExtractor={(item) => item.id}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.listContent}
-        ListHeaderComponent={addCard}
-        ListEmptyComponent={
-          fetchError ? (
-            <AppText style={styles.errorText}>{fetchError}</AppText>
-          ) : (
-            <AppEmptyState
-              title="No team members yet"
-              description="Add your first team member to get started."
-            />
-          )
-        }
-        ItemSeparatorComponent={() => <View style={styles.separator} />}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
-        }
-        renderItem={({ item }) => (
-          <View>
-            <TeamMemberCard
-              member={item}
-              onPressMenu={() =>
-                setOpenMenuMemberId((prev) =>
-                  prev === item.id ? null : item.id,
-                )
-              }
-            />
-            {openMenuMemberId === item.id && (
-              <View style={styles.inlineMenu}>
-                <Pressable
-                  style={styles.inlineMenuRow}
-                  onPress={() => {
-                    setOpenMenuMemberId(null);
-                    setEditingMember(item);
-                    setEditFirstName(item.firstName);
-                    setEditLastName(item.lastName);
-                    setEditPhotoUrl(item.photoUrl);
-                  }}
-                >
-                  <Ionicons
-                    name="create-outline"
-                    size={16}
-                    color={colors.textPrimary}
-                  />
-                  <AppText
-                    style={{
-                      fontSize: 14,
-                      fontWeight: "700",
-                      color: colors.textPrimary,
+        <FlatList
+          data={members}
+          keyExtractor={(item) => String(item.id)}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.listContent}
+          ListHeaderComponent={addCard}
+          ListEmptyComponent={
+            fetchError ? (
+              <AppText style={styles.errorText}>{fetchError}</AppText>
+            ) : (
+              <AppEmptyState
+                title="No team members yet"
+                description="Add your first team member to get started."
+              />
+            )
+          }
+          ItemSeparatorComponent={() => <View style={styles.separator} />}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+          }
+          renderItem={({ item }) => (
+            <View>
+              <Pressable
+                onPress={() => {
+                  if (openMenuMemberId === null) {
+                    console.log("navigating with memberId:", item.id);
+                    router.push({
+                      pathname: "/profile/team-member",
+                      params: { memberId: String(item.id) },
+                    });
+                  }
+                }}
+              >
+                <TeamMemberCard
+                  member={item}
+                  onPressMenu={() =>
+                    setOpenMenuMemberId((prev) =>
+                      prev === item.id ? null : item.id,
+                    )
+                  }
+                />
+              </Pressable>
+              {openMenuMemberId === item.id && (
+                <View style={styles.inlineMenu}>
+                  <Pressable
+                    style={styles.inlineMenuRow}
+                    onPress={() => {
+                      setOpenMenuMemberId(null);
+                      setEditingMember(item);
+                      setEditFirstName(item.firstName);
+                      setEditLastName(item.lastName);
+                      setEditPhotoUrl(item.photoUrl);
                     }}
                   >
-                    Edit
-                  </AppText>
-                </Pressable>
-                <View style={{ height: 1, backgroundColor: colors.border }} />
-                <Pressable
-                  style={styles.inlineMenuRow}
-                  onPress={() => {
-                    setOpenMenuMemberId(null);
-                    Alert.alert(
-                      "Delete team member",
-                      `Are you sure you want to delete ${item.firstName} ${item.lastName}?`,
-                      [
-                        { text: "Cancel", style: "cancel" },
-                        {
-                          text: "Delete",
-                          style: "destructive",
-                          onPress: () => void handleDeleteMember(item),
-                        },
-                      ],
-                    );
-                  }}
-                >
-                  <Ionicons
-                    name="trash-outline"
-                    size={16}
-                    color={colors.error}
-                  />
-                  <AppText
-                    style={{
-                      fontSize: 14,
-                      fontWeight: "700",
-                      color: colors.error,
+                    <Ionicons
+                      name="create-outline"
+                      size={16}
+                      color={colors.textPrimary}
+                    />
+                    <AppText
+                      style={{
+                        fontSize: 14,
+                        fontWeight: "700",
+                        color: colors.textPrimary,
+                      }}
+                    >
+                      Edit
+                    </AppText>
+                  </Pressable>
+                  <View style={{ height: 1, backgroundColor: colors.border }} />
+                  <Pressable
+                    style={styles.inlineMenuRow}
+                    onPress={() => {
+                      setOpenMenuMemberId(null);
+                      Alert.alert(
+                        "Delete team member",
+                        `Are you sure you want to delete ${item.firstName} ${item.lastName}?`,
+                        [
+                          { text: "Cancel", style: "cancel" },
+                          {
+                            text: "Delete",
+                            style: "destructive",
+                            onPress: () => void handleDeleteMember(item),
+                          },
+                        ],
+                      );
                     }}
                   >
-                    Delete
-                  </AppText>
-                </Pressable>
-              </View>
-            )}
-          </View>
-        )}
-      />
+                    <Ionicons
+                      name="trash-outline"
+                      size={16}
+                      color={colors.error}
+                    />
+                    <AppText
+                      style={{
+                        fontSize: 14,
+                        fontWeight: "700",
+                        color: colors.error,
+                      }}
+                    >
+                      Delete
+                    </AppText>
+                  </Pressable>
+                </View>
+              )}
+            </View>
+          )}
+        />
       )}
 
       <Modal
@@ -441,6 +466,128 @@ export default function TeamScreen() {
             </Pressable>
           </View>
         </KeyboardAvoidingView>
+      </Modal>
+
+      <Modal
+        visible={pendingServiceMember !== null}
+        transparent
+        animationType="fade"
+        onRequestClose={() => {
+          setPendingServiceMember(null);
+          setSelectedServiceIds([]);
+        }}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalCard, { backgroundColor: colors.surface }]}>
+            <AppText
+              style={{
+                fontSize: 20,
+                fontWeight: "800",
+                color: colors.textPrimary,
+              }}
+            >
+              Which services does this teammate perform?
+            </AppText>
+            <AppText
+              style={{
+                fontSize: 13,
+                color: colors.textSecondary,
+                marginTop: 4,
+              }}
+            >
+              Select all that apply.
+            </AppText>
+
+            <View
+              style={{
+                flexDirection: "row",
+                flexWrap: "wrap",
+                gap: 8,
+                marginTop: 16,
+              }}
+            >
+              {(business?.services ?? []).map((svc) => {
+                const svcSlug = svc.serviceId ?? svc.id;
+                const isSelected = selectedServiceIds.includes(svcSlug);
+                return (
+                  <Pressable
+                    key={svc.id}
+                    style={{
+                      paddingHorizontal: 14,
+                      paddingVertical: 8,
+                      borderRadius: 999,
+                      borderWidth: 1,
+                      backgroundColor: isSelected
+                        ? colors.primaryGreen
+                        : colors.surface,
+                      borderColor: isSelected
+                        ? colors.primaryGreen
+                        : colors.border,
+                    }}
+                    onPress={() => {
+                      setSelectedServiceIds((prev) =>
+                        prev.includes(svcSlug)
+                          ? prev.filter((id) => id !== svcSlug)
+                          : [...prev, svcSlug],
+                      );
+                    }}
+                  >
+                    <AppText
+                      style={{
+                        fontSize: 13,
+                        fontWeight: "700",
+                        color: isSelected ? "#FFFFFF" : colors.textSecondary,
+                      }}
+                    >
+                      {svc.name}
+                    </AppText>
+                  </Pressable>
+                );
+              })}
+            </View>
+
+            <Pressable
+              style={[
+                styles.saveButton,
+                { backgroundColor: colors.primaryGreen },
+              ]}
+              onPress={() => {
+                if (!pendingServiceMember || !businessId) return;
+                updateMember(String(pendingServiceMember.id), {
+                  serviceIds: selectedServiceIds,
+                });
+                void apiClient
+                  .patch(
+                    `/api/businesses/${businessId}/team/${String(pendingServiceMember.id)}`,
+                    { serviceIds: selectedServiceIds },
+                  )
+                  .catch(() => {});
+                setPendingServiceMember(null);
+                setSelectedServiceIds([]);
+              }}
+            >
+              <AppText style={styles.saveButtonText}>Save</AppText>
+            </Pressable>
+
+            <Pressable
+              style={{ alignSelf: "center", paddingVertical: 12 }}
+              onPress={() => {
+                setPendingServiceMember(null);
+                setSelectedServiceIds([]);
+              }}
+            >
+              <AppText
+                style={{
+                  fontSize: 14,
+                  fontWeight: "700",
+                  color: colors.textSecondary,
+                }}
+              >
+                Skip
+              </AppText>
+            </Pressable>
+          </View>
+        </View>
       </Modal>
 
       <Modal
@@ -563,32 +710,6 @@ function createStyles(colors: AppColors) {
       paddingHorizontal: 16,
       paddingTop: 16,
       paddingBottom: 24,
-    },
-    addCard: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 12,
-      borderRadius: 18,
-      borderWidth: 1,
-      borderColor: colors.border,
-      backgroundColor: colors.surface,
-      padding: spacing.md,
-      marginBottom: 12,
-    },
-    addIconCircle: {
-      width: 40,
-      height: 40,
-      borderRadius: 999,
-      borderWidth: 1.5,
-      borderStyle: "dashed",
-      borderColor: colors.primaryGreen,
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    addText: {
-      fontSize: 14,
-      fontWeight: "700",
-      color: colors.primaryGreen,
     },
     separator: {
       height: 12,

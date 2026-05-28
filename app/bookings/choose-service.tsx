@@ -43,7 +43,7 @@ export default function ChooseServiceScreen() {
       pathname: "/bookings/choose-specialist",
       params: {
         businessId,
-        serviceId: selectedServiceId,
+        serviceId: selectedService?.serviceId ?? selectedServiceId,
         serviceName: selectedService?.name,
         promotionId,
         promoCode,

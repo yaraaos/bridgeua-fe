@@ -99,6 +99,7 @@ export default function BusinessProfileScreen() {
                   ? m.photoUrl
                   : `${API_BASE_URL}${m.photoUrl}`
                 : undefined,
+              serviceIds: Array.isArray(m.serviceIds) ? m.serviceIds.map(String) : [],
             })),
           );
         })
@@ -439,7 +440,16 @@ export default function BusinessProfileScreen() {
               </AppText>
             ) : (
               teamMembers.map((member) => (
-                <View key={member.id} style={{ alignItems: "center", gap: 4 }}>
+                <Pressable
+                  key={member.id}
+                  style={{ alignItems: "center", gap: 4 }}
+                  onPress={() =>
+                    router.push({
+                      pathname: "/profile/team-member",
+                      params: { memberId: member.id },
+                    })
+                  }
+                >
                   <AppAvatar
                     name={`${member.firstName} ${member.lastName}`}
                     imageUrl={member.photoUrl}
@@ -456,7 +466,7 @@ export default function BusinessProfileScreen() {
                   >
                     {member.firstName} {member.lastName}
                   </AppText>
-                </View>
+                </Pressable>
               ))
             )}
           </ScrollView>
