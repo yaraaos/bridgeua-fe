@@ -1,80 +1,169 @@
+import DateTimePicker from "@react-native-community/datetimepicker";
 import React, { useEffect, useRef, useState } from "react";
-import { StyleSheet, Switch, TextInput, View } from "react-native";
+import {
+  Modal,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Switch,
+  View,
+} from "react-native";
 
 import AppText from "@/src/components/ui/AppText/AppText";
 import { AppColors } from "@/src/constants/colors";
 import { spacing } from "@/src/constants/spacing";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 
-function parseDigits(formatted: string): string {
-  return formatted.replace(/\D/g, "").slice(0, 4).padStart(4, "0");
+const ITEM_HEIGHT = 44;
+const HOURS = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, "0"));
+const MINUTES = Array.from({ length: 60 }, (_, i) =>
+  String(i).padStart(2, "0"),
+);
+
+function timeToDate(time: string) {
+  const [hours = "9", minutes = "0"] = time.split(":");
+  const date = new Date();
+  date.setHours(Number(hours), Number(minutes), 0, 0);
+  return date;
 }
 
-type TimeInputProps = {
-  value: string;
-  onChange: (v: string) => void;
-  hasError: boolean;
-  onFocus: () => void;
-  onBlur: () => void;
+function dateToTime(date: Date) {
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  return `${hours}:${minutes}`;
+}
+
+type IOSPickerProps = {
+  visible: boolean;
+  initialTime: string;
+  onConfirm: (time: string) => void;
+  onCancel: () => void;
+  colors: AppColors;
 };
 
-function TimeInput({ value, onChange, hasError, onFocus, onBlur }: TimeInputProps) {
-  const { colors } = useAppTheme();
+function IOSTimePicker({
+  visible,
+  initialTime,
+  onConfirm,
+  onCancel,
+  colors,
+}: IOSPickerProps) {
+  const [h, m] = initialTime.split(":");
+  const [selectedHour, setSelectedHour] = useState(h ?? "09");
+  const [selectedMinute, setSelectedMinute] = useState(m ?? "00");
 
-  const [digits, setDigits] = useState(() => parseDigits(value));
-  const prevProp = useRef(value);
+  const hourRef = useRef<ScrollView>(null);
+  const minuteRef = useRef<ScrollView>(null);
 
   useEffect(() => {
-    if (value !== prevProp.current) {
-      prevProp.current = value;
-      setDigits(parseDigits(value));
+    if (visible) {
+      const [initH, initM] = initialTime.split(":");
+      setSelectedHour(initH ?? "09");
+      setSelectedMinute(initM ?? "00");
+      setTimeout(() => {
+        hourRef.current?.scrollTo({
+          y: Number(initH ?? 9) * ITEM_HEIGHT,
+          animated: false,
+        });
+        minuteRef.current?.scrollTo({
+          y: Number(initM ?? 0) * ITEM_HEIGHT,
+          animated: false,
+        });
+      }, 50);
     }
-  }, [value]);
+  }, [visible, initialTime]);
 
-  const displayValue = `${digits.slice(0, 2)}:${digits.slice(2, 4)}`;
-
-  function handleKeyPress({ nativeEvent: { key } }: { nativeEvent: { key: string } }) {
-    let newDigits: string;
-    if (key === "Backspace") {
-      newDigits = "0" + digits.slice(0, 3);
-    } else if (/^[0-9]$/.test(key)) {
-      newDigits = digits.slice(1) + key;
-      if (parseInt(newDigits.slice(0, 2), 10) > 23) return;
-      if (parseInt(newDigits.slice(2, 4), 10) > 59) return;
-    } else {
-      return;
-    }
-    setDigits(newDigits);
-    onChange(`${newDigits.slice(0, 2)}:${newDigits.slice(2, 4)}`);
-  }
+  const pickerStyles = createPickerStyles(colors);
 
   return (
-    <TextInput
-      value={displayValue}
-      onChangeText={() => {}}
-      onKeyPress={handleKeyPress}
-      onFocus={onFocus}
-      onBlur={onBlur}
-      keyboardType="number-pad"
-      style={[
-        styles.timeInput,
-        { borderColor: hasError ? colors.error : colors.border },
-        { color: colors.textPrimary, backgroundColor: colors.surface },
-      ]}
-    />
+    <Modal visible={visible} transparent animationType="none">
+      <Pressable style={pickerStyles.backdrop} onPress={onCancel} />
+      <View style={pickerStyles.sheet}>
+        <View style={pickerStyles.toolbar}>
+          <Pressable onPress={onCancel}>
+            <AppText style={pickerStyles.toolbarCancel}>Cancel</AppText>
+          </Pressable>
+          <AppText style={pickerStyles.toolbarTitle}>Select Time</AppText>
+          <Pressable
+            onPress={() =>
+              onConfirm(
+                `${selectedHour.padStart(2, "0")}:${selectedMinute.padStart(2, "0")}`,
+              )
+            }
+          >
+            <AppText style={pickerStyles.toolbarDone}>Done</AppText>
+          </Pressable>
+        </View>
+
+        <View style={pickerStyles.wheelsRow}>
+          <View style={pickerStyles.wheelWrapper}>
+            <ScrollView
+              ref={hourRef}
+              showsVerticalScrollIndicator={false}
+              snapToInterval={ITEM_HEIGHT}
+              decelerationRate="fast"
+              contentContainerStyle={{ paddingVertical: ITEM_HEIGHT * 2 }}
+              onMomentumScrollEnd={(e) => {
+                const index = Math.round(
+                  e.nativeEvent.contentOffset.y / ITEM_HEIGHT,
+                );
+                setSelectedHour(HOURS[Math.max(0, Math.min(index, 23))]);
+              }}
+            >
+              {HOURS.map((hour) => (
+                <View key={hour} style={pickerStyles.wheelItem}>
+                  <AppText
+                    style={[
+                      pickerStyles.wheelItemText,
+                      selectedHour === hour && pickerStyles.wheelItemSelected,
+                    ]}
+                  >
+                    {hour}
+                  </AppText>
+                </View>
+              ))}
+            </ScrollView>
+            <View style={pickerStyles.selectionOverlay} pointerEvents="none" />
+          </View>
+
+          <AppText style={pickerStyles.colon}>:</AppText>
+
+          <View style={pickerStyles.wheelWrapper}>
+            <ScrollView
+              ref={minuteRef}
+              showsVerticalScrollIndicator={false}
+              snapToInterval={ITEM_HEIGHT}
+              decelerationRate="fast"
+              contentContainerStyle={{ paddingVertical: ITEM_HEIGHT * 2 }}
+              onMomentumScrollEnd={(e) => {
+                const index = Math.round(
+                  e.nativeEvent.contentOffset.y / ITEM_HEIGHT,
+                );
+                setSelectedMinute(MINUTES[Math.max(0, Math.min(index, 59))]);
+              }}
+            >
+              {MINUTES.map((minute) => (
+                <View key={minute} style={pickerStyles.wheelItem}>
+                  <AppText
+                    style={[
+                      pickerStyles.wheelItemText,
+                      selectedMinute === minute &&
+                        pickerStyles.wheelItemSelected,
+                    ]}
+                  >
+                    {minute}
+                  </AppText>
+                </View>
+              ))}
+            </ScrollView>
+            <View style={pickerStyles.selectionOverlay} pointerEvents="none" />
+          </View>
+        </View>
+      </View>
+    </Modal>
   );
 }
-
-const styles = StyleSheet.create({
-  timeInput: {
-    width: 54,
-    height: 36,
-    borderWidth: 1,
-    borderRadius: 8,
-    textAlign: "center",
-    fontSize: 13,
-  },
-});
 
 type Props = {
   label: string;
@@ -102,6 +191,9 @@ export default function EditBusinessHourRow({
 
   const [openTimeError, setOpenTimeError] = useState(false);
   const [closeTimeError, setCloseTimeError] = useState(false);
+  const [activePicker, setActivePicker] = useState<"open" | "close" | null>(
+    null,
+  );
 
   const isValid = !isOpen || (openTime !== "" && closeTime !== "");
 
@@ -112,10 +204,18 @@ export default function EditBusinessHourRow({
     }
   }, [isOpen]);
 
-  // Notify parent whenever validity changes; intentionally excludes onValidationChange
-  // from deps since it is recreated on every parent render but its behavior is stable.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => { onValidationChange(isValid); }, [isValid]);
+  useEffect(() => {
+    onValidationChange(isValid);
+  }, [isValid]);
+
+  const handleConfirm = (time: string) => {
+    if (activePicker === "open") {
+      onOpenTimeChange(time);
+    } else {
+      onCloseTimeChange(time);
+    }
+    setActivePicker(null);
+  };
 
   return (
     <View style={rowStyles.row}>
@@ -130,25 +230,67 @@ export default function EditBusinessHourRow({
 
       {isOpen ? (
         <View style={rowStyles.timesRow}>
-          <TimeInput
-            value={openTime}
-            onChange={onOpenTimeChange}
-            hasError={openTimeError}
-            onBlur={() => { if (openTime === "") setOpenTimeError(true); }}
-            onFocus={() => setOpenTimeError(false)}
-          />
+          <Pressable
+            style={[
+              rowStyles.timeInput,
+              { borderColor: openTimeError ? colors.error : colors.border },
+            ]}
+            onPress={() => {
+              setOpenTimeError(false);
+              setActivePicker("open");
+            }}
+          >
+            <AppText style={rowStyles.timeText}>{openTime || "09:00"}</AppText>
+          </Pressable>
+
           <AppText style={rowStyles.timeSep}>–</AppText>
-          <TimeInput
-            value={closeTime}
-            onChange={onCloseTimeChange}
-            hasError={closeTimeError}
-            onBlur={() => { if (closeTime === "") setCloseTimeError(true); }}
-            onFocus={() => setCloseTimeError(false)}
-          />
+
+          <Pressable
+            style={[
+              rowStyles.timeInput,
+              { borderColor: closeTimeError ? colors.error : colors.border },
+            ]}
+            onPress={() => {
+              setCloseTimeError(false);
+              setActivePicker("close");
+            }}
+          >
+            <AppText style={rowStyles.timeText}>{closeTime || "18:00"}</AppText>
+          </Pressable>
         </View>
       ) : (
         <AppText style={rowStyles.closedText}>Closed</AppText>
       )}
+
+      {Platform.OS === "android" && activePicker ? (
+        <DateTimePicker
+          value={timeToDate(
+            activePicker === "open"
+              ? openTime || "09:00"
+              : closeTime || "18:00",
+          )}
+          mode="time"
+          is24Hour
+          display="default"
+          onChange={(event, selectedDate) => {
+            setActivePicker(null);
+            if (event.type === "dismissed" || !selectedDate) return;
+            handleConfirm(dateToTime(selectedDate));
+          }}
+        />
+      ) : null}
+
+      {Platform.OS === "ios" ? (
+        <IOSTimePicker
+          visible={activePicker !== null}
+          initialTime={
+            activePicker === "open" ? openTime || "09:00" : closeTime || "18:00"
+          }
+          onConfirm={handleConfirm}
+          onCancel={() => setActivePicker(null)}
+          colors={colors}
+        />
+      ) : null}
     </View>
   );
 }
@@ -181,6 +323,101 @@ function createRowStyles(colors: AppColors) {
       flex: 1,
       fontSize: 14,
       color: colors.textMuted,
+    },
+    timeInput: {
+      width: 64,
+      height: 36,
+      borderWidth: 1,
+      borderRadius: 8,
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: colors.surface,
+    },
+    timeText: {
+      fontSize: 13,
+      fontWeight: "500",
+      color: colors.textPrimary,
+    },
+  });
+}
+
+function createPickerStyles(colors: AppColors) {
+  return StyleSheet.create({
+    backdrop: {
+      flex: 1,
+      backgroundColor: "rgba(0,0,0,0.4)",
+    },
+    sheet: {
+      backgroundColor: colors.surface,
+      borderTopLeftRadius: 16,
+      borderTopRightRadius: 16,
+      paddingBottom: spacing.xl,
+    },
+    toolbar: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      paddingHorizontal: spacing.lg,
+      paddingVertical: spacing.md,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+    },
+    toolbarCancel: {
+      fontSize: 16,
+      color: colors.textMuted,
+    },
+    toolbarTitle: {
+      fontSize: 16,
+      fontWeight: "600",
+      color: colors.textPrimary,
+    },
+    toolbarDone: {
+      fontSize: 16,
+      fontWeight: "600",
+      color: colors.primaryGreen,
+    },
+    wheelsRow: {
+      flexDirection: "row",
+      justifyContent: "center",
+      alignItems: "center",
+      height: ITEM_HEIGHT * 5,
+      gap: spacing.sm,
+      paddingHorizontal: spacing.lg,
+    },
+    wheelWrapper: {
+      width: 72,
+      height: ITEM_HEIGHT * 5,
+      overflow: "hidden",
+    },
+    wheelItem: {
+      height: ITEM_HEIGHT,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    wheelItemText: {
+      fontSize: 22,
+      color: colors.textMuted,
+    },
+    wheelItemSelected: {
+      fontSize: 26,
+      fontWeight: "700",
+      color: colors.textPrimary,
+    },
+    selectionOverlay: {
+      position: "absolute",
+      top: ITEM_HEIGHT * 2,
+      left: 0,
+      right: 0,
+      height: ITEM_HEIGHT,
+      borderTopWidth: 1,
+      borderBottomWidth: 1,
+      borderColor: colors.border,
+    },
+    colon: {
+      fontSize: 24,
+      fontWeight: "700",
+      color: colors.textPrimary,
+      marginBottom: 4,
     },
   });
 }
