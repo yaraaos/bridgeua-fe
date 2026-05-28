@@ -2,12 +2,16 @@ import ScreenHeader from "@/src/components/common/ScreenHeader/ScreenHeader";
 import { AppColors } from "@/src/constants/colors";
 import { radius } from "@/src/constants/radius";
 import { spacing } from "@/src/constants/spacing";
+import { useMyBusinessProfile } from "@/src/features/businesses/hooks/useBusiness";
+import { deleteBusiness } from "@/src/features/businesses/services/business.service";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { useAppStore } from "@/src/store/app.store";
 import { useAuthStore } from "@/src/store/auth.store";
 import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { useState } from "react";
 import {
+  Alert,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -90,6 +94,44 @@ export default function SettingsScreen() {
   const router = useRouter();
   const setThemeMode = useAppStore((s) => s.setThemeMode);
   const clearUser = useAuthStore((state) => state.clearUser);
+
+  const [isDeletingBusiness, setIsDeletingBusiness] = useState(false);
+  const { business } = useMyBusinessProfile();
+  const handleDeleteBusiness = () => {
+    if (!business?.id || isDeletingBusiness) return;
+
+    Alert.alert(
+      "Delete business?",
+      "This will permanently delete your business profile. This action cannot be undone.",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              setIsDeletingBusiness(true);
+              await deleteBusiness(business.id);
+              await clearUser();
+              router.replace("/auth/sign-in");
+            } catch (error) {
+              Alert.alert(
+                "Could not delete business",
+                error instanceof Error
+                  ? error.message
+                  : "Please try again later.",
+              );
+            } finally {
+              setIsDeletingBusiness(false);
+            }
+          },
+        },
+      ],
+    );
+  };
 
   return (
     <View style={styles.safeArea}>
@@ -220,6 +262,23 @@ export default function SettingsScreen() {
           <Text style={styles.logoutText}>Log Out</Text>
         </Pressable>
 
+        {business ? (
+          <Pressable
+            style={({ pressed }) => [
+              styles.deleteBusinessBtn,
+              pressed && styles.logoutPressed,
+              isDeletingBusiness && styles.disabledBtn,
+            ]}
+            onPress={handleDeleteBusiness}
+            disabled={isDeletingBusiness}
+          >
+            <Feather name="trash-2" size={18} color={colors.error} />
+            <Text style={styles.deleteBusinessText}>
+              {isDeletingBusiness ? "Deleting..." : "Delete Business"}
+            </Text>
+          </Pressable>
+        ) : null}
+
         <Text style={styles.version}>Version 2.4.7</Text>
       </ScrollView>
     </View>
@@ -326,6 +385,29 @@ function createStyles(colors: AppColors) {
       fontWeight: "600",
       color: colors.accentOrange,
     },
+
+    deleteBusinessBtn: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: spacing.sm,
+      marginHorizontal: spacing.lg,
+      marginBottom: spacing.md,
+      paddingVertical: 14,
+      borderRadius: radius.lg,
+      borderWidth: 1,
+      borderColor: colors.error,
+      backgroundColor: colors.surface,
+    },
+    deleteBusinessText: {
+      fontSize: 15,
+      fontWeight: "600",
+      color: colors.error,
+    },
+    disabledBtn: {
+      opacity: 0.6,
+    },
+
     version: {
       textAlign: "center",
       fontSize: 12,
