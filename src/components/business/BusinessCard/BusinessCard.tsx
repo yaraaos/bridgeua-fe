@@ -4,7 +4,6 @@ import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Image, Pressable, Text, View } from "react-native";
 
-import { useMyBusinessProfile } from "@/src/features/businesses/hooks/useBusiness";
 import { useBusinessReviewSummary } from "@/src/features/reviews/hooks/useBusinessReviewSummary";
 import { Business } from "@/src/types/business";
 import { createStyles } from "./BusinessCard.styles";
@@ -24,8 +23,6 @@ export default function BusinessCard({
 }: Props) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
-  const { business: myBusiness } = useMyBusinessProfile();
-  const isBusinessOwner = !!myBusiness?.id;
 
   const recommendedByPreview = business.recommendedByPreview ?? [];
   const recommendedByCount = business.recommendedByCount ?? 0;
@@ -98,7 +95,7 @@ export default function BusinessCard({
           )}
         </View>
 
-        {showFollowButton && !isBusinessOwner ? (
+        {showFollowButton ? (
           <View style={styles.actionSlot}>
             <FollowButton
               businessId={String(business.id)}
