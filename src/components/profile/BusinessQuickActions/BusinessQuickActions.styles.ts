@@ -66,6 +66,7 @@ export function createStyles(colors: AppColors) {
       fontWeight: "700",
       color: colors.textPrimary,
       textAlign: "center",
+      width: 72,
     },
 
     modalOverlay: {

@@ -58,7 +58,7 @@ export const QUICK_ACTIONS: QuickActionItem[] = [
   },
   {
     id: "view-recommended-by",
-    label: "Recommended by",
+    label: "Recomm-ed by",
     icon: "star-outline",
   },
 ];
