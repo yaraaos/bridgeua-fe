@@ -1,11 +1,14 @@
+import { Feather, Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Pressable, ScrollView, View } from "react-native";
-import { Feather, Ionicons } from "@expo/vector-icons";
 
 import AppAvatar from "@/src/components/ui/AppAvatar";
 import AppText from "@/src/components/ui/AppText/AppText";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
-import { useAccountStore, type AccountSummary } from "@/src/store/account.store";
+import {
+  useAccountStore,
+  type AccountSummary,
+} from "@/src/store/account.store";
 import { useNotificationsStore } from "@/src/store/notifications.store";
 
 import { createStyles } from "./AccountSwitcherSheet.styles";
@@ -43,6 +46,7 @@ export default function AccountSwitcherSheet({
 
       <View style={styles.header}>
         <AppText style={styles.headerTitle}>Switch account</AppText>
+
         <Pressable onPress={onClose} style={styles.closeButton} hitSlop={10}>
           <Feather name="x" size={18} color={colors.textMuted} />
         </Pressable>
@@ -55,6 +59,8 @@ export default function AccountSwitcherSheet({
       >
         {accounts.map((account) => {
           const isActive = account.id === activeAccountId;
+          const shouldShowHandle =
+            account.kind === "personal" && !!account.handle;
 
           return (
             <Pressable
@@ -65,7 +71,7 @@ export default function AccountSwitcherSheet({
               <AppAvatar
                 size="md"
                 name={account.displayName}
-                username={account.handle}
+                username={shouldShowHandle ? account.handle : undefined}
                 imageUrl={account.avatarUrl}
               />
 
@@ -74,9 +80,11 @@ export default function AccountSwitcherSheet({
                   {account.displayName}
                 </AppText>
 
-                <AppText style={styles.rowHandle} numberOfLines={1}>
-                  @{account.handle}
-                </AppText>
+                {shouldShowHandle ? (
+                  <AppText style={styles.rowHandle} numberOfLines={1}>
+                    @{account.handle}
+                  </AppText>
+                ) : null}
 
                 <AppText style={styles.rowSubtype}>
                   {account.kind === "personal"
@@ -123,7 +131,8 @@ export default function AccountSwitcherSheet({
           <View style={styles.addIcon}>
             <Ionicons name="add" size={22} color={colors.primaryGreen} />
           </View>
-          <AppText style={styles.addText}>Add business</AppText>
+
+          <AppText style={styles.addText}>Add account</AppText>
         </Pressable>
       </ScrollView>
     </View>
