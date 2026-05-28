@@ -14,6 +14,8 @@ export const lightColors = {
   textSecondary: "#5E665F",
   textMuted: "#98A09A",
   error: "#D9534F",
+  statTilePurple: "#EDE7FB",
+  statTileBlue: "#E0EEFC",
 };
 
 export const darkColors: AppColors = {
@@ -30,6 +32,8 @@ export const darkColors: AppColors = {
   textSecondary: "#8FA896",
   textMuted: "#5A7063",
   error: "#D9534F",
+  statTilePurple: "#2A2342",
+  statTileBlue: "#1C2D44",
 };
 
 // Backward-compatible default export (light palette)

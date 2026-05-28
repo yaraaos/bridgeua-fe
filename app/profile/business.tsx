@@ -308,18 +308,6 @@ export default function BusinessProfileScreen() {
             newClients={6}
             profileViews={92}
           />
-
-          <Pressable
-            style={styles.cardFooterLink}
-            onPress={() => router.push("/business/analytics")}
-          >
-            <AppText style={styles.cardFooterLinkText}>View analytics</AppText>
-            <Ionicons
-              name="chevron-forward"
-              size={16}
-              color={colors.textPrimary}
-            />
-          </Pressable>
         </View>
 
         <Pressable
