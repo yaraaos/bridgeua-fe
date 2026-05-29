@@ -3,13 +3,16 @@ import AppButton from "@/src/components/ui/AppButton/AppButton";
 import AppText from "@/src/components/ui/AppText/AppText";
 import type { AppColors } from "@/src/constants/colors";
 import { useMyBusinessProfile } from "@/src/features/businesses/hooks/useBusiness";
-import type { NewsDraft } from "@/src/features/news/types/news.types";
-import type { NewsCtaType } from "@/src/features/news/types/news.types";
+import type {
+  NewsCtaType,
+  NewsDraft,
+} from "@/src/features/news/types/news.types";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
-import React from "react";
+import React, { useRef, useState } from "react";
 import {
+  Alert,
   Image,
   Modal,
   Pressable,
@@ -31,9 +34,9 @@ type Props = {
 };
 
 const CTA_OPTIONS: Array<{ type: NewsCtaType; label: string }> = [
-  { type: "view_business", label: "View Business" },
   { type: "view_menu", label: "View Services" },
   { type: "view_address", label: "View Address" },
+  { type: "view_business", label: "View Business" },
 ];
 
 export default function OwnerNewsEditor({
@@ -43,18 +46,23 @@ export default function OwnerNewsEditor({
   onCancel,
   onSave,
   onPublish,
-  onUnpublish,
   onDelete,
 }: Props) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
   const { business } = useMyBusinessProfile();
 
-  const isExistingNews = !!draft.id;
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const scrollViewRef = useRef<ScrollView>(null);
+
   const isPublished = draft.status === "published";
 
   const updateDraft = (patch: Partial<NewsDraft>) => {
     onChangeDraft({ ...draft, ...patch });
+  };
+
+  const clearError = (key: string) => {
+    if (errors[key]) setErrors((e) => ({ ...e, [key]: "" }));
   };
 
   const pickImage = async () => {
@@ -66,6 +74,7 @@ export default function OwnerNewsEditor({
     });
     if (!result.canceled && result.assets[0]) {
       updateDraft({ imageUrl: result.assets[0].uri });
+      clearError("image");
     }
   };
 
@@ -73,6 +82,75 @@ export default function OwnerNewsEditor({
     !!draft.imageUrl &&
     (draft.imageUrl.startsWith("file://") ||
       draft.imageUrl.startsWith("http"));
+
+  const validate = () => {
+    const newErrors: Record<string, string> = {};
+    if (!draft.title?.trim()) newErrors.title = "Title is required";
+    if (!draft.imageUrl) newErrors.image = "Cover image is required";
+    if (!draft.content?.trim()) newErrors.content = "Content is required";
+    if (!draft.ctaLabel) newErrors.ctaLabel = "Please select a call to action";
+    return newErrors;
+  };
+
+  const handlePublish = () => {
+    const newErrors = validate();
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      scrollViewRef.current?.scrollTo({ y: 0, animated: true });
+      return;
+    }
+    setErrors({});
+    onPublish();
+  };
+
+  const handleDelete = () => {
+    Alert.alert("Delete news", "This cannot be undone.", [
+      { text: "Cancel", style: "cancel" },
+      { text: "Delete", style: "destructive", onPress: onDelete },
+    ]);
+  };
+
+  // Published news cannot be edited — only deleted
+  if (isPublished) {
+    return (
+      <Modal
+        visible={visible}
+        transparent={false}
+        animationType="slide"
+        onRequestClose={onCancel}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.header}>
+            <AppText style={styles.headerTitle}>Edit news</AppText>
+            <Pressable
+              style={styles.closeButton}
+              onPress={onCancel}
+              hitSlop={12}
+            >
+              <Ionicons name="close" size={22} color={colors.textSecondary} />
+            </Pressable>
+          </View>
+          <View style={styles.publishedNotice}>
+            <Ionicons
+              name="lock-closed-outline"
+              size={24}
+              color={colors.textMuted}
+            />
+            <AppText style={styles.publishedNoticeText}>
+              Published news cannot be edited.
+            </AppText>
+          </View>
+          {!!draft.id && !!onDelete && (
+            <View style={styles.footer}>
+              <Pressable style={styles.deleteButton} onPress={handleDelete}>
+                <AppText style={styles.deleteButtonText}>Delete news</AppText>
+              </Pressable>
+            </View>
+          )}
+        </View>
+      </Modal>
+    );
+  }
 
   return (
     <Modal
@@ -82,9 +160,10 @@ export default function OwnerNewsEditor({
       onRequestClose={onCancel}
     >
       <View style={styles.modalContainer}>
+        {/* ── Header ── */}
         <View style={styles.header}>
           <AppText style={styles.headerTitle}>
-            {isExistingNews ? "Edit news" : "Create news"}
+            {draft.id ? "Edit news" : "Create news"}
           </AppText>
           <Pressable style={styles.closeButton} onPress={onCancel} hitSlop={12}>
             <Ionicons name="close" size={22} color={colors.textSecondary} />
@@ -92,19 +171,33 @@ export default function OwnerNewsEditor({
         </View>
 
         <ScrollView
+          ref={scrollViewRef}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.scrollContent}
         >
-          <TextInput
-            placeholder="News title"
-            placeholderTextColor={colors.textMuted}
-            value={draft.title}
-            onChangeText={(t) => updateDraft({ title: t })}
-            style={styles.titleInput}
-            multiline
-          />
+          {/* ── Title ── */}
+          <View>
+            <TextInput
+              placeholder="News title"
+              placeholderTextColor={colors.textMuted}
+              value={draft.title}
+              onChangeText={(t) => {
+                updateDraft({ title: t });
+                clearError("title");
+              }}
+              style={[
+                styles.titleInput,
+                !!errors.title && styles.titleInputError,
+              ]}
+              multiline
+            />
+            {!!errors.title && (
+              <AppText style={styles.errorText}>{errors.title}</AppText>
+            )}
+          </View>
 
+          {/* ── Published date (static) ── */}
           <View style={styles.dateRow}>
             <Ionicons
               name="calendar-outline"
@@ -116,29 +209,46 @@ export default function OwnerNewsEditor({
             </AppText>
           </View>
 
-          {hasImage ? (
-            <View style={styles.imageWrapper}>
-              <Image
-                source={{ uri: draft.imageUrl }}
-                style={styles.heroImage}
-              />
-              <Pressable style={styles.imageEditOverlay} onPress={pickImage}>
-                <Ionicons name="camera-outline" size={20} color={colors.white} />
+          {/* ── Image picker ── */}
+          <View>
+            {hasImage ? (
+              <View style={styles.imageWrapper}>
+                <Image
+                  source={{ uri: draft.imageUrl }}
+                  style={styles.heroImage}
+                />
+                <Pressable style={styles.imageEditOverlay} onPress={pickImage}>
+                  <Ionicons
+                    name="camera-outline"
+                    size={20}
+                    color={colors.white}
+                  />
+                </Pressable>
+              </View>
+            ) : (
+              <Pressable
+                style={[
+                  styles.imagePlaceholder,
+                  !!errors.image && { borderColor: colors.error },
+                ]}
+                onPress={pickImage}
+              >
+                <Ionicons
+                  name="image-outline"
+                  size={32}
+                  color={colors.textMuted}
+                />
+                <AppText style={styles.imagePlaceholderText}>
+                  Add cover image
+                </AppText>
               </Pressable>
-            </View>
-          ) : (
-            <Pressable style={styles.imagePlaceholder} onPress={pickImage}>
-              <Ionicons
-                name="image-outline"
-                size={32}
-                color={colors.textMuted}
-              />
-              <AppText style={styles.imagePlaceholderText}>
-                Add cover image
-              </AppText>
-            </Pressable>
-          )}
+            )}
+            {!!errors.image && (
+              <AppText style={styles.errorText}>{errors.image}</AppText>
+            )}
+          </View>
 
+          {/* ── Business card (static) ── */}
           {!!business && (
             <View style={styles.businessCard}>
               <AppAvatar
@@ -149,71 +259,92 @@ export default function OwnerNewsEditor({
               <View style={styles.businessInfo}>
                 <AppText style={styles.businessName}>{business.name}</AppText>
                 <AppText style={styles.businessMeta}>
-                  {business.category} • {business.location}
+                  {business.category}
                 </AppText>
               </View>
             </View>
           )}
 
-          <View style={styles.sectionCard}>
-            <AppText style={styles.sectionTitle}>About</AppText>
-            <TextInput
-              placeholder="Write your news content here..."
-              placeholderTextColor={colors.textMuted}
-              value={draft.content}
-              onChangeText={(t) => updateDraft({ content: t })}
-              style={styles.textAreaInput}
-              multiline
-              textAlignVertical="top"
-            />
+          {/* ── Content card ── */}
+          <View>
+            <View
+              style={[
+                styles.sectionCard,
+                !!errors.content && { borderColor: colors.error },
+              ]}
+            >
+              <AppText style={styles.sectionTitle}>About</AppText>
+              <TextInput
+                placeholder="Write your news content..."
+                placeholderTextColor={colors.textMuted}
+                value={draft.content}
+                onChangeText={(t) => {
+                  updateDraft({ content: t });
+                  clearError("content");
+                }}
+                style={styles.textAreaInput}
+                multiline
+                textAlignVertical="top"
+              />
+            </View>
+            {!!errors.content && (
+              <AppText style={styles.errorText}>{errors.content}</AppText>
+            )}
           </View>
 
-          <View style={styles.ctaRow}>
-            {CTA_OPTIONS.map((opt) => (
-              <Pressable
-                key={opt.type}
-                style={[
-                  styles.ctaPill,
-                  draft.ctaType === opt.type && styles.ctaPillActive,
-                ]}
-                onPress={() =>
-                  updateDraft({ ctaType: opt.type, ctaLabel: opt.label })
-                }
-              >
-                <AppText
+          {/* ── CTA selector ── */}
+          <View>
+            <AppText style={styles.ctaSectionLabel}>Call to action</AppText>
+            <View style={styles.ctaRow}>
+              {CTA_OPTIONS.map((opt) => (
+                <Pressable
+                  key={opt.type}
                   style={[
-                    styles.ctaPillText,
-                    draft.ctaType === opt.type && styles.ctaPillTextActive,
+                    styles.ctaPill,
+                    draft.ctaType === opt.type && styles.ctaPillActive,
                   ]}
+                  onPress={() => {
+                    updateDraft({ ctaType: opt.type, ctaLabel: opt.label });
+                    clearError("ctaLabel");
+                  }}
                 >
-                  {opt.label}
-                </AppText>
-              </Pressable>
-            ))}
+                  <AppText
+                    style={[
+                      styles.ctaPillText,
+                      draft.ctaType === opt.type && styles.ctaPillTextActive,
+                    ]}
+                  >
+                    {opt.label}
+                  </AppText>
+                </Pressable>
+              ))}
+            </View>
+            {!!errors.ctaLabel && (
+              <AppText style={styles.errorText}>{errors.ctaLabel}</AppText>
+            )}
           </View>
         </ScrollView>
 
+        {/* ── Footer ── */}
         <View style={styles.footer}>
           <View style={styles.footerRow}>
             <View style={styles.footerButton}>
-              <AppButton title="Cancel" onPress={onCancel} variant="secondary" />
+              <AppButton title="Cancel" onPress={onCancel} variant="ghost" />
             </View>
             <View style={styles.footerButton}>
-              <AppButton
-                title="Save draft"
-                onPress={onSave}
-                variant="secondary"
-              />
+              <AppButton title="Save draft" onPress={onSave} variant="ghost" />
             </View>
           </View>
           <AppButton
-            title={isPublished ? "Unpublish" : "Publish"}
-            onPress={isPublished ? onUnpublish : onPublish}
+            title="Publish"
+            onPress={handlePublish}
             variant="primary"
           />
-          {isExistingNews && onDelete ? (
-            <AppButton title="Delete news" onPress={onDelete} variant="ghost" />
-          ) : null}
+          {!!draft.id && !!onDelete && (
+            <Pressable style={styles.deleteButton} onPress={handleDelete}>
+              <AppText style={styles.deleteButtonText}>Delete</AppText>
+            </Pressable>
+          )}
         </View>
       </View>
     </Modal>
@@ -235,7 +366,7 @@ function createStyles(colors: AppColors) {
       justifyContent: "space-between",
     },
     headerTitle: {
-      fontSize: 22,
+      fontSize: 18,
       fontWeight: "800",
       color: colors.textPrimary,
     },
@@ -251,12 +382,26 @@ function createStyles(colors: AppColors) {
       paddingBottom: 40,
       gap: 16,
     },
+
+    // Title
     titleInput: {
       fontSize: 28,
+      lineHeight: 34,
       fontWeight: "800",
       color: colors.textPrimary,
-      paddingVertical: 0,
+      paddingVertical: 4,
     },
+    titleInputError: {
+      borderBottomWidth: 1.5,
+      borderBottomColor: colors.error,
+    },
+    errorText: {
+      fontSize: 12,
+      color: colors.error,
+      marginTop: 4,
+    },
+
+    // Date row
     dateRow: {
       flexDirection: "row",
       alignItems: "center",
@@ -266,6 +411,8 @@ function createStyles(colors: AppColors) {
       fontSize: 13,
       color: colors.textMuted,
     },
+
+    // Image picker
     imageWrapper: {
       position: "relative",
     },
@@ -296,6 +443,8 @@ function createStyles(colors: AppColors) {
       fontSize: 14,
       color: colors.textMuted,
     },
+
+    // Business card
     businessCard: {
       flexDirection: "row",
       alignItems: "center",
@@ -319,12 +468,15 @@ function createStyles(colors: AppColors) {
       color: colors.textSecondary,
       marginTop: 2,
     },
+
+    // Section card
     sectionCard: {
       borderRadius: 16,
       borderWidth: 1,
       borderColor: colors.border,
       backgroundColor: colors.surface,
       padding: 16,
+      marginBottom: 16,
     },
     sectionTitle: {
       fontSize: 16,
@@ -337,6 +489,14 @@ function createStyles(colors: AppColors) {
       color: colors.textPrimary,
       minHeight: 120,
     },
+
+    // CTA
+    ctaSectionLabel: {
+      fontSize: 16,
+      fontWeight: "800",
+      color: colors.textPrimary,
+      marginBottom: 8,
+    },
     ctaRow: {
       flexDirection: "row",
       gap: 8,
@@ -344,11 +504,12 @@ function createStyles(colors: AppColors) {
     },
     ctaPill: {
       paddingHorizontal: 16,
-      paddingVertical: 8,
+      paddingVertical: 10,
       borderRadius: 999,
       borderWidth: 1,
       borderColor: colors.border,
       backgroundColor: colors.surface,
+      alignItems: "center",
     },
     ctaPillActive: {
       backgroundColor: colors.accentOrange,
@@ -362,6 +523,8 @@ function createStyles(colors: AppColors) {
     ctaPillTextActive: {
       color: colors.white,
     },
+
+    // Footer
     footer: {
       paddingHorizontal: 16,
       paddingTop: 12,
@@ -377,6 +540,31 @@ function createStyles(colors: AppColors) {
     },
     footerButton: {
       flex: 1,
+    },
+    deleteButton: {
+      height: 52,
+      borderRadius: 12,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    deleteButtonText: {
+      fontSize: 16,
+      fontWeight: "600",
+      color: colors.error,
+    },
+
+    // Published notice
+    publishedNotice: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 12,
+      paddingHorizontal: 32,
+    },
+    publishedNoticeText: {
+      fontSize: 15,
+      color: colors.textMuted,
+      textAlign: "center",
     },
   });
 }
