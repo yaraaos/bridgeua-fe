@@ -25,8 +25,8 @@ import { useFollowingStore } from "@/src/store";
 import { useAuthStore } from "@/src/store/auth.store";
 import { useFilterStore } from "@/src/store/filter.store";
 import { useFollowingLocationStore } from "@/src/store/following-location.store";
-import { router, useFocusEffect } from "expo-router";
-import React, { useCallback, useMemo, useState } from "react";
+import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Alert,
   FlatList,
@@ -88,6 +88,11 @@ export default function FollowingScreen() {
   const isGuest = useAuthStore((state) => state.isGuest);
   const user = useAuthStore((state) => state.user);
   const isBusinessAccount = user?.accountType === "business";
+
+  const params = useLocalSearchParams<{
+    tab?: string;
+    action?: string;
+  }>();
 
   const {
     label: selectedLocationLabel,
@@ -219,6 +224,26 @@ export default function FollowingScreen() {
     setDraftPromotion(createEmptyDraft());
     setIsEditorOpen(true);
   };
+
+  useEffect(() => {
+    if (params.tab === "promotion") {
+      setActiveTab("promotion");
+    }
+
+    if (params.tab === "news") {
+      setActiveTab("news");
+    }
+
+    if (params.action === "create" && params.tab === "promotion") {
+      handleOpenCreate();
+      router.replace("/(tabs)/following");
+    }
+
+    if (params.action === "create" && params.tab === "news") {
+      handleOpenCreateNews();
+      router.replace("/(tabs)/following");
+    }
+  }, [params.tab, params.action]);
 
   const handleOpenCreateNews = () => {
     setDraftNews(createEmptyNewsDraft());
