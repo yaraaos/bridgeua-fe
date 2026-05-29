@@ -12,6 +12,7 @@ export type NewsItem = {
   businessId: string;
 
   title: string;
+  subtitle?: string;
   description: string;
   content: string;
   imageUrl: string;
@@ -33,6 +34,7 @@ export type NewsDraft = {
   businessId: string;
 
   title: string;
+  subtitle?: string;
   description: string;
   content: string;
   imageUrl: string;

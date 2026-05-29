@@ -105,7 +105,7 @@ export default function OwnerNewsEditor({
   const handleDelete = () => {
     Alert.alert("Delete news", "This cannot be undone.", [
       { text: "Cancel", style: "cancel" },
-      { text: "Delete", style: "destructive", onPress: onDelete },
+      { text: "Delete", style: "destructive", onPress: () => onDelete?.() },
     ]);
   };
 
@@ -134,6 +134,9 @@ export default function OwnerNewsEditor({
             contentContainerStyle={styles.scrollContent}
           >
             <AppText style={styles.pvTitle}>{draft.title}</AppText>
+            {!!draft.subtitle && (
+              <AppText style={styles.pvSubtitle}>{draft.subtitle}</AppText>
+            )}
             <AppText style={styles.pvDate}>
               {draft.publishedAt
                 ? new Date(draft.publishedAt).toLocaleDateString()
@@ -223,6 +226,20 @@ export default function OwnerNewsEditor({
             {!!errors.title && (
               <AppText style={styles.errorText}>{errors.title}</AppText>
             )}
+          </View>
+
+          {/* ── Subtitle ── */}
+          <View>
+            <TextInput
+              placeholder="Short subtitle"
+              placeholderTextColor={colors.textMuted}
+              value={draft.subtitle ?? ''}
+              onChangeText={(t) => updateDraft({ subtitle: t })}
+              style={[
+                styles.subtitleInput,
+                !!errors.subtitle && styles.fieldError,
+              ]}
+            />
           </View>
 
           {/* ── Published date (static) ── */}
@@ -423,6 +440,15 @@ function createStyles(colors: AppColors) {
       borderBottomWidth: 1.5,
       borderBottomColor: colors.error,
     },
+    subtitleInput: {
+      fontSize: 15,
+      color: colors.textSecondary,
+      paddingVertical: 4,
+    },
+    fieldError: {
+      borderBottomWidth: 1.5,
+      borderBottomColor: colors.error,
+    },
     errorText: {
       fontSize: 12,
       color: colors.error,
@@ -605,6 +631,12 @@ function createStyles(colors: AppColors) {
       lineHeight: 34,
       fontWeight: "800",
       color: colors.textPrimary,
+    },
+    pvSubtitle: {
+      fontSize: 15,
+      lineHeight: 22,
+      color: colors.textSecondary,
+      marginTop: 4,
     },
     pvDate: {
       fontSize: 13,

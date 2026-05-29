@@ -178,6 +178,7 @@ export default function FollowingScreen() {
     id: "",
     businessId: businessId,
     title: "",
+    subtitle: "",
     description: "",
     content: "",
     imageUrl: "https://images.unsplash.com/photo-1495020689067-958852a7765e",
@@ -303,6 +304,7 @@ export default function FollowingScreen() {
       id: newsItem.id,
       businessId: newsItem.businessId,
       title: newsItem.title,
+      subtitle: newsItem.subtitle,
       description: newsItem.description,
       content: newsItem.content,
       imageUrl: newsItem.imageUrl,
@@ -417,10 +419,11 @@ export default function FollowingScreen() {
 
   const handleDeletePromotion = async () => {
     if (!draftPromotion?.id) return;
+    const idToDelete = draftPromotion.id;
     try {
-      await apiClient.delete(`/api/promotions/${draftPromotion.id}`);
+      await apiClient.delete(`/api/promotions/${idToDelete}`);
       setOwnerPromotions((prev) =>
-        prev.filter((item) => item.id !== draftPromotion.id),
+        prev.filter((item) => item.id !== idToDelete),
       );
       closeEditor();
     } catch {
@@ -526,9 +529,10 @@ export default function FollowingScreen() {
 
   const handleDeleteNews = async () => {
     if (!draftNews?.id) return;
+    const idToDelete = draftNews.id;
     try {
-      await apiClient.delete(`/api/news/${draftNews.id}`);
-      setOwnerNews((prev) => prev.filter((item) => item.id !== draftNews.id));
+      await apiClient.delete(`/api/news/${idToDelete}`);
+      setOwnerNews((prev) => prev.filter((item) => item.id !== idToDelete));
       closeNewsEditor();
     } catch {
       Alert.alert("Error", "Failed to delete news. Please try again.");
@@ -552,7 +556,10 @@ export default function FollowingScreen() {
       businessName: myBusiness?.name ?? "Your Business",
       businessCategory: myBusiness?.category ?? "",
       businessLocation: myBusiness?.location ?? "",
-      businessImage: myBusiness?.avatarUrl ?? promotion.imageUrl ?? "https://placehold.co/600x400",
+      businessImage:
+        myBusiness?.avatarUrl ??
+        promotion.imageUrl ??
+        "https://placehold.co/600x400",
       businessRating: 0,
       businessDistanceKm: 0,
       businessPriceLevel: undefined,
@@ -571,12 +578,15 @@ export default function FollowingScreen() {
       newsId: newsItem.id,
       status: newsItem.status,
       title: newsItem.title || "Untitled news",
-      description: newsItem.description || "No description added yet.",
+      description: newsItem.subtitle ?? newsItem.description ?? "No description added yet.",
       createdAt: newsItem.publishedAt || new Date().toISOString(),
       businessName: myBusiness?.name ?? "Your Business",
       businessCategory: myBusiness?.category ?? "",
       businessLocation: myBusiness?.location ?? "",
-      businessImage: myBusiness?.avatarUrl ?? newsItem.imageUrl ?? "https://placehold.co/600x400",
+      businessImage:
+        myBusiness?.avatarUrl ??
+        newsItem.imageUrl ??
+        "https://placehold.co/600x400",
       businessRating: 0,
       businessDistanceKm: 0,
       businessPriceLevel: undefined,
