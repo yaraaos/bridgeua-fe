@@ -76,6 +76,9 @@ export default function PromotionDetailScreen() {
         </AppText>
 
         <AppText style={styles.title}>{promotion.title}</AppText>
+        {!!promotion.subtitle && (
+          <AppText style={styles.subtitle}>{promotion.subtitle}</AppText>
+        )}
 
         <AppText style={styles.description}>{promotion.description}</AppText>
 
@@ -252,6 +255,12 @@ function createStyles(colors: AppColors) {
       fontSize: 15,
       lineHeight: 22,
       color: colors.textSecondary,
+    },
+    subtitle: {
+      fontSize: 15,
+      lineHeight: 22,
+      color: colors.textSecondary,
+      marginTop: 4,
     },
     heroImage: {
       width: "100%",
