@@ -311,7 +311,7 @@ export default function FollowingScreen() {
   };
 
   const handleSaveDraft = async () => {
-    if (!draftPromotion || !businessId) return;
+    if (!draftPromotion) return;
     try {
       const formData = new FormData();
       Object.entries(draftPromotion).forEach(([key, value]) => {
@@ -342,7 +342,7 @@ export default function FollowingScreen() {
   };
 
   const handlePublish = async () => {
-    if (!draftPromotion || !businessId) return;
+    if (!draftPromotion) return;
     try {
       const formData = new FormData();
       Object.entries(draftPromotion).forEach(([key, value]) => {
@@ -396,7 +396,7 @@ export default function FollowingScreen() {
   };
 
   const handleSaveNewsDraft = async () => {
-    if (!draftNews || !businessId) return;
+    if (!draftNews) return;
     try {
       const formData = new FormData();
       Object.entries(draftNews).forEach(([key, value]) => {
@@ -427,7 +427,7 @@ export default function FollowingScreen() {
   };
 
   const handlePublishNews = async () => {
-    if (!draftNews || !businessId) return;
+    if (!draftNews) return;
     try {
       const formData = new FormData();
       Object.entries(draftNews).forEach(([key, value]) => {
