@@ -938,6 +938,7 @@ export default function FollowingScreen() {
                       : undefined
                 }
                 isOwnerPromotion={item.isOwnerPromotion}
+                isOwnerNews={item.isOwnerNews}
                 onFeaturePromotion={
                   item.isOwnerPromotion
                     ? () => {
