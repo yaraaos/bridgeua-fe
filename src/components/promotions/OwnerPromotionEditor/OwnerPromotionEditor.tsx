@@ -112,7 +112,7 @@ export default function OwnerPromotionEditor({
     ]);
   };
 
-  // Published promotions cannot be edited — only deleted
+  // Published promotions — read-only detail view
   if (isPublished) {
     return (
       <Modal
@@ -122,35 +122,100 @@ export default function OwnerPromotionEditor({
         onRequestClose={onCancel}
       >
         <View style={styles.modalContainer}>
-          <View style={styles.header}>
-            <AppText style={styles.headerTitle}>Edit promotion</AppText>
-            <Pressable
-              style={styles.closeButton}
-              onPress={onCancel}
-              hitSlop={12}
-            >
-              <Ionicons name="close" size={22} color={colors.textSecondary} />
+          <View style={styles.pvHeader}>
+            <Pressable onPress={onCancel} hitSlop={12}>
+              <Ionicons
+                name="chevron-back"
+                size={24}
+                color={colors.textPrimary}
+              />
             </Pressable>
           </View>
-          <View style={styles.publishedNotice}>
-            <Ionicons
-              name="lock-closed-outline"
-              size={24}
-              color={colors.textMuted}
-            />
-            <AppText style={styles.publishedNoticeText}>
-              Published promotions cannot be edited.
-            </AppText>
-          </View>
-          {!!draft.id && !!onDelete && (
-            <View style={styles.footer}>
-              <Pressable style={styles.deleteButton} onPress={handleDelete}>
-                <AppText style={styles.deleteButtonText}>
-                  Delete promotion
-                </AppText>
-              </Pressable>
+
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={styles.scrollContent}
+          >
+            {!!draft.categoryLabel && (
+              <AppText style={styles.pvCategory}>
+                {draft.categoryLabel}
+              </AppText>
+            )}
+            <AppText style={styles.pvTitle}>{draft.title}</AppText>
+            {!!draft.subtitle && (
+              <AppText style={styles.pvSubtitle}>{draft.subtitle}</AppText>
+            )}
+            {!!draft.imageUrl && (
+              <Image
+                source={{ uri: draft.imageUrl }}
+                style={styles.heroImage}
+              />
+            )}
+            {!!business && (
+              <View style={styles.businessCard}>
+                <AppAvatar
+                  size="sm"
+                  imageUrl={business.avatarUrl}
+                  name={business.name}
+                />
+                <View style={styles.businessInfo}>
+                  <AppText style={styles.businessName}>
+                    {business.name}
+                  </AppText>
+                  <AppText style={styles.businessMeta}>
+                    {business.category}
+                  </AppText>
+                </View>
+              </View>
+            )}
+            {(!!draft.offerDetails?.length || !!formattedValidUntil) && (
+              <View style={styles.sectionCard}>
+                <AppText style={styles.sectionTitle}>Offer details</AppText>
+                {draft.offerDetails?.map((item, i) => (
+                  <AppText key={i} style={styles.pvOfferItem}>
+                    {item}
+                  </AppText>
+                ))}
+                {!!formattedValidUntil && (
+                  <View style={styles.pvValidityRow}>
+                    <Ionicons
+                      name="calendar-outline"
+                      size={15}
+                      color={colors.textMuted}
+                    />
+                    <AppText style={styles.pvValidityText}>
+                      Valid until {formattedValidUntil}
+                    </AppText>
+                  </View>
+                )}
+              </View>
+            )}
+            {!!draft.promoCode && (
+              <View style={styles.sectionCard}>
+                <AppText style={styles.sectionTitle}>Promo code</AppText>
+                <View style={styles.pvPromoCodeBox}>
+                  <AppText style={styles.pvPromoCodeText}>
+                    {draft.promoCode}
+                  </AppText>
+                </View>
+              </View>
+            )}
+            <View style={styles.pvActions}>
+              <AppButton
+                title={draft.ctaLabel ?? "Book Now"}
+                variant="primary"
+              />
+              <AppButton title="View Business" variant="secondary" />
             </View>
-          )}
+          </ScrollView>
+
+          <View style={styles.footer}>
+            <Pressable style={styles.deleteButton} onPress={handleDelete}>
+              <AppText style={styles.deleteButtonText}>
+                Delete promotion
+              </AppText>
+            </Pressable>
+          </View>
         </View>
       </Modal>
     );
@@ -752,7 +817,7 @@ function createStyles(colors: AppColors) {
       color: colors.error,
     },
 
-    // Published notice
+    // Published notice (unused — kept for compatibility)
     publishedNotice: {
       flex: 1,
       alignItems: "center",
@@ -764,6 +829,64 @@ function createStyles(colors: AppColors) {
       fontSize: 15,
       color: colors.textMuted,
       textAlign: "center",
+    },
+
+    // Published view
+    pvHeader: {
+      paddingHorizontal: 16,
+      paddingTop: 56,
+      paddingBottom: 12,
+    },
+    pvCategory: {
+      fontSize: 12,
+      fontWeight: "700",
+      color: colors.textMuted,
+    },
+    pvTitle: {
+      fontSize: 28,
+      lineHeight: 34,
+      fontWeight: "800",
+      color: colors.textPrimary,
+    },
+    pvSubtitle: {
+      fontSize: 15,
+      lineHeight: 22,
+      color: colors.textSecondary,
+    },
+    pvOfferItem: {
+      fontSize: 14,
+      lineHeight: 21,
+      color: colors.textSecondary,
+    },
+    pvValidityRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 8,
+      marginTop: 4,
+    },
+    pvValidityText: {
+      fontSize: 13,
+      fontWeight: "600",
+      color: colors.textMuted,
+    },
+    pvPromoCodeBox: {
+      alignSelf: "flex-start",
+      paddingHorizontal: 14,
+      paddingVertical: 10,
+      borderRadius: 12,
+      backgroundColor: colors.accentOrangeSoft,
+      borderWidth: 1,
+      borderColor: colors.accentOrange,
+      marginTop: 8,
+    },
+    pvPromoCodeText: {
+      fontSize: 18,
+      fontWeight: "900",
+      letterSpacing: 1,
+      color: colors.accentOrange,
+    },
+    pvActions: {
+      gap: 12,
     },
 
     // Date modal

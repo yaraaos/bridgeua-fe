@@ -33,7 +33,7 @@ type Props = {
   onDelete?: () => void;
 };
 
-const CTA_OPTIONS: Array<{ type: NewsCtaType; label: string }> = [
+const CTA_OPTIONS: { type: NewsCtaType; label: string }[] = [
   { type: "view_menu", label: "View Services" },
   { type: "view_address", label: "View Address" },
   { type: "view_business", label: "View Business" },
@@ -80,8 +80,7 @@ export default function OwnerNewsEditor({
 
   const hasImage =
     !!draft.imageUrl &&
-    (draft.imageUrl.startsWith("file://") ||
-      draft.imageUrl.startsWith("http"));
+    (draft.imageUrl.startsWith("file://") || draft.imageUrl.startsWith("http"));
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
@@ -110,7 +109,7 @@ export default function OwnerNewsEditor({
     ]);
   };
 
-  // Published news cannot be edited — only deleted
+  // Published news — read-only detail view
   if (isPublished) {
     return (
       <Modal
@@ -120,33 +119,62 @@ export default function OwnerNewsEditor({
         onRequestClose={onCancel}
       >
         <View style={styles.modalContainer}>
-          <View style={styles.header}>
-            <AppText style={styles.headerTitle}>Edit news</AppText>
-            <Pressable
-              style={styles.closeButton}
-              onPress={onCancel}
-              hitSlop={12}
-            >
-              <Ionicons name="close" size={22} color={colors.textSecondary} />
+          <View style={styles.pvHeader}>
+            <Pressable onPress={onCancel} hitSlop={12}>
+              <Ionicons
+                name="chevron-back"
+                size={24}
+                color={colors.textPrimary}
+              />
             </Pressable>
           </View>
-          <View style={styles.publishedNotice}>
-            <Ionicons
-              name="lock-closed-outline"
-              size={24}
-              color={colors.textMuted}
-            />
-            <AppText style={styles.publishedNoticeText}>
-              Published news cannot be edited.
+
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={styles.scrollContent}
+          >
+            <AppText style={styles.pvTitle}>{draft.title}</AppText>
+            <AppText style={styles.pvDate}>
+              {draft.publishedAt
+                ? new Date(draft.publishedAt).toLocaleDateString()
+                : new Date().toLocaleDateString()}
             </AppText>
-          </View>
-          {!!draft.id && !!onDelete && (
-            <View style={styles.footer}>
-              <Pressable style={styles.deleteButton} onPress={handleDelete}>
-                <AppText style={styles.deleteButtonText}>Delete news</AppText>
-              </Pressable>
+            {!!draft.imageUrl && (
+              <Image
+                source={{ uri: draft.imageUrl }}
+                style={styles.heroImage}
+              />
+            )}
+            {!!business && (
+              <View style={styles.businessCard}>
+                <AppAvatar
+                  size="sm"
+                  imageUrl={business.avatarUrl}
+                  name={business.name}
+                />
+                <View style={styles.businessInfo}>
+                  <AppText style={styles.businessName}>{business.name}</AppText>
+                  <AppText style={styles.businessMeta}>
+                    {business.category}
+                  </AppText>
+                </View>
+              </View>
+            )}
+            <View style={styles.sectionCard}>
+              <AppText style={styles.sectionTitle}>About</AppText>
+              <AppText style={styles.pvContent}>{draft.content}</AppText>
             </View>
-          )}
+            <View style={styles.pvActions}>
+              <AppButton title={draft.ctaLabel ?? "View"} variant="primary" />
+              <AppButton title="View Business" variant="secondary" />
+            </View>
+          </ScrollView>
+
+          <View style={styles.footer}>
+            <Pressable style={styles.deleteButton} onPress={handleDelete}>
+              <AppText style={styles.deleteButtonText}>Delete news</AppText>
+            </Pressable>
+          </View>
         </View>
       </Modal>
     );
@@ -553,7 +581,7 @@ function createStyles(colors: AppColors) {
       color: colors.error,
     },
 
-    // Published notice
+    // Published notice (unused — kept for compatibility)
     publishedNotice: {
       flex: 1,
       alignItems: "center",
@@ -565,6 +593,32 @@ function createStyles(colors: AppColors) {
       fontSize: 15,
       color: colors.textMuted,
       textAlign: "center",
+    },
+
+    // Published view
+    pvHeader: {
+      paddingHorizontal: 16,
+      paddingTop: 56,
+      paddingBottom: 12,
+    },
+    pvTitle: {
+      fontSize: 28,
+      lineHeight: 34,
+      fontWeight: "800",
+      color: colors.textPrimary,
+    },
+    pvDate: {
+      fontSize: 13,
+      fontWeight: "600",
+      color: colors.textMuted,
+    },
+    pvContent: {
+      fontSize: 15,
+      lineHeight: 23,
+      color: colors.textSecondary,
+    },
+    pvActions: {
+      gap: 12,
     },
   });
 }
