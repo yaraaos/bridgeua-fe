@@ -80,7 +80,9 @@ export default function PromotionDetailScreen() {
           <AppText style={styles.subtitle}>{promotion.subtitle}</AppText>
         )}
 
-        <AppText style={styles.description}>{promotion.description}</AppText>
+        {!!promotion.description && (
+          <AppText style={styles.description}>{promotion.description}</AppText>
+        )}
 
         <Image source={{ uri: promotion.imageUrl }} style={styles.heroImage} />
 
