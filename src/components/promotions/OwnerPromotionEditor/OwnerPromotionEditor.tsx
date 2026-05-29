@@ -79,8 +79,7 @@ export default function OwnerPromotionEditor({
 
   const hasImage =
     !!draft.imageUrl &&
-    (draft.imageUrl.startsWith("file://") ||
-      draft.imageUrl.startsWith("http"));
+    (draft.imageUrl.startsWith("file://") || draft.imageUrl.startsWith("http"));
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
@@ -137,9 +136,7 @@ export default function OwnerPromotionEditor({
             contentContainerStyle={styles.scrollContent}
           >
             {!!draft.categoryLabel && (
-              <AppText style={styles.pvCategory}>
-                {draft.categoryLabel}
-              </AppText>
+              <AppText style={styles.pvCategory}>{draft.categoryLabel}</AppText>
             )}
             <AppText style={styles.pvTitle}>{draft.title}</AppText>
             {!!draft.subtitle && (
@@ -159,9 +156,7 @@ export default function OwnerPromotionEditor({
                   name={business.name}
                 />
                 <View style={styles.businessInfo}>
-                  <AppText style={styles.businessName}>
-                    {business.name}
-                  </AppText>
+                  <AppText style={styles.businessName}>{business.name}</AppText>
                   <AppText style={styles.businessMeta}>
                     {business.category}
                   </AppText>
@@ -678,7 +673,6 @@ function createStyles(colors: AppColors) {
       borderColor: colors.border,
       backgroundColor: colors.surface,
       padding: 16,
-      marginBottom: 16,
     },
     sectionCardHeader: {
       flexDirection: "row",
