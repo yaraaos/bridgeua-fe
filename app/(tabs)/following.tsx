@@ -315,7 +315,8 @@ export default function FollowingScreen() {
     try {
       const formData = new FormData();
       Object.entries(draftPromotion).forEach(([key, value]) => {
-        if (value === undefined || value === null) return;
+        if (key === 'id' && !value) return;
+        if (value === undefined || value === null || value === '') return;
         if (Array.isArray(value)) {
           formData.append(key, JSON.stringify(value));
         } else if (typeof value === 'string' && value.startsWith('file://')) {
@@ -346,7 +347,8 @@ export default function FollowingScreen() {
     try {
       const formData = new FormData();
       Object.entries(draftPromotion).forEach(([key, value]) => {
-        if (value === undefined || value === null) return;
+        if (key === 'id' && !value) return;
+        if (value === undefined || value === null || value === '') return;
         if (Array.isArray(value)) {
           formData.append(key, JSON.stringify(value));
         } else if (typeof value === 'string' && value.startsWith('file://')) {
@@ -400,7 +402,8 @@ export default function FollowingScreen() {
     try {
       const formData = new FormData();
       Object.entries(draftNews).forEach(([key, value]) => {
-        if (value === undefined || value === null) return;
+        if (key === 'id' && !value) return;
+        if (value === undefined || value === null || value === '') return;
         if (Array.isArray(value)) {
           formData.append(key, JSON.stringify(value));
         } else if (typeof value === 'string' && value.startsWith('file://')) {
@@ -431,7 +434,8 @@ export default function FollowingScreen() {
     try {
       const formData = new FormData();
       Object.entries(draftNews).forEach(([key, value]) => {
-        if (value === undefined || value === null) return;
+        if (key === 'id' && !value) return;
+        if (value === undefined || value === null || value === '') return;
         if (Array.isArray(value)) {
           formData.append(key, JSON.stringify(value));
         } else if (typeof value === 'string' && value.startsWith('file://')) {
