@@ -19,10 +19,10 @@ import AppLoader from "@/src/components/ui/AppLoader/AppLoader";
 import AppRatingStars from "@/src/components/ui/AppRatingStars";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
 import AppText from "@/src/components/ui/AppText/AppText";
-import { useReviews } from "@/src/features/reviews/hooks/useReviews";
 import { AppColors } from "@/src/constants/colors";
 import { spacing } from "@/src/constants/spacing";
 import { useMyBusinessProfile } from "@/src/features/businesses/hooks/useBusiness";
+import { useReviews } from "@/src/features/reviews/hooks/useReviews";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { apiClient } from "@/src/services/api/client";
 import { API_BASE_URL } from "@/src/services/api/config";
@@ -72,7 +72,6 @@ const upcomingBookings: UpcomingBooking[] = [
     status: "pending",
   },
 ];
-
 
 export default function BusinessProfileScreen() {
   const { colors } = useAppTheme();
@@ -516,7 +515,7 @@ export default function BusinessProfileScreen() {
               onPress={() =>
                 router.push({
                   pathname: "/business/[id]",
-                  params: { id: account.id, tab: "reviews" },
+                  params: { id: String(publicBusinessId), tab: "reviews" },
                 })
               }
             >
@@ -552,11 +551,17 @@ export default function BusinessProfileScreen() {
 
                 <View style={styles.reviewActionsRow}>
                   <Pressable
-                    style={[styles.reviewActionButton, styles.reviewReplyButton]}
+                    style={[
+                      styles.reviewActionButton,
+                      styles.reviewReplyButton,
+                    ]}
                     onPress={() =>
                       router.push({
                         pathname: "/business/review/[reviewId]",
-                        params: { reviewId: latestReview.id },
+                        params: {
+                          reviewId: String(latestReview?.id ?? ""),
+                          reviewData: JSON.stringify(latestReview),
+                        },
                       })
                     }
                   >
@@ -564,7 +569,10 @@ export default function BusinessProfileScreen() {
                   </Pressable>
 
                   <Pressable
-                    style={[styles.reviewActionButton, styles.reviewReportButton]}
+                    style={[
+                      styles.reviewActionButton,
+                      styles.reviewReportButton,
+                    ]}
                   >
                     <AppText style={styles.reviewReportText}>Report</AppText>
                   </Pressable>
@@ -572,7 +580,13 @@ export default function BusinessProfileScreen() {
               </View>
             </View>
           ) : isReviewsLoading ? null : (
-            <AppText style={{ color: colors.textMuted, fontSize: 13, fontStyle: 'italic' }}>
+            <AppText
+              style={{
+                color: colors.textMuted,
+                fontSize: 13,
+                fontStyle: "italic",
+              }}
+            >
               No reviews yet.
             </AppText>
           )}
