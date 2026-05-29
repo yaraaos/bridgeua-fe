@@ -236,10 +236,12 @@ export default function FollowingScreen() {
 
     if (params.action === "create" && params.tab === "promotion") {
       handleOpenCreate();
+      router.replace("/(tabs)/following");
     }
 
     if (params.action === "create" && params.tab === "news") {
       handleOpenCreateNews();
+      router.replace("/(tabs)/following");
     }
   }, [params.tab, params.action]);
 
