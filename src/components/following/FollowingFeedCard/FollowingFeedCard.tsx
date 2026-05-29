@@ -29,6 +29,7 @@ export default function FollowingFeedCard({
   const accountType = useAuthStore((state) => state.user?.accountType);
   const isBusinessOwner = accountType === "business";
   const [showMenu, setShowMenu] = useState(false);
+  const [isFeatured, setIsFeatured] = useState(false);
 
   const extraStyles = useMemo(
     () =>
@@ -127,17 +128,19 @@ export default function FollowingFeedCard({
               <Pressable
                 style={extraStyles.inlineMenuRow}
                 onPress={() => {
+                  if (isFeatured) return;
                   setShowMenu(false);
+                  setIsFeatured(true);
                   onFeaturePromotion?.();
                 }}
               >
                 <Ionicons
-                  name="star-outline"
+                  name={isFeatured ? "star" : "star-outline"}
                   size={16}
-                  color={colors.primaryGreen}
+                  color={isFeatured ? colors.accentOrange : colors.primaryGreen}
                 />
-                <AppText style={extraStyles.inlineMenuText}>
-                  Add to home promo banner
+                <AppText style={[extraStyles.inlineMenuText, isFeatured && { color: colors.textMuted }]}>
+                  {isFeatured ? "Promo added to home banner" : "Add to home promo banner"}
                 </AppText>
               </Pressable>
             </View>
