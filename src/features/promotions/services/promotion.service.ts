@@ -40,5 +40,7 @@ export const getBannerPromotion = async (
 };
 
 export const getBannerPromotions = async (): Promise<Promotion[]> => {
-  return getActivePromotions();
+  const res = await apiClient.get<{ data: any[]; featured: any[] }>("/api/promotions/public");
+  const featured = res.data.featured ?? [];
+  return featured.map(normalizePromotion);
 };
