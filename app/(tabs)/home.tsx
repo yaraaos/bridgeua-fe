@@ -28,8 +28,9 @@ import { useDiscoveryLocationStore } from "@/src/store/discovery-location";
 import { useFilterStore } from "@/src/store/filter.store";
 import { Feather } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { router } from "expo-router";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { router, useFocusEffect } from "expo-router";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { PROMO_CATEGORY_LABEL } from "@/src/constants/categories";
 import {
   Alert,
   Animated,
@@ -98,7 +99,11 @@ export default function HomeScreen() {
   }, [currentUser, activeAccount]);
 
   const { categories } = useCategories();
-  const categoryNames = ["All Categories", ...categories.map((c) => c.name)];
+  const categoryNames = [
+    "All Categories",
+    PROMO_CATEGORY_LABEL,
+    ...categories.map((c) => c.name),
+  ];
 
   useEffect(() => {
     const loadRecentSearches = async () => {
@@ -114,17 +119,43 @@ export default function HomeScreen() {
 
   const normalizedSearchQuery = searchQuery.trim().toLowerCase();
 
+  const {
+    promotion,
+    isVisible: isPromotionVisible,
+    closePromotion,
+  } = useBannerPromotion();
+
+  const { promotions: bannerPromotions, isVisible: isBannerVisible } =
+    useBannerPromotions();
+
+  const businessIdsWithPromo = useMemo(
+    () => bannerPromotions.map((p) => String(p.businessId)),
+    [bannerPromotions],
+  );
+
   const { filteredBusinesses: discoveryFilteredBusinesses } = useDiscoveryFeed({
     businesses,
-    category: "",
+    // category is normally applied server-side; only forward the Promo
+    // pseudo-category so it can be filtered client-side here.
+    category: category === PROMO_CATEGORY_LABEL ? PROMO_CATEGORY_LABEL : "",
     sort: sort === "distance" ? "distance" : "relevance",
     cuisines,
     rating: "",
     distance,
     customDistance,
+    businessIdsWithPromo,
   });
 
   const selectedHomeCategory = category || "All Categories";
+
+  // Reset Promo filter when navigating from Promo → Home (per BU-196 sync rules).
+  useFocusEffect(
+    useCallback(() => {
+      if (category === PROMO_CATEGORY_LABEL) {
+        useFilterStore.getState().setCategory("discovery", "");
+      }
+    }, [category]),
+  );
 
   const filteredBusinesses = normalizedSearchQuery
     ? discoveryFilteredBusinesses.filter((business) =>
@@ -141,15 +172,6 @@ export default function HomeScreen() {
   const visibleBusinesses = isGuest
     ? prioritizedBusinesses.slice(0, 10)
     : prioritizedBusinesses;
-
-  const {
-    promotion,
-    isVisible: isPromotionVisible,
-    closePromotion,
-  } = useBannerPromotion();
-
-  const { promotions: bannerPromotions, isVisible: isBannerVisible } =
-    useBannerPromotions();
 
   const saveRecentSearch = async (value: string) => {
     const trimmed = value.trim();

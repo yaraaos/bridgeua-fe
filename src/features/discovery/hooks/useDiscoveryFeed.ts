@@ -1,4 +1,5 @@
 import type { Business } from "@/src/features/businesses";
+import { PROMO_CATEGORY_LABEL } from "@/src/constants/categories";
 import type {
   DistanceOption,
   RatingOption,
@@ -23,6 +24,7 @@ type UseDiscoveryFeedParams = {
   rating: RatingOption;
   distance: DistanceOption;
   customDistance: string;
+  businessIdsWithPromo?: string[];
 };
 
 export function useDiscoveryFeed({
@@ -33,7 +35,12 @@ export function useDiscoveryFeed({
                                    rating,
                                    distance,
                                    customDistance,
+                                   businessIdsWithPromo,
                                  }: UseDiscoveryFeedParams) {
+  const promoIdSet =
+    category === PROMO_CATEGORY_LABEL && businessIdsWithPromo
+      ? new Set(businessIdsWithPromo.map(String))
+      : null;
   const selectedDistanceKm =
     distance === "custom" ? Number(customDistance || 0) : distanceMap[distance];
 
@@ -68,19 +75,23 @@ export function useDiscoveryFeed({
 
       const categoryMatch =
         !category ||
-        (category === "Food"
-          ? cuisines.length > 0
-            ? cuisines.includes(businessCategory)
-            : [
-              "American",
-              "Chinese",
-              "Italian",
-              "Japanese",
-              "Mediterranean",
-              "Mexican",
-              "Vegan",
-            ].includes(businessCategory)
-          : businessCategory === category);
+        (category === PROMO_CATEGORY_LABEL
+          ? promoIdSet
+            ? promoIdSet.has(String(business.id))
+            : true
+          : category === "Food"
+            ? cuisines.length > 0
+              ? cuisines.includes(businessCategory)
+              : [
+                "American",
+                "Chinese",
+                "Italian",
+                "Japanese",
+                "Mediterranean",
+                "Mexican",
+                "Vegan",
+              ].includes(businessCategory)
+            : businessCategory === category);
 
       const ratingMatch =
         selectedRatingValue === null || businessRating >= selectedRatingValue;

@@ -26,6 +26,7 @@ import { apiClient } from "@/src/services/api/client";
 import { API_BASE_URL } from "@/src/services/api/config";
 import { useFollowingStore } from "@/src/store";
 import { useAuthStore } from "@/src/store/auth.store";
+import { PROMO_CATEGORY_LABEL } from "@/src/constants/categories";
 import { useFilterStore } from "@/src/store/filter.store";
 import { useFollowingLocationStore } from "@/src/store/following-location.store";
 import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
@@ -680,6 +681,15 @@ export default function FollowingScreen() {
     useCallback(() => {
       syncVisibleBusinessIds();
     }, [syncVisibleBusinessIds]),
+  );
+
+  // Per BU-196 sync rules: opening the Promo tab always sets the shared
+  // discovery filter to Promo, so navigating Promo → Map (or Promo → Home,
+  // before Home's own reset effect runs) keeps the Promo filter selected.
+  useFocusEffect(
+    useCallback(() => {
+      useFilterStore.getState().setCategory("discovery", PROMO_CATEGORY_LABEL);
+    }, []),
   );
 
   useFocusEffect(
