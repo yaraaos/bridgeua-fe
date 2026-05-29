@@ -37,6 +37,7 @@ import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
+  Alert,
   Animated,
   ScrollView,
   Share,
@@ -242,7 +243,10 @@ export default function BusinessDetailsScreen() {
         rightSlot={
           business.ownerId &&
           business.ownerId === currentUserId ? null : isBusinessOwner ? (
-            <RecommendButton businessId={business.id} onRecommendChange={() => void refetch()} />
+            <RecommendButton
+              businessId={business.id}
+              onRecommendChange={() => void refetch()}
+            />
           ) : (
             <FollowButton businessId={business.id} size="icon" variant="soft" />
           )
@@ -382,7 +386,15 @@ export default function BusinessDetailsScreen() {
                       animated: true,
                     });
                   }}
-                  onPressWriteReview={(rating) =>
+                  onPressWriteReview={(rating) => {
+                    if (isBusinessOwner) {
+                      Alert.alert(
+                        "Not available",
+                        "Business profiles cannot leave reviews.",
+                        [{ text: "OK" }],
+                      );
+                      return;
+                    }
                     requireAuth(
                       () => {
                         router.push({
@@ -396,8 +408,8 @@ export default function BusinessDetailsScreen() {
                       {
                         action: "review",
                       },
-                    )
-                  }
+                    );
+                  }}
                 />
               </View>
             </>
