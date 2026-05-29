@@ -433,6 +433,21 @@ export default function OwnerPromotionEditor({
                   placeholderTextColor={colors.accentOrange}
                 />
               </View>
+              <View style={styles.discountRow}>
+                <AppText style={styles.discountLabel}>Discount</AppText>
+                <View style={styles.discountPill}>
+                  <TextInput
+                    value={draft.discountLabel ?? ''}
+                    onChangeText={(t) => updateDraft({ discountLabel: t })}
+                    style={styles.discountInput}
+                    keyboardType="numeric"
+                    placeholder="0"
+                    placeholderTextColor={colors.textMuted}
+                    maxLength={3}
+                  />
+                  <AppText style={styles.discountPercent}>%</AppText>
+                </View>
+              </View>
             </View>
           )}
 
@@ -733,6 +748,40 @@ function createStyles(colors: AppColors) {
       color: colors.accentOrange,
       paddingVertical: 0,
       minWidth: 80,
+    },
+    discountRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      marginTop: 12,
+    },
+    discountLabel: {
+      fontSize: 14,
+      fontWeight: '700',
+      color: colors.textPrimary,
+    },
+    discountPill: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      borderRadius: 999,
+      borderWidth: 1.5,
+      borderColor: colors.accentOrange,
+      paddingHorizontal: 14,
+      paddingVertical: 6,
+      gap: 4,
+    },
+    discountInput: {
+      fontSize: 16,
+      fontWeight: '800',
+      color: colors.accentOrange,
+      minWidth: 36,
+      paddingVertical: 0,
+      textAlign: 'center',
+    },
+    discountPercent: {
+      fontSize: 16,
+      fontWeight: '800',
+      color: colors.accentOrange,
     },
 
     // CTA
