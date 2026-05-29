@@ -18,12 +18,14 @@ type Props = {
   businessId: string | number;
   style?: StyleProp<ViewStyle>;
   onRecommendChange?: () => void;
+  businessName?: string;
 };
 
 export default function RecommendButton({
   businessId,
   style,
   onRecommendChange,
+  businessName,
 }: Props) {
   const hasFetched = useRef(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -98,7 +100,7 @@ export default function RecommendButton({
         <View style={styles.modalOverlay}>
           <View style={styles.modalCard}>
             <AppText style={styles.modalTitle}>
-              Recommend this business?
+              Recommend {businessName ?? 'this business'}?
             </AppText>
             <AppText style={styles.modalBody}>
               Your recommendation will be publicly visible and shown on this
