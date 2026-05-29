@@ -10,7 +10,7 @@ import type {
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Alert,
   Image,
@@ -31,6 +31,7 @@ type Props = {
   onPublish: () => void;
   onUnpublish: () => void;
   onDelete?: () => void;
+  isPublishing?: boolean;
 };
 
 const CTA_OPTIONS: { type: NewsCtaType; label: string }[] = [
@@ -47,6 +48,7 @@ export default function OwnerNewsEditor({
   onSave,
   onPublish,
   onDelete,
+  isPublishing,
 }: Props) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
@@ -54,6 +56,12 @@ export default function OwnerNewsEditor({
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const scrollViewRef = useRef<ScrollView>(null);
+
+  useEffect(() => {
+    if (visible) {
+      setErrors({});
+    }
+  }, [visible]);
 
   const isPublished = draft.status === "published";
 
@@ -85,6 +93,7 @@ export default function OwnerNewsEditor({
   const validate = () => {
     const newErrors: Record<string, string> = {};
     if (!draft.title?.trim()) newErrors.title = "Title is required";
+    if (!draft.subtitle?.trim()) newErrors.subtitle = "Subtitle is required";
     if (!draft.imageUrl) newErrors.image = "Cover image is required";
     if (!draft.content?.trim()) newErrors.content = "Content is required";
     if (!draft.ctaLabel) newErrors.ctaLabel = "Please select a call to action";
@@ -105,7 +114,7 @@ export default function OwnerNewsEditor({
   const handleDelete = () => {
     Alert.alert("Delete news", "This cannot be undone.", [
       { text: "Cancel", style: "cancel" },
-      { text: "Delete", style: "destructive", onPress: onDelete },
+      { text: "Delete", style: "destructive", onPress: () => onDelete?.() },
     ]);
   };
 
@@ -134,6 +143,9 @@ export default function OwnerNewsEditor({
             contentContainerStyle={styles.scrollContent}
           >
             <AppText style={styles.pvTitle}>{draft.title}</AppText>
+            {!!draft.subtitle && (
+              <AppText style={styles.pvSubtitle}>{draft.subtitle}</AppText>
+            )}
             <AppText style={styles.pvDate}>
               {draft.publishedAt
                 ? new Date(draft.publishedAt).toLocaleDateString()
@@ -222,6 +234,23 @@ export default function OwnerNewsEditor({
             />
             {!!errors.title && (
               <AppText style={styles.errorText}>{errors.title}</AppText>
+            )}
+          </View>
+
+          {/* ── Subtitle ── */}
+          <View>
+            <TextInput
+              placeholder="Short subtitle"
+              placeholderTextColor={colors.textMuted}
+              value={draft.subtitle ?? ''}
+              onChangeText={(t) => updateDraft({ subtitle: t })}
+              style={[
+                styles.subtitleInput,
+                !!errors.subtitle && styles.fieldError,
+              ]}
+            />
+            {!!errors.subtitle && (
+              <AppText style={styles.errorText}>{errors.subtitle}</AppText>
             )}
           </View>
 
@@ -364,9 +393,10 @@ export default function OwnerNewsEditor({
             </View>
           </View>
           <AppButton
-            title="Publish"
+            title={isPublishing ? "Publishing..." : "Publish"}
             onPress={handlePublish}
             variant="primary"
+            disabled={isPublishing}
           />
           {!!draft.id && !!onDelete && (
             <Pressable style={styles.deleteButton} onPress={handleDelete}>
@@ -420,6 +450,15 @@ function createStyles(colors: AppColors) {
       paddingVertical: 4,
     },
     titleInputError: {
+      borderBottomWidth: 1.5,
+      borderBottomColor: colors.error,
+    },
+    subtitleInput: {
+      fontSize: 15,
+      color: colors.textSecondary,
+      paddingVertical: 4,
+    },
+    fieldError: {
       borderBottomWidth: 1.5,
       borderBottomColor: colors.error,
     },
@@ -605,6 +644,12 @@ function createStyles(colors: AppColors) {
       lineHeight: 34,
       fontWeight: "800",
       color: colors.textPrimary,
+    },
+    pvSubtitle: {
+      fontSize: 15,
+      lineHeight: 22,
+      color: colors.textSecondary,
+      marginTop: 4,
     },
     pvDate: {
       fontSize: 13,

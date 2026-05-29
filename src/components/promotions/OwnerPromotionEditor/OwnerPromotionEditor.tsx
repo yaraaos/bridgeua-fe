@@ -6,6 +6,7 @@ import { useMyBusinessProfile } from "@/src/features/businesses/hooks/useBusines
 import type { PromotionDraft } from "@/src/features/promotions/types/promotion.types";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { Ionicons } from "@expo/vector-icons";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import * as ImagePicker from "expo-image-picker";
 import React, { useRef, useState } from "react";
 import {
@@ -28,6 +29,7 @@ type Props = {
   onPublish: () => void;
   onUnpublish: () => void;
   onDelete?: () => void;
+  isPublishing?: boolean;
 };
 
 export default function OwnerPromotionEditor({
@@ -38,6 +40,7 @@ export default function OwnerPromotionEditor({
   onSave,
   onPublish,
   onDelete,
+  isPublishing,
 }: Props) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
@@ -45,7 +48,7 @@ export default function OwnerPromotionEditor({
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [showDateModal, setShowDateModal] = useState(false);
-  const [dateInput, setDateInput] = useState(draft.expiresAt ?? "");
+  const [tempDate, setTempDate] = useState(new Date());
   const [promoCodeVisible, setPromoCodeVisible] = useState(!!draft.promoCode);
   const scrollViewRef = useRef<ScrollView>(null);
 
@@ -361,7 +364,12 @@ export default function OwnerPromotionEditor({
               {/* Valid until row */}
               <Pressable
                 style={styles.validityRow}
-                onPress={() => setShowDateModal(true)}
+                onPress={() => {
+                  setTempDate(
+                    draft.expiresAt ? new Date(draft.expiresAt) : new Date(),
+                  );
+                  setShowDateModal(true);
+                }}
               >
                 <Ionicons
                   name="calendar-outline"
@@ -431,6 +439,21 @@ export default function OwnerPromotionEditor({
                   placeholderTextColor={colors.accentOrange}
                 />
               </View>
+              <View style={styles.discountRow}>
+                <AppText style={styles.discountLabel}>Discount</AppText>
+                <View style={styles.discountPill}>
+                  <TextInput
+                    value={draft.discountLabel ?? ""}
+                    onChangeText={(t) => updateDraft({ discountLabel: t })}
+                    style={styles.discountInput}
+                    keyboardType="numeric"
+                    placeholder="0"
+                    placeholderTextColor={colors.textMuted}
+                    maxLength={3}
+                  />
+                  <AppText style={styles.discountPercent}>%</AppText>
+                </View>
+              </View>
             </View>
           )}
 
@@ -488,6 +511,36 @@ export default function OwnerPromotionEditor({
           </View>
         </ScrollView>
 
+        {showDateModal && (
+          <View style={styles.datePickerContainer}>
+            <View style={styles.datePickerHeader}>
+              <Pressable onPress={() => setShowDateModal(false)} hitSlop={12}>
+                <AppText style={styles.datePickerCancel}>Cancel</AppText>
+              </Pressable>
+              <Pressable
+                onPress={() => {
+                  const iso = tempDate.toISOString().split("T")[0];
+                  updateDraft({ expiresAt: iso });
+                  clearError("expiresAt");
+                  setShowDateModal(false);
+                }}
+                hitSlop={12}
+              >
+                <AppText style={styles.datePickerDone}>Done</AppText>
+              </Pressable>
+            </View>
+            <DateTimePicker
+              value={tempDate}
+              mode="date"
+              display="spinner"
+              minimumDate={new Date()}
+              onChange={(_event, selectedDate) => {
+                if (selectedDate) setTempDate(selectedDate);
+              }}
+            />
+          </View>
+        )}
+
         {/* ── Footer ── */}
         <View style={styles.footer}>
           <View style={styles.footerRow}>
@@ -499,9 +552,10 @@ export default function OwnerPromotionEditor({
             </View>
           </View>
           <AppButton
-            title="Publish"
+            title={isPublishing ? "Publishing..." : "Publish"}
             onPress={handlePublish}
             variant="primary"
+            disabled={isPublishing}
           />
           {!!draft.id && !!onDelete && (
             <Pressable style={styles.deleteButton} onPress={handleDelete}>
@@ -510,39 +564,6 @@ export default function OwnerPromotionEditor({
           )}
         </View>
       </View>
-
-      {/* ── Date picker modal ── */}
-      <Modal
-        visible={showDateModal}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setShowDateModal(false)}
-      >
-        <Pressable
-          style={styles.dateOverlay}
-          onPress={() => setShowDateModal(false)}
-        >
-          <Pressable style={styles.dateCard} onPress={() => {}}>
-            <AppText style={styles.dateCardTitle}>Set expiry date</AppText>
-            <TextInput
-              placeholder="YYYY-MM-DD"
-              placeholderTextColor={colors.textMuted}
-              value={dateInput}
-              onChangeText={setDateInput}
-              style={styles.dateInput}
-            />
-            <AppButton
-              title="Confirm"
-              variant="primary"
-              onPress={() => {
-                updateDraft({ expiresAt: dateInput });
-                clearError("expiresAt");
-                setShowDateModal(false);
-              }}
-            />
-          </Pressable>
-        </Pressable>
-      </Modal>
     </Modal>
   );
 }
@@ -731,6 +752,68 @@ function createStyles(colors: AppColors) {
       paddingVertical: 0,
       minWidth: 80,
     },
+    discountRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      marginTop: 12,
+    },
+    discountLabel: {
+      fontSize: 14,
+      fontWeight: "700",
+      color: colors.textPrimary,
+    },
+    discountPill: {
+      flexDirection: "row",
+      alignItems: "center",
+      borderRadius: 999,
+      borderWidth: 1.5,
+      borderColor: colors.accentOrange,
+      paddingHorizontal: 14,
+      paddingVertical: 6,
+      gap: 4,
+    },
+    discountInput: {
+      fontSize: 16,
+      fontWeight: "800",
+      color: colors.accentOrange,
+      minWidth: 36,
+      paddingVertical: 0,
+      textAlign: "center",
+    },
+    discountPercent: {
+      fontSize: 16,
+      fontWeight: "800",
+      color: colors.accentOrange,
+    },
+
+    // Date picker
+    datePickerContainer: {
+      backgroundColor: colors.surface,
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
+      alignItems: "center",
+    },
+    datePickerHeader: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      paddingHorizontal: 16,
+      paddingVertical: 12,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+      width: "100%",
+    },
+    datePickerCancel: {
+      fontSize: 16,
+      fontWeight: "600",
+      color: colors.textSecondary,
+    },
+    datePickerDone: {
+      fontSize: 16,
+      fontWeight: "700",
+      color: colors.primaryGreen,
+    },
 
     // CTA
     ctaSectionLabel: {
@@ -881,35 +964,6 @@ function createStyles(colors: AppColors) {
     },
     pvActions: {
       gap: 12,
-    },
-
-    // Date modal
-    dateOverlay: {
-      flex: 1,
-      backgroundColor: "rgba(0,0,0,0.5)",
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    dateCard: {
-      backgroundColor: colors.background,
-      borderRadius: 16,
-      padding: 24,
-      width: "85%",
-      gap: 16,
-    },
-    dateCardTitle: {
-      fontSize: 18,
-      fontWeight: "800",
-      color: colors.textPrimary,
-    },
-    dateInput: {
-      borderWidth: 1,
-      borderColor: colors.border,
-      borderRadius: 12,
-      paddingHorizontal: 12,
-      paddingVertical: 10,
-      fontSize: 16,
-      color: colors.textPrimary,
     },
   });
 }

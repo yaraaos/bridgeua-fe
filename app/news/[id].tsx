@@ -74,6 +74,9 @@ export default function NewsDetailScreen() {
         </AppText>
 
         <AppText style={styles.title}>{newsItem.title}</AppText>
+        {!!newsItem.subtitle && (
+          <AppText style={styles.subtitle}>{newsItem.subtitle}</AppText>
+        )}
 
         <AppText style={styles.time}>
           {new Date(newsItem.publishedAt).toLocaleDateString()}
@@ -172,6 +175,12 @@ function createStyles(colors: AppColors) {
       lineHeight: 34,
       fontWeight: "900",
       color: colors.textPrimary,
+    },
+    subtitle: {
+      fontSize: 15,
+      lineHeight: 22,
+      color: colors.textSecondary,
+      marginTop: 4,
     },
     time: {
       fontSize: 13,

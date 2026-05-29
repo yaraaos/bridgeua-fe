@@ -83,7 +83,7 @@ export const useFollowingFeed = ({
           type: "news" as const,
           newsId: String(n.id),
           title: n.title,
-          description: n.description ?? "",
+          description: n.subtitle ?? n.description ?? "",
           createdAt: n.publishedAt ?? n.createdAt ?? new Date().toISOString(),
           businessName: n.business?.name ?? "",
           businessCategory:
