@@ -37,7 +37,10 @@ export default function RecommendedByCard({
 
         <View style={styles.metaRow}>
           <Ionicons name="star" size={12} color={colors.accentOrange} />
-          <Text style={styles.meta} numberOfLines={1}>
+          <Text style={styles.meta}>
+            {recommendation.businessRating
+              ? `${recommendation.businessRating.toFixed(1)} • `
+              : ""}
             {recommendation.businessCategory}
             {recommendation.businessLocation
               ? ` • ${recommendation.businessLocation}`
