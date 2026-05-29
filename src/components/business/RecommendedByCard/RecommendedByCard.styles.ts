@@ -23,8 +23,13 @@ export function createStyles(colors: AppColors) {
       fontWeight: "700",
       color: colors.textPrimary,
     },
+    metaRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 4,
+      marginTop: 2,
+    },
     meta: {
-      marginTop: spacing.xs,
       fontSize: 13,
       color: colors.textSecondary,
     },
