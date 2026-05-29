@@ -1,5 +1,3 @@
-import { apiClient } from "@/src/services/api/client";
-import { API_BASE_URL } from "@/src/services/api/config";
 import { AccountTypeSwitch } from "@/src/components/auth";
 import ScreenHeader from "@/src/components/common/ScreenHeader/ScreenHeader";
 import FollowingFeedCard from "@/src/components/following/FollowingFeedCard";
@@ -24,6 +22,8 @@ import type {
   PromotionDraft,
 } from "@/src/features/promotions/types/promotion.types";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { apiClient } from "@/src/services/api/client";
+import { API_BASE_URL } from "@/src/services/api/config";
 import { useFollowingStore } from "@/src/store";
 import { useAuthStore } from "@/src/store/auth.store";
 import { useFilterStore } from "@/src/store/filter.store";
@@ -276,8 +276,14 @@ export default function FollowingScreen() {
       discountLabel: promotion.discountLabel,
       redemptionType: promotion.redemptionType,
       redemptionInstructions: promotion.redemptionInstructions,
-      offerDetails: promotion.offerDetails,
-      terms: promotion.terms,
+      offerDetails:
+        typeof promotion.offerDetails === "string"
+          ? JSON.parse(promotion.offerDetails)
+          : (promotion.offerDetails ?? []),
+      terms:
+        typeof promotion.terms === "string"
+          ? JSON.parse(promotion.terms)
+          : (promotion.terms ?? []),
       ctaType: promotion.ctaType,
       ctaLabel: promotion.ctaLabel,
       status: promotion.status ?? "draft",
@@ -315,12 +321,16 @@ export default function FollowingScreen() {
     try {
       const formData = new FormData();
       Object.entries(draftPromotion).forEach(([key, value]) => {
-        if (key === 'id' && !value) return;
-        if (value === undefined || value === null || value === '') return;
+        if (key === "id" && !value) return;
+        if (value === undefined || value === null || value === "") return;
         if (Array.isArray(value)) {
           formData.append(key, JSON.stringify(value));
-        } else if (typeof value === 'string' && value.startsWith('file://')) {
-          formData.append('image', { uri: value, name: 'promo.jpg', type: 'image/jpeg' } as any);
+        } else if (typeof value === "string" && value.startsWith("file://")) {
+          formData.append("image", {
+            uri: value,
+            name: "promo.jpg",
+            type: "image/jpeg",
+          } as any);
         } else {
           formData.append(key, String(value));
         }
@@ -328,17 +338,23 @@ export default function FollowingScreen() {
       if (draftPromotion.id) {
         await apiClient.patch(`/api/promotions/${draftPromotion.id}`, formData);
       } else {
-        await apiClient.post('/api/promotions', formData);
+        await apiClient.post("/api/promotions", formData);
       }
-      const res = await apiClient.get<{ data: any[] }>('/api/promotions/mine');
+      const res = await apiClient.get<{ data: any[] }>("/api/promotions/mine");
       const data = (res.data.data ?? res.data) as any[];
-      setOwnerPromotions(data.map((p) => ({
-        ...p,
-        imageUrl: p.imageUrl ? p.imageUrl.startsWith('http') ? p.imageUrl : `${API_BASE_URL}${p.imageUrl}` : p.imageUrl,
-      })) as Promotion[]);
+      setOwnerPromotions(
+        data.map((p) => ({
+          ...p,
+          imageUrl: p.imageUrl
+            ? p.imageUrl.startsWith("http")
+              ? p.imageUrl
+              : `${API_BASE_URL}${p.imageUrl}`
+            : p.imageUrl,
+        })) as Promotion[],
+      );
       closeEditor();
     } catch {
-      Alert.alert('Error', 'Failed to save promotion. Please try again.');
+      Alert.alert("Error", "Failed to save promotion. Please try again.");
     }
   };
 
@@ -347,12 +363,16 @@ export default function FollowingScreen() {
     try {
       const formData = new FormData();
       Object.entries(draftPromotion).forEach(([key, value]) => {
-        if (key === 'id' && !value) return;
-        if (value === undefined || value === null || value === '') return;
+        if (key === "id" && !value) return;
+        if (value === undefined || value === null || value === "") return;
         if (Array.isArray(value)) {
           formData.append(key, JSON.stringify(value));
-        } else if (typeof value === 'string' && value.startsWith('file://')) {
-          formData.append('image', { uri: value, name: 'promo.jpg', type: 'image/jpeg' } as any);
+        } else if (typeof value === "string" && value.startsWith("file://")) {
+          formData.append("image", {
+            uri: value,
+            name: "promo.jpg",
+            type: "image/jpeg",
+          } as any);
         } else {
           formData.append(key, String(value));
         }
@@ -361,19 +381,28 @@ export default function FollowingScreen() {
       if (savedId) {
         await apiClient.patch(`/api/promotions/${savedId}`, formData);
       } else {
-        const createRes = await apiClient.post<any>('/api/promotions', formData);
+        const createRes = await apiClient.post<any>(
+          "/api/promotions",
+          formData,
+        );
         savedId = createRes.data.data?.id ?? createRes.data.id;
       }
       await apiClient.patch(`/api/promotions/${savedId}/publish`);
-      const res = await apiClient.get<{ data: any[] }>('/api/promotions/mine');
+      const res = await apiClient.get<{ data: any[] }>("/api/promotions/mine");
       const data = (res.data.data ?? res.data) as any[];
-      setOwnerPromotions(data.map((p) => ({
-        ...p,
-        imageUrl: p.imageUrl ? p.imageUrl.startsWith('http') ? p.imageUrl : `${API_BASE_URL}${p.imageUrl}` : p.imageUrl,
-      })) as Promotion[]);
+      setOwnerPromotions(
+        data.map((p) => ({
+          ...p,
+          imageUrl: p.imageUrl
+            ? p.imageUrl.startsWith("http")
+              ? p.imageUrl
+              : `${API_BASE_URL}${p.imageUrl}`
+            : p.imageUrl,
+        })) as Promotion[],
+      );
       closeEditor();
     } catch {
-      Alert.alert('Error', 'Failed to publish promotion. Please try again.');
+      Alert.alert("Error", "Failed to publish promotion. Please try again.");
     }
   };
 
@@ -390,10 +419,12 @@ export default function FollowingScreen() {
     if (!draftPromotion?.id) return;
     try {
       await apiClient.delete(`/api/promotions/${draftPromotion.id}`);
-      setOwnerPromotions((prev) => prev.filter((item) => item.id !== draftPromotion.id));
+      setOwnerPromotions((prev) =>
+        prev.filter((item) => item.id !== draftPromotion.id),
+      );
       closeEditor();
     } catch {
-      Alert.alert('Error', 'Failed to delete promotion. Please try again.');
+      Alert.alert("Error", "Failed to delete promotion. Please try again.");
     }
   };
 
@@ -402,12 +433,16 @@ export default function FollowingScreen() {
     try {
       const formData = new FormData();
       Object.entries(draftNews).forEach(([key, value]) => {
-        if (key === 'id' && !value) return;
-        if (value === undefined || value === null || value === '') return;
+        if (key === "id" && !value) return;
+        if (value === undefined || value === null || value === "") return;
         if (Array.isArray(value)) {
           formData.append(key, JSON.stringify(value));
-        } else if (typeof value === 'string' && value.startsWith('file://')) {
-          formData.append('image', { uri: value, name: 'news.jpg', type: 'image/jpeg' } as any);
+        } else if (typeof value === "string" && value.startsWith("file://")) {
+          formData.append("image", {
+            uri: value,
+            name: "news.jpg",
+            type: "image/jpeg",
+          } as any);
         } else {
           formData.append(key, String(value));
         }
@@ -415,17 +450,23 @@ export default function FollowingScreen() {
       if (draftNews.id) {
         await apiClient.patch(`/api/news/${draftNews.id}`, formData);
       } else {
-        await apiClient.post('/api/news', formData);
+        await apiClient.post("/api/news", formData);
       }
-      const res = await apiClient.get<{ data: any[] }>('/api/news/mine');
+      const res = await apiClient.get<{ data: any[] }>("/api/news/mine");
       const data = (res.data.data ?? res.data) as any[];
-      setOwnerNews(data.map((n) => ({
-        ...n,
-        imageUrl: n.imageUrl ? n.imageUrl.startsWith('http') ? n.imageUrl : `${API_BASE_URL}${n.imageUrl}` : n.imageUrl,
-      })) as NewsItem[]);
+      setOwnerNews(
+        data.map((n) => ({
+          ...n,
+          imageUrl: n.imageUrl
+            ? n.imageUrl.startsWith("http")
+              ? n.imageUrl
+              : `${API_BASE_URL}${n.imageUrl}`
+            : n.imageUrl,
+        })) as NewsItem[],
+      );
       closeNewsEditor();
     } catch {
-      Alert.alert('Error', 'Failed to save news. Please try again.');
+      Alert.alert("Error", "Failed to save news. Please try again.");
     }
   };
 
@@ -434,12 +475,16 @@ export default function FollowingScreen() {
     try {
       const formData = new FormData();
       Object.entries(draftNews).forEach(([key, value]) => {
-        if (key === 'id' && !value) return;
-        if (value === undefined || value === null || value === '') return;
+        if (key === "id" && !value) return;
+        if (value === undefined || value === null || value === "") return;
         if (Array.isArray(value)) {
           formData.append(key, JSON.stringify(value));
-        } else if (typeof value === 'string' && value.startsWith('file://')) {
-          formData.append('image', { uri: value, name: 'news.jpg', type: 'image/jpeg' } as any);
+        } else if (typeof value === "string" && value.startsWith("file://")) {
+          formData.append("image", {
+            uri: value,
+            name: "news.jpg",
+            type: "image/jpeg",
+          } as any);
         } else {
           formData.append(key, String(value));
         }
@@ -448,19 +493,25 @@ export default function FollowingScreen() {
       if (savedId) {
         await apiClient.patch(`/api/news/${savedId}`, formData);
       } else {
-        const createRes = await apiClient.post<any>('/api/news', formData);
+        const createRes = await apiClient.post<any>("/api/news", formData);
         savedId = createRes.data.data?.id ?? createRes.data.id;
       }
       await apiClient.patch(`/api/news/${savedId}/publish`);
-      const res = await apiClient.get<{ data: any[] }>('/api/news/mine');
+      const res = await apiClient.get<{ data: any[] }>("/api/news/mine");
       const data = (res.data.data ?? res.data) as any[];
-      setOwnerNews(data.map((n) => ({
-        ...n,
-        imageUrl: n.imageUrl ? n.imageUrl.startsWith('http') ? n.imageUrl : `${API_BASE_URL}${n.imageUrl}` : n.imageUrl,
-      })) as NewsItem[]);
+      setOwnerNews(
+        data.map((n) => ({
+          ...n,
+          imageUrl: n.imageUrl
+            ? n.imageUrl.startsWith("http")
+              ? n.imageUrl
+              : `${API_BASE_URL}${n.imageUrl}`
+            : n.imageUrl,
+        })) as NewsItem[],
+      );
       closeNewsEditor();
     } catch {
-      Alert.alert('Error', 'Failed to publish news. Please try again.');
+      Alert.alert("Error", "Failed to publish news. Please try again.");
     }
   };
 
@@ -480,7 +531,7 @@ export default function FollowingScreen() {
       setOwnerNews((prev) => prev.filter((item) => item.id !== draftNews.id));
       closeNewsEditor();
     } catch {
-      Alert.alert('Error', 'Failed to delete news. Please try again.');
+      Alert.alert("Error", "Failed to delete news. Please try again.");
     }
   };
 
@@ -643,7 +694,7 @@ export default function FollowingScreen() {
                   ? p.imageUrl
                   : `${API_BASE_URL}${p.imageUrl}`
                 : p.imageUrl,
-            })) as Promotion[]
+            })) as Promotion[],
           );
         })
         .catch(() => {});
@@ -660,11 +711,11 @@ export default function FollowingScreen() {
                   ? n.imageUrl
                   : `${API_BASE_URL}${n.imageUrl}`
                 : n.imageUrl,
-            })) as NewsItem[]
+            })) as NewsItem[],
           );
         })
         .catch(() => {});
-    }, [isBusinessAccount])
+    }, [isBusinessAccount]),
   );
 
   const handleRefresh = () => {
