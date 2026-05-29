@@ -340,8 +340,8 @@ export default function BusinessProfileScreen() {
         <View style={styles.card}>
           <View style={styles.cardHeader}>
             <AppText style={styles.cardTitle}>Upcoming bookings</AppText>
-            <Pressable onPress={() => router.push("/business/analytics")}>
-              <AppText style={styles.cardLink}>View calendar</AppText>
+            <Pressable onPress={() => router.push("/business/bookings")}>
+              <AppText style={styles.cardLink}>View all</AppText>
             </Pressable>
           </View>
 
@@ -389,7 +389,7 @@ export default function BusinessProfileScreen() {
 
           <Pressable
             style={styles.cardFooterLink}
-            onPress={() => router.push("/business/analytics")}
+            onPress={() => router.push("/business/bookings")}
           >
             <AppText style={styles.cardFooterLinkText}>
               View all bookings
