@@ -37,6 +37,7 @@ import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
+  Alert,
   Animated,
   ScrollView,
   Share,
@@ -385,25 +386,30 @@ export default function BusinessDetailsScreen() {
                       animated: true,
                     });
                   }}
-                  onPressWriteReview={
-                    isBusinessOwner
-                      ? undefined
-                      : (rating) =>
-                          requireAuth(
-                            () => {
-                              router.push({
-                                pathname: "/business/write-review",
-                                params: {
-                                  businessId: business.id,
-                                  rating: rating ? String(rating) : undefined,
-                                },
-                              });
-                            },
-                            {
-                              action: "review",
-                            },
-                          )
-                  }
+                  onPressWriteReview={(rating) => {
+                    if (isBusinessOwner) {
+                      Alert.alert(
+                        "Not available",
+                        "Business profiles cannot leave reviews.",
+                        [{ text: "OK" }],
+                      );
+                      return;
+                    }
+                    requireAuth(
+                      () => {
+                        router.push({
+                          pathname: "/business/write-review",
+                          params: {
+                            businessId: business.id,
+                            rating: rating ? String(rating) : undefined,
+                          },
+                        });
+                      },
+                      {
+                        action: "review",
+                      },
+                    );
+                  }}
                 />
               </View>
             </>
