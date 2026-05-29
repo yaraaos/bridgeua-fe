@@ -72,6 +72,18 @@ export function createStyles(colors: AppColors) {
       textAlignVertical: "top",
     },
 
+    sectionTitle: {
+      fontSize: 16,
+      fontWeight: "700",
+      color: colors.textPrimary,
+      marginBottom: spacing.md,
+    },
+
+    textAreaSmall: {
+      minHeight: 80,
+      textAlignVertical: "top",
+    },
+
     previewTitle: {
       marginBottom: spacing.sm,
       color: colors.textSecondary,

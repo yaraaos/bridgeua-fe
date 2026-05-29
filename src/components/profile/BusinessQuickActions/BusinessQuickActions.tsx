@@ -1,5 +1,4 @@
 import { apiClient } from "@/src/services/api/client";
-import { useMyBusinessProfile } from "@/src/features/businesses/hooks/useBusiness";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useRef, useState } from "react";
 import { Modal, Pressable, View } from "react-native";
@@ -31,8 +30,6 @@ export default function BusinessQuickActions({
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
 
-  const { business } = useMyBusinessProfile();
-
   const [selectedActions, setSelectedActions] = useState<QuickActionId[]>(
     DEFAULT_SELECTED_ACTIONS,
   );
@@ -44,12 +41,13 @@ export default function BusinessQuickActions({
   const hasLoaded = useRef(false);
 
   useEffect(() => {
-    if (business?.quickActions && !hasLoaded.current) {
+    if (!hasLoaded.current) {
       hasLoaded.current = true;
-      setSelectedActions(business.quickActions as QuickActionId[]);
-      setDraftActions(business.quickActions as QuickActionId[]);
+
+      setSelectedActions(DEFAULT_SELECTED_ACTIONS);
+      setDraftActions(DEFAULT_SELECTED_ACTIONS);
     }
-  }, [business?.quickActions]);
+  }, []);
 
   const visibleActions = QUICK_ACTIONS.filter((action) =>
     selectedActions.includes(action.id),
@@ -77,7 +75,7 @@ export default function BusinessQuickActions({
     setSelectedActions(draftActions);
     setIsEditOpen(false);
     void apiClient
-      .patch('/api/businesses/me/quick-actions', { quickActions: draftActions })
+      .patch("/api/businesses/me/quick-actions", { quickActions: draftActions })
       .catch(() => {});
   };
 
