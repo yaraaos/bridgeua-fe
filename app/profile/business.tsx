@@ -184,7 +184,7 @@ export default function BusinessProfileScreen() {
     }
 
     if (actionId === "view-bookings") {
-      router.push("/bookings");
+      router.push("/business/bookings");
       return;
     }
 
