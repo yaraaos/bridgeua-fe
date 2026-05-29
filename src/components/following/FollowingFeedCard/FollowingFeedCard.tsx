@@ -1,6 +1,7 @@
 import FollowButton from "@/src/components/business/FollowButton/FollowButton";
 import type { FollowingFeedCardItem } from "@/src/features/following/types/following.types";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { useAuthStore } from "@/src/store/auth.store";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { Image, Pressable, Text, View } from "react-native";
@@ -17,6 +18,8 @@ export default function FollowingFeedCard({
 }: FollowingFeedCardProps) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+  const accountType = useAuthStore((state) => state.user?.accountType);
+  const isBusinessOwner = accountType === "business";
 
   const handlePress = () => {
     if (onPress) {
@@ -79,11 +82,13 @@ export default function FollowingFeedCard({
           </View>
         </View>
 
-        <FollowButton
-          businessId={String(item.businessId)}
-          size="icon"
-          variant="soft"
-        />
+        {!isBusinessOwner && (
+          <FollowButton
+            businessId={String(item.businessId)}
+            size="icon"
+            variant="soft"
+          />
+        )}
       </View>
 
       <View style={styles.feedBody}>
