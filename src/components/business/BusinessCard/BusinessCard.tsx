@@ -113,7 +113,7 @@ export default function BusinessCard({
         {showFollowButton && !isOwnedBusiness ? (
           <View style={styles.actionSlot}>
             {isBusinessAccount ? (
-              <RecommendButton businessId={String(business.id)} />
+              <RecommendButton businessId={String(business.id)} businessName={business.name} />
             ) : (
               <FollowButton
                 businessId={String(business.id)}

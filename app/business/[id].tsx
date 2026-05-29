@@ -25,11 +25,11 @@ import {
   useRequireAuth,
 } from "@/src/features/auth";
 import { useBusinessDetails } from "@/src/features/businesses/hooks/useBusiness";
-import { buildBusinessPreview } from "@/src/features/businesses/utils/buildBusinessPreview";
 import type {
   BusinessDetailsReview,
   BusinessRecommendation,
 } from "@/src/features/businesses/types/business.types";
+import { buildBusinessPreview } from "@/src/features/businesses/utils/buildBusinessPreview";
 import { useReviews } from "@/src/features/reviews/hooks/useReviews";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { useAuthStore } from "@/src/store/auth.store";
@@ -196,17 +196,19 @@ export default function BusinessDetailsScreen() {
   const isEditPreview = preview === "edit";
   const viewBusiness = isEditPreview
     ? buildBusinessPreview({
-      business,
-      dirty,
-      overviewDraft,
-      galleryDraft,
-      servicesDraft,
-      aboutDraft,
-    })
+        business,
+        dirty,
+        overviewDraft,
+        galleryDraft,
+        servicesDraft,
+        aboutDraft,
+      })
     : business;
 
   const heroPhotos =
-    viewBusiness.images.length > 0 ? viewBusiness.images : viewBusiness.reviewPhotos;
+    viewBusiness.images.length > 0
+      ? viewBusiness.images
+      : viewBusiness.reviewPhotos;
 
   const allReviewPhotos = reviews.flatMap((review) => review.photos ?? []);
 
@@ -263,13 +265,19 @@ export default function BusinessDetailsScreen() {
         onPressShare={handleShareBusiness}
         rightSlot={
           viewBusiness.ownerId &&
-          String(viewBusiness.ownerId) === String(currentUserId) ? null : isBusinessOwner ? (
+          String(viewBusiness.ownerId) ===
+            String(currentUserId) ? null : isBusinessOwner ? (
             <RecommendButton
               businessId={viewBusiness.id}
+              businessName={viewBusiness.name}
               onRecommendChange={() => void refetch()}
             />
           ) : (
-            <FollowButton businessId={viewBusiness.id} size="icon" variant="soft" />
+            <FollowButton
+              businessId={viewBusiness.id}
+              size="icon"
+              variant="soft"
+            />
           )
         }
       />
