@@ -16,11 +16,13 @@ import ScreenHeader from "@/src/components/common/ScreenHeader/ScreenHeader";
 import BusinessDashboardStats from "@/src/components/profile/BusinessDashboardStats/BusinessDashboardStats";
 import AppAvatar from "@/src/components/ui/AppAvatar";
 import AppLoader from "@/src/components/ui/AppLoader/AppLoader";
+import AppRatingStars from "@/src/components/ui/AppRatingStars";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
 import AppText from "@/src/components/ui/AppText/AppText";
 import { AppColors } from "@/src/constants/colors";
 import { spacing } from "@/src/constants/spacing";
 import { useMyBusinessProfile } from "@/src/features/businesses/hooks/useBusiness";
+import { useReviews } from "@/src/features/reviews/hooks/useReviews";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { apiClient } from "@/src/services/api/client";
 import { API_BASE_URL } from "@/src/services/api/config";
@@ -71,15 +73,6 @@ const upcomingBookings: UpcomingBooking[] = [
   },
 ];
 
-const featuredReview = {
-  id: "review-1",
-  authorName: "Sarah M.",
-  authorAvatar: "https://i.pravatar.cc/100?img=5",
-  rating: 4,
-  postedAgo: "2 days ago",
-  text: "I've been looking for a place I can truly trust — and I finally found it. Everything was explained clearly, th...",
-};
-
 export default function BusinessProfileScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
@@ -124,6 +117,12 @@ export default function BusinessProfileScreen() {
   const businessRating = business?.rating ?? 0;
   const businessReviewCount = business?.reviewCount ?? 0;
   const publicBusinessId = business?.id ?? account.id;
+
+  const { reviews, isLoading: isReviewsLoading } = useReviews({
+    businessId: String(publicBusinessId),
+    limit: 1,
+  });
+  const latestReview = reviews[0] ?? null;
 
   if (isLoading) {
     return (
@@ -516,7 +515,7 @@ export default function BusinessProfileScreen() {
               onPress={() =>
                 router.push({
                   pathname: "/business/[id]",
-                  params: { id: account.id, tab: "reviews" },
+                  params: { id: String(publicBusinessId), tab: "reviews" },
                 })
               }
             >
@@ -524,62 +523,73 @@ export default function BusinessProfileScreen() {
             </Pressable>
           </View>
 
-          <View style={styles.reviewRow}>
-            <Image
-              source={{ uri: featuredReview.authorAvatar }}
-              style={styles.reviewAvatar}
-            />
+          {latestReview ? (
+            <View style={styles.reviewRow}>
+              <Image
+                source={{ uri: latestReview.authorAvatar }}
+                style={styles.reviewAvatar}
+              />
 
-            <View style={styles.reviewBody}>
-              <View style={styles.reviewHeader}>
-                <AppText style={styles.reviewAuthor}>
-                  {featuredReview.authorName}
+              <View style={styles.reviewBody}>
+                <View style={styles.reviewHeader}>
+                  <AppText style={styles.reviewAuthor}>
+                    {latestReview.authorName}
+                  </AppText>
+
+                  <View style={styles.reviewStarsRow}>
+                    <AppRatingStars rating={latestReview.rating} size={11} />
+                    <AppText style={styles.reviewAgo}>
+                      {" "}
+                      · {new Date(latestReview.createdAt).toLocaleDateString()}
+                    </AppText>
+                  </View>
+                </View>
+
+                <AppText style={styles.reviewText} numberOfLines={3}>
+                  {latestReview.text}
                 </AppText>
 
-                <View style={styles.reviewStarsRow}>
-                  {Array.from({ length: 5 }).map((_, index) => {
-                    const isFilled = index < featuredReview.rating;
-                    return (
-                      <Ionicons
-                        key={index}
-                        name={isFilled ? "star" : "star-outline"}
-                        size={11}
-                        color={colors.accentOrange}
-                      />
-                    );
-                  })}
-                  <AppText style={styles.reviewAgo}>
-                    {" "}
-                    · {featuredReview.postedAgo}
-                  </AppText>
+                <View style={styles.reviewActionsRow}>
+                  <Pressable
+                    style={[
+                      styles.reviewActionButton,
+                      styles.reviewReplyButton,
+                    ]}
+                    onPress={() =>
+                      router.push({
+                        pathname: "/business/review/[reviewId]",
+                        params: {
+                          reviewId: String(latestReview?.id ?? ""),
+                          reviewData: JSON.stringify(latestReview),
+                        },
+                      })
+                    }
+                  >
+                    <AppText style={styles.reviewReplyText}>Reply</AppText>
+                  </Pressable>
+
+                  <Pressable
+                    style={[
+                      styles.reviewActionButton,
+                      styles.reviewReportButton,
+                    ]}
+                  >
+                    <AppText style={styles.reviewReportText}>Report</AppText>
+                  </Pressable>
                 </View>
               </View>
-
-              <AppText style={styles.reviewText} numberOfLines={3}>
-                {featuredReview.text}
-              </AppText>
-
-              <View style={styles.reviewActionsRow}>
-                <Pressable
-                  style={[styles.reviewActionButton, styles.reviewReplyButton]}
-                  onPress={() =>
-                    router.push({
-                      pathname: "/business/review/[reviewId]",
-                      params: { reviewId: featuredReview.id },
-                    })
-                  }
-                >
-                  <AppText style={styles.reviewReplyText}>Reply</AppText>
-                </Pressable>
-
-                <Pressable
-                  style={[styles.reviewActionButton, styles.reviewReportButton]}
-                >
-                  <AppText style={styles.reviewReportText}>Report</AppText>
-                </Pressable>
-              </View>
             </View>
-          </View>
+          ) : isReviewsLoading ? null : (
+            <AppText
+              style={{
+                color: colors.textMuted,
+                fontSize: 13,
+                fontStyle: "italic",
+              }}
+            >
+              No reviews yet.
+            </AppText>
+          )}
         </View>
         <BusinessQuickActions
           businessId={String(publicBusinessId)}
