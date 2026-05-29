@@ -101,7 +101,7 @@ export default function NewsDetailScreen() {
               <View style={styles.metaRow}>
                 <Ionicons name="star" size={14} color={colors.accentOrange} />
                 <AppText style={styles.metaText}>
-                  {newsItem.business.rating.toFixed(1)}
+                  {((newsItem.business as any)?.averageRating ?? (newsItem.business as any)?.rating ?? 0).toFixed(1)}
                 </AppText>
                 <AppText style={styles.dot}>•</AppText>
                 <AppText style={styles.metaText} numberOfLines={1}>

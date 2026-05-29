@@ -1,7 +1,8 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { useBusinesses } from "@/src/features/businesses";
-import { followingFeedMock } from "@/src/mocks/following-feed.mock";
+import { apiClient } from "@/src/services/api/client";
+import { API_BASE_URL } from "@/src/services/api/config";
 import { useFilterStore } from "@/src/store/filter.store";
 import { useFollowingStore } from "@/src/store/following.store";
 import {
@@ -30,33 +31,82 @@ export const useFollowingFeed = ({
   const [activeTab, setActiveTab] = useState<FollowingFeedType>("promotion");
   const [searchQuery, setSearchQuery] = useState("");
 
-  const feedItems = useMemo<FollowingFeedCardItem[]>(() => {
-    return followingFeedMock
-      .filter((item) => feedBusinessIds.includes(String(item.businessId)))
-      .map((item) => {
-        const business = businesses.find(
-          (entry) => String(entry.id) === String(item.businessId),
-        );
+  const [apiFeedItems, setApiFeedItems] = useState<FollowingFeedCardItem[]>([]);
 
-        if (!business) {
-          return null;
-        }
+  useEffect(() => {
+    if (followedBusinessIds.length === 0) {
+      setApiFeedItems([]);
+      return;
+    }
 
-        return {
-          ...item,
-          businessName: business.name,
-          businessCategory: business.category,
-          businessLocation: business.location,
-          businessImage: business.image,
-          businessRating: business.rating,
-          businessDistanceKm: business.distanceKm,
-          businessPriceLevel: business.priceLevel,
-          recommendedByPreview: business.recommendedByPreview ?? [],
-          recommendedByCount: business.recommendedByCount ?? 0,
-        };
-      })
-      .filter(Boolean) as FollowingFeedCardItem[];
-  }, [businesses, feedBusinessIds]);
+    const followedIds = followedBusinessIds.map(String);
+
+    void Promise.all([
+      apiClient.get("/api/promotions/public").catch(() => ({ data: [] })),
+      apiClient.get("/api/news/public").catch(() => ({ data: [] })),
+    ]).then(([promoRes, newsRes]) => {
+      const promos = ((promoRes.data as any).data ?? promoRes.data) as any[];
+      const news = ((newsRes.data as any).data ?? newsRes.data) as any[];
+
+      const promoItems: FollowingFeedCardItem[] = promos
+        .filter((p) => followedIds.includes(String(p.businessId)))
+        .map((p) => ({
+          id: String(p.id),
+          businessId: String(p.businessId),
+          type: "promotion" as const,
+          promotionId: String(p.id),
+          title: p.title,
+          description: p.subtitle ?? p.description ?? "",
+          createdAt: p.startsAt ?? p.createdAt ?? new Date().toISOString(),
+          businessName: p.business?.name ?? "",
+          businessCategory:
+            p.business?.category?.name ?? p.business?.category ?? "",
+          businessLocation: p.business?.city ?? "",
+          businessImage: p.business?.avatarUrl
+            ? p.business.avatarUrl.startsWith("http")
+              ? p.business.avatarUrl
+              : `${API_BASE_URL}${p.business.avatarUrl}`
+            : "",
+          businessRating: 0,
+          businessDistanceKm: 0,
+          distanceKm: 0,
+          recommendedByPreview: [],
+          recommendedByCount: 0,
+          status: p.status,
+        }));
+
+      const newsItems: FollowingFeedCardItem[] = news
+        .filter((n) => followedIds.includes(String(n.businessId)))
+        .map((n) => ({
+          id: String(n.id),
+          businessId: String(n.businessId),
+          type: "news" as const,
+          newsId: String(n.id),
+          title: n.title,
+          description: n.description ?? "",
+          createdAt: n.publishedAt ?? n.createdAt ?? new Date().toISOString(),
+          businessName: n.business?.name ?? "",
+          businessCategory:
+            n.business?.category?.name ?? n.business?.category ?? "",
+          businessLocation: n.business?.city ?? "",
+          businessImage: n.business?.avatarUrl
+            ? n.business.avatarUrl.startsWith("http")
+              ? n.business.avatarUrl
+              : `${API_BASE_URL}${n.business.avatarUrl}`
+            : "",
+          businessRating: 0,
+          businessDistanceKm: 0,
+          distanceKm: 0,
+          recommendedByPreview: [],
+          recommendedByCount: 0,
+          status: n.status,
+        }));
+
+      setApiFeedItems([...promoItems, ...newsItems]);
+    });
+  }, [followedBusinessIds]);
+
+  const feedItems = apiFeedItems;
 
   const filteredItems = useMemo(() => {
     const normalizedQuery = searchQuery.trim().toLowerCase();
