@@ -6,12 +6,12 @@ import HomePromotionModal from "@/src/components/home/HomePromotionModal/HomePro
 import AppEmptyState from "@/src/components/ui/AppEmptyState";
 import AppLoader from "@/src/components/ui/AppLoader/AppLoader";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
-import { useCategories } from "@/src/features/categories/hooks/useCategories";
 import {
   DEFAULT_LOCATION_OPTIONS,
   LocationOption,
 } from "@/src/constants/locations";
 import { useBusinesses } from "@/src/features/businesses";
+import { useCategories } from "@/src/features/categories/hooks/useCategories";
 import { useDiscoveryFeed } from "@/src/features/discovery/hooks/useDiscoveryFeed";
 import { useBannerPromotion } from "@/src/features/promotions/hooks/useBannerPromotion";
 import { useBannerPromotions } from "@/src/features/promotions/hooks/useBannerPromotions";
@@ -230,7 +230,8 @@ export default function HomeScreen() {
   const selectedHomeCategory = category || "All Categories";
 
   const handleSelectCategory = (selectedCategory: string) => {
-    const mappedCategory = selectedCategory === "All Categories" ? "" : selectedCategory;
+    const mappedCategory =
+      selectedCategory === "All Categories" ? "" : selectedCategory;
     useFilterStore.getState().setCategory("discovery", mappedCategory);
   };
 
@@ -339,7 +340,15 @@ export default function HomeScreen() {
           )}
           scrollEventThrottle={16}
         >
-          <View style={[styles.bannerWrap, (!isBannerVisible || searchQuery.trim()) && { height: 0, overflow: 'hidden' }]}>
+          <View
+            style={[
+              styles.bannerWrap,
+              (!isBannerVisible || searchQuery.trim()) && {
+                height: 0,
+                overflow: "hidden",
+              },
+            ]}
+          >
             <HomePromotionBanner
               promotions={bannerPromotions}
               visible={isBannerVisible && !searchQuery.trim()}
