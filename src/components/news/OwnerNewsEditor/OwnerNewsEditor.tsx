@@ -504,7 +504,6 @@ function createStyles(colors: AppColors) {
       borderColor: colors.border,
       backgroundColor: colors.surface,
       padding: 16,
-      marginBottom: 16,
     },
     sectionTitle: {
       fontSize: 16,

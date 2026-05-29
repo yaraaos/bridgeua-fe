@@ -549,10 +549,10 @@ export default function FollowingScreen() {
         (promotion.offerDetails as any)?.[0] ||
         "No description added yet.",
       createdAt: new Date().toISOString(),
-      businessName: "Your Business",
-      businessCategory: "Business",
-      businessLocation: "California, USA",
-      businessImage: promotion.imageUrl || "https://placehold.co/600x400",
+      businessName: myBusiness?.name ?? "Your Business",
+      businessCategory: myBusiness?.category ?? "",
+      businessLocation: myBusiness?.location ?? "",
+      businessImage: myBusiness?.avatarUrl ?? promotion.imageUrl ?? "https://placehold.co/600x400",
       businessRating: 0,
       businessDistanceKm: 0,
       businessPriceLevel: undefined,
@@ -561,7 +561,7 @@ export default function FollowingScreen() {
       recommendedByPreview: [],
       recommendedByCount: 0,
     }));
-  }, [ownerPromotions]);
+  }, [ownerPromotions, myBusiness]);
 
   const ownerNewsFeedItems = useMemo<FollowingFeedCardItem[]>(() => {
     return ownerNews.map((newsItem) => ({
@@ -573,10 +573,10 @@ export default function FollowingScreen() {
       title: newsItem.title || "Untitled news",
       description: newsItem.description || "No description added yet.",
       createdAt: newsItem.publishedAt || new Date().toISOString(),
-      businessName: "Your Business",
-      businessCategory: "Business",
-      businessLocation: "California, USA",
-      businessImage: newsItem.imageUrl || "https://placehold.co/600x400",
+      businessName: myBusiness?.name ?? "Your Business",
+      businessCategory: myBusiness?.category ?? "",
+      businessLocation: myBusiness?.location ?? "",
+      businessImage: myBusiness?.avatarUrl ?? newsItem.imageUrl ?? "https://placehold.co/600x400",
       businessRating: 0,
       businessDistanceKm: 0,
       businessPriceLevel: undefined,
@@ -585,7 +585,7 @@ export default function FollowingScreen() {
       recommendedByPreview: [],
       recommendedByCount: 0,
     }));
-  }, [ownerNews]);
+  }, [ownerNews, myBusiness]);
 
   const listData = useMemo<FeedListItem[]>(() => {
     const feedItems: FeedListItem[] = items.map((item) => ({
