@@ -189,7 +189,13 @@ export default function BusinessProfileScreen() {
     }
 
     if (actionId === "view-reviews") {
-      router.push("/business/reviews");
+      router.push({
+        pathname: "/business/[id]",
+        params: {
+          id: String(publicBusinessId),
+          tab: "reviews",
+        },
+      });
       return;
     }
 
