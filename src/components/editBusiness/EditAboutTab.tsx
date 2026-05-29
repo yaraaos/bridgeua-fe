@@ -20,9 +20,10 @@ import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { useEditBusinessStore } from "@/src/store/editBusiness.store";
 
 import { BusinessDetails } from "@/src/features/businesses/types/business.types";
+import { BUSINESS_DESCRIPTION_MAX_LENGTH } from "@/src/features/businesses/validation/businessProfile.validation";
 import SelectableChip from "./SelectableChip";
 
-const DESCRIPTION_LIMIT = 1000;
+const DESCRIPTION_LIMIT = BUSINESS_DESCRIPTION_MAX_LENGTH;
 
 const LANGUAGES = [
   "English",
@@ -165,7 +166,13 @@ export default function EditAboutTab({ business }: EditAboutTabProps) {
                 textAlignVertical="top"
                 maxLength={DESCRIPTION_LIMIT}
               />
-              <AppText style={styles.charCounter}>
+              <AppText
+                style={[
+                  styles.charCounter,
+                  aboutDraft.description.length >= DESCRIPTION_LIMIT &&
+                    styles.charCounterAtLimit,
+                ]}
+              >
                 {aboutDraft.description.length}/{DESCRIPTION_LIMIT}
               </AppText>
             </View>
@@ -272,6 +279,10 @@ function createStyles(colors: AppColors) {
       fontSize: 12,
       color: colors.textMuted,
       textAlign: "right",
+    },
+    charCounterAtLimit: {
+      color: colors.error,
+      fontWeight: "700",
     },
     emptyHint: {
       fontSize: 13,
