@@ -1,8 +1,18 @@
+import AppButton from "@/src/components/ui/AppButton/AppButton";
+import AppText from "@/src/components/ui/AppText/AppText";
+import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { apiClient } from "@/src/services/api/client";
 import { useRecommendationsStore } from "@/src/store/recommendations.store";
 import { Ionicons } from "@expo/vector-icons";
-import React, { useEffect, useRef } from "react";
-import { Pressable, StyleProp, StyleSheet, ViewStyle } from "react-native";
+import React, { useEffect, useRef, useState } from "react";
+import {
+  Modal,
+  Pressable,
+  StyleProp,
+  StyleSheet,
+  View,
+  ViewStyle,
+} from "react-native";
 
 type Props = {
   businessId: string | number;
@@ -16,8 +26,14 @@ export default function RecommendButton({
   onRecommendChange,
 }: Props) {
   const hasFetched = useRef(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
-  const isRecommended = useRecommendationsStore((s) => s.isRecommended);
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
+  const recommendedBusinessIds = useRecommendationsStore(
+    (s) => s.recommendedBusinessIds,
+  );
   const addRecommendation = useRecommendationsStore((s) => s.addRecommendation);
   const removeRecommendation = useRecommendationsStore(
     (s) => s.removeRecommendation,
@@ -27,7 +43,7 @@ export default function RecommendButton({
   );
 
   const normalizedId = String(businessId);
-  const isActive = isRecommended(normalizedId);
+  const isActive = recommendedBusinessIds.includes(normalizedId);
 
   useEffect(() => {
     if (hasFetched.current) return;
@@ -45,22 +61,23 @@ export default function RecommendButton({
 
   const handlePress = () => {
     if (!isActive) {
-      addRecommendation(normalizedId);
-      void apiClient
-        .post("/api/recommendations", { businessId: normalizedId })
-        .then(() => onRecommendChange?.())
-        .catch(() => removeRecommendation(normalizedId));
+      setShowConfirmModal(true);
     } else {
       removeRecommendation(normalizedId);
       void apiClient
         .delete(`/api/recommendations/${normalizedId}`)
-        .then(() => {
-          onRecommendChange?.();
-        })
-        .catch(() => {
-          addRecommendation(normalizedId);
-        });
+        .then(() => onRecommendChange?.())
+        .catch(() => addRecommendation(normalizedId));
     }
+  };
+
+  const handleConfirmRecommend = () => {
+    setShowConfirmModal(false);
+    addRecommendation(normalizedId);
+    void apiClient
+      .post("/api/recommendations", { businessId: normalizedId })
+      .then(() => onRecommendChange?.())
+      .catch(() => removeRecommendation(normalizedId));
   };
 
   return (
@@ -72,17 +89,85 @@ export default function RecommendButton({
           color="#FFFFFF"
         />
       </Pressable>
+      <Modal
+        visible={showConfirmModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowConfirmModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalCard}>
+            <AppText style={styles.modalTitle}>
+              Recommend this business?
+            </AppText>
+            <AppText style={styles.modalBody}>
+              Your recommendation will be publicly visible and shown on this
+              business&apos;s profile. Other users will see that you endorse
+              this place.
+            </AppText>
+            <View style={styles.modalActions}>
+              <View style={styles.modalActionButton}>
+                <AppButton
+                  title="Cancel"
+                  variant="ghost"
+                  onPress={() => setShowConfirmModal(false)}
+                />
+              </View>
+              <View style={styles.modalActionButton}>
+                <AppButton
+                  title="Recommend"
+                  variant="primary"
+                  onPress={handleConfirmRecommend}
+                />
+              </View>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </>
   );
 }
 
-const styles = StyleSheet.create({
-  iconButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 10,
-    backgroundColor: "#F79A2E",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});
+function createStyles(colors: ReturnType<typeof useAppTheme>["colors"]) {
+  return StyleSheet.create({
+    iconButton: {
+      width: 36,
+      height: 36,
+      borderRadius: 10,
+      backgroundColor: "#F79A2E",
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    modalOverlay: {
+      flex: 1,
+      backgroundColor: "rgba(0,0,0,0.5)",
+      alignItems: "center",
+      justifyContent: "center",
+      padding: 24,
+    },
+    modalCard: {
+      backgroundColor: colors.surface,
+      borderRadius: 20,
+      padding: 24,
+      gap: 12,
+    },
+    modalTitle: {
+      fontSize: 18,
+      fontWeight: "800",
+      color: colors.textPrimary,
+    },
+    modalBody: {
+      fontSize: 14,
+      lineHeight: 21,
+      color: colors.textSecondary,
+    },
+    modalActions: {
+      flexDirection: "row",
+      gap: 12,
+      marginTop: 8,
+    },
+    modalActionButton: {
+      flex: 1,
+    },
+  });
+}
