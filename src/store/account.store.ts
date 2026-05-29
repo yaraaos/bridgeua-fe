@@ -9,6 +9,7 @@ export type AccountSummary = {
   handle: string;
   avatarUrl?: string;
   notificationsCount: number;
+  ownedBusinessId?: string;
 };
 
 const personalMockAccount: AccountSummary = {
@@ -28,6 +29,9 @@ const businessMockAccount: AccountSummary = {
   handle: "zlnska.beauty",
   avatarUrl: "https://picsum.photos/200/200?31",
   notificationsCount: 3,
+  // Until BU-198 ships, FE points the mock business account at a real
+  // backend business id so owned-business priority is testable locally.
+  ownedBusinessId: "21",
 };
 
 type AccountState = {

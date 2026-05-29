@@ -16,6 +16,11 @@ export function createStyles(colors: AppColors) {
       marginBottom: spacing.cardGap,
       minHeight: 96,
     },
+    ownedCard: {
+      borderColor: colors.accentOrange,
+      backgroundColor: colors.accentOrangeSoft,
+    },
+
     cardCompact: {
       padding: 8,
       gap: 10,
@@ -50,12 +55,35 @@ export function createStyles(colors: AppColors) {
       flexShrink: 0,
     },
 
+    nameRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6,
+      marginBottom: 2,
+    },
+
     name: {
+      flexShrink: 1,
       fontSize: 16,
       fontWeight: "700",
       color: colors.textPrimary,
       lineHeight: 20,
       marginBottom: 2,
+    },
+
+    yourBusinessBadge: {
+      flexShrink: 0,
+      paddingHorizontal: 8,
+      paddingVertical: 3,
+      borderRadius: 999,
+      backgroundColor: colors.primaryGreen,
+    },
+
+    yourBusinessBadgeText: {
+      fontSize: 10,
+      fontWeight: "800",
+      color: colors.white,
+      lineHeight: 12,
     },
 
     ratingRow: {

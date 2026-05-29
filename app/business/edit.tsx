@@ -75,7 +75,10 @@ export default function EditBusinessScreen() {
   }
 
   function handlePreview() {
-    router.push({ pathname: "/business/[id]", params: { id: account.id } });
+    router.push({
+      pathname: "/business/[id]",
+      params: { id: account.id, preview: "edit" },
+    });
   }
 
   return (

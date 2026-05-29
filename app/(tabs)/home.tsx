@@ -13,10 +13,17 @@ import {
 import { useBusinesses } from "@/src/features/businesses";
 import { useCategories } from "@/src/features/categories/hooks/useCategories";
 import { useDiscoveryFeed } from "@/src/features/discovery/hooks/useDiscoveryFeed";
+import {
+  isOwnedBusiness,
+  prioritizeOwnedBusiness,
+} from "@/src/features/discovery/utils/ownedBusinessDiscovery";
 import { useBannerPromotion } from "@/src/features/promotions/hooks/useBannerPromotion";
 import { useBannerPromotions } from "@/src/features/promotions/hooks/useBannerPromotions";
 import type { HomePromotion } from "@/src/features/promotions/types/promotion.types";
+import type { Business } from "@/src/types/business";
+import { useActiveAccount } from "@/src/store/account.store";
 import { useAuthStore } from "@/src/store/auth.store";
+import type { AuthUser } from "@/src/features/auth/types/auth.types";
 import { useDiscoveryLocationStore } from "@/src/store/discovery-location";
 import { useFilterStore } from "@/src/store/filter.store";
 import { Feather } from "@expo/vector-icons";
@@ -51,7 +58,6 @@ export default function HomeScreen() {
   const { category, sort, cuisines, rating, distance, customDistance } =
     useFilterStore((state) => state.discoveryFilters);
 
-  // Серверные фильтры: category, sort, rating
   const serverParams = useMemo(() => {
     const params: Record<string, string | number> = {};
     if (category) params.categoryName = category;
@@ -65,6 +71,31 @@ export default function HomeScreen() {
   );
 
   const isGuest = useAuthStore((state) => state.isGuest);
+  const currentUser = useAuthStore((state) => state.user);
+  const activeAccount = useActiveAccount();
+
+  // FE-only fallback until BU-198 (BE ownership metadata) lands.
+  // When the Switch Account sheet picks a business account, treat the viewer
+  // as a business owner for priority/Recommend purposes, using the account's
+  // ownedBusinessId to mark which business is "mine".
+  const effectiveUser = useMemo<AuthUser | null>(() => {
+    if (activeAccount?.kind !== "business") return currentUser;
+
+    const fallbackOwnedId = activeAccount.ownedBusinessId;
+    const base = currentUser ?? ({ id: activeAccount.id, email: "" } as AuthUser);
+
+    return {
+      ...base,
+      accountType: "business",
+      activeBusinessId: fallbackOwnedId ?? base.activeBusinessId ?? null,
+      ownedBusinessIds:
+        base.ownedBusinessIds && base.ownedBusinessIds.length > 0
+          ? base.ownedBusinessIds
+          : fallbackOwnedId
+            ? [fallbackOwnedId]
+            : [],
+    };
+  }, [currentUser, activeAccount]);
 
   const { categories } = useCategories();
   const categoryNames = ["All Categories", ...categories.map((c) => c.name)];
@@ -85,7 +116,6 @@ export default function HomeScreen() {
 
   const { filteredBusinesses: discoveryFilteredBusinesses } = useDiscoveryFeed({
     businesses,
-    // category, sort, rating уже применены на сервере — передаём нейтральные значения
     category: "",
     sort: sort === "distance" ? "distance" : "relevance",
     cuisines,
@@ -94,15 +124,23 @@ export default function HomeScreen() {
     customDistance,
   });
 
+  const selectedHomeCategory = category || "All Categories";
+
   const filteredBusinesses = normalizedSearchQuery
     ? discoveryFilteredBusinesses.filter((business) =>
-        business.name?.toLowerCase().startsWith(normalizedSearchQuery),
-      )
+      business.name?.toLowerCase().startsWith(normalizedSearchQuery),
+    )
     : discoveryFilteredBusinesses;
 
+  const prioritizedBusinesses = prioritizeOwnedBusiness(
+    filteredBusinesses,
+    selectedHomeCategory,
+    effectiveUser,
+  );
+
   const visibleBusinesses = isGuest
-    ? filteredBusinesses.slice(0, 10)
-    : filteredBusinesses;
+    ? prioritizedBusinesses.slice(0, 10)
+    : prioritizedBusinesses;
 
   const {
     promotion,
@@ -148,13 +186,18 @@ export default function HomeScreen() {
     setIsSearchFocused(false);
   };
 
-  const handleBusinessPress = (businessId: string) => {
+  const handleBusinessPress = (business: Business) => {
     saveRecentSearch(searchQuery);
     setIsSearchFocused(false);
 
+    const owned = isOwnedBusiness(business, effectiveUser);
+
     router.push({
       pathname: "/business/[id]",
-      params: { id: businessId },
+      params: {
+        id: String(business.id),
+        preview: owned ? "owner" : undefined,
+      },
     });
   };
 
@@ -226,8 +269,6 @@ export default function HomeScreen() {
       params: { scope: "discovery" },
     });
   };
-
-  const selectedHomeCategory = category || "All Categories";
 
   const handleSelectCategory = (selectedCategory: string) => {
     const mappedCategory =
@@ -390,7 +431,8 @@ export default function HomeScreen() {
                 <BusinessCard
                   key={String(item.id)}
                   business={item}
-                  onPress={() => handleBusinessPress(String(item.id))}
+                  onPress={() => handleBusinessPress(item)}
+                  isOwnedBusiness={isOwnedBusiness(item, effectiveUser)}
                 />
               ))
             )}

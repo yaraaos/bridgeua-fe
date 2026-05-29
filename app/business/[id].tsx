@@ -25,6 +25,7 @@ import {
   useRequireAuth,
 } from "@/src/features/auth";
 import { useBusinessDetails } from "@/src/features/businesses/hooks/useBusiness";
+import { buildBusinessPreview } from "@/src/features/businesses/utils/buildBusinessPreview";
 import type {
   BusinessDetailsReview,
   BusinessRecommendation,
@@ -32,6 +33,7 @@ import type {
 import { useReviews } from "@/src/features/reviews/hooks/useReviews";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { useAuthStore } from "@/src/store/auth.store";
+import { useEditBusinessStore } from "@/src/store/editBusiness.store";
 import { useProfileStore } from "@/src/store/profile.store";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useRef, useState } from "react";
@@ -84,10 +86,12 @@ export default function BusinessDetailsScreen() {
     id,
     tab,
     focusedReviewId: focusedReviewIdParam,
+    preview,
   } = useLocalSearchParams<{
     id?: string;
     tab?: string;
     focusedReviewId?: string;
+    preview?: string;
   }>();
 
   const [activeTab, setActiveTab] = useState<BusinessDetailsTab>("overview");
@@ -100,6 +104,11 @@ export default function BusinessDetailsScreen() {
   const reviewsListYRef = useRef(0);
 
   const { business, isLoading, refetch } = useBusinessDetails(id);
+  const dirty = useEditBusinessStore((state) => state.dirty);
+  const overviewDraft = useEditBusinessStore((state) => state.overviewDraft);
+  const galleryDraft = useEditBusinessStore((state) => state.galleryDraft);
+  const servicesDraft = useEditBusinessStore((state) => state.servicesDraft);
+  const aboutDraft = useEditBusinessStore((state) => state.aboutDraft);
   const {
     reviews,
     reviewCount,
@@ -184,15 +193,27 @@ export default function BusinessDetailsScreen() {
     );
   }
 
+  const isEditPreview = preview === "edit";
+  const viewBusiness = isEditPreview
+    ? buildBusinessPreview({
+      business,
+      dirty,
+      overviewDraft,
+      galleryDraft,
+      servicesDraft,
+      aboutDraft,
+    })
+    : business;
+
   const heroPhotos =
-    business.images.length > 0 ? business.images : business.reviewPhotos;
+    viewBusiness.images.length > 0 ? viewBusiness.images : viewBusiness.reviewPhotos;
 
   const allReviewPhotos = reviews.flatMap((review) => review.photos ?? []);
 
   const handleShareBusiness = async () => {
     try {
       await Share.share({
-        message: `Check out ${business.name} on BridgeUA\nhttps://bridgeua.app/business/${business.id}`,
+        message: `Check out ${viewBusiness.name} on BridgeUA\nhttps://bridgeua.app/business/${viewBusiness.id}`,
       });
     } catch (error) {
       console.error("Share failed", error);
@@ -224,31 +245,31 @@ export default function BusinessDetailsScreen() {
 
   const topReviews = getTopReviews(reviews);
 
-  const services = business.services ?? [];
+  const services = viewBusiness.services ?? [];
 
   return (
     <AppScreen withTopInset={false} style={styles.container}>
       <ScreenHeader
         variant="business"
-        title={business.name}
-        imageUrl={business.avatarUrl ?? business.images[0]?.url}
-        rating={reviewsSummary?.rating ?? business.rating}
+        title={viewBusiness.name}
+        imageUrl={viewBusiness.avatarUrl ?? viewBusiness.images[0]?.url}
+        rating={reviewsSummary?.rating ?? viewBusiness.rating}
         reviewCount={reviewsSummary?.reviewCount ?? reviewCount}
-        category={business.category}
-        location={business.location}
-        isOpen={business.isOpen}
-        closesAt={business.closesAt}
+        category={viewBusiness.category}
+        location={viewBusiness.location}
+        isOpen={viewBusiness.isOpen}
+        closesAt={viewBusiness.closesAt}
         gradientColors={DISCOVERY_GRADIENT}
         onPressShare={handleShareBusiness}
         rightSlot={
-          business.ownerId &&
-          business.ownerId === currentUserId ? null : isBusinessOwner ? (
+          viewBusiness.ownerId &&
+          String(viewBusiness.ownerId) === String(currentUserId) ? null : isBusinessOwner ? (
             <RecommendButton
-              businessId={business.id}
+              businessId={viewBusiness.id}
               onRecommendChange={() => void refetch()}
             />
           ) : (
-            <FollowButton businessId={business.id} size="icon" variant="soft" />
+            <FollowButton businessId={viewBusiness.id} size="icon" variant="soft" />
           )
         }
       />
@@ -276,7 +297,7 @@ export default function BusinessDetailsScreen() {
                 openImageViewer(imageIndex >= 0 ? imageIndex : 0, {
                   overlayIndex: heroPhotos.length - 1,
                   overlayText: "View all",
-                  businessId: business.id,
+                  businessId: viewBusiness.id,
                 });
               }}
               onPressViewAll={() => handleChangeTab("photos")}
@@ -296,21 +317,21 @@ export default function BusinessDetailsScreen() {
         <Animated.View style={{ opacity: contentOpacity }}>
           {activeTab === "overview" ? (
             <>
-              <BusinessOverviewCard business={business} />
+              <BusinessOverviewCard business={viewBusiness} />
 
-              {(business.services?.length ?? 0) > 0 && (
+              {(viewBusiness.services?.length ?? 0) > 0 && (
                 <BusinessBookingCard
-                  businessId={business.id}
-                  category={business.category}
+                  businessId={viewBusiness.id}
+                  category={viewBusiness.category}
                 />
               )}
 
               <BusinessRecommendedByPreview
-                recommendations={business.about.recommendedBy}
+                recommendations={viewBusiness.about.recommendedBy}
                 onPressViewAll={() =>
                   router.push({
                     pathname: "/business/recommended-by",
-                    params: { businessId: business.id },
+                    params: { businessId: viewBusiness.id },
                   })
                 }
                 onPressRecommendation={(
@@ -324,7 +345,7 @@ export default function BusinessDetailsScreen() {
               />
               <BusinessTopReviews
                 reviews={topReviews}
-                reviewCount={business.reviewCount}
+                reviewCount={viewBusiness.reviewCount}
                 onPressViewAll={() => {
                   setFocusedReviewId(null);
                   handleChangeTab("reviews");
@@ -344,7 +365,7 @@ export default function BusinessDetailsScreen() {
                 router.push({
                   pathname: "/bookings/choose-service",
                   params: {
-                    businessId: business.id,
+                    businessId: viewBusiness.id,
                     serviceId: service.id,
                   },
                 });
@@ -355,10 +376,10 @@ export default function BusinessDetailsScreen() {
           {activeTab === "reviews" ? (
             <>
               <BusinessRatingSummary
-                rating={reviewsSummary?.rating ?? business.rating}
+                rating={reviewsSummary?.rating ?? viewBusiness.rating}
                 reviewCount={reviewsSummary?.reviewCount ?? reviewCount}
                 breakdown={
-                  reviewsSummary?.breakdown ?? business.ratingBreakdown
+                  reviewsSummary?.breakdown ?? viewBusiness.ratingBreakdown
                 }
               />
 
@@ -400,7 +421,7 @@ export default function BusinessDetailsScreen() {
                         router.push({
                           pathname: "/business/write-review",
                           params: {
-                            businessId: business.id,
+                            businessId: viewBusiness.id,
                             rating: rating ? String(rating) : undefined,
                           },
                         });
@@ -417,15 +438,15 @@ export default function BusinessDetailsScreen() {
 
           {activeTab === "photos" ? (
             <BusinessGalleryGrid
-              businessPhotos={business.images}
+              businessPhotos={viewBusiness.images}
               reviewPhotos={allReviewPhotos}
             />
           ) : null}
 
           {activeTab === "about" ? (
             <BusinessAboutSection
-              businessId={business.id}
-              about={business.about}
+              businessId={viewBusiness.id}
+              about={viewBusiness.about}
             />
           ) : null}
         </Animated.View>

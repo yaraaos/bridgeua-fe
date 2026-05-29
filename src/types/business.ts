@@ -8,6 +8,8 @@ export type Business = {
   rating: number;
   image: string;
   avatarUrl?: string | null;
+  ownerId?: string | number | null;
+  isOwnedByMe?: boolean;
   distanceKm: number;
   priceLevel: number;
   coordinates: {
