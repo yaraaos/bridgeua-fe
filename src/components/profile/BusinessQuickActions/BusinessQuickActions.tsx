@@ -1,3 +1,4 @@
+import { useMyBusinessProfile } from "@/src/features/businesses/hooks/useBusiness";
 import { apiClient } from "@/src/services/api/client";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useRef, useState } from "react";
@@ -30,6 +31,8 @@ export default function BusinessQuickActions({
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
 
+  const { business } = useMyBusinessProfile();
+
   const [selectedActions, setSelectedActions] = useState<QuickActionId[]>(
     DEFAULT_SELECTED_ACTIONS,
   );
@@ -41,13 +44,12 @@ export default function BusinessQuickActions({
   const hasLoaded = useRef(false);
 
   useEffect(() => {
-    if (!hasLoaded.current) {
+    if (business?.quickActions && !hasLoaded.current) {
       hasLoaded.current = true;
-
-      setSelectedActions(DEFAULT_SELECTED_ACTIONS);
-      setDraftActions(DEFAULT_SELECTED_ACTIONS);
+      setSelectedActions(business.quickActions as QuickActionId[]);
+      setDraftActions(business.quickActions as QuickActionId[]);
     }
-  }, []);
+  }, [business?.quickActions]);
 
   const visibleActions = QUICK_ACTIONS.filter((action) =>
     selectedActions.includes(action.id),

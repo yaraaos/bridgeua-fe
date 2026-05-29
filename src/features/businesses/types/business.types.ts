@@ -150,6 +150,7 @@ export type BusinessDetails = {
   name: string;
   category: string;
   location: string;
+  quickActions?: string[];
   address: string;
   zipCode?: string;
   city?: string;
