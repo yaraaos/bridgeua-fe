@@ -526,7 +526,7 @@ export default function BusinessProfileScreen() {
           {latestReview ? (
             <View style={styles.reviewRow}>
               <Image
-                source={{ uri: latestReview.authorAvatar }}
+                source={latestReview.authorAvatar ? { uri: latestReview.authorAvatar } : undefined}
                 style={styles.reviewAvatar}
               />
 
