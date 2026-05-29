@@ -1,4 +1,5 @@
 import { FollowButton } from "@/src/components/business";
+import RecommendButton from "@/src/components/business/RecommendButton";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { Business } from "@/src/types/business";
 import { Feather, Ionicons } from "@expo/vector-icons";
@@ -19,12 +20,16 @@ type Props = {
   business: Business;
   onPressDetails: () => void;
   onClose: () => void;
+  isOwned?: boolean;
+  isBusinessAccount?: boolean;
 };
 
 export default function MapBusinessCallout({
   business,
   onPressDetails,
   onClose,
+  isOwned = false,
+  isBusinessAccount = false,
 }: Props) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
@@ -132,11 +137,15 @@ export default function MapBusinessCallout({
           <Feather name="share-2" size={18} color={colors.white} />
         </Pressable>
 
-        <FollowButton
-          businessId={String(business.id)}
-          size="icon"
-          variant="soft"
-        />
+        {isOwned ? null : isBusinessAccount ? (
+          <RecommendButton businessId={String(business.id)} />
+        ) : (
+          <FollowButton
+            businessId={String(business.id)}
+            size="icon"
+            variant="soft"
+          />
+        )}
       </View>
     </View>
   );

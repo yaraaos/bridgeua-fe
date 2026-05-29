@@ -7,13 +7,22 @@ import {
 } from "@/src/components/map";
 import AppLoader from "@/src/components/ui/AppLoader/AppLoader";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
+import { PROMO_CATEGORY_LABEL } from "@/src/constants/categories";
 import {
   DEFAULT_LOCATION_OPTIONS,
   LocationOption,
 } from "@/src/constants/locations";
+import type { AuthUser } from "@/src/features/auth/types/auth.types";
 import { useBusinesses } from "@/src/features/businesses";
 import { useCategories } from "@/src/features/categories/hooks/useCategories";
 import { useDiscoveryFeed } from "@/src/features/discovery/hooks/useDiscoveryFeed";
+import {
+  isOwnedBusiness,
+  prioritizeOwnedBusiness,
+} from "@/src/features/discovery/utils/ownedBusinessDiscovery";
+import { useBannerPromotions } from "@/src/features/promotions/hooks/useBannerPromotions";
+import { useActiveAccount } from "@/src/store/account.store";
+import { useAuthStore } from "@/src/store/auth.store";
 import { useDiscoveryLocationStore } from "@/src/store/discovery-location";
 import { useFilterStore } from "@/src/store/filter.store";
 import { useFollowingStore } from "@/src/store/following.store";
@@ -35,38 +44,42 @@ const FOCUSED_DELTA = 0.05;
 type BusinessMarkerProps = {
   business: Business;
   isFollowed: boolean;
+  isOwned?: boolean;
   onPress: NonNullable<MapMarkerProps["onPress"]>;
 };
 
 function BusinessMarker({
   business,
   isFollowed,
+  isOwned = false,
   onPress,
 }: BusinessMarkerProps) {
   const [imageLoaded, setImageLoaded] = useState(false);
-  const [followChangePending, setFollowChangePending] = useState(false);
-  const isFirstFollowEffect = useRef(true);
+  const [stylingChangePending, setStylingChangePending] = useState(false);
+  const isFirstStylingEffect = useRef(true);
 
   useEffect(() => {
-    if (isFirstFollowEffect.current) {
-      isFirstFollowEffect.current = false;
+    if (isFirstStylingEffect.current) {
+      isFirstStylingEffect.current = false;
       return;
     }
-    setFollowChangePending(true);
-    const timer = setTimeout(() => setFollowChangePending(false), 120);
+    setStylingChangePending(true);
+    const timer = setTimeout(() => setStylingChangePending(false), 120);
     return () => clearTimeout(timer);
-  }, [isFollowed]);
+  }, [isFollowed, isOwned]);
 
   return (
     <Marker
       coordinate={business.coordinates}
       onPress={onPress}
       anchor={{ x: 0.5, y: MAP_MARKER_ANCHOR_Y }}
-      tracksViewChanges={!imageLoaded || followChangePending}
+      tracksViewChanges={!imageLoaded || stylingChangePending}
+      zIndex={isOwned ? 10 : 1}
     >
       <MapMarkerPin
         imageUrl={business.avatarUrl ?? business.image}
         isFollowed={isFollowed}
+        isOwned={isOwned}
         onImageLoad={() => setImageLoaded(true)}
       />
     </Marker>
@@ -104,6 +117,34 @@ export default function MapScreen() {
   );
   const { businesses, isLoading } = useBusinesses();
 
+  const currentUser = useAuthStore((state) => state.user);
+  const activeAccount = useActiveAccount();
+  // Same FE fallback as Home until BU-198 (BE ownership metadata) lands.
+  const effectiveUser = useMemo<AuthUser | null>(() => {
+    if (activeAccount?.kind !== "business") return currentUser;
+
+    const fallbackOwnedId = activeAccount.ownedBusinessId;
+    const base = currentUser ?? ({ id: activeAccount.id, email: "" } as AuthUser);
+
+    return {
+      ...base,
+      accountType: "business",
+      activeBusinessId: fallbackOwnedId ?? base.activeBusinessId ?? null,
+      ownedBusinessIds:
+        base.ownedBusinessIds && base.ownedBusinessIds.length > 0
+          ? base.ownedBusinessIds
+          : fallbackOwnedId
+            ? [fallbackOwnedId]
+            : [],
+    };
+  }, [currentUser, activeAccount]);
+
+  const { promotions: bannerPromotions } = useBannerPromotions();
+  const businessIdsWithPromo = useMemo(
+    () => bannerPromotions.map((p) => String(p.businessId)),
+    [bannerPromotions],
+  );
+
   const { filteredBusinesses } = useDiscoveryFeed({
     businesses,
     category,
@@ -112,6 +153,7 @@ export default function MapScreen() {
     rating,
     distance,
     customDistance,
+    businessIdsWithPromo,
   });
 
   const markerKeyPrefix = useMemo(
@@ -149,6 +191,18 @@ export default function MapScreen() {
 
     return result;
   }, [filteredBusinesses]);
+
+  const selectedHomeCategory = category || "All Categories";
+
+  const prioritizedMappableBusinesses = useMemo(
+    () =>
+      prioritizeOwnedBusiness(
+        mappableBusinesses,
+        selectedHomeCategory,
+        effectiveUser,
+      ),
+    [mappableBusinesses, selectedHomeCategory, effectiveUser],
+  );
 
   const initialRegion: Region = useMemo(() => {
     if (
@@ -247,7 +301,11 @@ export default function MapScreen() {
   };
 
   const { categories } = useCategories();
-  const categoryNames = ["All Categories", ...categories.map((c) => c.name)];
+  const categoryNames = [
+    "All Categories",
+    PROMO_CATEGORY_LABEL,
+    ...categories.map((c) => c.name),
+  ];
 
   const selectedCategory = category || "All Categories";
 
@@ -314,16 +372,18 @@ export default function MapScreen() {
             showsMyLocationButton={false}
             onPress={() => setSelectedBusinessId(null)}
           >
-            {mappableBusinesses.map((business) => {
+            {prioritizedMappableBusinesses.map((business) => {
               const isFollowed = followedBusinessIds.includes(
                 String(business.id),
               );
+              const isOwned = isOwnedBusiness(business, effectiveUser);
 
               return (
                 <BusinessMarker
                   key={`${markerKeyPrefix}-${String(business.id)}`}
                   business={business}
                   isFollowed={isFollowed}
+                  isOwned={isOwned}
                   onPress={(event) => {
                     event.stopPropagation();
                     handleMarkerPress(business);
@@ -349,6 +409,8 @@ export default function MapScreen() {
               business={selectedBusiness}
               onClose={() => setSelectedBusinessId(null)}
               onPressDetails={() => handleDetailsPress(selectedBusiness.id)}
+              isOwned={isOwnedBusiness(selectedBusiness, effectiveUser)}
+              isBusinessAccount={effectiveUser?.accountType === "business"}
             />
           </View>
         ) : null}
