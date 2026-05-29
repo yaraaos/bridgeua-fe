@@ -13,6 +13,7 @@ type FollowingFeedCardProps = {
   item: FollowingFeedCardItem;
   onPress?: () => void;
   isOwnerPromotion?: boolean;
+  isOwnerNews?: boolean;
   onFeaturePromotion?: () => void;
 };
 
@@ -20,6 +21,7 @@ export default function FollowingFeedCard({
   item,
   onPress,
   isOwnerPromotion,
+  isOwnerNews,
   onFeaturePromotion,
 }: FollowingFeedCardProps) {
   const { colors } = useAppTheme();
@@ -173,7 +175,7 @@ export default function FollowingFeedCard({
                 {item.title}
               </Text>
 
-              {statusLabel ? (
+              {(isOwnerPromotion || isOwnerNews) && statusLabel ? (
                 <View style={styles.statusBadge}>
                   <Text style={styles.statusBadgeText}>{statusLabel}</Text>
                 </View>
