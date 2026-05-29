@@ -1,6 +1,6 @@
 import { Feather } from "@expo/vector-icons";
-import { router } from "expo-router";
-import React from "react";
+import { router, useLocalSearchParams } from "expo-router";
+import React, { useEffect } from "react";
 import { Alert, Pressable, StyleSheet, View } from "react-native";
 
 import EditAboutTab from "@/src/components/editBusiness/EditAboutTab";
@@ -36,10 +36,18 @@ export default function EditBusinessScreen() {
 
   const { business } = useMyBusinessProfile();
 
+  const { tab } = useLocalSearchParams<{ tab?: string }>();
+
   const activeTab = useEditBusinessStore((s) => s.activeTab);
   const dirty = useEditBusinessStore((s) => s.dirty);
   const setActiveTab = useEditBusinessStore((s) => s.setActiveTab);
   const resetAll = useEditBusinessStore((s) => s.resetAll);
+
+  useEffect(() => {
+    if (tab === "services" || tab === "gallery" || tab === "overview" || tab === "about") {
+      setActiveTab(tab as EditBusinessTab);
+    }
+  }, [tab, setActiveTab]);
 
   const hasUnsaved = Object.values(dirty).some(Boolean);
 

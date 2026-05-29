@@ -3,7 +3,14 @@
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { router, useFocusEffect } from "expo-router";
 import React, { useCallback } from "react";
-import { Image, Pressable, ScrollView, StyleSheet, View } from "react-native";
+import {
+  Image,
+  Pressable,
+  ScrollView,
+  Share,
+  StyleSheet,
+  View,
+} from "react-native";
 
 import ScreenHeader from "@/src/components/common/ScreenHeader/ScreenHeader";
 import BusinessDashboardStats from "@/src/components/profile/BusinessDashboardStats/BusinessDashboardStats";
@@ -140,32 +147,44 @@ export default function BusinessProfileScreen() {
 
   const handleQuickActionPress = (actionId: QuickActionId) => {
     if (actionId === "add-promo") {
-      router.push("/business/promotions");
+      router.push({
+        pathname: "/(tabs)/following",
+        params: {
+          tab: "promotion",
+          action: "create",
+        },
+      });
       return;
     }
 
     if (actionId === "add-news") {
-      router.push("/business/promotions");
-      return;
-    }
-
-    if (actionId === "edit-business") {
-      router.push("/business/edit");
+      router.push({
+        pathname: "/(tabs)/following",
+        params: {
+          tab: "news",
+          action: "create",
+        },
+      });
       return;
     }
 
     if (actionId === "edit-services") {
-      router.push("/business/services");
+      router.push({ pathname: "/business/edit", params: { tab: "services" } });
+      return;
+    }
+
+    if (actionId === "edit-business") {
+      router.push({ pathname: "/business/edit", params: { tab: "overview" } });
       return;
     }
 
     if (actionId === "edit-gallery") {
-      router.push("/business/photos");
+      router.push({ pathname: "/business/edit", params: { tab: "gallery" } });
       return;
     }
 
     if (actionId === "view-bookings") {
-      router.push("/business/analytics");
+      router.push("/bookings");
       return;
     }
 
@@ -175,14 +194,39 @@ export default function BusinessProfileScreen() {
     }
 
     if (actionId === "share-business") {
+      void Share.share({
+        message: `Check out ${business?.name} on BridgeUA\nhttps://bridgeua.app/business/${publicBusinessId}`,
+      });
       return;
     }
 
     if (actionId === "view-public-profile") {
       router.push({
         pathname: "/business/[id]",
-        params: { id: publicBusinessId },
+        params: { id: String(publicBusinessId) },
       });
+      return;
+    }
+
+    if (actionId === "edit-team") {
+      router.push("/profile/team");
+      return;
+    }
+
+    if (actionId === "view-recommends") {
+      router.push({
+        pathname: "/business/recommends",
+        params: { businessId: String(publicBusinessId) },
+      });
+      return;
+    }
+
+    if (actionId === "view-recommended-by") {
+      router.push({
+        pathname: "/business/recommended-by",
+        params: { businessId: String(publicBusinessId) },
+      });
+      return;
     }
   };
 
