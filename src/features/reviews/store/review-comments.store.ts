@@ -1,10 +1,8 @@
-import * as SecureStore from "expo-secure-store";
 import { create } from "zustand";
-import { createJSONStorage, persist } from "zustand/middleware";
 
 import { useProfileStore } from "@/src/store/profile.store";
 import { useReviewsStore } from "@/src/store/reviews.store";
-import { reviewCommentsMock } from "../mocks/review-comments.mock";
+import * as reviewCommentService from "../services/reviewComment.service";
 import type {
   CreateReviewCommentPayload,
   ReviewComment,
@@ -14,15 +12,15 @@ type ReviewCommentsState = {
   comments: ReviewComment[];
 
   getCommentsByReviewId: (reviewId: string) => ReviewComment[];
-  addComment: (payload: CreateReviewCommentPayload) => ReviewComment;
+  loadComments: (businessId: string, reviewId: string) => Promise<void>;
+  addComment: (payload: CreateReviewCommentPayload) => Promise<ReviewComment | null>;
   toggleCommentLike: (commentId: string) => void;
-  deleteComment: (commentId: string) => void;
+  deleteComment: (businessId: string, reviewId: string, commentId: string) => Promise<void>;
 };
 
 export const useReviewCommentsStore = create<ReviewCommentsState>()(
-  persist(
-    (set, get) => ({
-      comments: reviewCommentsMock,
+  (set, get) => ({
+      comments: [],
 
       getCommentsByReviewId: (reviewId) =>
         get()
@@ -32,11 +30,27 @@ export const useReviewCommentsStore = create<ReviewCommentsState>()(
               new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
           ),
 
-      addComment: (payload) => {
+      loadComments: async (businessId, reviewId) => {
+        try {
+          const fetched = await reviewCommentService.getComments(businessId, reviewId);
+          set((state) => ({
+            comments: [
+              ...state.comments.filter((c) => c.reviewId !== reviewId),
+              ...fetched,
+            ],
+          }));
+        } catch {
+          // keep existing comments on error
+        }
+      },
+
+      addComment: async (payload) => {
         const profile = useProfileStore.getState().profile;
 
-        const newComment: ReviewComment = {
-          id: `comment-${Date.now()}`,
+        // Optimistic comment
+        const optimisticId = `optimistic-${Date.now()}`;
+        const optimistic: ReviewComment = {
+          id: optimisticId,
           reviewId: payload.reviewId,
           parentCommentId: payload.parentCommentId,
           author: {
@@ -52,45 +66,74 @@ export const useReviewCommentsStore = create<ReviewCommentsState>()(
           createdAt: new Date().toISOString(),
         };
 
-        console.log("API POST /reviews/:reviewId/comments", payload);
+        set((state) => ({ comments: [...state.comments, optimistic] }));
+
+        if (payload.parentCommentId) {
+          set((state) => ({
+            comments: state.comments.map((c) =>
+              c.id === payload.parentCommentId
+                ? { ...c, repliesCount: c.repliesCount + 1 }
+                : c,
+            ),
+          }));
+        }
 
         useReviewsStore.getState().updateReview(payload.reviewId, {
           commentsCount:
             (useReviewsStore
               .getState()
-              .submittedReviews.find((review) => review.id === payload.reviewId)
+              .submittedReviews.find((r) => r.id === payload.reviewId)
               ?.commentsCount ?? 0) + 1,
         });
 
-        if (payload.parentCommentId) {
+        try {
+          const real = await reviewCommentService.addComment(
+            payload.businessId,
+            payload.reviewId,
+            payload.text,
+            payload.parentCommentId,
+          );
+          // Replace optimistic with real
           set((state) => ({
-            comments: state.comments.map((comment) =>
-              comment.id === payload.parentCommentId
-                ? {
-                    ...comment,
-                    repliesCount: comment.repliesCount + 1,
-                  }
-                : comment,
+            comments: state.comments.map((c) =>
+              c.id === optimisticId ? real : c,
             ),
           }));
+          return real;
+        } catch {
+          // Remove optimistic on failure
+          set((state) => ({
+            comments: state.comments.filter((c) => c.id !== optimisticId),
+          }));
+          // Rollback commentsCount
+          useReviewsStore.getState().updateReview(payload.reviewId, {
+            commentsCount: Math.max(
+              0,
+              (useReviewsStore
+                .getState()
+                .submittedReviews.find((r) => r.id === payload.reviewId)
+                ?.commentsCount ?? 1) - 1,
+            ),
+          });
+          if (payload.parentCommentId) {
+            set((state) => ({
+              comments: state.comments.map((c) =>
+                c.id === payload.parentCommentId
+                  ? { ...c, repliesCount: Math.max(0, c.repliesCount - 1) }
+                  : c,
+              ),
+            }));
+          }
+          return null;
         }
-
-        set((state) => ({
-          comments: [...state.comments, newComment],
-        }));
-
-        return newComment;
       },
+
       toggleCommentLike: (commentId) =>
         set((state) => ({
           comments: state.comments.map((comment) => {
-            if (comment.id !== commentId) {
-              return comment;
-            }
-
+            if (comment.id !== commentId) return comment;
             const isLiked = comment.likedByMe ?? false;
             const currentLikesCount = comment.likesCount ?? 0;
-
             return {
               ...comment,
               likedByMe: !isLiked,
@@ -101,48 +144,40 @@ export const useReviewCommentsStore = create<ReviewCommentsState>()(
           }),
         })),
 
-      deleteComment: (commentId) =>
-        set((state) => {
-          const commentToDelete = state.comments.find(
-            (comment) => comment.id === commentId,
-          );
+      deleteComment: async (businessId, reviewId, commentId) => {
+        const state = get();
+        const commentToDelete = state.comments.find((c) => c.id === commentId);
+        if (!commentToDelete) return;
 
-          if (!commentToDelete) {
-            return state;
-          }
-          const deletedRepliesCount = state.comments.filter(
-            (comment) => comment.parentCommentId === commentId,
-          ).length;
+        const deletedRepliesCount = state.comments.filter(
+          (c) => c.parentCommentId === commentId,
+        ).length;
 
-          useReviewsStore.getState().updateReview(commentToDelete.reviewId, {
-            commentsCount: Math.max(
-              0,
-              (useReviewsStore
-                .getState()
-                .submittedReviews.find(
-                  (review) => review.id === commentToDelete.reviewId,
-                )?.commentsCount ?? 0) -
-                1 -
-                deletedRepliesCount,
-            ),
-          });
+        // Optimistic delete
+        set((s) => ({
+          comments: s.comments.filter(
+            (c) => c.id !== commentId && c.parentCommentId !== commentId,
+          ),
+        }));
 
-          return {
-            comments: state.comments.filter(
-              (comment) =>
-                comment.id !== commentId &&
-                comment.parentCommentId !== commentId,
-            ),
-          };
-        }),
+        useReviewsStore.getState().updateReview(reviewId, {
+          commentsCount: Math.max(
+            0,
+            (useReviewsStore
+              .getState()
+              .submittedReviews.find((r) => r.id === reviewId)
+              ?.commentsCount ?? 0) -
+              1 -
+              deletedRepliesCount,
+          ),
+        });
+
+        try {
+          await reviewCommentService.deleteComment(businessId, reviewId, commentId);
+        } catch {
+          // Reload comments on failure to restore state
+          await get().loadComments(businessId, reviewId);
+        }
+      },
     }),
-    {
-      name: "review-comments-storage",
-      storage: createJSONStorage(() => ({
-        getItem: SecureStore.getItemAsync,
-        setItem: SecureStore.setItemAsync,
-        removeItem: SecureStore.deleteItemAsync,
-      })),
-    },
-  ),
 );
