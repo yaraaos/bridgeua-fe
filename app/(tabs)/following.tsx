@@ -13,6 +13,7 @@ import {
   DEFAULT_LOCATION_OPTIONS,
   LocationOption,
 } from "@/src/constants/locations";
+import { useMyBusinessProfile } from "@/src/features/businesses/hooks/useBusiness";
 import { useFollowingFeed } from "@/src/features/following";
 import type { FollowingFeedCardItem } from "@/src/features/following/types/following.types";
 import type { NewsDraft, NewsItem } from "@/src/features/news/types/news.types";
@@ -21,6 +22,8 @@ import type {
   PromotionDraft,
 } from "@/src/features/promotions/types/promotion.types";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { apiClient } from "@/src/services/api/client";
+import { API_BASE_URL } from "@/src/services/api/config";
 import { useFollowingStore } from "@/src/store";
 import { useAuthStore } from "@/src/store/auth.store";
 import { useFilterStore } from "@/src/store/filter.store";
@@ -52,8 +55,6 @@ type FeedListItem =
       isOwnerNews?: boolean;
     };
 
-const BUSINESS_ID = "1";
-
 const createPromotionFromDraft = (
   draft: PromotionDraft,
   status: "draft" | "published" | "unpublished",
@@ -61,7 +62,7 @@ const createPromotionFromDraft = (
   return {
     ...draft,
     id: draft.id || `${Date.now()}`,
-    businessId: draft.businessId || BUSINESS_ID,
+    businessId: draft.businessId,
     status,
     isActive: status === "published",
   } as Promotion;
@@ -74,7 +75,7 @@ const createNewsFromDraft = (
   return {
     ...draft,
     id: draft.id || `${Date.now()}`,
-    businessId: draft.businessId || BUSINESS_ID,
+    businessId: draft.businessId,
     publishedAt: draft.publishedAt || new Date().toISOString(),
     status,
     isActive: status === "published",
@@ -84,6 +85,9 @@ const createNewsFromDraft = (
 export default function FollowingScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+
+  const { business: myBusiness } = useMyBusinessProfile();
+  const businessId = String(myBusiness?.id ?? "");
 
   const isGuest = useAuthStore((state) => state.isGuest);
   const user = useAuthStore((state) => state.user);
@@ -151,7 +155,7 @@ export default function FollowingScreen() {
 
   const createEmptyDraft = (): PromotionDraft => ({
     id: "",
-    businessId: BUSINESS_ID,
+    businessId: businessId,
     title: "",
     subtitle: "",
     description: "",
@@ -172,7 +176,7 @@ export default function FollowingScreen() {
 
   const createEmptyNewsDraft = (): NewsDraft => ({
     id: "",
-    businessId: BUSINESS_ID,
+    businessId: businessId,
     title: "",
     description: "",
     content: "",
@@ -272,8 +276,14 @@ export default function FollowingScreen() {
       discountLabel: promotion.discountLabel,
       redemptionType: promotion.redemptionType,
       redemptionInstructions: promotion.redemptionInstructions,
-      offerDetails: promotion.offerDetails,
-      terms: promotion.terms,
+      offerDetails:
+        typeof promotion.offerDetails === "string"
+          ? JSON.parse(promotion.offerDetails)
+          : (promotion.offerDetails ?? []),
+      terms:
+        typeof promotion.terms === "string"
+          ? JSON.parse(promotion.terms)
+          : (promotion.terms ?? []),
       ctaType: promotion.ctaType,
       ctaLabel: promotion.ctaLabel,
       status: promotion.status ?? "draft",
@@ -306,22 +316,94 @@ export default function FollowingScreen() {
     setIsNewsEditorOpen(true);
   };
 
-  const handleSaveDraft = () => {
+  const handleSaveDraft = async () => {
     if (!draftPromotion) return;
-
-    const promotion = createPromotionFromDraft(draftPromotion, "draft");
-
-    upsertOwnerPromotion(promotion);
-    closeEditor();
+    try {
+      const formData = new FormData();
+      Object.entries(draftPromotion).forEach(([key, value]) => {
+        if (key === "id" && !value) return;
+        if (value === undefined || value === null || value === "") return;
+        if (Array.isArray(value)) {
+          formData.append(key, JSON.stringify(value));
+        } else if (typeof value === "string" && value.startsWith("file://")) {
+          formData.append("image", {
+            uri: value,
+            name: "promo.jpg",
+            type: "image/jpeg",
+          } as any);
+        } else {
+          formData.append(key, String(value));
+        }
+      });
+      if (draftPromotion.id) {
+        await apiClient.patch(`/api/promotions/${draftPromotion.id}`, formData);
+      } else {
+        await apiClient.post("/api/promotions", formData);
+      }
+      const res = await apiClient.get<{ data: any[] }>("/api/promotions/mine");
+      const data = (res.data.data ?? res.data) as any[];
+      setOwnerPromotions(
+        data.map((p) => ({
+          ...p,
+          imageUrl: p.imageUrl
+            ? p.imageUrl.startsWith("http")
+              ? p.imageUrl
+              : `${API_BASE_URL}${p.imageUrl}`
+            : p.imageUrl,
+        })) as Promotion[],
+      );
+      closeEditor();
+    } catch {
+      Alert.alert("Error", "Failed to save promotion. Please try again.");
+    }
   };
 
-  const handlePublish = () => {
+  const handlePublish = async () => {
     if (!draftPromotion) return;
-
-    const promotion = createPromotionFromDraft(draftPromotion, "published");
-
-    upsertOwnerPromotion(promotion);
-    closeEditor();
+    try {
+      const formData = new FormData();
+      Object.entries(draftPromotion).forEach(([key, value]) => {
+        if (key === "id" && !value) return;
+        if (value === undefined || value === null || value === "") return;
+        if (Array.isArray(value)) {
+          formData.append(key, JSON.stringify(value));
+        } else if (typeof value === "string" && value.startsWith("file://")) {
+          formData.append("image", {
+            uri: value,
+            name: "promo.jpg",
+            type: "image/jpeg",
+          } as any);
+        } else {
+          formData.append(key, String(value));
+        }
+      });
+      let savedId = draftPromotion.id;
+      if (savedId) {
+        await apiClient.patch(`/api/promotions/${savedId}`, formData);
+      } else {
+        const createRes = await apiClient.post<any>(
+          "/api/promotions",
+          formData,
+        );
+        savedId = createRes.data.data?.id ?? createRes.data.id;
+      }
+      await apiClient.patch(`/api/promotions/${savedId}/publish`);
+      const res = await apiClient.get<{ data: any[] }>("/api/promotions/mine");
+      const data = (res.data.data ?? res.data) as any[];
+      setOwnerPromotions(
+        data.map((p) => ({
+          ...p,
+          imageUrl: p.imageUrl
+            ? p.imageUrl.startsWith("http")
+              ? p.imageUrl
+              : `${API_BASE_URL}${p.imageUrl}`
+            : p.imageUrl,
+        })) as Promotion[],
+      );
+      closeEditor();
+    } catch {
+      Alert.alert("Error", "Failed to publish promotion. Please try again.");
+    }
   };
 
   const handleUnpublish = () => {
@@ -333,32 +415,104 @@ export default function FollowingScreen() {
     closeEditor();
   };
 
-  const handleDeletePromotion = () => {
+  const handleDeletePromotion = async () => {
     if (!draftPromotion?.id) return;
-
-    setOwnerPromotions((prev) =>
-      prev.filter((item) => item.id !== draftPromotion.id),
-    );
-
-    closeEditor();
+    try {
+      await apiClient.delete(`/api/promotions/${draftPromotion.id}`);
+      setOwnerPromotions((prev) =>
+        prev.filter((item) => item.id !== draftPromotion.id),
+      );
+      closeEditor();
+    } catch {
+      Alert.alert("Error", "Failed to delete promotion. Please try again.");
+    }
   };
 
-  const handleSaveNewsDraft = () => {
+  const handleSaveNewsDraft = async () => {
     if (!draftNews) return;
-
-    const newsItem = createNewsFromDraft(draftNews, "draft");
-
-    upsertOwnerNews(newsItem);
-    closeNewsEditor();
+    try {
+      const formData = new FormData();
+      Object.entries(draftNews).forEach(([key, value]) => {
+        if (key === "id" && !value) return;
+        if (value === undefined || value === null || value === "") return;
+        if (Array.isArray(value)) {
+          formData.append(key, JSON.stringify(value));
+        } else if (typeof value === "string" && value.startsWith("file://")) {
+          formData.append("image", {
+            uri: value,
+            name: "news.jpg",
+            type: "image/jpeg",
+          } as any);
+        } else {
+          formData.append(key, String(value));
+        }
+      });
+      if (draftNews.id) {
+        await apiClient.patch(`/api/news/${draftNews.id}`, formData);
+      } else {
+        await apiClient.post("/api/news", formData);
+      }
+      const res = await apiClient.get<{ data: any[] }>("/api/news/mine");
+      const data = (res.data.data ?? res.data) as any[];
+      setOwnerNews(
+        data.map((n) => ({
+          ...n,
+          imageUrl: n.imageUrl
+            ? n.imageUrl.startsWith("http")
+              ? n.imageUrl
+              : `${API_BASE_URL}${n.imageUrl}`
+            : n.imageUrl,
+        })) as NewsItem[],
+      );
+      closeNewsEditor();
+    } catch {
+      Alert.alert("Error", "Failed to save news. Please try again.");
+    }
   };
 
-  const handlePublishNews = () => {
+  const handlePublishNews = async () => {
     if (!draftNews) return;
-
-    const newsItem = createNewsFromDraft(draftNews, "published");
-
-    upsertOwnerNews(newsItem);
-    closeNewsEditor();
+    try {
+      const formData = new FormData();
+      Object.entries(draftNews).forEach(([key, value]) => {
+        if (key === "id" && !value) return;
+        if (value === undefined || value === null || value === "") return;
+        if (Array.isArray(value)) {
+          formData.append(key, JSON.stringify(value));
+        } else if (typeof value === "string" && value.startsWith("file://")) {
+          formData.append("image", {
+            uri: value,
+            name: "news.jpg",
+            type: "image/jpeg",
+          } as any);
+        } else {
+          formData.append(key, String(value));
+        }
+      });
+      let savedId = draftNews.id;
+      if (savedId) {
+        await apiClient.patch(`/api/news/${savedId}`, formData);
+      } else {
+        const createRes = await apiClient.post<any>("/api/news", formData);
+        savedId = createRes.data.data?.id ?? createRes.data.id;
+      }
+      await apiClient.patch(`/api/news/${savedId}/publish`);
+      const res = await apiClient.get<{ data: any[] }>("/api/news/mine");
+      const data = (res.data.data ?? res.data) as any[];
+      setOwnerNews(
+        data.map((n) => ({
+          ...n,
+          imageUrl: n.imageUrl
+            ? n.imageUrl.startsWith("http")
+              ? n.imageUrl
+              : `${API_BASE_URL}${n.imageUrl}`
+            : n.imageUrl,
+        })) as NewsItem[],
+      );
+      closeNewsEditor();
+    } catch {
+      Alert.alert("Error", "Failed to publish news. Please try again.");
+    }
   };
 
   const handleUnpublishNews = () => {
@@ -370,12 +524,15 @@ export default function FollowingScreen() {
     closeNewsEditor();
   };
 
-  const handleDeleteNews = () => {
+  const handleDeleteNews = async () => {
     if (!draftNews?.id) return;
-
-    setOwnerNews((prev) => prev.filter((item) => item.id !== draftNews.id));
-
-    closeNewsEditor();
+    try {
+      await apiClient.delete(`/api/news/${draftNews.id}`);
+      setOwnerNews((prev) => prev.filter((item) => item.id !== draftNews.id));
+      closeNewsEditor();
+    } catch {
+      Alert.alert("Error", "Failed to delete news. Please try again.");
+    }
   };
 
   const ownerFeedItems = useMemo<FollowingFeedCardItem[]>(() => {
@@ -386,12 +543,16 @@ export default function FollowingScreen() {
       promotionId: promotion.id,
       status: promotion.status,
       title: promotion.title || "Untitled promotion",
-      description: promotion.description || "No description added yet.",
+      description:
+        promotion.subtitle ||
+        promotion.description ||
+        (promotion.offerDetails as any)?.[0] ||
+        "No description added yet.",
       createdAt: new Date().toISOString(),
-      businessName: "Your Business",
-      businessCategory: "Business",
-      businessLocation: "California, USA",
-      businessImage: promotion.imageUrl || "https://placehold.co/600x400",
+      businessName: myBusiness?.name ?? "Your Business",
+      businessCategory: myBusiness?.category ?? "",
+      businessLocation: myBusiness?.location ?? "",
+      businessImage: myBusiness?.avatarUrl ?? promotion.imageUrl ?? "https://placehold.co/600x400",
       businessRating: 0,
       businessDistanceKm: 0,
       businessPriceLevel: undefined,
@@ -400,7 +561,7 @@ export default function FollowingScreen() {
       recommendedByPreview: [],
       recommendedByCount: 0,
     }));
-  }, [ownerPromotions]);
+  }, [ownerPromotions, myBusiness]);
 
   const ownerNewsFeedItems = useMemo<FollowingFeedCardItem[]>(() => {
     return ownerNews.map((newsItem) => ({
@@ -412,10 +573,10 @@ export default function FollowingScreen() {
       title: newsItem.title || "Untitled news",
       description: newsItem.description || "No description added yet.",
       createdAt: newsItem.publishedAt || new Date().toISOString(),
-      businessName: "Your Business",
-      businessCategory: "Business",
-      businessLocation: "California, USA",
-      businessImage: newsItem.imageUrl || "https://placehold.co/600x400",
+      businessName: myBusiness?.name ?? "Your Business",
+      businessCategory: myBusiness?.category ?? "",
+      businessLocation: myBusiness?.location ?? "",
+      businessImage: myBusiness?.avatarUrl ?? newsItem.imageUrl ?? "https://placehold.co/600x400",
       businessRating: 0,
       businessDistanceKm: 0,
       businessPriceLevel: undefined,
@@ -424,7 +585,7 @@ export default function FollowingScreen() {
       recommendedByPreview: [],
       recommendedByCount: 0,
     }));
-  }, [ownerNews]);
+  }, [ownerNews, myBusiness]);
 
   const listData = useMemo<FeedListItem[]>(() => {
     const feedItems: FeedListItem[] = items.map((item) => ({
@@ -519,6 +680,46 @@ export default function FollowingScreen() {
     useCallback(() => {
       syncVisibleBusinessIds();
     }, [syncVisibleBusinessIds]),
+  );
+
+  useFocusEffect(
+    useCallback(() => {
+      if (!isBusinessAccount) return;
+
+      void apiClient
+        .get<{ data: any[] }>("/api/promotions/mine")
+        .then((res) => {
+          const data = (res.data.data ?? res.data) as any[];
+          setOwnerPromotions(
+            data.map((p) => ({
+              ...p,
+              imageUrl: p.imageUrl
+                ? p.imageUrl.startsWith("http")
+                  ? p.imageUrl
+                  : `${API_BASE_URL}${p.imageUrl}`
+                : p.imageUrl,
+            })) as Promotion[],
+          );
+        })
+        .catch(() => {});
+
+      void apiClient
+        .get<{ data: any[] }>("/api/news/mine")
+        .then((res) => {
+          const data = (res.data.data ?? res.data) as any[];
+          setOwnerNews(
+            data.map((n) => ({
+              ...n,
+              imageUrl: n.imageUrl
+                ? n.imageUrl.startsWith("http")
+                  ? n.imageUrl
+                  : `${API_BASE_URL}${n.imageUrl}`
+                : n.imageUrl,
+            })) as NewsItem[],
+          );
+        })
+        .catch(() => {});
+    }, [isBusinessAccount]),
   );
 
   const handleRefresh = () => {

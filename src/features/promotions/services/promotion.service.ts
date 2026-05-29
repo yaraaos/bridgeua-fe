@@ -1,181 +1,44 @@
-import { businessesMock } from "@/src/mocks/businesses.mock";
-import { mockBannerPromotions } from "../data/mockBannerPromotions";
-import { mockFollowingPromotions } from "../data/mockFollowingPromotions";
-import type {
-  HomePromotion,
-  Promotion,
-  PromotionDraft,
-} from "../types/promotion.types";
+import { apiClient } from "@/src/services/api/client";
+import { API_BASE_URL } from "@/src/services/api/config";
+import type { Promotion } from "../types/promotion.types";
 
-const allPromotions: Promotion[] = [
-  ...mockBannerPromotions,
-  ...mockFollowingPromotions,
-];
+const normalizePromotion = (p: any): Promotion => ({
+  ...p,
+  imageUrl: p.imageUrl
+    ? p.imageUrl.startsWith("http")
+      ? p.imageUrl
+      : `${API_BASE_URL}${p.imageUrl}`
+    : undefined,
+});
 
-let ownerPromotions: Promotion[] = [];
+export const getActivePromotions = async (): Promise<Promotion[]> => {
+  const res = await apiClient.get<{ data: any[] }>("/api/promotions/public");
+  return (res.data.data ?? res.data).map(normalizePromotion);
+};
 
-export async function getBannerPromotion(): Promise<HomePromotion | null> {
-  // Later BE integration:
-  // return api.get("/promotions/banner");
-
-  const activePromotion = mockBannerPromotions.find(
-    (promotion) => promotion.isActive,
-  );
-
-  return activePromotion ?? null;
-}
-
-export async function getBannerPromotions(): Promise<HomePromotion[]> {
-  // Later BE integration:
-  // return api.get("/promotions/banner");
-
-  return mockBannerPromotions.filter((promotion) => promotion.isActive);
-}
-
-export async function getActivePromotions(): Promise<Promotion[]> {
-  return allPromotions
-    .filter((promotion) => promotion.isActive)
-    .map((promotion) => ({
-      ...promotion,
-      business: businessesMock.find(
-        (business) => business.id === promotion.businessId,
-      ),
-    }));
-}
-
-export async function getPromotionById(id: string): Promise<Promotion | null> {
-  const promotion = allPromotions.find((item) => item.id === id);
-
-  if (!promotion) {
-    return null;
-  }
-
-  return {
-    ...promotion,
-    business: businessesMock.find(
-      (business) => business.id === promotion.businessId,
-    ),
-  };
-}
-
-export async function getBusinessPromotions(
+export const getBusinessPromotions = async (
   businessId: string,
-): Promise<Promotion[]> {
-  return allPromotions
-    .filter(
-      (promotion) => promotion.businessId === businessId && promotion.isActive,
-    )
-    .map((promotion) => ({
-      ...promotion,
-      business: businessesMock.find(
-        (business) => business.id === promotion.businessId,
-      ),
-    }));
-}
+): Promise<Promotion[]> => {
+  const res = await apiClient.get<{ data: any[] }>(`/api/promotions/mine`);
+  return (res.data.data ?? res.data).map(normalizePromotion);
+};
 
-export async function getFollowingPromotions(): Promise<Promotion[]> {
-  return mockFollowingPromotions
-    .filter((promotion) => promotion.isActive)
-    .map((promotion) => ({
-      ...promotion,
-      business: businessesMock.find(
-        (business) => business.id === promotion.businessId,
-      ),
-    }));
-}
-
-export async function getOwnerPromotions(
-  businessId: string,
-): Promise<Promotion[]> {
-  return ownerPromotions
-    .filter((promotion) => promotion.businessId === businessId)
-    .map((promotion) => ({
-      ...promotion,
-      business: businessesMock.find((b) => b.id === promotion.businessId),
-    }));
-}
-
-export async function createPromotion(
-  draft: PromotionDraft,
-): Promise<Promotion> {
-  const id = `${Date.now()}`;
-  const promotion: Promotion = {
-    ...draft,
-    id,
-    isActive: draft.status === "published",
-  } as Promotion;
-
-  ownerPromotions.push(promotion);
-
-  return {
-    ...promotion,
-    business: businessesMock.find((b) => b.id === promotion.businessId),
-  };
-}
-
-export async function updatePromotion(
+export const getPromotionById = async (
   id: string,
-  draft: PromotionDraft,
-): Promise<Promotion> {
-  const idx = ownerPromotions.findIndex((p) => p.id === id);
+): Promise<Promotion | null> => {
+  const res = await apiClient.get<{ data: any }>(`/api/promotions/${id}`);
+  const p = res.data.data ?? res.data;
+  return p ? normalizePromotion(p) : null;
+};
 
-  if (idx === -1) {
-    throw new Error("Promotion not found");
-  }
+export const getBannerPromotion = async (
+  id?: string,
+): Promise<Promotion | null> => {
+  if (id) return getPromotionById(id);
+  const promotions = await getActivePromotions();
+  return promotions[0] ?? null;
+};
 
-  const updated: Promotion = {
-    ...ownerPromotions[idx],
-    ...draft,
-    id,
-    isActive: draft.status === "published",
-  } as Promotion;
-
-  ownerPromotions[idx] = updated;
-
-  return {
-    ...updated,
-    business: businessesMock.find((b) => b.id === updated.businessId),
-  };
-}
-
-export async function publishPromotion(id: string): Promise<Promotion> {
-  const idx = ownerPromotions.findIndex((p) => p.id === id);
-
-  if (idx === -1) {
-    throw new Error("Promotion not found");
-  }
-
-  ownerPromotions[idx] = {
-    ...ownerPromotions[idx],
-    status: "published",
-    isActive: true,
-  } as Promotion;
-
-  const updated = ownerPromotions[idx];
-
-  return {
-    ...updated,
-    business: businessesMock.find((b) => b.id === updated.businessId),
-  };
-}
-
-export async function unpublishPromotion(id: string): Promise<Promotion> {
-  const idx = ownerPromotions.findIndex((p) => p.id === id);
-
-  if (idx === -1) {
-    throw new Error("Promotion not found");
-  }
-
-  ownerPromotions[idx] = {
-    ...ownerPromotions[idx],
-    status: "unpublished",
-    isActive: false,
-  } as Promotion;
-
-  const updated = ownerPromotions[idx];
-
-  return {
-    ...updated,
-    business: businessesMock.find((b) => b.id === updated.businessId),
-  };
-}
+export const getBannerPromotions = async (): Promise<Promotion[]> => {
+  return getActivePromotions();
+};
