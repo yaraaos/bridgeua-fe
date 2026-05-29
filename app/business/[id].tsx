@@ -242,7 +242,10 @@ export default function BusinessDetailsScreen() {
         rightSlot={
           business.ownerId &&
           business.ownerId === currentUserId ? null : isBusinessOwner ? (
-            <RecommendButton businessId={business.id} onRecommendChange={() => void refetch()} />
+            <RecommendButton
+              businessId={business.id}
+              onRecommendChange={() => void refetch()}
+            />
           ) : (
             <FollowButton businessId={business.id} size="icon" variant="soft" />
           )
@@ -382,21 +385,24 @@ export default function BusinessDetailsScreen() {
                       animated: true,
                     });
                   }}
-                  onPressWriteReview={(rating) =>
-                    requireAuth(
-                      () => {
-                        router.push({
-                          pathname: "/business/write-review",
-                          params: {
-                            businessId: business.id,
-                            rating: rating ? String(rating) : undefined,
-                          },
-                        });
-                      },
-                      {
-                        action: "review",
-                      },
-                    )
+                  onPressWriteReview={
+                    isBusinessOwner
+                      ? undefined
+                      : (rating) =>
+                          requireAuth(
+                            () => {
+                              router.push({
+                                pathname: "/business/write-review",
+                                params: {
+                                  businessId: business.id,
+                                  rating: rating ? String(rating) : undefined,
+                                },
+                              });
+                            },
+                            {
+                              action: "review",
+                            },
+                          )
                   }
                 />
               </View>
