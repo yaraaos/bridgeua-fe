@@ -9,12 +9,12 @@ import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import {
-    Image,
-    Pressable,
-    ScrollView,
-    Share,
-    StyleSheet,
-    View,
+  Image,
+  Pressable,
+  ScrollView,
+  Share,
+  StyleSheet,
+  View,
 } from "react-native";
 
 export default function PromotionDetailScreen() {
@@ -32,6 +32,11 @@ export default function PromotionDetailScreen() {
     promotion.business && "about" in promotion.business
       ? promotion.business.about
       : undefined;
+
+  const offerDetails =
+    typeof promotion.offerDetails === "string"
+      ? JSON.parse(promotion.offerDetails)
+      : (promotion.offerDetails ?? []);
 
   const validUntil = promotion.expiresAt ?? promotion.endsAt;
 
@@ -96,7 +101,11 @@ export default function PromotionDetailScreen() {
               <View style={styles.metaRow}>
                 <Ionicons name="star" size={14} color={colors.accentOrange} />
                 <AppText style={styles.metaText}>
-                  {promotion.business.rating.toFixed(1)}
+                  {(
+                    (promotion.business as any)?.averageRating ??
+                    (promotion.business as any)?.rating ??
+                    0
+                  ).toFixed(1)}
                 </AppText>
                 <AppText style={styles.dot}>•</AppText>
                 <AppText style={styles.metaText} numberOfLines={1}>
@@ -118,12 +127,12 @@ export default function PromotionDetailScreen() {
           </View>
         )}
 
-        {(!!promotion.offerDetails?.length || !!formattedValidUntil) && (
+        {(!!offerDetails.length || !!formattedValidUntil) && (
           <View style={styles.sectionCard}>
             <AppText style={styles.sectionTitle}>Offer details</AppText>
 
-            {!!promotion.offerDetails?.length &&
-              promotion.offerDetails.map((detail) => (
+            {!!offerDetails.length &&
+              offerDetails.map((detail: string) => (
                 <AppText key={detail} style={styles.sectionText}>
                   {detail}
                 </AppText>
