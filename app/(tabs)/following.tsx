@@ -927,6 +927,16 @@ export default function FollowingScreen() {
                       ? () => openOwnerNewsEdit(item.item.newsId)
                       : undefined
                 }
+                isOwnerPromotion={item.isOwnerPromotion}
+                onFeaturePromotion={
+                  item.isOwnerPromotion
+                    ? () => {
+                        void apiClient
+                          .patch(`/api/promotions/${item.item.promotionId}/feature`, { isFeatured: true })
+                          .catch(() => {});
+                      }
+                    : undefined
+                }
               />
             );
           }}
