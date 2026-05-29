@@ -54,7 +54,7 @@ const normalizeBusinessDetailsImages = (
 export const getBusinesses = async (
   params?: GetBusinessesParams,
 ): Promise<Business[]> => {
-  let url = ENDPOINTS.BUSINESSES;
+  let url: string = ENDPOINTS.BUSINESSES;
 
   if (params) {
     const query = new URLSearchParams();
