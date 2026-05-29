@@ -18,6 +18,7 @@ export type ReviewComment = {
 };
 
 export type CreateReviewCommentPayload = {
+  businessId: string;
   reviewId: string;
   parentCommentId?: string;
   text: string;
