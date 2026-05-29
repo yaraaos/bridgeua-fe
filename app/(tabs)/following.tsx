@@ -13,6 +13,7 @@ import {
   DEFAULT_LOCATION_OPTIONS,
   LocationOption,
 } from "@/src/constants/locations";
+import { useMyBusinessProfile } from "@/src/features/businesses/hooks/useBusiness";
 import { useFollowingFeed } from "@/src/features/following";
 import type { FollowingFeedCardItem } from "@/src/features/following/types/following.types";
 import type { NewsDraft, NewsItem } from "@/src/features/news/types/news.types";
@@ -52,8 +53,6 @@ type FeedListItem =
       isOwnerNews?: boolean;
     };
 
-const BUSINESS_ID = "1";
-
 const createPromotionFromDraft = (
   draft: PromotionDraft,
   status: "draft" | "published" | "unpublished",
@@ -61,7 +60,7 @@ const createPromotionFromDraft = (
   return {
     ...draft,
     id: draft.id || `${Date.now()}`,
-    businessId: draft.businessId || BUSINESS_ID,
+    businessId: draft.businessId,
     status,
     isActive: status === "published",
   } as Promotion;
@@ -74,7 +73,7 @@ const createNewsFromDraft = (
   return {
     ...draft,
     id: draft.id || `${Date.now()}`,
-    businessId: draft.businessId || BUSINESS_ID,
+    businessId: draft.businessId,
     publishedAt: draft.publishedAt || new Date().toISOString(),
     status,
     isActive: status === "published",
@@ -84,6 +83,9 @@ const createNewsFromDraft = (
 export default function FollowingScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+
+  const { business: myBusiness } = useMyBusinessProfile();
+  const businessId = String(myBusiness?.id ?? "");
 
   const isGuest = useAuthStore((state) => state.isGuest);
   const user = useAuthStore((state) => state.user);
@@ -151,7 +153,7 @@ export default function FollowingScreen() {
 
   const createEmptyDraft = (): PromotionDraft => ({
     id: "",
-    businessId: BUSINESS_ID,
+    businessId: businessId,
     title: "",
     subtitle: "",
     description: "",
@@ -172,7 +174,7 @@ export default function FollowingScreen() {
 
   const createEmptyNewsDraft = (): NewsDraft => ({
     id: "",
-    businessId: BUSINESS_ID,
+    businessId: businessId,
     title: "",
     description: "",
     content: "",

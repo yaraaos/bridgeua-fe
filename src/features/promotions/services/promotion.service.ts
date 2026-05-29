@@ -30,3 +30,15 @@ export const getPromotionById = async (
   const p = res.data.data ?? res.data;
   return p ? normalizePromotion(p) : null;
 };
+
+export const getBannerPromotion = async (
+  id?: string,
+): Promise<Promotion | null> => {
+  if (id) return getPromotionById(id);
+  const promotions = await getActivePromotions();
+  return promotions[0] ?? null;
+};
+
+export const getBannerPromotions = async (): Promise<Promotion[]> => {
+  return getActivePromotions();
+};

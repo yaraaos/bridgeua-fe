@@ -339,15 +339,13 @@ export default function HomeScreen() {
           )}
           scrollEventThrottle={16}
         >
-          {isBannerVisible && !searchQuery.trim() ? (
-            <View style={styles.bannerWrap}>
-              <HomePromotionBanner
-                promotions={bannerPromotions}
-                visible={isBannerVisible}
-                onPressPromotion={handlePromotionBannerPress}
-              />
-            </View>
-          ) : null}
+          <View style={[styles.bannerWrap, (!isBannerVisible || searchQuery.trim()) && { height: 0, overflow: 'hidden' }]}>
+            <HomePromotionBanner
+              promotions={bannerPromotions}
+              visible={isBannerVisible && !searchQuery.trim()}
+              onPressPromotion={handlePromotionBannerPress}
+            />
+          </View>
 
           <View style={styles.stickyCategoryWrap}>{categoryBar}</View>
 
@@ -425,7 +423,6 @@ const styles = StyleSheet.create({
 
   bannerWrap: {
     overflow: "hidden",
-    marginBottom: -10,
   },
 
   stickyCategoryWrap: {
