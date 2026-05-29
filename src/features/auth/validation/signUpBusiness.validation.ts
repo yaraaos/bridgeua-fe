@@ -1,8 +1,10 @@
 import { z } from "zod";
 
+import { businessNameSchema } from "@/src/features/businesses/validation/businessProfile.validation";
+
 export const signUpBusinessSchema = z
   .object({
-    businessName: z.string().trim().min(1, "Business name is required"),
+    businessName: businessNameSchema,
     ownerName: z
       .string()
       .trim()

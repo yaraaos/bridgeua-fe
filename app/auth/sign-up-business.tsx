@@ -20,6 +20,11 @@ import {
   SignUpBusinessFormErrors,
   validateSignUpBusinessForm,
 } from "../../src/features/auth/validation/signUpBusiness.validation";
+import {
+  BUSINESS_NAME_HARD_LIMIT,
+  BUSINESS_NAME_RECOMMENDED_LIMIT,
+  isBusinessNameNearLimit,
+} from "../../src/features/businesses/validation/businessProfile.validation";
 
 const FALLBACK_CATEGORIES = [
   "Beauty",
@@ -160,14 +165,36 @@ export default function SignUpBusinessScreen() {
                 setBusinessName(value);
                 clearFieldError("businessName");
               }}
+              maxLength={BUSINESS_NAME_HARD_LIMIT}
               disabled={isLoading}
               error={Boolean(errors.businessName)}
             />
-            {errors.businessName ? (
-              <Text style={styles.errorText}>{errors.businessName}</Text>
-            ) : (
-              <Text style={styles.helperText}>Cannot be changed later</Text>
-            )}
+            <View style={styles.businessNameHintRow}>
+              {errors.businessName ? (
+                <Text style={styles.errorText}>{errors.businessName}</Text>
+              ) : (
+                <Text style={styles.helperText}>Cannot be changed later</Text>
+              )}
+              <Text
+                style={[
+                  styles.charCounter,
+                  isBusinessNameNearLimit(businessName) &&
+                    styles.charCounterWarning,
+                  businessName.length >= BUSINESS_NAME_HARD_LIMIT &&
+                    styles.charCounterAtLimit,
+                ]}
+              >
+                {businessName.length}/{BUSINESS_NAME_HARD_LIMIT}
+              </Text>
+            </View>
+            {!errors.businessName &&
+            isBusinessNameNearLimit(businessName) &&
+            businessName.length < BUSINESS_NAME_HARD_LIMIT ? (
+              <Text style={styles.helperWarningText}>
+                Recommended length is {BUSINESS_NAME_RECOMMENDED_LIMIT} characters
+                — longer names may not display well in cards and headers.
+              </Text>
+            ) : null}
           </View>
 
           <View>
@@ -450,6 +477,36 @@ function createStyles(colors: AppColors) {
       marginTop: 4,
       fontSize: 12,
       color: colors.textMuted,
+    },
+
+    helperWarningText: {
+      marginTop: 4,
+      fontSize: 12,
+      color: colors.accentOrange,
+      fontWeight: "600",
+    },
+
+    businessNameHintRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      gap: 8,
+    },
+
+    charCounter: {
+      marginTop: 4,
+      fontSize: 12,
+      color: colors.textMuted,
+    },
+
+    charCounterWarning: {
+      color: colors.accentOrange,
+      fontWeight: "700",
+    },
+
+    charCounterAtLimit: {
+      color: colors.error,
+      fontWeight: "700",
     },
 
     addressRow: {
