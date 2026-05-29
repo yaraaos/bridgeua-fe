@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useFocusEffect } from "expo-router";
+import { useCallback, useState } from "react";
 
 import { getBannerPromotions } from "../services/promotion.service";
 import type { HomePromotion } from "../types/promotion.types";
@@ -11,25 +12,27 @@ export function useBannerPromotions() {
     !hasDismissedBannerPromotionThisSession,
   );
 
-  useEffect(() => {
-    let isMounted = true;
+  useFocusEffect(
+    useCallback(() => {
+      let isMounted = true;
 
-    async function loadPromotions() {
-      const data = await getBannerPromotions();
+      async function loadPromotions() {
+        const data = await getBannerPromotions();
 
-      if (!isMounted) {
-        return;
+        if (!isMounted) {
+          return;
+        }
+
+        setPromotions(data);
       }
 
-      setPromotions(data);
-    }
+      void loadPromotions();
 
-    loadPromotions();
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+      return () => {
+        isMounted = false;
+      };
+    }, []),
+  );
 
   const closeBanner = () => {
     hasDismissedBannerPromotionThisSession = true;
