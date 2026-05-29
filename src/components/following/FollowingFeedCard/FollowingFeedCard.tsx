@@ -14,6 +14,7 @@ type FollowingFeedCardProps = {
   onPress?: () => void;
   isOwnerPromotion?: boolean;
   isOwnerNews?: boolean;
+  isFeatured?: boolean;
   onFeaturePromotion?: () => void;
 };
 
@@ -22,6 +23,7 @@ export default function FollowingFeedCard({
   onPress,
   isOwnerPromotion,
   isOwnerNews,
+  isFeatured,
   onFeaturePromotion,
 }: FollowingFeedCardProps) {
   const { colors } = useAppTheme();
@@ -29,7 +31,7 @@ export default function FollowingFeedCard({
   const accountType = useAuthStore((state) => state.user?.accountType);
   const isBusinessOwner = accountType === "business";
   const [showMenu, setShowMenu] = useState(false);
-  const [isFeatured, setIsFeatured] = useState(false);
+  const isAlreadyFeatured = isFeatured === true;
 
   const extraStyles = useMemo(
     () =>
@@ -128,19 +130,29 @@ export default function FollowingFeedCard({
               <Pressable
                 style={extraStyles.inlineMenuRow}
                 onPress={() => {
-                  if (isFeatured) return;
+                  if (isAlreadyFeatured) return;
                   setShowMenu(false);
-                  setIsFeatured(true);
                   onFeaturePromotion?.();
                 }}
               >
                 <Ionicons
-                  name={isFeatured ? "star" : "star-outline"}
+                  name={isAlreadyFeatured ? "star" : "star-outline"}
                   size={16}
-                  color={isFeatured ? colors.accentOrange : colors.primaryGreen}
+                  color={
+                    isAlreadyFeatured
+                      ? colors.accentOrange
+                      : colors.primaryGreen
+                  }
                 />
-                <AppText style={[extraStyles.inlineMenuText, isFeatured && { color: colors.textMuted }]}>
-                  {isFeatured ? "Promo added to home banner" : "Add to home promo banner"}
+                <AppText
+                  style={[
+                    extraStyles.inlineMenuText,
+                    isAlreadyFeatured && { color: colors.textMuted },
+                  ]}
+                >
+                  {isAlreadyFeatured
+                    ? "Promo added to home banner"
+                    : "Add to home promo banner"}
                 </AppText>
               </Pressable>
             </View>

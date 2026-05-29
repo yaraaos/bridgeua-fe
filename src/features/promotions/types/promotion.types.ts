@@ -23,6 +23,7 @@ export type Promotion = {
   endsAt?: string;
 
   isActive: boolean;
+  isFeatured?: boolean;
   status?: PromotionStatus;
 
   promoCode?: string;

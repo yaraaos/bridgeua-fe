@@ -24,4 +24,5 @@ export type FollowingFeedCardItem = FollowingFeedItem & {
   recommendedByPreview: string[];
   recommendedByCount: number;
   status?: "draft" | "published" | "unpublished";
+  isFeatured?: boolean;
 };

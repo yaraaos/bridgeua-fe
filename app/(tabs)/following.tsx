@@ -549,12 +549,15 @@ export default function FollowingScreen() {
   };
 
   const ownerFeedItems = useMemo<FollowingFeedCardItem[]>(() => {
-    return ownerPromotions.map((promotion) => ({
+    return ownerPromotions.map((promotion) => {
+      
+      return ({
       id: `owner-promotion-${promotion.id}`,
       businessId: promotion.businessId,
       type: "promotion",
       promotionId: promotion.id,
       status: promotion.status,
+      isFeatured: promotion.isFeatured === true,
       title: promotion.title || "Untitled promotion",
       description:
         promotion.subtitle ||
@@ -576,7 +579,8 @@ export default function FollowingScreen() {
       priceLevel: undefined,
       recommendedByPreview: [],
       recommendedByCount: 0,
-    }));
+    });
+    });
   }, [ownerPromotions, myBusiness]);
 
   const ownerNewsFeedItems = useMemo<FollowingFeedCardItem[]>(() => {
@@ -939,11 +943,27 @@ export default function FollowingScreen() {
                 }
                 isOwnerPromotion={item.isOwnerPromotion}
                 isOwnerNews={item.isOwnerNews}
+                isFeatured={item.item.isFeatured}
                 onFeaturePromotion={
                   item.isOwnerPromotion
                     ? () => {
                         void apiClient
                           .patch(`/api/promotions/${item.item.promotionId}/feature`, { isFeatured: true })
+                          .then(() => {
+                            void apiClient.get<{ data: any[] }>("/api/promotions/mine").then((res) => {
+                              const data = (res.data.data ?? res.data) as any[];
+                              setOwnerPromotions(
+                                data.map((p) => ({
+                                  ...p,
+                                  imageUrl: p.imageUrl
+                                    ? p.imageUrl.startsWith("http")
+                                      ? p.imageUrl
+                                      : `${API_BASE_URL}${p.imageUrl}`
+                                    : p.imageUrl,
+                                })) as Promotion[],
+                              );
+                            });
+                          })
                           .catch(() => {});
                       }
                     : undefined
