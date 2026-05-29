@@ -10,7 +10,7 @@ import type {
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Alert,
   Image,
@@ -31,6 +31,7 @@ type Props = {
   onPublish: () => void;
   onUnpublish: () => void;
   onDelete?: () => void;
+  isPublishing?: boolean;
 };
 
 const CTA_OPTIONS: { type: NewsCtaType; label: string }[] = [
@@ -47,6 +48,7 @@ export default function OwnerNewsEditor({
   onSave,
   onPublish,
   onDelete,
+  isPublishing,
 }: Props) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
@@ -54,6 +56,12 @@ export default function OwnerNewsEditor({
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const scrollViewRef = useRef<ScrollView>(null);
+
+  useEffect(() => {
+    if (visible) {
+      setErrors({});
+    }
+  }, [visible]);
 
   const isPublished = draft.status === "published";
 
@@ -85,6 +93,7 @@ export default function OwnerNewsEditor({
   const validate = () => {
     const newErrors: Record<string, string> = {};
     if (!draft.title?.trim()) newErrors.title = "Title is required";
+    if (!draft.subtitle?.trim()) newErrors.subtitle = "Subtitle is required";
     if (!draft.imageUrl) newErrors.image = "Cover image is required";
     if (!draft.content?.trim()) newErrors.content = "Content is required";
     if (!draft.ctaLabel) newErrors.ctaLabel = "Please select a call to action";
@@ -240,6 +249,9 @@ export default function OwnerNewsEditor({
                 !!errors.subtitle && styles.fieldError,
               ]}
             />
+            {!!errors.subtitle && (
+              <AppText style={styles.errorText}>{errors.subtitle}</AppText>
+            )}
           </View>
 
           {/* ── Published date (static) ── */}
@@ -381,9 +393,10 @@ export default function OwnerNewsEditor({
             </View>
           </View>
           <AppButton
-            title="Publish"
+            title={isPublishing ? "Publishing..." : "Publish"}
             onPress={handlePublish}
             variant="primary"
+            disabled={isPublishing}
           />
           {!!draft.id && !!onDelete && (
             <Pressable style={styles.deleteButton} onPress={handleDelete}>

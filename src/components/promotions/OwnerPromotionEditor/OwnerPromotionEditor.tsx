@@ -28,6 +28,7 @@ type Props = {
   onPublish: () => void;
   onUnpublish: () => void;
   onDelete?: () => void;
+  isPublishing?: boolean;
 };
 
 export default function OwnerPromotionEditor({
@@ -38,6 +39,7 @@ export default function OwnerPromotionEditor({
   onSave,
   onPublish,
   onDelete,
+  isPublishing,
 }: Props) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
@@ -499,9 +501,10 @@ export default function OwnerPromotionEditor({
             </View>
           </View>
           <AppButton
-            title="Publish"
+            title={isPublishing ? "Publishing..." : "Publish"}
             onPress={handlePublish}
             variant="primary"
+            disabled={isPublishing}
           />
           {!!draft.id && !!onDelete && (
             <Pressable style={styles.deleteButton} onPress={handleDelete}>
