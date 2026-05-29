@@ -543,7 +543,11 @@ export default function FollowingScreen() {
       promotionId: promotion.id,
       status: promotion.status,
       title: promotion.title || "Untitled promotion",
-      description: promotion.description || "No description added yet.",
+      description:
+        promotion.subtitle ||
+        promotion.description ||
+        (promotion.offerDetails as any)?.[0] ||
+        "No description added yet.",
       createdAt: new Date().toISOString(),
       businessName: "Your Business",
       businessCategory: "Business",
