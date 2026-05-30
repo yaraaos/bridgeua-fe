@@ -84,6 +84,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     set({ isLoading: true });
 
     try {
+      await useAccountStore.getState().hydrateAccounts();
       await useAccountStore.getState().setActiveAccountId(accountId);
 
       clearAccountScopedState();
