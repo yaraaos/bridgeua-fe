@@ -99,8 +99,6 @@ export default function ChooseSpecialistScreen() {
           <SpecialistCard
             name="Any specialist"
             role="First available professional"
-            rating={business?.rating ?? 5}
-            reviewsCount={business?.reviewCount ?? 0}
             description="Recommended if you want the earliest available time."
             badgeText="Fastest"
             onPress={() => setSelectedSpecialistId("any")}
@@ -119,8 +117,6 @@ export default function ChooseSpecialistScreen() {
                 key={String(member.id)}
                 name={`${member.firstName} ${member.lastName}`}
                 role="Specialist"
-                rating={business?.rating ?? 5}
-                reviewsCount={business?.reviewCount ?? 0}
                 avatarUrl={member.photoUrl}
                 onPress={() => setSelectedSpecialistId(String(member.id))}
                 isSelected={selectedSpecialistId === String(member.id)}

@@ -20,8 +20,7 @@ import { FlatList, StyleSheet, View } from "react-native";
 const MEMBER_TABS = [
   { label: "Services", value: "services" },
   { label: "Bookings", value: "bookings" },
-  { label: "Reviews", value: "reviews" },
-] satisfies AppTabPillItem<"services" | "bookings" | "reviews">[];
+] satisfies AppTabPillItem<"services" | "bookings">[];
 
 export default function TeamMemberScreen() {
   const { colors } = useAppTheme();
@@ -30,9 +29,9 @@ export default function TeamMemberScreen() {
   const { members, setMembers } = useTeamStore();
   const { business } = useMyBusinessProfile();
   const businessId = business?.id;
-  const [activeTab, setActiveTab] = useState<
-    "services" | "bookings" | "reviews"
-  >("services");
+  const [activeTab, setActiveTab] = useState<"services" | "bookings">(
+    "services",
+  );
   const [isFetching, setIsFetching] = useState(false);
 
   useFocusEffect(
@@ -51,7 +50,9 @@ export default function TeamMemberScreen() {
                   ? m.photoUrl
                   : `${API_BASE_URL}${m.photoUrl}`
                 : undefined,
-              serviceIds: Array.isArray(m.serviceIds) ? m.serviceIds.map(String) : [],
+              serviceIds: Array.isArray(m.serviceIds)
+                ? m.serviceIds.map(String)
+                : [],
             })),
           );
         })
@@ -93,7 +94,9 @@ export default function TeamMemberScreen() {
   }
 
   const assignedServices = (business?.services ?? []).filter(
-    (s) => member.serviceIds?.map(String).includes(String(s.serviceId ?? s.id)) ?? false,
+    (s) =>
+      member.serviceIds?.map(String).includes(String(s.serviceId ?? s.id)) ??
+      false,
   );
 
   return (
@@ -140,15 +143,10 @@ export default function TeamMemberScreen() {
             )}
           />
         )
-      ) : activeTab === "bookings" ? (
+      ) : (
         <AppEmptyState
           title="No bookings yet"
           description="Bookings for this team member will appear here."
-        />
-      ) : (
-        <AppEmptyState
-          title="No reviews yet"
-          description="Reviews for this team member will appear here."
         />
       )}
     </AppScreen>
