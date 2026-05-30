@@ -415,7 +415,7 @@ export default function FollowingScreen() {
             : p.imageUrl,
         })) as Promotion[],
       );
-      closeEditor();
+      closeEditor(true);
     } catch {
       Alert.alert("Error", "Failed to save promotion. Please try again.");
     }
@@ -464,7 +464,7 @@ export default function FollowingScreen() {
             : p.imageUrl,
         })) as Promotion[],
       );
-      closeEditor();
+      closeEditor(true);
     } catch {
       Alert.alert("Error", "Failed to publish promotion. Please try again.");
     } finally {
@@ -478,7 +478,7 @@ export default function FollowingScreen() {
     const promotion = createPromotionFromDraft(draftPromotion, "unpublished");
 
     upsertOwnerPromotion(promotion);
-    closeEditor();
+    closeEditor(true);
   };
 
   const handleDeletePromotion = async () => {
@@ -489,7 +489,7 @@ export default function FollowingScreen() {
       setOwnerPromotions((prev) =>
         prev.filter((item) => item.id !== idToDelete),
       );
-      closeEditor();
+      closeEditor(true);
     } catch {
       Alert.alert("Error", "Failed to delete promotion. Please try again.");
     }
@@ -532,7 +532,7 @@ export default function FollowingScreen() {
             : n.imageUrl,
         })) as NewsItem[],
       );
-      closeNewsEditor();
+      closeNewsEditor(true);
     } catch {
       Alert.alert("Error", "Failed to save news. Please try again.");
     }
@@ -578,7 +578,7 @@ export default function FollowingScreen() {
             : n.imageUrl,
         })) as NewsItem[],
       );
-      closeNewsEditor();
+      closeNewsEditor(true);
     } catch {
       Alert.alert("Error", "Failed to publish news. Please try again.");
     } finally {
@@ -592,7 +592,7 @@ export default function FollowingScreen() {
     const newsItem = createNewsFromDraft(draftNews, "unpublished");
 
     upsertOwnerNews(newsItem);
-    closeNewsEditor();
+    closeNewsEditor(true);
   };
 
   const handleDeleteNews = async () => {
@@ -601,7 +601,7 @@ export default function FollowingScreen() {
     try {
       await apiClient.delete(`/api/news/${idToDelete}`);
       setOwnerNews((prev) => prev.filter((item) => item.id !== idToDelete));
-      closeNewsEditor();
+      closeNewsEditor(true);
     } catch {
       Alert.alert("Error", "Failed to delete news. Please try again.");
     }
