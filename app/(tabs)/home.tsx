@@ -91,13 +91,8 @@ export default function HomeScreen() {
     return {
       ...base,
       accountType: "business",
-      activeBusinessId: fallbackOwnedId ?? base.activeBusinessId ?? null,
-      ownedBusinessIds:
-        base.ownedBusinessIds && base.ownedBusinessIds.length > 0
-          ? base.ownedBusinessIds
-          : fallbackOwnedId
-            ? [fallbackOwnedId]
-            : [],
+      activeBusinessId: fallbackOwnedId ?? null,
+      ownedBusinessIds: fallbackOwnedId ? [fallbackOwnedId] : [],
     };
   }, [currentUser, activeAccount, isHydrated]);
 
