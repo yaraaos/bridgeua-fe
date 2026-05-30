@@ -12,6 +12,7 @@ import React, { useRef, useState } from "react";
 import {
   Alert,
   Image,
+  Keyboard,
   KeyboardAvoidingView,
   Modal,
   Platform,
@@ -68,7 +69,10 @@ export default function OwnerPromotionEditor({
     t.replace(/^\n+/, "").replace(/\n{2,}/g, "\n");
 
   const sanitizeOnBlur = (t: string) =>
-    t.replace(/^\n+/, "").replace(/\n{2,}/g, "\n").replace(/\n+$/, "");
+    t
+      .replace(/^\n+/, "")
+      .replace(/\n{2,}/g, "\n")
+      .replace(/\n+$/, "");
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -266,7 +270,9 @@ export default function OwnerPromotionEditor({
                   updateDraft({ title: sanitizeWhileTyping(t) });
                   clearError("title");
                 }}
-                onBlur={() => updateDraft({ title: sanitizeOnBlur(draft.title ?? "") })}
+                onBlur={() =>
+                  updateDraft({ title: sanitizeOnBlur(draft.title ?? "") })
+                }
                 style={[
                   styles.titleInput,
                   !!errors.title && styles.titleInputError,
@@ -288,7 +294,11 @@ export default function OwnerPromotionEditor({
                   updateDraft({ subtitle: sanitizeWhileTyping(t) });
                   clearError("subtitle");
                 }}
-                onBlur={() => updateDraft({ subtitle: sanitizeOnBlur(draft.subtitle ?? "") })}
+                onBlur={() =>
+                  updateDraft({
+                    subtitle: sanitizeOnBlur(draft.subtitle ?? ""),
+                  })
+                }
                 style={[
                   styles.subtitleInput,
                   !!errors.subtitle && styles.fieldError,
@@ -373,10 +383,18 @@ export default function OwnerPromotionEditor({
                   placeholderTextColor={colors.textMuted}
                   value={draft.offerDetails?.join("\n") ?? ""}
                   onChangeText={(t) => {
-                    updateDraft({ offerDetails: sanitizeWhileTyping(t).split("\n") });
+                    updateDraft({
+                      offerDetails: sanitizeWhileTyping(t).split("\n"),
+                    });
                     clearError("offerDetails");
                   }}
-                  onBlur={() => updateDraft({ offerDetails: [sanitizeOnBlur(draft.offerDetails?.join("\n") ?? "")] })}
+                  onBlur={() =>
+                    updateDraft({
+                      offerDetails: [
+                        sanitizeOnBlur(draft.offerDetails?.join("\n") ?? ""),
+                      ],
+                    })
+                  }
                   style={styles.textAreaInput}
                   multiline
                   textAlignVertical="top"
@@ -385,6 +403,7 @@ export default function OwnerPromotionEditor({
                 <Pressable
                   style={styles.validityRow}
                   onPress={() => {
+                    Keyboard.dismiss();
                     setTempDate(
                       draft.expiresAt ? new Date(draft.expiresAt) : new Date(),
                     );
@@ -537,8 +556,8 @@ export default function OwnerPromotionEditor({
           </ScrollView>
         </KeyboardAvoidingView>
 
-        {showDateModal && (
-          <View style={styles.datePickerContainer}>
+      {showDateModal && (
+        <View style={styles.datePickerContainer}>
             <View style={styles.datePickerHeader}>
               <Pressable onPress={() => setShowDateModal(false)} hitSlop={12}>
                 <AppText style={styles.datePickerCancel}>Cancel</AppText>
@@ -564,8 +583,8 @@ export default function OwnerPromotionEditor({
                 if (selectedDate) setTempDate(selectedDate);
               }}
             />
-          </View>
-        )}
+        </View>
+      )}
 
         {/* ── Footer ── */}
         <View style={styles.footer}>
