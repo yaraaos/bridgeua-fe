@@ -65,6 +65,7 @@ export const useAuthStore = create<AuthState>((set) => ({
 
         await useAccountStore.getState().addAccount({
           userId: String(user.id),
+          accountType: user.accountType ?? "personal",
           accessToken: tokens.accessToken,
           refreshToken: tokens.refreshToken,
         });
@@ -183,6 +184,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       if (accessToken && refreshToken && res.data.id) {
         await useAccountStore.getState().addAccount({
           userId: String(res.data.id),
+          accountType: res.data.accountType ?? "personal",
           accessToken,
           refreshToken,
         });

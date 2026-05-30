@@ -91,7 +91,7 @@ export default function AccountSwitcherSheet({
 
           return (
             <Pressable
-              key={account.id}
+              key={`${account.id}-${account.kind}`}
               style={[
                 styles.row,
                 isActive && styles.rowActive,

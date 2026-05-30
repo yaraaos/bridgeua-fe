@@ -47,6 +47,7 @@ async function tryRefreshToken(): Promise<string | null> {
       if (activeUser?.id) {
         await saveAccountTokens({
           userId: String(activeUser.id),
+          accountType: activeUser.accountType ?? "personal",
           accessToken,
           refreshToken: newRefreshToken,
         });
