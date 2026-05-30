@@ -78,8 +78,10 @@ export default function NotificationsScreen() {
   const activeAccount = useActiveAccount();
 
   useEffect(() => {
-    useNotificationsStore.getState().setActiveAccountType(activeAccount.kind);
-  }, [activeAccount.kind]);
+    if (activeAccount) {
+      useNotificationsStore.getState().setActiveAccountType(activeAccount.kind);
+    }
+  }, [activeAccount?.kind]);
 
   const [activeTab, setActiveTab] = useState<NotificationTab>("all");
 
@@ -297,4 +299,3 @@ function createStyles(colors: AppColors) {
     },
   });
 }
-

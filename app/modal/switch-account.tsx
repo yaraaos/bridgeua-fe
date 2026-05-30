@@ -1,5 +1,6 @@
 // app/modal/switch-account.tsx
 
+import { router } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import {
   Animated,
@@ -10,7 +11,6 @@ import {
   TouchableWithoutFeedback,
   View,
 } from "react-native";
-import { router } from "expo-router";
 
 import AccountSwitcherSheet from "@/src/components/profile/AccountSwitcherSheet/AccountSwitcherSheet";
 
@@ -92,7 +92,7 @@ export default function SwitchAccountModal() {
           <AccountSwitcherSheet
             onClose={handleClose}
             onAddBusiness={() => {
-              router.push("/profile/businesses");
+              router.replace("/auth/sign-in");
             }}
           />
         </View>

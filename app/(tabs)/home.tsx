@@ -21,7 +21,7 @@ import { useBannerPromotion } from "@/src/features/promotions/hooks/useBannerPro
 import { useBannerPromotions } from "@/src/features/promotions/hooks/useBannerPromotions";
 import type { HomePromotion } from "@/src/features/promotions/types/promotion.types";
 import type { Business } from "@/src/types/business";
-import { useActiveAccount } from "@/src/store/account.store";
+import { useAccountStore, useActiveAccount } from "@/src/store/account.store";
 import { useAuthStore } from "@/src/store/auth.store";
 import type { AuthUser } from "@/src/features/auth/types/auth.types";
 import { useDiscoveryLocationStore } from "@/src/store/discovery-location";
@@ -74,13 +74,14 @@ export default function HomeScreen() {
   const isGuest = useAuthStore((state) => state.isGuest);
   const currentUser = useAuthStore((state) => state.user);
   const activeAccount = useActiveAccount();
+  const isHydrated = useAccountStore((s) => s.isHydrated);
 
   // FE-only fallback until BU-198 (BE ownership metadata) lands.
   // When the Switch Account sheet picks a business account, treat the viewer
   // as a business owner for priority/Recommend purposes, using the account's
   // ownedBusinessId to mark which business is "mine".
   const effectiveUser = useMemo<AuthUser | null>(() => {
-    if (activeAccount?.kind !== "business") return currentUser;
+    if (!isHydrated || activeAccount?.kind !== "business") return currentUser;
 
     const fallbackOwnedId = activeAccount.ownedBusinessId;
     const base = currentUser ?? ({ id: activeAccount.id, email: "" } as AuthUser);
@@ -96,7 +97,7 @@ export default function HomeScreen() {
             ? [fallbackOwnedId]
             : [],
     };
-  }, [currentUser, activeAccount]);
+  }, [currentUser, activeAccount, isHydrated]);
 
   const { categories } = useCategories();
   const categoryNames = [

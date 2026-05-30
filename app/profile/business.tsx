@@ -110,13 +110,13 @@ export default function BusinessProfileScreen() {
   );
 
   const businessName = business?.name || "";
-  const handle = business?.category ?? account.handle;
+  const handle = business?.category ?? account?.handle ?? "";
   const avatarUrl =
-    business?.avatarUrl ?? business?.images?.[0]?.url ?? account.avatarUrl;
+    business?.avatarUrl ?? business?.images?.[0]?.url ?? account?.avatarUrl;
   const businessLocation = business?.location ?? "";
   const businessRating = business?.rating ?? 0;
   const businessReviewCount = business?.reviewCount ?? 0;
-  const publicBusinessId = business?.id ?? account.id;
+  const publicBusinessId = business?.id ?? account?.id ?? "";
 
   const { reviews, isLoading: isReviewsLoading } = useReviews({
     businessId: String(publicBusinessId),
@@ -526,7 +526,11 @@ export default function BusinessProfileScreen() {
           {latestReview ? (
             <View style={styles.reviewRow}>
               <Image
-                source={latestReview.authorAvatar ? { uri: latestReview.authorAvatar } : undefined}
+                source={
+                  latestReview.authorAvatar
+                    ? { uri: latestReview.authorAvatar }
+                    : undefined
+                }
                 style={styles.reviewAvatar}
               />
 

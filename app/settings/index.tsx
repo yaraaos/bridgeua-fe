@@ -7,6 +7,7 @@ import { deleteBusiness } from "@/src/features/businesses/services/business.serv
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { useAppStore } from "@/src/store/app.store";
 import { useAuthStore } from "@/src/store/auth.store";
+import { useAccountStore } from "@/src/store/account.store";
 import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useState } from "react";
@@ -115,6 +116,10 @@ export default function SettingsScreen() {
             try {
               setIsDeletingBusiness(true);
               await deleteBusiness(business.id);
+              const currentUser = useAuthStore.getState().user;
+              if (currentUser?.id) {
+                await useAccountStore.getState().removeAccount(String(currentUser.id));
+              }
               await clearUser();
               router.replace("/auth/sign-in");
             } catch (error) {
@@ -254,6 +259,10 @@ export default function SettingsScreen() {
             pressed && styles.logoutPressed,
           ]}
           onPress={async () => {
+            const currentUser = useAuthStore.getState().user;
+            if (currentUser?.id) {
+              await useAccountStore.getState().removeAccount(String(currentUser.id));
+            }
             await clearUser();
             router.replace("/auth/sign-in");
           }}
