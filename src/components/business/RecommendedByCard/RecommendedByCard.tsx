@@ -35,23 +35,26 @@ export default function RecommendedByCard({
           {recommendation.businessName}
         </Text>
 
-        <Text style={styles.meta} numberOfLines={1}>
-          {recommendation.businessCategory}
-          {recommendation.businessLocation
-            ? ` • ${recommendation.businessLocation}`
-            : ""}
-        </Text>
+        <View style={styles.metaRow}>
+          <Ionicons name="star" size={12} color={colors.accentOrange} />
+          <Text style={styles.meta}>
+            {recommendation.businessRating
+              ? `${recommendation.businessRating.toFixed(1)} • `
+              : ""}
+            {recommendation.businessCategory}
+            {recommendation.businessLocation
+              ? ` • ${recommendation.businessLocation}`
+              : ""}
+          </Text>
+        </View>
 
         <View style={styles.recommendedRow}>
-          {!!recommendation.recommendedByPreview?.length ? (
-            <Text style={styles.recommendedLabel} numberOfLines={1}>
-              Recommended by {recommendation.recommendedByPreview[0]}
-            </Text>
-          ) : (
-            <Text style={styles.recommendedLabel} numberOfLines={1}>
-              Recommended by community
-            </Text>
-          )}
+          <Text style={styles.recommendedLabel} numberOfLines={1}>
+            Recommended by{" "}
+            {recommendation.recommendedByPreview?.[0] ??
+              recommendation.businessName ??
+              "community"}
+          </Text>
 
           {(recommendation.recommendedByCount ?? 0) > 0 ? (
             <Text style={styles.recommendedCount} numberOfLines={1}>
