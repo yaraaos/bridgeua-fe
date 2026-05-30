@@ -8,9 +8,10 @@ import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import * as ImagePicker from "expo-image-picker";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Alert,
+  Animated,
   Image,
   Keyboard,
   KeyboardAvoidingView,
@@ -54,8 +55,22 @@ export default function OwnerPromotionEditor({
   const [tempDate, setTempDate] = useState(new Date());
   const [promoCodeVisible, setPromoCodeVisible] = useState(!!draft.promoCode);
   const scrollViewRef = useRef<ScrollView>(null);
+  const datePickerAnim = useRef(new Animated.Value(0)).current;
 
   const isPublished = draft.status === "published";
+
+  useEffect(() => {
+    if (showDateModal) {
+      Animated.spring(datePickerAnim, {
+        toValue: 1,
+        useNativeDriver: true,
+        tension: 65,
+        friction: 11,
+      }).start();
+    } else {
+      datePickerAnim.setValue(0);
+    }
+  }, [showDateModal, datePickerAnim]);
 
   const updateDraft = (patch: Partial<PromotionDraft>) => {
     onChangeDraft({ ...draft, ...patch });
@@ -557,7 +572,20 @@ export default function OwnerPromotionEditor({
         </KeyboardAvoidingView>
 
       {showDateModal && (
-        <View style={styles.datePickerContainer}>
+        <Animated.View
+          style={[
+            styles.datePickerContainer,
+            {
+              opacity: datePickerAnim,
+              transform: [{
+                translateY: datePickerAnim.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [20, 0],
+                }),
+              }],
+            },
+          ]}
+        >
             <View style={styles.datePickerHeader}>
               <Pressable onPress={() => setShowDateModal(false)} hitSlop={12}>
                 <AppText style={styles.datePickerCancel}>Cancel</AppText>
@@ -583,7 +611,7 @@ export default function OwnerPromotionEditor({
                 if (selectedDate) setTempDate(selectedDate);
               }}
             />
-        </View>
+        </Animated.View>
       )}
 
         {/* ── Footer ── */}
