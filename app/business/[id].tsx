@@ -282,6 +282,15 @@ export default function BusinessDetailsScreen() {
         }
       />
 
+      {isEditPreview ? (
+        <View style={styles.previewBanner}>
+          <Text style={styles.previewBannerTitle}>Preview mode</Text>
+          <Text style={styles.previewBannerSubtitle}>
+            Unsaved changes are visible only to you
+          </Text>
+        </View>
+      ) : null}
+
       <Animated.ScrollView
         ref={scrollViewRef}
         stickyHeaderIndices={[stickyIndex]}
@@ -319,15 +328,6 @@ export default function BusinessDetailsScreen() {
             onChange={handleChangeTab}
           />
         </View>
-
-        {isEditPreview ? (
-          <View style={styles.previewBanner}>
-            <Text style={styles.previewBannerTitle}>Preview mode</Text>
-            <Text style={styles.previewBannerSubtitle}>
-              Unsaved changes are visible only to you
-            </Text>
-          </View>
-        ) : null}
 
         {isGuest ? <GuestBusinessCtaBanner /> : null}
 
@@ -509,7 +509,7 @@ function createStyles(colors: AppColors) {
     },
     previewBanner: {
       marginHorizontal: spacing.md,
-      marginBottom: spacing.md,
+      marginTop: spacing.md,
       paddingVertical: spacing.sm,
       paddingHorizontal: spacing.md,
       backgroundColor: colors.accentOrange + "22",
@@ -520,13 +520,13 @@ function createStyles(colors: AppColors) {
       gap: 2,
     },
     previewBannerTitle: {
-      fontSize: 13,
+      fontSize: 15,
       fontWeight: "600",
       color: colors.accentOrange,
     },
     previewBannerSubtitle: {
-      fontSize: 12,
-      color: colors.textMuted,
+      fontSize: 11,
+      color: colors.accentOrange,
       textAlign: "center",
     },
   });
