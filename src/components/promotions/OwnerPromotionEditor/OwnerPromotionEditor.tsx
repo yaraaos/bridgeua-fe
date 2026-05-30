@@ -56,8 +56,27 @@ export default function OwnerPromotionEditor({
   const [promoCodeVisible, setPromoCodeVisible] = useState(!!draft.promoCode);
   const scrollViewRef = useRef<ScrollView>(null);
   const datePickerAnim = useRef(new Animated.Value(0)).current;
+  const titleRef = useRef<View>(null);
+  const subtitleRef = useRef<View>(null);
+  const imageRef = useRef<View>(null);
+  const offerDetailsRef = useRef<View>(null);
+  const expiresAtRef = useRef<View>(null);
+  const ctaRef = useRef<View>(null);
+  const promoCodeRef = useRef<View>(null);
 
   const isPublished = draft.status === "published";
+
+  const scrollToRef = (ref: React.RefObject<View | null>) => {
+    ref.current?.measureLayout(
+      scrollViewRef.current?.getInnerViewNode?.() as any,
+      (x, y) => {
+        scrollViewRef.current?.scrollTo({ y: y - 20, animated: true });
+      },
+      () => {
+        scrollViewRef.current?.scrollTo({ y: 0, animated: true });
+      },
+    );
+  };
 
   useEffect(() => {
     if (showDateModal) {
@@ -115,19 +134,32 @@ export default function OwnerPromotionEditor({
     const newErrors: Record<string, string> = {};
     if (!draft.title?.trim()) newErrors.title = "Title is required";
     if (!draft.subtitle?.trim()) newErrors.subtitle = "Subtitle is required";
-    if (!draft.imageUrl) newErrors.image = "Cover image is required";
+    if (!hasImage) newErrors.image = "Cover image is required";
     if (!draft.offerDetails?.length)
       newErrors.offerDetails = "Offer details are required";
     if (!draft.expiresAt) newErrors.expiresAt = "Expiry date is required";
-    if (!draft.ctaLabel) newErrors.ctaLabel = "Please select a call to action";
+    if (!draft.ctaLabel?.trim()) newErrors.ctaLabel = "Please choose a Call to Action";
+    const hasPromoCode = !!draft.promoCode?.trim();
+    const hasDiscount = !!draft.discountLabel?.trim();
+    if (hasPromoCode && !hasDiscount)
+      newErrors.discountLabel = "Discount is required when a promo code is set";
+    if (hasDiscount && !hasPromoCode)
+      newErrors.promoCode = "Promo code is required when a discount is set";
     return newErrors;
   };
+
+  const isPublishReady = Object.keys(validate()).length === 0;
 
   const handlePublish = () => {
     const newErrors = validate();
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
-      scrollViewRef.current?.scrollTo({ y: 0, animated: true });
+      if (newErrors.title) scrollToRef(titleRef);
+      else if (newErrors.subtitle) scrollToRef(subtitleRef);
+      else if (newErrors.image) scrollToRef(imageRef);
+      else if (newErrors.offerDetails || newErrors.expiresAt) scrollToRef(offerDetailsRef);
+      else if (newErrors.promoCode || newErrors.discountLabel) scrollToRef(promoCodeRef);
+      else if (newErrors.ctaLabel) scrollToRef(ctaRef);
       return;
     }
     setErrors({});
@@ -276,7 +308,7 @@ export default function OwnerPromotionEditor({
             contentContainerStyle={styles.scrollContent}
           >
             {/* ── Title ── */}
-            <View>
+            <View ref={titleRef}>
               <TextInput
                 placeholder="Promotion title"
                 placeholderTextColor={colors.textMuted}
@@ -300,7 +332,7 @@ export default function OwnerPromotionEditor({
             </View>
 
             {/* ── Subtitle ── */}
-            <View>
+            <View ref={subtitleRef}>
               <TextInput
                 placeholder="Short subtitle"
                 placeholderTextColor={colors.textMuted}
@@ -326,7 +358,7 @@ export default function OwnerPromotionEditor({
             </View>
 
             {/* ── Image picker ── */}
-            <View>
+            <View ref={imageRef}>
               {hasImage ? (
                 <View style={styles.imageWrapper}>
                   <Image
@@ -385,7 +417,7 @@ export default function OwnerPromotionEditor({
             )}
 
             {/* ── Offer details card ── */}
-            <View>
+            <View ref={offerDetailsRef}>
               <View
                 style={[
                   styles.sectionCard,
@@ -457,6 +489,7 @@ export default function OwnerPromotionEditor({
             </View>
 
             {/* ── Promo code (optional) ── */}
+            <View ref={promoCodeRef} />
             {!promoCodeVisible ? (
               <Pressable
                 style={styles.addRow}
@@ -493,8 +526,8 @@ export default function OwnerPromotionEditor({
                     onChangeText={(t) => updateDraft({ promoCode: t })}
                     style={styles.promoCodeInput}
                     autoCapitalize="characters"
-                    placeholder="BRIDGE20"
-                    placeholderTextColor={colors.accentOrange}
+                    placeholder="ADD PROMO CODE HERE"
+                    placeholderTextColor={colors.accentOrange + "66"}
                   />
                 </View>
                 <View style={styles.discountRow}>
@@ -512,12 +545,18 @@ export default function OwnerPromotionEditor({
                     <AppText style={styles.discountPercent}>%</AppText>
                   </View>
                 </View>
+            {!!errors.discountLabel && (
+              <AppText style={styles.errorText}>{errors.discountLabel}</AppText>
+            )}
+            {!!errors.promoCode && (
+              <AppText style={styles.errorText}>{errors.promoCode}</AppText>
+            )}
               </View>
             )}
 
             {/* ── CTA selector ── */}
-            <View>
-              <AppText style={styles.ctaSectionLabel}>Call to action</AppText>
+            <View ref={ctaRef}>
+              <AppText style={styles.ctaSectionLabel}>Choose Call to Action</AppText>
               <View style={styles.ctaRow}>
                 <Pressable
                   style={[
@@ -624,12 +663,14 @@ export default function OwnerPromotionEditor({
               <AppButton title="Save draft" onPress={onSave} variant="ghost" />
             </View>
           </View>
-          <AppButton
-            title={isPublishing ? "Publishing..." : "Publish"}
-            onPress={handlePublish}
-            variant="primary"
-            disabled={isPublishing}
-          />
+          <View style={!isPublishReady && !isPublishing ? { opacity: 0.5 } : undefined}>
+            <AppButton
+              title={isPublishing ? "Publishing..." : "Publish"}
+              onPress={handlePublish}
+              variant="primary"
+              disabled={isPublishing}
+            />
+          </View>
           {!!draft.id && !!onDelete && (
             <Pressable style={styles.deleteButton} onPress={handleDelete}>
               <AppText style={styles.deleteButtonText}>Delete</AppText>
