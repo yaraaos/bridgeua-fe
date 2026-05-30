@@ -192,19 +192,38 @@ export default function FollowingScreen() {
     status: "draft",
   });
 
+  const hasPromotionDraftContent = (draft: PromotionDraft): boolean =>
+    Boolean(
+      draft.title?.trim() ||
+      draft.subtitle?.trim() ||
+      draft.description?.trim() ||
+      draft.imageUrl?.trim() ||
+      draft.promoCode?.trim() ||
+      draft.discountLabel?.trim() ||
+      draft.ctaType ||
+      draft.ctaLabel?.trim() ||
+      draft.redemptionInstructions?.trim() ||
+      draft.offerDetails?.some((item) => item.trim()) ||
+      draft.terms?.some((item) => item.trim()) ||
+      draft.startsAt ||
+      draft.expiresAt ||
+      draft.endsAt,
+    );
+
+  const hasNewsDraftContent = (draft: NewsDraft): boolean =>
+    Boolean(
+      draft.title?.trim() ||
+      draft.subtitle?.trim() ||
+      draft.description?.trim() ||
+      draft.content?.trim() ||
+      draft.imageUrl?.trim() ||
+      draft.ctaType ||
+      draft.ctaLabel?.trim() ||
+      draft.publishedAt,
+    );
+
   const closeEditor = (force = false) => {
-    if (
-      !force &&
-      draftPromotion &&
-      (draftPromotion.title?.trim() ||
-        draftPromotion.subtitle?.trim() ||
-        (draftPromotion.imageUrl &&
-          draftPromotion.imageUrl.startsWith("file://")) ||
-        draftPromotion.description?.trim() ||
-        draftPromotion.promoCode?.trim() ||
-        draftPromotion.offerDetails?.some((o) => o.trim()) ||
-        draftPromotion.expiresAt)
-    ) {
+    if (!force && draftPromotion && hasPromotionDraftContent(draftPromotion)) {
       Alert.alert(
         "Unsaved changes",
         "You have unsaved changes. What would you like to do?",
@@ -228,14 +247,7 @@ export default function FollowingScreen() {
   };
 
   const closeNewsEditor = (force = false) => {
-    if (
-      !force &&
-      draftNews &&
-      (draftNews.title?.trim() ||
-        draftNews.subtitle?.trim() ||
-        (draftNews.imageUrl && draftNews.imageUrl.startsWith("file://")) ||
-        draftNews.content?.trim())
-    ) {
+    if (!force && draftNews && hasNewsDraftContent(draftNews)) {
       Alert.alert(
         "Unsaved changes",
         "You have unsaved changes. What would you like to do?",
