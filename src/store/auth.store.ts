@@ -8,11 +8,22 @@ import {
   getAuthSession,
   startGuestSession,
 } from "../services/auth/session";
-import { clearAuthTokens, getRefreshToken } from "../services/auth/tokens";
+import {
+  clearAuthTokens,
+  getAccessToken,
+  getRefreshToken,
+  saveAuthTokens,
+} from "../services/auth/tokens";
 import { useAccountStore } from "./account.store";
+import { useFilterStore } from "./filter.store";
 import { useFollowingStore } from "./following.store";
 import { useProfileStore } from "./profile.store";
 import { useReviewsStore } from "./reviews.store";
+
+type AuthTokens = {
+  accessToken: string;
+  refreshToken: string;
+};
 
 type AuthState = {
   user: AuthUser | null;
@@ -20,10 +31,17 @@ type AuthState = {
   isGuest: boolean;
   isLoading: boolean;
 
-  setUser: (user: AuthUser) => void;
+  setUser: (user: AuthUser, tokens?: AuthTokens) => void;
+  switchToAccount: (accountId: string) => Promise<void>;
   enterGuestMode: () => Promise<void>;
   clearUser: () => Promise<void>;
   hydrate: () => Promise<void>;
+};
+
+const clearAccountScopedState = () => {
+  useReviewsStore.getState().clearReviews();
+  useProfileStore.getState().clearProfile();
+  useFilterStore.getState().resetAllFilters();
 };
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -32,12 +50,8 @@ export const useAuthStore = create<AuthState>((set) => ({
   isGuest: false,
   isLoading: true,
 
-  setUser: (user) => {
+  setUser: (user, tokens) => {
     void clearGuestSession();
-
-    useAccountStore
-      .getState()
-      .setActiveAccountKind(user.accountType ?? "personal");
 
     set({
       user,
@@ -45,15 +59,67 @@ export const useAuthStore = create<AuthState>((set) => ({
       isGuest: false,
       isLoading: false,
     });
+
+    if (tokens && user.id) {
+      void (async () => {
+        await saveAuthTokens(tokens.accessToken, tokens.refreshToken);
+
+        await useAccountStore.getState().addAccount({
+          userId: String(user.id),
+          accountType: user.accountType ?? "personal",
+          accessToken: tokens.accessToken,
+          refreshToken: tokens.refreshToken,
+        });
+
+        await useAccountStore.getState().setActiveAccountId(String(user.id));
+      })();
+    } else {
+      void useAccountStore
+        .getState()
+        .setActiveAccountKind(user.accountType ?? "personal");
+    }
+  },
+
+  switchToAccount: async (accountId) => {
+    set({ isLoading: true });
+
+    try {
+      await useAccountStore.getState().hydrateAccounts();
+      await useAccountStore.getState().setActiveAccountId(accountId);
+
+      clearAccountScopedState();
+
+      const res = await apiClient.get<AuthUser>(ENDPOINTS.AUTH_ME);
+
+      set({
+        user: res.data,
+        isAuthenticated: true,
+        isGuest: false,
+        isLoading: false,
+      });
+
+      await useProfileStore.getState().loadProfile();
+      await useFollowingStore.getState().syncWithServer();
+      useFilterStore.getState().bumpBusinessVersion?.();
+    } catch {
+      set({
+        user: null,
+        isAuthenticated: false,
+        isGuest: false,
+        isLoading: false,
+      });
+
+      throw new Error("Failed to switch account");
+    }
   },
 
   enterGuestMode: async () => {
     await startGuestSession();
 
-    useFollowingStore.getState().resetFollowing();
-    useReviewsStore.getState().clearReviews();
-    useProfileStore.getState().clearProfile();
-    useAccountStore.getState().setActiveAccountKind("personal");
+    clearAccountScopedState();
+
+    await useAccountStore.getState().setActiveAccountKind("personal");
+
     set({
       user: null,
       isAuthenticated: false,
@@ -76,10 +142,10 @@ export const useAuthStore = create<AuthState>((set) => ({
     await clearAuthTokens();
     await clearGuestSession();
 
-    useFollowingStore.getState().resetFollowing();
-    useReviewsStore.getState().clearReviews();
-    useProfileStore.getState().clearProfile();
-    useAccountStore.getState().setActiveAccountKind("personal");
+    clearAccountScopedState();
+
+    await useAccountStore.getState().setActiveAccountKind("personal");
+
     set({
       user: null,
       isAuthenticated: false,
@@ -116,9 +182,25 @@ export const useAuthStore = create<AuthState>((set) => ({
 
       const res = await apiClient.get<AuthUser>(ENDPOINTS.AUTH_ME);
 
-      useAccountStore
-        .getState()
-        .setActiveAccountKind(res.data.accountType ?? "personal");
+      const accessToken = await getAccessToken();
+      const refreshToken = await getRefreshToken();
+
+      if (accessToken && refreshToken && res.data.id) {
+        await useAccountStore.getState().addAccount({
+          userId: String(res.data.id),
+          accountType: res.data.accountType ?? "personal",
+          accessToken,
+          refreshToken,
+        });
+
+        await useAccountStore
+          .getState()
+          .setActiveAccountId(String(res.data.id));
+      } else {
+        await useAccountStore
+          .getState()
+          .setActiveAccountKind(res.data.accountType ?? "personal");
+      }
 
       set({
         user: res.data,
@@ -128,6 +210,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       });
 
       await useProfileStore.getState().loadProfile();
+      await useFollowingStore.getState().syncWithServer();
     } catch {
       await clearAuthTokens();
       await clearGuestSession();

@@ -1,5 +1,6 @@
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { getOnboardingSeen } from "@/src/services/storage/onboarding";
+import { useAccountStore } from "@/src/store/account.store";
 import { useAuthStore } from "@/src/store/auth.store";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
@@ -25,11 +26,13 @@ export default function SplashScreen() {
   const textOpacity = useRef(new Animated.Value(0)).current;
   const textY = useRef(new Animated.Value(8)).current;
   const hydrate = useAuthStore((state) => state.hydrate);
+  const hydrateAccounts = useAccountStore((state) => state.hydrateAccounts);
 
   useEffect(() => {
     let isMounted = true;
 
     async function resolveInitialRoute() {
+      await hydrateAccounts();
       await hydrate();
 
       const onboardingSeen = await getOnboardingSeen();

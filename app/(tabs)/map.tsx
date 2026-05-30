@@ -21,7 +21,7 @@ import {
   prioritizeOwnedBusiness,
 } from "@/src/features/discovery/utils/ownedBusinessDiscovery";
 import { useBannerPromotions } from "@/src/features/promotions/hooks/useBannerPromotions";
-import { useActiveAccount } from "@/src/store/account.store";
+import { useAccountStore, useActiveAccount } from "@/src/store/account.store";
 import { useAuthStore } from "@/src/store/auth.store";
 import { useDiscoveryLocationStore } from "@/src/store/discovery-location";
 import { useFilterStore } from "@/src/store/filter.store";
@@ -115,13 +115,16 @@ export default function MapScreen() {
   const followedBusinessIds = useFollowingStore(
     (state) => state.followedBusinessIds,
   );
-  const { businesses, isLoading } = useBusinesses();
+  const businessVersion = useFilterStore((s) => s.businessVersion);
+
+  const { businesses, isLoading } = useBusinesses(undefined, businessVersion);
 
   const currentUser = useAuthStore((state) => state.user);
   const activeAccount = useActiveAccount();
+  const isHydrated = useAccountStore((s) => s.isHydrated);
   // Same FE fallback as Home until BU-198 (BE ownership metadata) lands.
   const effectiveUser = useMemo<AuthUser | null>(() => {
-    if (activeAccount?.kind !== "business") return currentUser;
+    if (!isHydrated || activeAccount?.kind !== "business") return currentUser;
 
     const fallbackOwnedId = activeAccount.ownedBusinessId;
     const base = currentUser ?? ({ id: activeAccount.id, email: "" } as AuthUser);
@@ -129,15 +132,10 @@ export default function MapScreen() {
     return {
       ...base,
       accountType: "business",
-      activeBusinessId: fallbackOwnedId ?? base.activeBusinessId ?? null,
-      ownedBusinessIds:
-        base.ownedBusinessIds && base.ownedBusinessIds.length > 0
-          ? base.ownedBusinessIds
-          : fallbackOwnedId
-            ? [fallbackOwnedId]
-            : [],
+      activeBusinessId: fallbackOwnedId ?? null,
+      ownedBusinessIds: fallbackOwnedId ? [fallbackOwnedId] : [],
     };
-  }, [currentUser, activeAccount]);
+  }, [currentUser, activeAccount, isHydrated]);
 
   const { promotions: bannerPromotions } = useBannerPromotions();
   const businessIdsWithPromo = useMemo(

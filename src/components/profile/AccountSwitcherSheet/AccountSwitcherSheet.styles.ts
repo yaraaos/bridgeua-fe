@@ -89,6 +89,9 @@ export function createStyles(colors: AppColors) {
       fontWeight: "600",
       color: colors.textMuted,
     },
+    rowDisabled: {
+      opacity: 0.6,
+    },
     notificationCount: {
       marginTop: 4,
       fontSize: 12,

@@ -21,7 +21,7 @@ import { useBannerPromotion } from "@/src/features/promotions/hooks/useBannerPro
 import { useBannerPromotions } from "@/src/features/promotions/hooks/useBannerPromotions";
 import type { HomePromotion } from "@/src/features/promotions/types/promotion.types";
 import type { Business } from "@/src/types/business";
-import { useActiveAccount } from "@/src/store/account.store";
+import { useAccountStore, useActiveAccount } from "@/src/store/account.store";
 import { useAuthStore } from "@/src/store/auth.store";
 import type { AuthUser } from "@/src/features/auth/types/auth.types";
 import { useDiscoveryLocationStore } from "@/src/store/discovery-location";
@@ -61,26 +61,29 @@ export default function HomeScreen() {
 
   const serverParams = useMemo(() => {
     const params: Record<string, string | number> = {};
-    if (category) params.categoryName = category;
     if (sort && sort !== "relevance" && sort !== "distance") params.sort = sort;
     if (rating && rating !== "custom") params.minRating = Number(rating);
     return params;
-  }, [category, sort, rating]);
+  }, [sort, rating]);
+
+  const businessVersion = useFilterStore((s) => s.businessVersion);
 
   const { businesses, isLoading } = useBusinesses(
     Object.keys(serverParams).length > 0 ? serverParams : undefined,
+    businessVersion,
   );
 
   const isGuest = useAuthStore((state) => state.isGuest);
   const currentUser = useAuthStore((state) => state.user);
   const activeAccount = useActiveAccount();
+  const isHydrated = useAccountStore((s) => s.isHydrated);
 
   // FE-only fallback until BU-198 (BE ownership metadata) lands.
   // When the Switch Account sheet picks a business account, treat the viewer
   // as a business owner for priority/Recommend purposes, using the account's
   // ownedBusinessId to mark which business is "mine".
   const effectiveUser = useMemo<AuthUser | null>(() => {
-    if (activeAccount?.kind !== "business") return currentUser;
+    if (!isHydrated || activeAccount?.kind !== "business") return currentUser;
 
     const fallbackOwnedId = activeAccount.ownedBusinessId;
     const base = currentUser ?? ({ id: activeAccount.id, email: "" } as AuthUser);
@@ -88,15 +91,10 @@ export default function HomeScreen() {
     return {
       ...base,
       accountType: "business",
-      activeBusinessId: fallbackOwnedId ?? base.activeBusinessId ?? null,
-      ownedBusinessIds:
-        base.ownedBusinessIds && base.ownedBusinessIds.length > 0
-          ? base.ownedBusinessIds
-          : fallbackOwnedId
-            ? [fallbackOwnedId]
-            : [],
+      activeBusinessId: fallbackOwnedId ?? null,
+      ownedBusinessIds: fallbackOwnedId ? [fallbackOwnedId] : [],
     };
-  }, [currentUser, activeAccount]);
+  }, [currentUser, activeAccount, isHydrated]);
 
   const { categories } = useCategories();
   const categoryNames = [
@@ -135,9 +133,7 @@ export default function HomeScreen() {
 
   const { filteredBusinesses: discoveryFilteredBusinesses } = useDiscoveryFeed({
     businesses,
-    // category is normally applied server-side; only forward the Promo
-    // pseudo-category so it can be filtered client-side here.
-    category: category === PROMO_CATEGORY_LABEL ? PROMO_CATEGORY_LABEL : "",
+    category,
     sort: sort === "distance" ? "distance" : "relevance",
     cuisines,
     rating: "",

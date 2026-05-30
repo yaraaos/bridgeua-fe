@@ -1,6 +1,5 @@
 import { AppColors } from "@/src/constants/colors";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
-import { saveAuthTokens } from "@/src/services/auth/tokens";
 import { useAuthStore } from "@/src/store/auth.store";
 import { useFollowingStore } from "@/src/store/following.store";
 import { useProfileStore } from "@/src/store/profile.store";
@@ -9,7 +8,6 @@ import { router } from "expo-router";
 import { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
-import { useAccountStore } from "@/src/store/account.store";
 import AppButton from "../../src/components/ui/AppButton/AppButton";
 import AppInput from "../../src/components/ui/AppInput/AppInput";
 import AppLoader from "../../src/components/ui/AppLoader/AppLoader";
@@ -26,17 +24,14 @@ export default function SignInScreen() {
   const styles = createStyles(colors);
 
   const { submitSignIn, isLoading, apiError, setApiError } = useSignIn();
+
   const setUser = useAuthStore((state) => state.setUser);
   const enterGuestMode = useAuthStore((state) => state.enterGuestMode);
+
   const resetFollowing = useFollowingStore((state) => state.resetFollowing);
   const syncFollowing = useFollowingStore((state) => state.syncWithServer);
   const loadProfile = useProfileStore((state) => state.loadProfile);
   const clearReviews = useReviewsStore((state) => state.clearReviews);
-
-  const accounts = useAccountStore((state) => state.accounts);
-  const setActiveAccountId = useAccountStore(
-    (state) => state.setActiveAccountId,
-  );
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -44,6 +39,7 @@ export default function SignInScreen() {
 
   const handleSubmit = async () => {
     if (isLoading) return;
+
     const values = { email, password };
     const validationErrors = validateSignInForm(values);
 
@@ -54,28 +50,20 @@ export default function SignInScreen() {
 
     const response = await submitSignIn(values);
 
-    if (response) {
-      resetFollowing();
-      clearReviews();
+    if (!response) return;
 
-      await saveAuthTokens(response.accessToken, response.refreshToken);
+    resetFollowing();
+    clearReviews();
 
-      setUser(response.user);
+    setUser(response.user, {
+      accessToken: response.accessToken,
+      refreshToken: response.refreshToken,
+    });
 
-      const targetAccountKind = response.user.accountType ?? "personal";
-      const targetAccount = accounts.find(
-        (account) => account.kind === targetAccountKind,
-      );
+    await loadProfile();
+    await syncFollowing();
 
-      if (targetAccount) {
-        setActiveAccountId(targetAccount.id);
-      }
-
-      await loadProfile();
-      await syncFollowing();
-
-      router.replace("/(tabs)/profile");
-    }
+    router.replace("/(tabs)/profile");
   };
 
   const handleSkipForNow = async () => {
@@ -106,6 +94,7 @@ export default function SignInScreen() {
             error={Boolean(errors.email)}
             disabled={isLoading}
           />
+
           {errors.email ? (
             <Text style={styles.errorText}>{errors.email}</Text>
           ) : null}
@@ -123,6 +112,7 @@ export default function SignInScreen() {
             error={Boolean(errors.password)}
             disabled={isLoading}
           />
+
           {errors.password ? (
             <Text style={styles.errorText}>{errors.password}</Text>
           ) : null}
@@ -142,6 +132,7 @@ export default function SignInScreen() {
         ) : (
           <AppButton title="Login" onPress={handleSubmit} />
         )}
+
         <AppButton
           title="Skip for now"
           variant="ghost"

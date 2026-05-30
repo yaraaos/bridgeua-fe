@@ -4,7 +4,7 @@ import AppText from "@/src/components/ui/AppText/AppText";
 import { AppColors } from "@/src/constants/colors";
 import { spacing } from "@/src/constants/spacing";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
-import { useActiveAccount } from "@/src/store/account.store";
+import { useAccountStore, useActiveAccount } from "@/src/store/account.store";
 import { useAuthStore } from "@/src/store/auth.store";
 import { router } from "expo-router";
 import { StyleSheet, View } from "react-native";
@@ -23,7 +23,11 @@ export default function ProfileTabScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
   const isGuest = useAuthStore((state) => state.isGuest);
+  const user = useAuthStore((state) => state.user);
   const account = useActiveAccount();
+  const isHydrated = useAccountStore((s) => s.isHydrated);
+
+  const effectiveAccountKind = account?.kind ?? user?.accountType ?? "personal";
 
   const handleRegisterPress = () => {
     router.push({
@@ -72,7 +76,11 @@ export default function ProfileTabScreen() {
     );
   }
 
-  if (account?.kind === "business") {
+  if (!isHydrated) {
+    return null;
+  }
+
+  if (effectiveAccountKind === "business") {
     return <BusinessProfileScreen />;
   }
 

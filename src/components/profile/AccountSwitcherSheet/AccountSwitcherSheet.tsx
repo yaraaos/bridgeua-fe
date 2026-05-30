@@ -1,5 +1,5 @@
 import { Feather, Ionicons } from "@expo/vector-icons";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Pressable, ScrollView, View } from "react-native";
 
 import AppAvatar from "@/src/components/ui/AppAvatar";
@@ -9,6 +9,7 @@ import {
   useAccountStore,
   type AccountSummary,
 } from "@/src/store/account.store";
+import { useAuthStore } from "@/src/store/auth.store";
 import { useNotificationsStore } from "@/src/store/notifications.store";
 
 import { createStyles } from "./AccountSwitcherSheet.styles";
@@ -27,15 +28,41 @@ export default function AccountSwitcherSheet({
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
 
+  const [isSwitching, setIsSwitching] = useState(false);
+
   const accounts = useAccountStore((s) => s.accounts);
   const activeAccountId = useAccountStore((s) => s.activeAccountId);
-  const setActiveAccountId = useAccountStore((s) => s.setActiveAccountId);
+  const hydrateAccounts = useAccountStore((s) => s.hydrateAccounts);
 
-  const handleSelect = (account: AccountSummary) => {
-    setActiveAccountId(account.id);
-    useNotificationsStore.getState().setActiveAccountType(account.kind);
-    onSelectAccount?.(account);
-    onClose();
+  const switchToAccount = useAuthStore((s) => s.switchToAccount);
+
+  useEffect(() => {
+    void hydrateAccounts();
+  }, [hydrateAccounts]);
+
+  const handleSelect = async (account: AccountSummary) => {
+    if (isSwitching) return;
+
+    if (account.id === activeAccountId) {
+      onSelectAccount?.(account);
+      onClose();
+      return;
+    }
+
+    try {
+      setIsSwitching(true);
+
+      await switchToAccount(account.id);
+
+      useNotificationsStore.getState().setActiveAccountType(account.kind);
+
+      onSelectAccount?.(account);
+      onClose();
+    } catch {
+      // Later we can show a toast here if you have one.
+    } finally {
+      setIsSwitching(false);
+    }
   };
 
   return (
@@ -64,9 +91,14 @@ export default function AccountSwitcherSheet({
 
           return (
             <Pressable
-              key={account.id}
-              style={[styles.row, isActive && styles.rowActive]}
-              onPress={() => handleSelect(account)}
+              key={`${account.id}-${account.kind}`}
+              style={[
+                styles.row,
+                isActive && styles.rowActive,
+                isSwitching && styles.rowDisabled,
+              ]}
+              disabled={isSwitching}
+              onPress={() => void handleSelect(account)}
             >
               <AppAvatar
                 size="md"
@@ -122,10 +154,10 @@ export default function AccountSwitcherSheet({
         })}
 
         <Pressable
-          style={styles.addRow}
+          style={[styles.addRow, isSwitching && styles.rowDisabled]}
+          disabled={isSwitching}
           onPress={() => {
             onAddBusiness?.();
-            onClose();
           }}
         >
           <View style={styles.addIcon}>
