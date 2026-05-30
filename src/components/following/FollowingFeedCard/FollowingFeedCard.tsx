@@ -108,7 +108,7 @@ export default function FollowingFeedCard({
 
   return (
     <Pressable style={styles.feedCard} onPress={handlePress}>
-      {isOwnerPromotion && (
+      {isOwnerPromotion && item.status === "published" && (
         <View style={extraStyles.menuWrapper}>
           <Pressable
             style={[
@@ -191,8 +191,24 @@ export default function FollowingFeedCard({
               </Text>
 
               {(isOwnerPromotion || isOwnerNews) && statusLabel ? (
-                <View style={styles.statusBadge}>
-                  <Text style={styles.statusBadgeText}>{statusLabel}</Text>
+                <View
+                  style={[
+                    styles.statusBadge,
+                    item.status === "draft" && {
+                      backgroundColor: colors.accentOrangeSoft,
+                    },
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.statusBadgeText,
+                      item.status === "draft" && {
+                        color: colors.accentOrange,
+                      },
+                    ]}
+                  >
+                    {statusLabel}
+                  </Text>
                 </View>
               ) : null}
             </View>
