@@ -1,4 +1,3 @@
-import { apiClient } from "@/src/services/api/client";
 import { API_BASE_URL } from "@/src/services/api/config";
 import {
   getAllStoredAccounts,
@@ -35,6 +34,30 @@ type AccountState = {
   setActiveAccountKind: (kind: AccountKind) => Promise<void>;
 };
 
+function buildAccountSummary(
+  userId: string,
+  accessToken: string,
+  refreshToken: string,
+  d: any,
+): AccountSummary {
+  return {
+    id: userId,
+    kind: d.accountType as AccountKind,
+    displayName: d.displayName ?? 'Account',
+    handle: d.username ?? undefined,
+    avatarUrl: d.avatarUrl
+      ? d.avatarUrl.startsWith('http')
+        ? d.avatarUrl
+        : `${API_BASE_URL}${d.avatarUrl}`
+      : undefined,
+    notificationsCount: d.notificationCount ?? 0,
+    ownedBusinessId:
+      d.accountType === 'business' ? userId : undefined,
+    accessToken,
+    refreshToken,
+  };
+}
+
 export const useAccountStore = create<AccountState>((set, get) => ({
   accounts: [],
   activeAccountId: null,
@@ -48,33 +71,64 @@ export const useAccountStore = create<AccountState>((set, get) => ({
       return;
     }
 
+    const { saveAuthTokens } = await import('@/src/services/auth/tokens');
+
     const summaries = await Promise.all(
       stored.map(async (entry) => {
         try {
-          const res = await apiClient.get<any>("/api/auth/accounts/me", {
-            headers: {
-              Authorization: `Bearer ${entry.accessToken}`,
-            },
-          });
+          // Try the access token first
+          let accessToken = entry.accessToken;
 
-          const d = res.data;
+          const testRes = await fetch(
+            `${API_BASE_URL}/api/auth/accounts/me`,
+            { headers: { Authorization: `Bearer ${accessToken}` } },
+          );
 
-          return {
-            id: entry.userId,
-            kind: d.accountType as AccountKind,
-            displayName: d.displayName ?? "Account",
-            handle: d.username ?? undefined,
-            avatarUrl: d.avatarUrl
-              ? d.avatarUrl.startsWith("http")
-                ? d.avatarUrl
-                : `${API_BASE_URL}${d.avatarUrl}`
-              : undefined,
-            notificationsCount: d.notificationCount ?? 0,
-            ownedBusinessId:
-              d.accountType === "business" ? entry.userId : undefined,
-            accessToken: entry.accessToken,
-            refreshToken: entry.refreshToken,
-          } satisfies AccountSummary;
+          // If expired, try refreshing with this account's refresh token
+          if (testRes.status === 401) {
+            const refreshRes = await fetch(
+              `${API_BASE_URL}/api/auth/refresh`,
+              {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ refreshToken: entry.refreshToken }),
+              },
+            );
+
+            if (!refreshRes.ok) return null; // refresh failed, drop account
+
+            const refreshJson = await refreshRes.json();
+            accessToken = refreshJson.data.accessToken;
+            const newRefreshToken = refreshJson.data.refreshToken;
+
+            // Persist updated tokens for this account
+            await saveAccountTokens({
+              userId: entry.userId,
+              accountType: entry.accountType,
+              accessToken,
+              refreshToken: newRefreshToken,
+            });
+
+            // Re-fetch with new token
+            const retryRes = await fetch(
+              `${API_BASE_URL}/api/auth/accounts/me`,
+              { headers: { Authorization: `Bearer ${accessToken}` } },
+            );
+
+            if (!retryRes.ok) return null;
+
+            const retryJson = await retryRes.json();
+            const d = retryJson.data ?? retryJson;
+
+            return buildAccountSummary(entry.userId, accessToken, newRefreshToken, d);
+          }
+
+          if (!testRes.ok) return null;
+
+          const json = await testRes.json();
+          const d = json.data ?? json;
+
+          return buildAccountSummary(entry.userId, accessToken, entry.refreshToken, d);
         } catch {
           return null;
         }
@@ -83,7 +137,7 @@ export const useAccountStore = create<AccountState>((set, get) => ({
 
     const valid = summaries.filter(Boolean) as AccountSummary[];
 
-    const { user } = await import("@/src/store/auth.store").then((m) => ({
+    const { user } = await import('@/src/store/auth.store').then((m) => ({
       user: m.useAuthStore.getState().user,
     }));
 
@@ -94,17 +148,12 @@ export const useAccountStore = create<AccountState>((set, get) => ({
 
     if (activeId) {
       const active = valid.find((a) => a.id === activeId);
-
       if (active) {
         await saveAuthTokens(active.accessToken, active.refreshToken);
       }
     }
 
-    set({
-      accounts: valid,
-      activeAccountId: activeId,
-      isHydrated: true,
-    });
+    set({ accounts: valid, activeAccountId: activeId, isHydrated: true });
   },
 
   addAccount: async (tokens) => {
