@@ -70,9 +70,6 @@ export const useAuthStore = create<AuthState>((set) => ({
         });
 
         await useAccountStore.getState().setActiveAccountId(String(user.id));
-        await useAccountStore
-          .getState()
-          .setActiveAccountKind(user.accountType ?? "personal");
       })();
     } else {
       void useAccountStore

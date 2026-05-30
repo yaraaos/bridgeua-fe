@@ -51,16 +51,13 @@ export const useAccountStore = create<AccountState>((set, get) => ({
     const summaries = await Promise.all(
       stored.map(async (entry) => {
         try {
-          const res = await apiClient.get<{ data: any }>(
-            "/api/auth/accounts/me",
-            {
-              headers: {
-                Authorization: `Bearer ${entry.accessToken}`,
-              },
+          const res = await apiClient.get<any>("/api/auth/accounts/me", {
+            headers: {
+              Authorization: `Bearer ${entry.accessToken}`,
             },
-          );
+          });
 
-          const d = res.data.data;
+          const d = res.data;
 
           return {
             id: entry.userId,
