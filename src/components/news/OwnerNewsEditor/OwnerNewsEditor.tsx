@@ -75,6 +75,12 @@ export default function OwnerNewsEditor({
     if (errors[key]) setErrors((e) => ({ ...e, [key]: "" }));
   };
 
+  const sanitizeWhileTyping = (t: string) =>
+    t.replace(/^\n+/, "").replace(/\n{2,}/g, "\n");
+
+  const sanitizeOnBlur = (t: string) =>
+    t.replace(/^\n+/, "").replace(/\n{2,}/g, "\n").replace(/\n+$/, "");
+
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ["images"],
@@ -230,11 +236,10 @@ export default function OwnerNewsEditor({
               placeholderTextColor={colors.textMuted}
               value={draft.title}
               onChangeText={(t) => {
-                updateDraft({
-                  title: t.replace(/^\n+/, "").replace(/\n{2,}/g, "\n"),
-                });
+                updateDraft({ title: sanitizeWhileTyping(t) });
                 clearError("title");
               }}
+              onBlur={() => updateDraft({ title: sanitizeOnBlur(draft.title ?? "") })}
               style={[
                 styles.titleInput,
                 !!errors.title && styles.titleInputError,
@@ -252,11 +257,13 @@ export default function OwnerNewsEditor({
               placeholder="Short subtitle"
               placeholderTextColor={colors.textMuted}
               value={draft.subtitle ?? ""}
-              onChangeText={(t) => updateDraft({ subtitle: t })}
+              onChangeText={(t) => updateDraft({ subtitle: sanitizeWhileTyping(t) })}
+              onBlur={() => updateDraft({ subtitle: sanitizeOnBlur(draft.subtitle ?? "") })}
               style={[
                 styles.subtitleInput,
                 !!errors.subtitle && styles.fieldError,
               ]}
+              multiline
             />
             {!!errors.subtitle && (
               <AppText style={styles.errorText}>{errors.subtitle}</AppText>
@@ -345,9 +352,10 @@ export default function OwnerNewsEditor({
                 placeholderTextColor={colors.textMuted}
                 value={draft.content}
                 onChangeText={(t) => {
-                  updateDraft({ content: t });
+                  updateDraft({ content: sanitizeWhileTyping(t) });
                   clearError("content");
                 }}
+                onBlur={() => updateDraft({ content: sanitizeOnBlur(draft.content ?? "") })}
                 style={styles.textAreaInput}
                 multiline
                 textAlignVertical="top"
