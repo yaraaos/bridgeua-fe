@@ -1054,7 +1054,7 @@ export default function FollowingScreen() {
         visible={isEditorOpen}
         draft={draftPromotion ?? createEmptyDraft()}
         onChangeDraft={setDraftPromotion}
-        onCancel={closeEditor}
+        onCancel={() => closeEditor()}
         onSave={handleSaveDraft}
         onPublish={handlePublish}
         onUnpublish={handleUnpublish}
@@ -1066,7 +1066,7 @@ export default function FollowingScreen() {
         visible={isNewsEditorOpen}
         draft={draftNews ?? createEmptyNewsDraft()}
         onChangeDraft={setDraftNews}
-        onCancel={closeNewsEditor}
+        onCancel={() => closeNewsEditor()}
         onSave={handleSaveNewsDraft}
         onPublish={handlePublishNews}
         onUnpublish={handleUnpublishNews}
