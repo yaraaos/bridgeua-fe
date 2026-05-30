@@ -15,6 +15,7 @@ import AppText from "@/src/components/ui/AppText/AppText";
 import { AppColors } from "@/src/constants/colors";
 import { spacing } from "@/src/constants/spacing";
 import { useMyBusinessProfile } from "@/src/features/businesses";
+import { type DayOfWeek } from "@/src/features/businesses/types/editBusiness.types";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { useActiveAccount } from "@/src/store/account.store";
 import {
@@ -42,12 +43,90 @@ export default function EditBusinessScreen() {
   const dirty = useEditBusinessStore((s) => s.dirty);
   const setActiveTab = useEditBusinessStore((s) => s.setActiveTab);
   const resetAll = useEditBusinessStore((s) => s.resetAll);
+  const setOverviewDraft = useEditBusinessStore((s) => s.setOverviewDraft);
+  const setGalleryDraft = useEditBusinessStore((s) => s.setGalleryDraft);
+  const setServicesDraft = useEditBusinessStore((s) => s.setServicesDraft);
+  const setAboutDraft = useEditBusinessStore((s) => s.setAboutDraft);
 
   useEffect(() => {
-    if (tab === "services" || tab === "gallery" || tab === "overview" || tab === "about") {
+    if (
+      tab === "services" ||
+      tab === "gallery" ||
+      tab === "overview" ||
+      tab === "about"
+    ) {
       setActiveTab(tab as EditBusinessTab);
     }
   }, [tab, setActiveTab]);
+
+  useEffect(() => {
+    if (!business) return;
+
+    setOverviewDraft({
+      name: business.name ?? "",
+      category: business.category ?? "",
+      avatarUrl: business.avatarUrl ?? undefined,
+      address: business.address ?? "",
+      postalCode: business.zipCode ?? "",
+      city: business.city ?? "",
+      state: business.state ?? "",
+      phone: business.phone ?? "",
+      socialLinks: {
+        website: business.socialLinks?.website ?? "",
+        instagram: business.socialLinks?.instagram ?? "",
+        facebook: business.socialLinks?.facebook ?? "",
+        telegram: business.socialLinks?.telegram ?? "",
+        whatsapp: business.socialLinks?.whatsapp ?? "",
+      },
+      hours:
+        business.businessHours?.map((h) => {
+          const DAY_NAMES: DayOfWeek[] = [
+            "sunday",
+            "monday",
+            "tuesday",
+            "wednesday",
+            "thursday",
+            "friday",
+            "saturday",
+          ];
+          return {
+            day: DAY_NAMES[h.day] ?? "monday",
+            isOpen: !h.isClosed,
+            openTime: h.opensAt ?? "09:00",
+            closeTime: h.closesAt ?? "18:00",
+          };
+        }) ?? [],
+    });
+
+    setGalleryDraft({
+      photos:
+        business.images?.map((img) => ({
+          id: img.id,
+          url: img.url,
+          isLocal: false,
+        })) ?? [],
+      defaultPhotoIds:
+        business.images?.filter((img) => img.isDefault).map((img) => img.id) ??
+        [],
+      deletedPhotoIds: [],
+    });
+
+    setServicesDraft({
+      services:
+        business.services?.map((svc) => ({
+          id: svc.id,
+          name: svc.name,
+          duration: svc.duration ?? "",
+          price: String(svc.price ?? ""),
+        })) ?? [],
+    });
+
+    setAboutDraft({
+      description: business.about?.description ?? "",
+      languages: business.about?.languages ?? [],
+      amenities: business.about?.amenities?.map((a) => a.label) ?? [],
+    });
+  }, [business?.id]);
 
   const hasUnsaved = Object.values(dirty).some(Boolean);
 
