@@ -4,7 +4,7 @@ import { useAuthStore } from "@/src/store/auth.store";
 import { useFollowingStore } from "@/src/store/following.store";
 import { useProfileStore } from "@/src/store/profile.store";
 import { useReviewsStore } from "@/src/store/reviews.store";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
@@ -22,6 +22,8 @@ import {
 export default function SignInScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+
+  const { mode } = useLocalSearchParams<{ mode?: string }>();
 
   const { submitSignIn, isLoading, apiError, setApiError } = useSignIn();
 
@@ -133,11 +135,13 @@ export default function SignInScreen() {
           <AppButton title="Login" onPress={handleSubmit} />
         )}
 
-        <AppButton
-          title="Skip for now"
-          variant="ghost"
-          onPress={handleSkipForNow}
-        />
+        {mode !== "add-account" ? (
+          <AppButton
+            title="Skip for now"
+            variant="ghost"
+            onPress={handleSkipForNow}
+          />
+        ) : null}
       </View>
 
       <Text style={styles.footer}>

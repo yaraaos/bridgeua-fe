@@ -1,4 +1,5 @@
 import { Feather, Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { Pressable, ScrollView, View } from "react-native";
 
@@ -17,13 +18,11 @@ import { createStyles } from "./AccountSwitcherSheet.styles";
 type Props = {
   onClose: () => void;
   onSelectAccount?: (account: AccountSummary) => void;
-  onAddBusiness?: () => void;
 };
 
 export default function AccountSwitcherSheet({
   onClose,
   onSelectAccount,
-  onAddBusiness,
 }: Props) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
@@ -157,7 +156,13 @@ export default function AccountSwitcherSheet({
           style={[styles.addRow, isSwitching && styles.rowDisabled]}
           disabled={isSwitching}
           onPress={() => {
-            onAddBusiness?.();
+            onClose();
+            setTimeout(() => {
+              router.push({
+                pathname: '/auth/sign-in',
+                params: { mode: 'add-account' },
+              });
+            }, 300);
           }}
         >
           <View style={styles.addIcon}>
