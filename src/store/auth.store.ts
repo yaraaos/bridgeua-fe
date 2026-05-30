@@ -39,7 +39,6 @@ type AuthState = {
 };
 
 const clearAccountScopedState = () => {
-  useFollowingStore.getState().resetFollowing();
   useReviewsStore.getState().clearReviews();
   useProfileStore.getState().clearProfile();
 };
@@ -98,6 +97,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       });
 
       await useProfileStore.getState().loadProfile();
+      await useFollowingStore.getState().syncWithServer();
       useFilterStore.getState().bumpBusinessVersion?.();
     } catch {
       set({
@@ -208,6 +208,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       });
 
       await useProfileStore.getState().loadProfile();
+      await useFollowingStore.getState().syncWithServer();
     } catch {
       await clearAuthTokens();
       await clearGuestSession();
