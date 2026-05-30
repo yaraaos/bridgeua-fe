@@ -6,9 +6,59 @@ import { spacing } from "@/src/constants/spacing";
 import { useBusinesses } from "@/src/features/businesses";
 import { useFilterStore } from "@/src/store/filter.store";
 import { useFollowingStore } from "@/src/store/following.store";
+import type { Business } from "@/src/types/business";
 import { router } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import { FlatList, RefreshControl, StyleSheet, View } from "react-native";
+
+const FOOD_SUBCATEGORIES = [
+  "Ukrainian",
+  "Italian",
+  "Japanese",
+  "Georgian",
+  "American",
+  "Chinese",
+  "Mediterranean",
+  "Mexican",
+  "Vegan",
+];
+
+const CATEGORY_ALIASES: Record<string, string[]> = {
+  Food: FOOD_SUBCATEGORIES,
+  Beauty: ["Beauty"],
+  Healthcare: ["Healthcare", "Health & Medical"],
+  Shopping: ["Shopping"],
+  Services: ["Services", "Home & Repair", "Automotive"],
+};
+
+const getBusinessSubcategories = (business: Business) => {
+  return [business.category].filter(Boolean);
+};
+
+const doesBusinessMatchCategory = (business: Business, category: string) => {
+  if (!category) {
+    return true;
+  }
+
+  const allowedCategories = CATEGORY_ALIASES[category] ?? [category];
+
+  return allowedCategories.includes(business.category);
+};
+
+const doesBusinessMatchSubcategories = (
+  business: Business,
+  subcategories: string[],
+) => {
+  if (subcategories.length === 0) {
+    return true;
+  }
+
+  const businessSubcategories = getBusinessSubcategories(business);
+
+  return subcategories.some((subcategory) =>
+    businessSubcategories.includes(subcategory),
+  );
+};
 
 export default function ProfileFollowingScreen() {
   const [search, setSearch] = useState("");
@@ -20,13 +70,13 @@ export default function ProfileFollowingScreen() {
     (state) => state.followedBusinessIds,
   );
 
-  const { sort, cuisines, rating, distance, customDistance } = useFilterStore(
-    (state) => state.followingFilters,
-  );
+  const { category, sort, cuisines, rating, distance, customDistance } =
+    useFilterStore((state) => state.followingFilters);
 
   const activeFilterCount = useMemo(() => {
     let count = 0;
 
+    if (category) count += 1;
     if (sort && sort !== "relevance") count += 1;
     if (cuisines.length > 0) count += cuisines.length;
     if (rating) count += 1;
@@ -34,7 +84,7 @@ export default function ProfileFollowingScreen() {
     if (distance === "custom" && customDistance) count += 1;
 
     return count;
-  }, [sort, cuisines, rating, distance, customDistance]);
+  }, [category, sort, cuisines, rating, distance, customDistance]);
 
   const [visibleBusinessIds, setVisibleBusinessIds] = useState<string[]>([]);
 
@@ -60,8 +110,12 @@ export default function ProfileFollowingScreen() {
     return businesses
       .filter((business) => visibleBusinessIds.includes(String(business.id)))
       .filter((business) => {
-        const cuisineMatch =
-          cuisines.length === 0 || cuisines.includes(business.category);
+        const categoryMatch = doesBusinessMatchCategory(business, category);
+
+        const subcategoryMatch = doesBusinessMatchSubcategories(
+          business,
+          cuisines,
+        );
 
         const ratingMatch =
           selectedRatingValue === null ||
@@ -72,7 +126,9 @@ export default function ProfileFollowingScreen() {
           Number.isNaN(selectedDistanceKm) ||
           Number(business.distanceKm ?? 0) <= selectedDistanceKm;
 
-        return cuisineMatch && ratingMatch && distanceMatch;
+        return (
+          categoryMatch && subcategoryMatch && ratingMatch && distanceMatch
+        );
       })
       .filter((business) => {
         if (!normalizedSearch) {
@@ -108,6 +164,7 @@ export default function ProfileFollowingScreen() {
     businesses,
     visibleBusinessIds,
     search,
+    category,
     sort,
     cuisines,
     rating,
@@ -132,10 +189,6 @@ export default function ProfileFollowingScreen() {
     });
   };
 
-  const handleMapPress = () => {
-    router.push("/(tabs)/map");
-  };
-
   return (
     <AppScreen withTopInset={false} style={styles.container}>
       <ScreenHeader
@@ -146,8 +199,7 @@ export default function ProfileFollowingScreen() {
         searchValue={search}
         onSearchChangeText={setSearch}
         searchPlaceholder="Find followed businesses"
-        actions={["map", "filter"]}
-        onPressMap={handleMapPress}
+        actions={["filter"]}
         onPressFilter={handleFilterPress}
         activeFilterCount={activeFilterCount}
       />
@@ -177,8 +229,8 @@ export default function ProfileFollowingScreen() {
         )}
         ListEmptyComponent={
           <AppEmptyState
-            title="No followed businesses yet"
-            description="Businesses you follow will appear here."
+            title="No followed businesses found"
+            description="Try changing your filters or follow more businesses."
           />
         }
       />
