@@ -12,7 +12,9 @@ import React, { useRef, useState } from "react";
 import {
   Alert,
   Image,
+  KeyboardAvoidingView,
   Modal,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -237,6 +239,11 @@ export default function OwnerPromotionEditor({
           </Pressable>
         </View>
 
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          keyboardVerticalOffset={0}
+        >
         <ScrollView
           ref={scrollViewRef}
           keyboardShouldPersistTaps="handled"
@@ -512,6 +519,7 @@ export default function OwnerPromotionEditor({
             )}
           </View>
         </ScrollView>
+        </KeyboardAvoidingView>
 
         {showDateModal && (
           <View style={styles.datePickerContainer}>
