@@ -1,8 +1,8 @@
 import { Feather } from "@expo/vector-icons";
 import { usePreventRemove } from '@react-navigation/core';
 import { router, useLocalSearchParams } from "expo-router";
-import React, { useEffect } from "react";
-import { Alert, Pressable, StyleSheet, View } from "react-native";
+import React, { useEffect, useRef } from "react";
+import { Animated, Alert, Pressable, StyleSheet, View } from "react-native";
 
 import EditAboutTab from "@/src/components/editBusiness/EditAboutTab";
 import EditGalleryTab from "@/src/components/editBusiness/EditGalleryTab";
@@ -131,6 +131,33 @@ export default function EditBusinessScreen() {
 
   const hasUnsaved = Object.values(dirty).some(Boolean);
 
+  const pulseAnim = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    if (!hasUnsaved) {
+      pulseAnim.setValue(1);
+      return;
+    }
+
+    const pulse = Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulseAnim, {
+          toValue: 1.25,
+          duration: 600,
+          useNativeDriver: true,
+        }),
+        Animated.timing(pulseAnim, {
+          toValue: 1,
+          duration: 600,
+          useNativeDriver: true,
+        }),
+      ]),
+    );
+
+    pulse.start();
+    return () => pulse.stop();
+  }, [hasUnsaved]);
+
   usePreventRemove(hasUnsaved, ({ data }) => {
     Alert.alert(
       'Unsaved changes',
@@ -187,17 +214,25 @@ export default function EditBusinessScreen() {
           <Feather name="arrow-left" size={22} color={colors.textPrimary} />
         </Pressable>
 
-        <View style={styles.headerTitleRow}>
-          <AppText style={styles.headerTitle}>Edit Business</AppText>
-          {hasUnsaved && <View style={styles.dirtyDot} />}
-        </View>
+        <AppText style={styles.headerTitle}>Edit Business</AppText>
 
         <Pressable
           onPress={handlePreview}
           style={styles.headerButton}
           hitSlop={8}
         >
-          <Feather name="eye" size={22} color={colors.textPrimary} />
+          <View style={styles.previewButtonInner}>
+            <AppText style={[styles.previewLabel, !hasUnsaved && styles.previewLabelHidden]}>
+              Preview
+            </AppText>
+            <Animated.View style={{ transform: [{ scale: pulseAnim }] }}>
+              <Feather
+                name="eye"
+                size={22}
+                color={hasUnsaved ? colors.accentOrange : colors.textPrimary}
+              />
+            </Animated.View>
+          </View>
         </Pressable>
       </View>
 
@@ -231,9 +266,9 @@ function createStyles(colors: AppColors) {
       padding: 0,
     },
     header: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
       paddingHorizontal: spacing.lg,
       paddingVertical: spacing.md,
       backgroundColor: colors.background,
@@ -241,26 +276,19 @@ function createStyles(colors: AppColors) {
       borderBottomColor: colors.border,
     },
     headerButton: {
-      width: 36,
       height: 36,
+      minWidth: 36,
       alignItems: "center",
       justifyContent: "center",
     },
-    headerTitleRow: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 6,
-    },
     headerTitle: {
       fontSize: 17,
-      fontWeight: "800",
+      fontWeight: '800',
       color: colors.textPrimary,
-    },
-    dirtyDot: {
-      width: 8,
-      height: 8,
-      borderRadius: 4,
-      backgroundColor: colors.accentOrange,
+      position: 'absolute',
+      left: 0,
+      right: 0,
+      textAlign: 'center',
     },
     tabsRow: {
       paddingHorizontal: spacing.lg,
@@ -269,6 +297,19 @@ function createStyles(colors: AppColors) {
     },
     content: {
       flex: 1,
+    },
+    previewButtonInner: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+    },
+    previewLabel: {
+      fontSize: 13,
+      fontWeight: '600',
+      color: colors.accentOrange,
+    },
+    previewLabelHidden: {
+      opacity: 0,
     },
   });
 }
