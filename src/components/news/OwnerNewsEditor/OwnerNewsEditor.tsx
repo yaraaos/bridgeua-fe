@@ -8,9 +8,10 @@ import type {
   NewsDraft,
 } from "@/src/features/news/types/news.types";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { useScrollToError } from "@/src/hooks/useScrollToError";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Alert,
   Image,
@@ -57,7 +58,7 @@ export default function OwnerNewsEditor({
   const { business } = useMyBusinessProfile();
 
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const scrollViewRef = useRef<ScrollView>(null);
+  const { scrollRef: scrollViewRef, registerField, scrollToFirstError } = useScrollToError();
 
   useEffect(() => {
     if (visible) {
@@ -112,7 +113,10 @@ export default function OwnerNewsEditor({
     const newErrors = validate();
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
-      scrollViewRef.current?.scrollTo({ y: 0, animated: true });
+      scrollToFirstError(
+        ['title', 'subtitle', 'image', 'content', 'ctaLabel'],
+        newErrors,
+      );
       return;
     }
     setErrors({});
@@ -230,7 +234,7 @@ export default function OwnerNewsEditor({
           contentContainerStyle={styles.scrollContent}
         >
           {/* ── Title ── */}
-          <View>
+          <View {...registerField('title')}>
             <TextInput
               placeholder="News title"
               placeholderTextColor={colors.textMuted}
@@ -252,7 +256,7 @@ export default function OwnerNewsEditor({
           </View>
 
           {/* ── Subtitle ── */}
-          <View>
+          <View {...registerField('subtitle')}>
             <TextInput
               placeholder="Short subtitle"
               placeholderTextColor={colors.textMuted}
@@ -283,7 +287,7 @@ export default function OwnerNewsEditor({
           </View>
 
           {/* ── Image picker ── */}
-          <View>
+          <View {...registerField('image')}>
             {hasImage ? (
               <View style={styles.imageWrapper}>
                 <Image
@@ -339,7 +343,7 @@ export default function OwnerNewsEditor({
           )}
 
           {/* ── Content card ── */}
-          <View>
+          <View {...registerField('content')}>
             <View
               style={[
                 styles.sectionCard,
@@ -367,7 +371,7 @@ export default function OwnerNewsEditor({
           </View>
 
           {/* ── CTA selector ── */}
-          <View>
+          <View {...registerField('ctaLabel')}>
             <AppText style={styles.ctaSectionLabel}>Call to action</AppText>
             <View style={styles.ctaRow}>
               {CTA_OPTIONS.map((opt) => (

@@ -5,6 +5,7 @@ import type { AppColors } from "@/src/constants/colors";
 import { useMyBusinessProfile } from "@/src/features/businesses/hooks/useBusiness";
 import type { PromotionDraft } from "@/src/features/promotions/types/promotion.types";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { useScrollToError } from "@/src/hooks/useScrollToError";
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import * as ImagePicker from "expo-image-picker";
@@ -54,7 +55,11 @@ export default function OwnerPromotionEditor({
   const [showDateModal, setShowDateModal] = useState(false);
   const [tempDate, setTempDate] = useState(new Date());
   const [promoCodeVisible, setPromoCodeVisible] = useState(!!draft.promoCode);
-  const scrollViewRef = useRef<ScrollView>(null);
+  const {
+    scrollRef: scrollViewRef,
+    registerField,
+    scrollToFirstError,
+  } = useScrollToError();
   const datePickerAnim = useRef(new Animated.Value(0)).current;
   const titleRef = useRef<View>(null);
   const subtitleRef = useRef<View>(null);
@@ -65,18 +70,6 @@ export default function OwnerPromotionEditor({
   const promoCodeRef = useRef<View>(null);
 
   const isPublished = draft.status === "published";
-
-  const scrollToRef = (ref: React.RefObject<View | null>) => {
-    ref.current?.measureLayout(
-      scrollViewRef.current?.getInnerViewNode?.() as any,
-      (x, y) => {
-        scrollViewRef.current?.scrollTo({ y: y - 20, animated: true });
-      },
-      () => {
-        scrollViewRef.current?.scrollTo({ y: 0, animated: true });
-      },
-    );
-  };
 
   useEffect(() => {
     if (showDateModal) {
@@ -138,7 +131,8 @@ export default function OwnerPromotionEditor({
     if (!draft.offerDetails?.length)
       newErrors.offerDetails = "Offer details are required";
     if (!draft.expiresAt) newErrors.expiresAt = "Expiry date is required";
-    if (!draft.ctaLabel?.trim()) newErrors.ctaLabel = "Please choose a Call to Action";
+    if (!draft.ctaLabel?.trim())
+      newErrors.ctaLabel = "Please choose a Call to Action";
     const hasPromoCode = !!draft.promoCode?.trim();
     const hasDiscount = !!draft.discountLabel?.trim();
     if (hasPromoCode && !hasDiscount)
@@ -154,12 +148,19 @@ export default function OwnerPromotionEditor({
     const newErrors = validate();
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
-      if (newErrors.title) scrollToRef(titleRef);
-      else if (newErrors.subtitle) scrollToRef(subtitleRef);
-      else if (newErrors.image) scrollToRef(imageRef);
-      else if (newErrors.offerDetails || newErrors.expiresAt) scrollToRef(offerDetailsRef);
-      else if (newErrors.promoCode || newErrors.discountLabel) scrollToRef(promoCodeRef);
-      else if (newErrors.ctaLabel) scrollToRef(ctaRef);
+      scrollToFirstError(
+        [
+          "title",
+          "subtitle",
+          "image",
+          "offerDetails",
+          "expiresAt",
+          "promoCode",
+          "discountLabel",
+          "ctaLabel",
+        ],
+        newErrors,
+      );
       return;
     }
     setErrors({});
@@ -308,7 +309,7 @@ export default function OwnerPromotionEditor({
             contentContainerStyle={styles.scrollContent}
           >
             {/* ── Title ── */}
-            <View ref={titleRef}>
+            <View ref={titleRef} {...registerField("title")}>
               <TextInput
                 placeholder="Promotion title"
                 placeholderTextColor={colors.textMuted}
@@ -332,7 +333,7 @@ export default function OwnerPromotionEditor({
             </View>
 
             {/* ── Subtitle ── */}
-            <View ref={subtitleRef}>
+            <View ref={subtitleRef} {...registerField("subtitle")}>
               <TextInput
                 placeholder="Short subtitle"
                 placeholderTextColor={colors.textMuted}
@@ -358,7 +359,7 @@ export default function OwnerPromotionEditor({
             </View>
 
             {/* ── Image picker ── */}
-            <View ref={imageRef}>
+            <View ref={imageRef} {...registerField("image")}>
               {hasImage ? (
                 <View style={styles.imageWrapper}>
                   <Image
@@ -417,7 +418,7 @@ export default function OwnerPromotionEditor({
             )}
 
             {/* ── Offer details card ── */}
-            <View ref={offerDetailsRef}>
+            <View ref={offerDetailsRef} {...registerField("offerDetails")}>
               <View
                 style={[
                   styles.sectionCard,
@@ -489,7 +490,7 @@ export default function OwnerPromotionEditor({
             </View>
 
             {/* ── Promo code (optional) ── */}
-            <View ref={promoCodeRef} />
+            <View ref={promoCodeRef} {...registerField("promoCode")} />
             {!promoCodeVisible ? (
               <Pressable
                 style={styles.addRow}
@@ -545,18 +546,22 @@ export default function OwnerPromotionEditor({
                     <AppText style={styles.discountPercent}>%</AppText>
                   </View>
                 </View>
-            {!!errors.discountLabel && (
-              <AppText style={styles.errorText}>{errors.discountLabel}</AppText>
-            )}
-            {!!errors.promoCode && (
-              <AppText style={styles.errorText}>{errors.promoCode}</AppText>
-            )}
+                {!!errors.discountLabel && (
+                  <AppText style={styles.errorText}>
+                    {errors.discountLabel}
+                  </AppText>
+                )}
+                {!!errors.promoCode && (
+                  <AppText style={styles.errorText}>{errors.promoCode}</AppText>
+                )}
               </View>
             )}
 
             {/* ── CTA selector ── */}
-            <View ref={ctaRef}>
-              <AppText style={styles.ctaSectionLabel}>Choose Call to Action</AppText>
+            <View ref={ctaRef} {...registerField("ctaLabel")}>
+              <AppText style={styles.ctaSectionLabel}>
+                Choose Call to Action
+              </AppText>
               <View style={styles.ctaRow}>
                 <Pressable
                   style={[
@@ -610,21 +615,23 @@ export default function OwnerPromotionEditor({
           </ScrollView>
         </KeyboardAvoidingView>
 
-      {showDateModal && (
-        <Animated.View
-          style={[
-            styles.datePickerContainer,
-            {
-              opacity: datePickerAnim,
-              transform: [{
-                translateY: datePickerAnim.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: [20, 0],
-                }),
-              }],
-            },
-          ]}
-        >
+        {showDateModal && (
+          <Animated.View
+            style={[
+              styles.datePickerContainer,
+              {
+                opacity: datePickerAnim,
+                transform: [
+                  {
+                    translateY: datePickerAnim.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [20, 0],
+                    }),
+                  },
+                ],
+              },
+            ]}
+          >
             <View style={styles.datePickerHeader}>
               <Pressable onPress={() => setShowDateModal(false)} hitSlop={12}>
                 <AppText style={styles.datePickerCancel}>Cancel</AppText>
@@ -650,8 +657,8 @@ export default function OwnerPromotionEditor({
                 if (selectedDate) setTempDate(selectedDate);
               }}
             />
-        </Animated.View>
-      )}
+          </Animated.View>
+        )}
 
         {/* ── Footer ── */}
         <View style={styles.footer}>
@@ -663,7 +670,11 @@ export default function OwnerPromotionEditor({
               <AppButton title="Save draft" onPress={onSave} variant="ghost" />
             </View>
           </View>
-          <View style={!isPublishReady && !isPublishing ? { opacity: 0.5 } : undefined}>
+          <View
+            style={
+              !isPublishReady && !isPublishing ? { opacity: 0.5 } : undefined
+            }
+          >
             <AppButton
               title={isPublishing ? "Publishing..." : "Publish"}
               onPress={handlePublish}
