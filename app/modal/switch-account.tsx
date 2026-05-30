@@ -91,9 +91,6 @@ export default function SwitchAccountModal() {
         <View {...panResponder.panHandlers}>
           <AccountSwitcherSheet
             onClose={handleClose}
-            onAddBusiness={() => {
-              router.replace("/auth/sign-in");
-            }}
           />
         </View>
       </Animated.View>
