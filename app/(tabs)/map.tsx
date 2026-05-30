@@ -115,7 +115,9 @@ export default function MapScreen() {
   const followedBusinessIds = useFollowingStore(
     (state) => state.followedBusinessIds,
   );
-  const { businesses, isLoading } = useBusinesses();
+  const businessVersion = useFilterStore((s) => s.businessVersion);
+
+  const { businesses, isLoading } = useBusinesses(undefined, businessVersion);
 
   const currentUser = useAuthStore((state) => state.user);
   const activeAccount = useActiveAccount();

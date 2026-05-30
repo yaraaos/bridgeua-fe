@@ -10,29 +10,36 @@ import {
   type GetBusinessesParams,
 } from "../services/business.service";
 
-export const useBusinesses = (params?: GetBusinessesParams) => {
+export const useBusinesses = (params?: GetBusinessesParams, refetchTrigger?: number) => {
   const [businesses, setBusinesses] = useState<Business[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    let cancelled = false;
+
     const loadBusinesses = async () => {
-      setIsLoading(true);
       try {
         const data = await getBusinesses(params);
-        setBusinesses(data);
+        if (!cancelled) {
+          setBusinesses(data);
+          setIsInitialLoad(false);
+        }
       } catch (e) {
-        setError(e instanceof Error ? e.message : "Failed to load businesses");
-      } finally {
-        setIsLoading(false);
+        if (!cancelled) {
+          setError(e instanceof Error ? e.message : "Failed to load businesses");
+          setIsInitialLoad(false);
+        }
       }
     };
 
-    loadBusinesses();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [JSON.stringify(params)]);
+    void loadBusinesses();
 
-  return { businesses, isLoading, error };
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [JSON.stringify(params), refetchTrigger]);
+
+  return { businesses, isLoading: isInitialLoad, error };
 };
 
 export const useBusinessDetails = (id?: string) => {

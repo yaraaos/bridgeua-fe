@@ -60,6 +60,8 @@ const defaultFilters: FilterValues = {
 type FilterState = {
   discoveryFilters: FilterValues;
   followingFilters: FilterValues;
+  businessVersion: number;
+  bumpBusinessVersion: () => void;
   setCategory: (scope: FilterScope, value: string) => void;
   setSort: (scope: FilterScope, value: SortOption) => void;
   toggleCuisine: (scope: FilterScope, value: string) => void;
@@ -75,6 +77,8 @@ const getScopeKey = (scope: FilterScope) =>
 export const useFilterStore = create<FilterState>((set) => ({
   discoveryFilters: defaultFilters,
   followingFilters: defaultFilters,
+  businessVersion: 0,
+  bumpBusinessVersion: () => set((s) => ({ businessVersion: s.businessVersion + 1 })),
   setCategory: (scope, value) =>
     set((state) => {
       const key = getScopeKey(scope);

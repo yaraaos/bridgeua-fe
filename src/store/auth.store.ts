@@ -15,6 +15,7 @@ import {
   saveAuthTokens,
 } from "../services/auth/tokens";
 import { useAccountStore } from "./account.store";
+import { useFilterStore } from "./filter.store";
 import { useFollowingStore } from "./following.store";
 import { useProfileStore } from "./profile.store";
 import { useReviewsStore } from "./reviews.store";
@@ -97,6 +98,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       });
 
       await useProfileStore.getState().loadProfile();
+      useFilterStore.getState().bumpBusinessVersion?.();
     } catch {
       set({
         user: null,

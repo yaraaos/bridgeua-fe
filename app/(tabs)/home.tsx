@@ -67,8 +67,11 @@ export default function HomeScreen() {
     return params;
   }, [category, sort, rating]);
 
+  const businessVersion = useFilterStore((s) => s.businessVersion);
+
   const { businesses, isLoading } = useBusinesses(
     Object.keys(serverParams).length > 0 ? serverParams : undefined,
+    businessVersion,
   );
 
   const isGuest = useAuthStore((state) => state.isGuest);
