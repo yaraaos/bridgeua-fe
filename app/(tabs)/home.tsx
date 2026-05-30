@@ -61,11 +61,10 @@ export default function HomeScreen() {
 
   const serverParams = useMemo(() => {
     const params: Record<string, string | number> = {};
-    if (category) params.categoryName = category;
     if (sort && sort !== "relevance" && sort !== "distance") params.sort = sort;
     if (rating && rating !== "custom") params.minRating = Number(rating);
     return params;
-  }, [category, sort, rating]);
+  }, [sort, rating]);
 
   const businessVersion = useFilterStore((s) => s.businessVersion);
 
@@ -139,9 +138,7 @@ export default function HomeScreen() {
 
   const { filteredBusinesses: discoveryFilteredBusinesses } = useDiscoveryFeed({
     businesses,
-    // category is normally applied server-side; only forward the Promo
-    // pseudo-category so it can be filtered client-side here.
-    category: category === PROMO_CATEGORY_LABEL ? PROMO_CATEGORY_LABEL : "",
+    category,
     sort: sort === "distance" ? "distance" : "relevance",
     cuisines,
     rating: "",
