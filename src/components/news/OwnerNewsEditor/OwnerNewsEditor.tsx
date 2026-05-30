@@ -99,15 +99,23 @@ export default function OwnerNewsEditor({
     !!draft.imageUrl &&
     (draft.imageUrl.startsWith("file://") || draft.imageUrl.startsWith("http"));
 
+  const hasDraftContent =
+    !!draft.title?.trim() ||
+    hasImage ||
+    !!draft.content?.trim() ||
+    !!draft.subtitle?.trim();
+
   const validate = () => {
     const newErrors: Record<string, string> = {};
     if (!draft.title?.trim()) newErrors.title = "Title is required";
     if (!draft.subtitle?.trim()) newErrors.subtitle = "Subtitle is required";
     if (!draft.imageUrl) newErrors.image = "Cover image is required";
     if (!draft.content?.trim()) newErrors.content = "Content is required";
-    if (!draft.ctaLabel) newErrors.ctaLabel = "Please select a call to action";
+    if (!draft.ctaLabel?.trim()) newErrors.ctaLabel = "Please choose a Call to Action";
     return newErrors;
   };
+
+  const isPublishReady = Object.keys(validate()).length === 0;
 
   const handlePublish = () => {
     const newErrors = validate();
@@ -372,7 +380,7 @@ export default function OwnerNewsEditor({
 
           {/* ── CTA selector ── */}
           <View {...registerField('ctaLabel')}>
-            <AppText style={styles.ctaSectionLabel}>Call to action</AppText>
+            <AppText style={styles.ctaSectionLabel}>Choose Call to Action</AppText>
             <View style={styles.ctaRow}>
               {CTA_OPTIONS.map((opt) => (
                 <Pressable
@@ -410,16 +418,29 @@ export default function OwnerNewsEditor({
             <View style={styles.footerButton}>
               <AppButton title="Cancel" onPress={onCancel} variant="ghost" />
             </View>
-            <View style={styles.footerButton}>
-              <AppButton title="Save draft" onPress={onSave} variant="ghost" />
+            <View
+              style={[styles.footerButton, !hasDraftContent && { opacity: 0.4 }]}
+            >
+              <AppButton
+                title="Save draft"
+                onPress={onSave}
+                variant="ghost"
+                disabled={!hasDraftContent}
+              />
             </View>
           </View>
-          <AppButton
-            title={isPublishing ? "Publishing..." : "Publish"}
-            onPress={handlePublish}
-            variant="primary"
-            disabled={isPublishing}
-          />
+          <View
+            style={
+              !isPublishReady && !isPublishing ? { opacity: 0.5 } : undefined
+            }
+          >
+            <AppButton
+              title={isPublishing ? "Publishing..." : "Publish"}
+              onPress={handlePublish}
+              variant="primary"
+              disabled={isPublishing}
+            />
+          </View>
           {!!draft.id && !!onDelete && (
             <Pressable style={styles.deleteButton} onPress={handleDelete}>
               <AppText style={styles.deleteButtonText}>Delete</AppText>

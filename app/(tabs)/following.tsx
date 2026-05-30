@@ -7,6 +7,7 @@ import AppAddCard from "@/src/components/ui/AppAddCard/AppAddCard";
 import AppEmptyState from "@/src/components/ui/AppEmptyState";
 import AppLoader from "@/src/components/ui/AppLoader/AppLoader";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
+import { PROMO_CATEGORY_LABEL } from "@/src/constants/categories";
 import { AppColors } from "@/src/constants/colors";
 import { DISCOVERY_GRADIENT } from "@/src/constants/gradients";
 import {
@@ -26,7 +27,6 @@ import { apiClient } from "@/src/services/api/client";
 import { API_BASE_URL } from "@/src/services/api/config";
 import { useFollowingStore } from "@/src/store";
 import { useAuthStore } from "@/src/store/auth.store";
-import { PROMO_CATEGORY_LABEL } from "@/src/constants/categories";
 import { useFilterStore } from "@/src/store/filter.store";
 import { useFollowingLocationStore } from "@/src/store/following-location.store";
 import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
@@ -172,8 +172,8 @@ export default function FollowingScreen() {
     redemptionInstructions: "",
     offerDetails: [],
     terms: [],
-    ctaType: "view_business",
-    ctaLabel: "View",
+    ctaType: undefined,
+    ctaLabel: undefined,
     status: "draft",
   });
 
@@ -187,17 +187,73 @@ export default function FollowingScreen() {
     imageUrl: "",
     categoryLabel: "News",
     publishedAt: "",
-    ctaType: "view_business",
-    ctaLabel: "View Business",
+    ctaType: undefined,
+    ctaLabel: undefined,
     status: "draft",
   });
 
-  const closeEditor = () => {
+  const closeEditor = (force = false) => {
+    if (
+      !force &&
+      draftPromotion &&
+      (draftPromotion.title?.trim() ||
+        draftPromotion.subtitle?.trim() ||
+        (draftPromotion.imageUrl &&
+          draftPromotion.imageUrl.startsWith("file://")) ||
+        draftPromotion.description?.trim() ||
+        draftPromotion.promoCode?.trim() ||
+        draftPromotion.offerDetails?.some((o) => o.trim()) ||
+        draftPromotion.expiresAt)
+    ) {
+      Alert.alert(
+        "Unsaved changes",
+        "You have unsaved changes. What would you like to do?",
+        [
+          { text: "Keep editing", style: "cancel" },
+          {
+            text: "Save draft",
+            onPress: () => void handleSaveDraft(),
+          },
+          {
+            text: "Discard",
+            style: "destructive",
+            onPress: () => closeEditor(true),
+          },
+        ],
+      );
+      return;
+    }
     setIsEditorOpen(false);
     setDraftPromotion(null);
   };
 
-  const closeNewsEditor = () => {
+  const closeNewsEditor = (force = false) => {
+    if (
+      !force &&
+      draftNews &&
+      (draftNews.title?.trim() ||
+        draftNews.subtitle?.trim() ||
+        (draftNews.imageUrl && draftNews.imageUrl.startsWith("file://")) ||
+        draftNews.content?.trim())
+    ) {
+      Alert.alert(
+        "Unsaved changes",
+        "You have unsaved changes. What would you like to do?",
+        [
+          { text: "Keep editing", style: "cancel" },
+          {
+            text: "Save draft",
+            onPress: () => void handleSaveNewsDraft(),
+          },
+          {
+            text: "Discard",
+            style: "destructive",
+            onPress: () => closeNewsEditor(true),
+          },
+        ],
+      );
+      return;
+    }
     setIsNewsEditorOpen(false);
     setDraftNews(null);
   };
@@ -251,6 +307,7 @@ export default function FollowingScreen() {
       handleOpenCreateNews();
       router.replace("/(tabs)/following");
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.tab, params.action]);
 
   const handleOpenCreateNews = () => {
@@ -325,7 +382,8 @@ export default function FollowingScreen() {
     if (!draftPromotion) return;
     try {
       const formData = new FormData();
-      Object.entries(draftPromotion).forEach(([key, value]) => {
+      const draftWithStatus = { ...draftPromotion, status: "draft" };
+      Object.entries(draftWithStatus).forEach(([key, value]) => {
         if (key === "id" && !value) return;
         if (value === undefined || value === null || value === "") return;
         if (Array.isArray(value)) {
@@ -441,7 +499,8 @@ export default function FollowingScreen() {
     if (!draftNews) return;
     try {
       const formData = new FormData();
-      Object.entries(draftNews).forEach(([key, value]) => {
+      const draftWithStatus = { ...draftNews, status: "draft" };
+      Object.entries(draftWithStatus).forEach(([key, value]) => {
         if (key === "id" && !value) return;
         if (value === undefined || value === null || value === "") return;
         if (Array.isArray(value)) {
@@ -550,36 +609,35 @@ export default function FollowingScreen() {
 
   const ownerFeedItems = useMemo<FollowingFeedCardItem[]>(() => {
     return ownerPromotions.map((promotion) => {
-      
-      return ({
-      id: `owner-promotion-${promotion.id}`,
-      businessId: promotion.businessId,
-      type: "promotion",
-      promotionId: promotion.id,
-      status: promotion.status,
-      isFeatured: promotion.isFeatured === true,
-      title: promotion.title || "Untitled promotion",
-      description:
-        promotion.subtitle ||
-        promotion.description ||
-        (promotion.offerDetails as any)?.[0] ||
-        "No description added yet.",
-      createdAt: new Date().toISOString(),
-      businessName: myBusiness?.name ?? "Your Business",
-      businessCategory: myBusiness?.category ?? "",
-      businessLocation: myBusiness?.location ?? "",
-      businessImage:
-        myBusiness?.avatarUrl ??
-        promotion.imageUrl ??
-        "https://placehold.co/600x400",
-      businessRating: 0,
-      businessDistanceKm: 0,
-      businessPriceLevel: undefined,
-      distanceKm: 0,
-      priceLevel: undefined,
-      recommendedByPreview: [],
-      recommendedByCount: 0,
-    });
+      return {
+        id: `owner-promotion-${promotion.id}`,
+        businessId: promotion.businessId,
+        type: "promotion",
+        promotionId: promotion.id,
+        status: promotion.status,
+        isFeatured: promotion.isFeatured === true,
+        title: promotion.title || "Untitled promotion",
+        description:
+          promotion.subtitle ||
+          promotion.description ||
+          (promotion.offerDetails as any)?.[0] ||
+          "No description added yet.",
+        createdAt: new Date().toISOString(),
+        businessName: myBusiness?.name ?? "Your Business",
+        businessCategory: myBusiness?.category ?? "",
+        businessLocation: myBusiness?.location ?? "",
+        businessImage:
+          myBusiness?.avatarUrl ??
+          promotion.imageUrl ??
+          "https://placehold.co/600x400",
+        businessRating: 0,
+        businessDistanceKm: 0,
+        businessPriceLevel: undefined,
+        distanceKm: 0,
+        priceLevel: undefined,
+        recommendedByPreview: [],
+        recommendedByCount: 0,
+      };
     });
   }, [ownerPromotions, myBusiness]);
 
@@ -948,21 +1006,27 @@ export default function FollowingScreen() {
                   item.isOwnerPromotion
                     ? () => {
                         void apiClient
-                          .patch(`/api/promotions/${item.item.promotionId}/feature`, { isFeatured: true })
+                          .patch(
+                            `/api/promotions/${item.item.promotionId}/feature`,
+                            { isFeatured: true },
+                          )
                           .then(() => {
-                            void apiClient.get<{ data: any[] }>("/api/promotions/mine").then((res) => {
-                              const data = (res.data.data ?? res.data) as any[];
-                              setOwnerPromotions(
-                                data.map((p) => ({
-                                  ...p,
-                                  imageUrl: p.imageUrl
-                                    ? p.imageUrl.startsWith("http")
-                                      ? p.imageUrl
-                                      : `${API_BASE_URL}${p.imageUrl}`
-                                    : p.imageUrl,
-                                })) as Promotion[],
-                              );
-                            });
+                            void apiClient
+                              .get<{ data: any[] }>("/api/promotions/mine")
+                              .then((res) => {
+                                const data = (res.data.data ??
+                                  res.data) as any[];
+                                setOwnerPromotions(
+                                  data.map((p) => ({
+                                    ...p,
+                                    imageUrl: p.imageUrl
+                                      ? p.imageUrl.startsWith("http")
+                                        ? p.imageUrl
+                                        : `${API_BASE_URL}${p.imageUrl}`
+                                      : p.imageUrl,
+                                  })) as Promotion[],
+                                );
+                              });
                           })
                           .catch(() => {});
                       }

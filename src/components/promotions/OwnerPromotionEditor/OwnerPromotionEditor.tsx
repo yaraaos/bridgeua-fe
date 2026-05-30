@@ -61,13 +61,14 @@ export default function OwnerPromotionEditor({
     scrollToFirstError,
   } = useScrollToError();
   const datePickerAnim = useRef(new Animated.Value(0)).current;
-  const titleRef = useRef<View>(null);
-  const subtitleRef = useRef<View>(null);
-  const imageRef = useRef<View>(null);
-  const offerDetailsRef = useRef<View>(null);
-  const expiresAtRef = useRef<View>(null);
-  const ctaRef = useRef<View>(null);
-  const promoCodeRef = useRef<View>(null);
+
+  useEffect(() => {
+    if (visible) {
+      setErrors({});
+      setPromoCodeVisible(!!draft.promoCode);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [visible]);
 
   const isPublished = draft.status === "published";
 
@@ -122,6 +123,16 @@ export default function OwnerPromotionEditor({
   const hasImage =
     !!draft.imageUrl &&
     (draft.imageUrl.startsWith("file://") || draft.imageUrl.startsWith("http"));
+
+  const hasDraftContent =
+    !!draft.title?.trim() ||
+    hasImage ||
+    !!draft.description?.trim() ||
+    !!draft.discountLabel?.trim() ||
+    !!draft.promoCode?.trim() ||
+    !!draft.subtitle?.trim() ||
+    !!draft.offerDetails?.some((o) => o.trim()) ||
+    !!draft.expiresAt;
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
@@ -309,7 +320,7 @@ export default function OwnerPromotionEditor({
             contentContainerStyle={styles.scrollContent}
           >
             {/* ── Title ── */}
-            <View ref={titleRef} {...registerField("title")}>
+            <View {...registerField("title")}>
               <TextInput
                 placeholder="Promotion title"
                 placeholderTextColor={colors.textMuted}
@@ -333,7 +344,7 @@ export default function OwnerPromotionEditor({
             </View>
 
             {/* ── Subtitle ── */}
-            <View ref={subtitleRef} {...registerField("subtitle")}>
+            <View {...registerField("subtitle")}>
               <TextInput
                 placeholder="Short subtitle"
                 placeholderTextColor={colors.textMuted}
@@ -359,7 +370,7 @@ export default function OwnerPromotionEditor({
             </View>
 
             {/* ── Image picker ── */}
-            <View ref={imageRef} {...registerField("image")}>
+            <View {...registerField("image")}>
               {hasImage ? (
                 <View style={styles.imageWrapper}>
                   <Image
@@ -418,7 +429,7 @@ export default function OwnerPromotionEditor({
             )}
 
             {/* ── Offer details card ── */}
-            <View ref={offerDetailsRef} {...registerField("offerDetails")}>
+            <View {...registerField("offerDetails")}>
               <View
                 style={[
                   styles.sectionCard,
@@ -490,7 +501,7 @@ export default function OwnerPromotionEditor({
             </View>
 
             {/* ── Promo code (optional) ── */}
-            <View ref={promoCodeRef} {...registerField("promoCode")} />
+            <View {...registerField("promoCode")} />
             {!promoCodeVisible ? (
               <Pressable
                 style={styles.addRow}
@@ -558,7 +569,7 @@ export default function OwnerPromotionEditor({
             )}
 
             {/* ── CTA selector ── */}
-            <View ref={ctaRef} {...registerField("ctaLabel")}>
+            <View {...registerField("ctaLabel")}>
               <AppText style={styles.ctaSectionLabel}>
                 Choose Call to Action
               </AppText>
@@ -666,8 +677,18 @@ export default function OwnerPromotionEditor({
             <View style={styles.footerButton}>
               <AppButton title="Cancel" onPress={onCancel} variant="ghost" />
             </View>
-            <View style={styles.footerButton}>
-              <AppButton title="Save draft" onPress={onSave} variant="ghost" />
+            <View
+              style={[
+                styles.footerButton,
+                !hasDraftContent && { opacity: 0.4 },
+              ]}
+            >
+              <AppButton
+                title="Save draft"
+                onPress={onSave}
+                variant="ghost"
+                disabled={!hasDraftContent}
+              />
             </View>
           </View>
           <View
