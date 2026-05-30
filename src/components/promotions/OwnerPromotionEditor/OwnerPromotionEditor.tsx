@@ -250,7 +250,9 @@ export default function OwnerPromotionEditor({
               placeholderTextColor={colors.textMuted}
               value={draft.title}
               onChangeText={(t) => {
-                updateDraft({ title: t });
+                updateDraft({
+                  title: t.replace(/^\n+/, "").replace(/\n{2,}/g, "\n"),
+                });
                 clearError("title");
               }}
               style={[

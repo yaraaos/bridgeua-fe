@@ -223,7 +223,9 @@ export default function OwnerNewsEditor({
               placeholderTextColor={colors.textMuted}
               value={draft.title}
               onChangeText={(t) => {
-                updateDraft({ title: t });
+                updateDraft({
+                  title: t.replace(/^\n+/, "").replace(/\n{2,}/g, "\n"),
+                });
                 clearError("title");
               }}
               style={[
@@ -242,7 +244,7 @@ export default function OwnerNewsEditor({
             <TextInput
               placeholder="Short subtitle"
               placeholderTextColor={colors.textMuted}
-              value={draft.subtitle ?? ''}
+              value={draft.subtitle ?? ""}
               onChangeText={(t) => updateDraft({ subtitle: t })}
               style={[
                 styles.subtitleInput,
