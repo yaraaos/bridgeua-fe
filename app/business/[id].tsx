@@ -262,11 +262,11 @@ export default function BusinessDetailsScreen() {
         isOpen={viewBusiness.isOpen}
         closesAt={viewBusiness.closesAt}
         gradientColors={DISCOVERY_GRADIENT}
-        onPressShare={handleShareBusiness}
+        onPressShare={isEditPreview ? undefined : handleShareBusiness}
         rightSlot={
-          viewBusiness.ownerId &&
-          String(viewBusiness.ownerId) ===
-            String(currentUserId) ? null : isBusinessOwner ? (
+          isEditPreview ? null : viewBusiness.ownerId &&
+            String(viewBusiness.ownerId) ===
+              String(currentUserId) ? null : isBusinessOwner ? (
             <RecommendButton
               businessId={viewBusiness.id}
               businessName={viewBusiness.name}
@@ -320,6 +320,15 @@ export default function BusinessDetailsScreen() {
           />
         </View>
 
+        {isEditPreview ? (
+          <View style={styles.previewBanner}>
+            <Text style={styles.previewBannerTitle}>Preview mode</Text>
+            <Text style={styles.previewBannerSubtitle}>
+              Unsaved changes are visible only to you
+            </Text>
+          </View>
+        ) : null}
+
         {isGuest ? <GuestBusinessCtaBanner /> : null}
 
         <Animated.View style={{ opacity: contentOpacity }}>
@@ -327,7 +336,7 @@ export default function BusinessDetailsScreen() {
             <>
               <BusinessOverviewCard business={viewBusiness} />
 
-              {(viewBusiness.services?.length ?? 0) > 0 && (
+              {(viewBusiness.services?.length ?? 0) > 0 && !isEditPreview && (
                 <BusinessBookingCard
                   businessId={viewBusiness.id}
                   category={viewBusiness.category}
@@ -415,30 +424,34 @@ export default function BusinessDetailsScreen() {
                       animated: true,
                     });
                   }}
-                  onPressWriteReview={(rating) => {
-                    if (isBusinessOwner) {
-                      Alert.alert(
-                        "Not available",
-                        "Business profiles cannot leave reviews.",
-                        [{ text: "OK" }],
-                      );
-                      return;
-                    }
-                    requireAuth(
-                      () => {
-                        router.push({
-                          pathname: "/business/write-review",
-                          params: {
-                            businessId: viewBusiness.id,
-                            rating: rating ? String(rating) : undefined,
-                          },
-                        });
-                      },
-                      {
-                        action: "review",
-                      },
-                    );
-                  }}
+                  onPressWriteReview={
+                    isEditPreview
+                      ? undefined
+                      : (rating) => {
+                          if (isBusinessOwner) {
+                            Alert.alert(
+                              "Not available",
+                              "Business profiles cannot leave reviews.",
+                              [{ text: "OK" }],
+                            );
+                            return;
+                          }
+                          requireAuth(
+                            () => {
+                              router.push({
+                                pathname: "/business/write-review",
+                                params: {
+                                  businessId: viewBusiness.id,
+                                  rating: rating ? String(rating) : undefined,
+                                },
+                              });
+                            },
+                            {
+                              action: "review",
+                            },
+                          );
+                        }
+                  }
                 />
               </View>
             </>
@@ -493,6 +506,28 @@ function createStyles(colors: AppColors) {
     },
     scrollContent: {
       paddingBottom: spacing.xl,
+    },
+    previewBanner: {
+      marginHorizontal: spacing.md,
+      marginBottom: spacing.md,
+      paddingVertical: spacing.sm,
+      paddingHorizontal: spacing.md,
+      backgroundColor: colors.accentOrange + "22",
+      borderRadius: 10,
+      borderWidth: 1,
+      borderColor: colors.accentOrange + "55",
+      alignItems: "center",
+      gap: 2,
+    },
+    previewBannerTitle: {
+      fontSize: 13,
+      fontWeight: "600",
+      color: colors.accentOrange,
+    },
+    previewBannerSubtitle: {
+      fontSize: 12,
+      color: colors.textMuted,
+      textAlign: "center",
     },
   });
 }
