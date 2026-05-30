@@ -1,4 +1,5 @@
 import { Feather } from "@expo/vector-icons";
+import { usePreventRemove } from '@react-navigation/core';
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect } from "react";
 import { Alert, Pressable, StyleSheet, View } from "react-native";
@@ -129,6 +130,24 @@ export default function EditBusinessScreen() {
   }, [business?.id]);
 
   const hasUnsaved = Object.values(dirty).some(Boolean);
+
+  usePreventRemove(hasUnsaved, ({ data }) => {
+    Alert.alert(
+      'Unsaved changes',
+      'You have unsaved changes. Are you sure you want to leave?',
+      [
+        { text: 'Stay', style: 'cancel' },
+        {
+          text: 'Leave',
+          style: 'destructive',
+          onPress: () => {
+            resetAll();
+            router.dismiss();
+          },
+        },
+      ],
+    );
+  });
 
   function handleBack() {
     if (hasUnsaved) {
