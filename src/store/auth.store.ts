@@ -41,6 +41,7 @@ type AuthState = {
 const clearAccountScopedState = () => {
   useReviewsStore.getState().clearReviews();
   useProfileStore.getState().clearProfile();
+  useFilterStore.getState().resetAllFilters();
 };
 
 export const useAuthStore = create<AuthState>((set) => ({
