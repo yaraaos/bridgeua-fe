@@ -572,14 +572,14 @@ export default function BusinessProfileScreen() {
                     <AppText style={styles.reviewReplyText}>Reply</AppText>
                   </Pressable>
 
-                  <Pressable
+                  {false && <Pressable
                     style={[
                       styles.reviewActionButton,
                       styles.reviewReportButton,
                     ]}
                   >
                     <AppText style={styles.reviewReportText}>Report</AppText>
-                  </Pressable>
+                  </Pressable>}
                 </View>
               </View>
             </View>
