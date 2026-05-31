@@ -79,6 +79,8 @@ export type BusinessAbout = {
   title?: string;
   description: string;
   isOpen?: boolean;
+  closesAt?: string;
+  opensAt?: string;
   openingHours?: BusinessOpeningHour[];
   contacts: BusinessContactItem[];
   languages?: string[];
