@@ -326,23 +326,6 @@ export default function SettingsScreen() {
           <Text style={styles.logoutText}>Log Out</Text>
         </Pressable>
 
-        {business ? (
-          <Pressable
-            style={({ pressed }) => [
-              styles.deleteBusinessBtn,
-              pressed && styles.logoutPressed,
-              isDeletingBusiness && styles.disabledBtn,
-            ]}
-            onPress={handleDeleteBusiness}
-            disabled={isDeletingBusiness}
-          >
-            <Feather name="trash-2" size={18} color={colors.error} />
-            <Text style={styles.deleteBusinessText}>
-              {isDeletingBusiness ? "Deleting..." : "Delete Business"}
-            </Text>
-          </Pressable>
-        ) : null}
-
         <Text style={styles.version}>Version 2.4.7</Text>
       </ScrollView>
     </View>
