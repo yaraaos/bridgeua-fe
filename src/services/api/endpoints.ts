@@ -45,4 +45,10 @@ export const ENDPOINTS = {
 
   // Bookings
   BOOKINGS: "/api/bookings",
+
+  // Settings & Account
+  SETTINGS: '/api/settings',
+  ACCOUNT_EMAIL: '/api/account/email',
+  ACCOUNT_PASSWORD: '/api/account/password',
+  ACCOUNT_DELETE: '/api/account',
 } as const;

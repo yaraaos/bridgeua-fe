@@ -2,6 +2,7 @@ import ScreenHeader from "@/src/components/common/ScreenHeader/ScreenHeader";
 import { AppColors } from "@/src/constants/colors";
 import { radius } from "@/src/constants/radius";
 import { spacing } from "@/src/constants/spacing";
+import { useSettings } from "@/src/features/settings/hooks/useSettings";
 import { useMyBusinessProfile } from "@/src/features/businesses/hooks/useBusiness";
 import { deleteBusiness } from "@/src/features/businesses/services/business.service";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
@@ -95,6 +96,8 @@ export default function SettingsScreen() {
   const router = useRouter();
   const setThemeMode = useAppStore((s) => s.setThemeMode);
   const clearUser = useAuthStore((state) => state.clearUser);
+  const accountType = useAuthStore((state) => state.user?.accountType);
+  const { settings, updateSetting } = useSettings();
 
   const [isDeletingBusiness, setIsDeletingBusiness] = useState(false);
   const { business } = useMyBusinessProfile();
@@ -192,7 +195,9 @@ export default function SettingsScreen() {
             onPress={() => router.push("/settings/language")}
             rightElement={
               <View style={styles.rowRight}>
-                <Text style={styles.rowValue}>English</Text>
+                <Text style={styles.rowValue}>
+                  {settings?.language === "uk" ? "Українська" : "English"}
+                </Text>
                 <Feather
                   name="chevron-right"
                   size={18}
@@ -220,6 +225,56 @@ export default function SettingsScreen() {
             }
           />
         </SettingsSection>
+
+        {/* Business */}
+        {accountType === "business" && (
+          <SettingsSection label="Business">
+            <SettingsRow
+              icon="refresh-cw"
+              title="Auto-confirm Bookings"
+              subtitle="Automatically confirm new booking requests"
+              rightElement={
+                <Switch
+                  value={settings?.bookingAutoConfirm ?? false}
+                  onValueChange={(val) => updateSetting("bookingAutoConfirm", val)}
+                  trackColor={{ false: colors.textMuted, true: colors.primaryGreen }}
+                  thumbColor={colors.white}
+                  ios_backgroundColor={colors.textMuted}
+                />
+              }
+            />
+            <View style={styles.divider} />
+            <SettingsRow
+              icon="map-pin"
+              title="Show in Discovery"
+              subtitle="Display your business on the map and search"
+              rightElement={
+                <Switch
+                  value={settings?.profileVisible ?? true}
+                  onValueChange={(val) => updateSetting("profileVisible", val)}
+                  trackColor={{ false: colors.textMuted, true: colors.primaryGreen }}
+                  thumbColor={colors.white}
+                  ios_backgroundColor={colors.textMuted}
+                />
+              }
+            />
+            <View style={styles.divider} />
+            <SettingsRow
+              icon="tag"
+              title="Show Price Level"
+              subtitle="Display price level on your business profile"
+              rightElement={
+                <Switch
+                  value={settings?.showPriceLevel ?? true}
+                  onValueChange={(val) => updateSetting("showPriceLevel", val)}
+                  trackColor={{ false: colors.textMuted, true: colors.primaryGreen }}
+                  thumbColor={colors.white}
+                  ios_backgroundColor={colors.textMuted}
+                />
+              }
+            />
+          </SettingsSection>
+        )}
 
         {/* Support */}
         <SettingsSection label="Support">
