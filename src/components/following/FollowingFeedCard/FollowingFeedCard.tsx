@@ -38,8 +38,8 @@ export default function FollowingFeedCard({
       StyleSheet.create({
         menuWrapper: {
           position: "absolute",
-          top: 8,
-          right: 8,
+          top: 12,
+          right: 14,
           zIndex: 20,
           alignItems: "flex-end",
         },
