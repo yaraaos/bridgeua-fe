@@ -129,7 +129,7 @@ export default function BusinessReviewsList({
           styles.containerWithoutExtras,
       ]}
     >
-      <View style={styles.writeCard}>
+      <View style={[styles.writeCard, isPreview && { opacity: 0.4 }]}>
         <Text style={styles.writeTitle}>Write a review</Text>
 
         <View style={styles.writeStars}>
