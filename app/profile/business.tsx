@@ -258,7 +258,7 @@ export default function BusinessProfileScreen() {
 
                 <View style={styles.heroRatingRow}>
                   {Array.from({ length: 5 }).map((_, index) => {
-                    const isFilled = index < 4;
+                    const isFilled = index < Math.round(businessRating);
                     return (
                       <Ionicons
                         key={index}

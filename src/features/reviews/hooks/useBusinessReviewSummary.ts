@@ -1,6 +1,5 @@
 import { useMemo } from "react";
 
-import { businessDetailsMock } from "@/src/mocks/business-details.mock";
 import { useReviewsStore } from "@/src/store/reviews.store";
 
 type Params = {
@@ -24,21 +23,9 @@ export function useBusinessReviewSummary({
       };
     }
 
-    const business = businessDetailsMock.find(
-      (item) => String(item.id) === String(businessId),
-    );
-
-    const mockReviews =
-      business?.reviews.map((review) => ({
-        ...review,
-        businessId,
-      })) ?? [];
-
-    const liveSubmittedReviews = submittedReviews.filter(
+    const allReviews = submittedReviews.filter(
       (review) => String(review.businessId) === String(businessId),
     );
-
-    const allReviews = [...liveSubmittedReviews, ...mockReviews];
 
     if (allReviews.length === 0) {
       return {

@@ -16,4 +16,7 @@ export type Business = {
     latitude: number;
     longitude: number;
   };
+  isOpen?: boolean;
+  closesAt?: string | null;
+  opensAt?: string | null;
 };
