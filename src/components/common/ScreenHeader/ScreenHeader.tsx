@@ -246,7 +246,10 @@ export default function ScreenHeader({
           <View style={styles.businessActionsColumn}>
             {rightSlot}
 
-            <Pressable style={styles.actionButton} onPress={onPressShare}>
+            <Pressable
+              style={[styles.actionButton, !onPressShare && { opacity: 0.4 }]}
+              onPress={onPressShare}
+            >
               <Ionicons name="share-outline" size={16} color={colors.white} />
             </Pressable>
           </View>
