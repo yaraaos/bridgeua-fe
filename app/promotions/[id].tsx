@@ -25,7 +25,15 @@ export default function PromotionDetailScreen() {
   const { promotion, isLoading } = usePromotion(id);
 
   if (isLoading || !promotion) {
-    return <AppLoader />;
+    return (
+      <AppScreen style={styles.appScreen}>
+        <View
+          style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+        >
+          <AppLoader />
+        </View>
+      </AppScreen>
+    );
   }
 
   const businessAbout =
