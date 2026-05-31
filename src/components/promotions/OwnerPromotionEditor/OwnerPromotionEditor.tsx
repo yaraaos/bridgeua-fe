@@ -644,6 +644,9 @@ export default function OwnerPromotionEditor({
                 <AppText style={styles.ctaPillViewBusinessText}>
                   View Business
                 </AppText>
+                <AppText style={styles.ctaPillViewBusinessDefault}>
+                  Default
+                </AppText>
               </View>
               {!!errors.ctaLabel && (
                 <AppText style={styles.errorText}>{errors.ctaLabel}</AppText>
@@ -1035,6 +1038,14 @@ function createStyles(colors: AppColors) {
       fontWeight: "600",
       color: colors.white,
       textAlign: "center",
+    },
+    ctaPillViewBusinessDefault: {
+      fontSize: 10,
+      fontWeight: '700',
+      color: colors.white,
+      opacity: 0.7,
+      textTransform: 'uppercase',
+      letterSpacing: 0.5,
     },
 
     // Footer
