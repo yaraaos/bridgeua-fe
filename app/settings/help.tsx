@@ -133,7 +133,7 @@ export default function HelpScreen() {
             <SettingsRow
               icon="mail"
               title="Email Support"
-              onPress={() => Linking.openURL("mailto:support@bridgeua.com")}
+              onPress={() => Linking.openURL("mailto:support@bridgeua.com?subject=Support%20Request")}
             />
             <View style={styles.divider} />
             <SettingsRow

@@ -46,7 +46,7 @@ export default function EditProfileScreen() {
   const [lastName, setLastName] = useState(initialNames.lastName);
   const [username, setUsername] = useState(profile.username ?? "");
   const [phoneNumber, setPhoneNumber] = useState(profile.phoneNumber ?? "");
-  const [isPhoneValid, setIsPhoneValid] = useState(!!(profile.phoneNumber));
+  const [isPhoneValid, setIsPhoneValid] = useState(!!profile.phoneNumber);
   const [dateOfBirth, setDateOfBirth] = useState(profile.dateOfBirth ?? "");
 
   const { saveProfile, isSaving } = useEditProfile();
@@ -173,7 +173,15 @@ export default function EditProfileScreen() {
         title="Edit Profile"
         titleSubtitle="Update your personal profile"
         gradientColors={DISCOVERY_GRADIENT}
-        onPressBack={handleBackPress}
+        leftSlot={
+          <Pressable
+            onPress={handleBackPress}
+            style={{ alignSelf: "flex-start", marginLeft: -4, marginTop: -4 }}
+            hitSlop={12}
+          >
+            <Ionicons name="chevron-back" size={28} color={colors.textPrimary} />
+          </Pressable>
+        }
       />
 
       <ScrollView

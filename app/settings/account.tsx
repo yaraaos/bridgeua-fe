@@ -13,6 +13,7 @@ import { useState } from "react";
 import {
     ActivityIndicator,
     Alert,
+    Linking,
     Pressable,
     ScrollView,
     StyleSheet,
@@ -318,10 +319,8 @@ export default function AccountScreen() {
                 pressed && styles.rowPressed,
               ]}
               onPress={() =>
-                Alert.alert(
-                  "Change Business Name",
-                  "To change your business name, we need to verify your request. Our team will review it and contact you within 2–3 business days.",
-                  [{ text: "OK" }],
+                Linking.openURL(
+                  "mailto:support@bridgeua.com?subject=Request%20to%20Change%20Business%20Name",
                 )
               }
             >
@@ -353,10 +352,8 @@ export default function AccountScreen() {
                 pressed && styles.rowPressed,
               ]}
               onPress={() =>
-                Alert.alert(
-                  "Change Business Category",
-                  "To change your business category, we need to verify your request. Our team will review it and contact you within 2–3 business days.",
-                  [{ text: "OK" }],
+                Linking.openURL(
+                  "mailto:support@bridgeua.com?subject=Request%20to%20Change%20Business%20Category",
                 )
               }
             >
