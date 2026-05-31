@@ -66,6 +66,24 @@ export const getMyReviews = async (): Promise<PersonalProfileReview[]> => {
   return res.data;
 };
 
+export const uploadReviewPhoto = async (
+  businessId: string,
+  reviewId: string,
+  photoUri: string
+): Promise<void> => {
+  const formData = new FormData();
+  formData.append('photo', {
+    uri: photoUri,
+    type: 'image/jpeg',
+    name: 'review-photo.jpg',
+  } as any);
+  await apiClient.post(
+    ENDPOINTS.REVIEW_PHOTOS(businessId, reviewId),
+    formData,
+    { headers: { 'Content-Type': 'multipart/form-data' } }
+  );
+};
+
 export const likeReview = async (businessId: string, reviewId: string): Promise<void> => {
   await apiClient.post(ENDPOINTS.REVIEW_LIKE(businessId, reviewId));
 };
