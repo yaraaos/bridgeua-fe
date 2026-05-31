@@ -16,12 +16,14 @@ export const getReviews = async ({
   limit = 10,
   rating,
 }: GetReviewsParams): Promise<GetReviewsResponse> => {
-  const params: Record<string, string | number> = { page, limit };
-  if (rating) params.rating = rating;
+  const queryParams = new URLSearchParams({
+    page: String(page),
+    limit: String(limit),
+  });
+  if (rating) queryParams.set('rating', String(rating));
 
   const res = await apiClient.get<GetReviewsResponse>(
-    ENDPOINTS.BUSINESS_REVIEWS(businessId),
-    { params },
+    `${ENDPOINTS.BUSINESS_REVIEWS(businessId)}?${queryParams.toString()}`
   );
   return res.data;
 };
