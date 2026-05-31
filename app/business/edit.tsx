@@ -18,7 +18,6 @@ import { spacing } from "@/src/constants/spacing";
 import { useMyBusinessProfile } from "@/src/features/businesses";
 import { type DayOfWeek } from "@/src/features/businesses/types/editBusiness.types";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
-import { useActiveAccount } from "@/src/store/account.store";
 import {
   type EditBusinessTab,
   useEditBusinessStore,
@@ -34,8 +33,6 @@ const TABS: AppTabPillItem<EditBusinessTab>[] = [
 export default function EditBusinessScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
-  const account = useActiveAccount();
-
   const { business } = useMyBusinessProfile();
 
   const { tab } = useLocalSearchParams<{ tab?: string }>();
@@ -127,9 +124,9 @@ export default function EditBusinessScreen() {
       languages: business.about?.languages ?? [],
       amenities: business.about?.amenities?.map((a) => a.label) ?? [],
     });
-  }, [business?.id]);
+  }, [business, setOverviewDraft, setGalleryDraft, setServicesDraft, setAboutDraft]);
 
-  const hasUnsaved = Object.values(dirty).some(Boolean);
+  const hasUnsaved: boolean = Object.values(dirty).some(Boolean);
 
   const pulseAnim = useRef(new Animated.Value(1)).current;
 
@@ -156,7 +153,7 @@ export default function EditBusinessScreen() {
 
     pulse.start();
     return () => pulse.stop();
-  }, [hasUnsaved]);
+  }, [hasUnsaved, pulseAnim]);
 
   usePreventRemove(hasUnsaved, ({ data }) => {
     Alert.alert(
@@ -214,7 +211,7 @@ export default function EditBusinessScreen() {
           <Ionicons name="chevron-back" size={28} color={colors.textPrimary} />
         </Pressable>
 
-        <AppText style={styles.headerTitle}>Edit Business</AppText>
+        <AppText pointerEvents="none" style={styles.headerTitle}>Edit Business</AppText>
 
         <Pressable
           onPress={handlePreview}
@@ -280,15 +277,17 @@ function createStyles(colors: AppColors) {
       minWidth: 36,
       alignItems: "center",
       justifyContent: "center",
+      zIndex: 2,
     },
     headerTitle: {
       fontSize: 17,
-      fontWeight: '800',
+      fontWeight: "800",
       color: colors.textPrimary,
-      position: 'absolute',
+      position: "absolute",
       left: 0,
       right: 0,
-      textAlign: 'center',
+      textAlign: "center",
+      zIndex: 1,
     },
     tabsRow: {
       paddingHorizontal: spacing.lg,
