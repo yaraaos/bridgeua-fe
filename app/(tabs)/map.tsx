@@ -138,10 +138,13 @@ export default function MapScreen() {
   }, [currentUser, activeAccount, isHydrated]);
 
   const { promotions: bannerPromotions } = useBannerPromotions();
-  const businessIdsWithPromo = useMemo(
-    () => bannerPromotions.map((p) => String(p.businessId)),
-    [bannerPromotions],
-  );
+
+  const businessIdsWithPromo = useMemo(() => {
+    const followedSet = new Set(followedBusinessIds.map(String));
+    return bannerPromotions
+      .map((p) => String(p.businessId))
+      .filter((id) => followedSet.has(id));
+  }, [bannerPromotions, followedBusinessIds]);
 
   const { filteredBusinesses } = useDiscoveryFeed({
     businesses,
@@ -298,10 +301,14 @@ export default function MapScreen() {
     });
   };
 
+  const isGuest = useAuthStore((state) => state.isGuest);
+  const isBusinessAccount = effectiveUser?.accountType === "business";
+  const canUsePromoFilter = !isBusinessAccount && !isGuest;
+
   const { categories } = useCategories();
   const categoryNames = [
     "All Categories",
-    PROMO_CATEGORY_LABEL,
+    ...(canUsePromoFilter ? [PROMO_CATEGORY_LABEL] : []),
     ...categories.map((c) => c.name),
   ];
 

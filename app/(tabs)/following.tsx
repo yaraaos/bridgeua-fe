@@ -778,13 +778,11 @@ export default function FollowingScreen() {
     }, [syncVisibleBusinessIds]),
   );
 
-  // Per BU-196 sync rules: opening the Promo tab always sets the shared
-  // discovery filter to Promo, so navigating Promo → Map (or Promo → Home,
-  // before Home's own reset effect runs) keeps the Promo filter selected.
   useFocusEffect(
     useCallback(() => {
+      if (isBusinessAccount || isGuest) return;
       useFilterStore.getState().setCategory("discovery", PROMO_CATEGORY_LABEL);
-    }, []),
+    }, [isBusinessAccount, isGuest]),
   );
 
   useFocusEffect(
@@ -884,27 +882,38 @@ export default function FollowingScreen() {
     );
   }
 
+  const newsAndPromosHeader = isBusinessAccount ? (
+    <ScreenHeader
+      title="News & Promos"
+      titleSubtitle="Add and view your news and promotions"
+      gradientColors={DISCOVERY_GRADIENT}
+    />
+  ) : (
+    <ScreenHeader
+      title="News & Promos"
+      titleSubtitle="Updates from followed businesses"
+      subtitleLabel="Location"
+      subtitleValue={selectedLocationLabel}
+      showSubtitleChevron
+      locationOptions={DEFAULT_LOCATION_OPTIONS}
+      onSelectLocationOption={handleSelectLocationOption}
+      onRequestNearby={handleRequestNearby}
+      showSearch
+      searchPlaceholder="Search here..."
+      searchValue={searchQuery}
+      onSearchChangeText={setSearchQuery}
+      actions={["map", "filter"]}
+      onPressMap={handleMapPress}
+      onPressFilter={handleFilterPress}
+      gradientColors={DISCOVERY_GRADIENT}
+      activeFilterCount={activeFilterCount}
+    />
+  );
+
   if (isLoading) {
     return (
       <AppScreen withTopInset={false} style={styles.container}>
-        <ScreenHeader
-          title="News & Promos"
-          titleSubtitle="Updates from followed businesses"
-          subtitleLabel="Location"
-          subtitleValue={selectedLocationLabel}
-          showSubtitleChevron
-          locationOptions={DEFAULT_LOCATION_OPTIONS}
-          onSelectLocationOption={handleSelectLocationOption}
-          onRequestNearby={handleRequestNearby}
-          searchPlaceholder="Search here..."
-          searchValue={searchQuery}
-          onSearchChangeText={setSearchQuery}
-          actions={["map", "filter"]}
-          onPressMap={handleMapPress}
-          onPressFilter={handleFilterPress}
-          gradientColors={DISCOVERY_GRADIENT}
-          activeFilterCount={activeFilterCount}
-        />
+        {newsAndPromosHeader}
 
         <View style={styles.switchWrap}>
           <AccountTypeSwitch
@@ -926,25 +935,7 @@ export default function FollowingScreen() {
 
   return (
     <AppScreen withTopInset={false} style={styles.container}>
-      <ScreenHeader
-        title="News & Promos"
-        titleSubtitle="Updates from followed businesses"
-        subtitleLabel="Location"
-        subtitleValue={selectedLocationLabel}
-        showSubtitleChevron
-        locationOptions={DEFAULT_LOCATION_OPTIONS}
-        onSelectLocationOption={handleSelectLocationOption}
-        onRequestNearby={handleRequestNearby}
-        showSearch
-        searchPlaceholder="Search here..."
-        searchValue={searchQuery}
-        onSearchChangeText={setSearchQuery}
-        actions={["map", "filter"]}
-        onPressMap={handleMapPress}
-        onPressFilter={handleFilterPress}
-        gradientColors={DISCOVERY_GRADIENT}
-        activeFilterCount={activeFilterCount}
-      />
+      {newsAndPromosHeader}
 
       <View style={styles.switchWrap}>
         <AccountTypeSwitch

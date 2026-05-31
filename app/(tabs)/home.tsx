@@ -22,6 +22,7 @@ import { useBannerPromotions } from "@/src/features/promotions/hooks/useBannerPr
 import type { HomePromotion } from "@/src/features/promotions/types/promotion.types";
 import type { Business } from "@/src/types/business";
 import { useAccountStore, useActiveAccount } from "@/src/store/account.store";
+import { useFollowingStore } from "@/src/store/following.store";
 import { useAuthStore } from "@/src/store/auth.store";
 import type { AuthUser } from "@/src/features/auth/types/auth.types";
 import { useDiscoveryLocationStore } from "@/src/store/discovery-location";
@@ -78,10 +79,6 @@ export default function HomeScreen() {
   const activeAccount = useActiveAccount();
   const isHydrated = useAccountStore((s) => s.isHydrated);
 
-  // FE-only fallback until BU-198 (BE ownership metadata) lands.
-  // When the Switch Account sheet picks a business account, treat the viewer
-  // as a business owner for priority/Recommend purposes, using the account's
-  // ownedBusinessId to mark which business is "mine".
   const effectiveUser = useMemo<AuthUser | null>(() => {
     if (!isHydrated || activeAccount?.kind !== "business") return currentUser;
 
@@ -96,10 +93,13 @@ export default function HomeScreen() {
     };
   }, [currentUser, activeAccount, isHydrated]);
 
+  const isBusinessAccount = effectiveUser?.accountType === "business";
+  const canUsePromoFilter = !isBusinessAccount && !isGuest;
+
   const { categories } = useCategories();
   const categoryNames = [
     "All Categories",
-    PROMO_CATEGORY_LABEL,
+    ...(canUsePromoFilter ? [PROMO_CATEGORY_LABEL] : []),
     ...categories.map((c) => c.name),
   ];
 
@@ -126,10 +126,16 @@ export default function HomeScreen() {
   const { promotions: bannerPromotions, isVisible: isBannerVisible } =
     useBannerPromotions();
 
-  const businessIdsWithPromo = useMemo(
-    () => bannerPromotions.map((p) => String(p.businessId)),
-    [bannerPromotions],
+  const followedBusinessIds = useFollowingStore(
+    (state) => state.followedBusinessIds,
   );
+
+  const businessIdsWithPromo = useMemo(() => {
+    const followedSet = new Set(followedBusinessIds.map(String));
+    return bannerPromotions
+      .map((p) => String(p.businessId))
+      .filter((id) => followedSet.has(id));
+  }, [bannerPromotions, followedBusinessIds]);
 
   const { filteredBusinesses: discoveryFilteredBusinesses } = useDiscoveryFeed({
     businesses,
@@ -144,7 +150,6 @@ export default function HomeScreen() {
 
   const selectedHomeCategory = category || "All Categories";
 
-  // Reset Promo filter when navigating from Promo → Home (per BU-196 sync rules).
   useFocusEffect(
     useCallback(() => {
       if (category === PROMO_CATEGORY_LABEL) {
