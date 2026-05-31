@@ -175,7 +175,7 @@ export default function SettingsScreen() {
             icon="credit-card"
             title="Payment Methods"
             subtitle="Manage your saved payment methods"
-            onPress={() => router.push("/settings/account")}
+            onPress={() => router.push("/settings/payment-methods")}
           />
           <View style={styles.divider} />
           <SettingsRow
