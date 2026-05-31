@@ -161,7 +161,7 @@ export default function SettingsScreen() {
             icon="user"
             title="Profile"
             subtitle="View and edit your profile"
-            onPress={() => router.push("/profile/edit")}
+            onPress={() => router.push(accountType === "business" ? "/business/edit" : "/profile/edit")}
           />
           <View style={styles.divider} />
           <SettingsRow
