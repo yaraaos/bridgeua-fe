@@ -16,6 +16,8 @@ import {
 } from "react-native";
 import type { UserSettings } from "@/src/features/settings/types/settings.types";
 
+type BooleanSettingKey = Exclude<keyof UserSettings, "language">;
+
 // ─── SettingsSection ─────────────────────────────────────────────────────────
 
 function SettingsSection({
@@ -70,10 +72,10 @@ export default function NotificationsScreen() {
   const accountType = useAuthStore((state) => state.user?.accountType);
   const { settings, isLoading, updateSetting } = useSettings();
 
-  function renderSwitch(key: keyof UserSettings) {
+  function renderSwitch(key: BooleanSettingKey) {
     return (
       <Switch
-        value={settings?.[key] ?? true}
+        value={(settings?.[key] as boolean) ?? true}
         onValueChange={(val) => updateSetting(key, val)}
         trackColor={{ false: colors.textMuted, true: colors.primaryGreen }}
         thumbColor={colors.white}
