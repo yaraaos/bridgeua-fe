@@ -372,7 +372,7 @@ export default function ReviewCard({
                   ))}
                 </ScrollView>
               ) : null}
-              <View style={[styles.interactionRow, isInteractionDisabled && { opacity: 0.4 }]}>
+              <View style={[styles.interactionRow, (isInteractionDisabled || isVariantPreview) && { opacity: 0.4 }]}>
                 <Pressable
                   style={styles.interactionButton}
                   onPress={
@@ -576,7 +576,7 @@ export default function ReviewCard({
                   ))}
                 </View>
               ) : null}
-              <View style={[styles.interactionRow, isInteractionDisabled && { opacity: 0.4 }]}>
+              <View style={[styles.interactionRow, (isInteractionDisabled || isVariantPreview) && { opacity: 0.4 }]}>
                 <Pressable
                   style={styles.interactionButton}
                   onPress={
