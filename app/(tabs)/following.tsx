@@ -1006,9 +1006,13 @@ export default function FollowingScreen() {
                 item={item.item}
                 onPress={
                   item.isOwnerPromotion
-                    ? () => openOwnerPromotionEdit(item.item.promotionId)
+                    ? item.item.status === "published"
+                      ? undefined
+                      : () => openOwnerPromotionEdit(item.item.promotionId)
                     : item.isOwnerNews
-                      ? () => openOwnerNewsEdit(item.item.newsId)
+                      ? item.item.status === "published"
+                        ? undefined
+                        : () => openOwnerNewsEdit(item.item.newsId)
                       : undefined
                 }
                 isOwnerPromotion={item.isOwnerPromotion}
