@@ -102,6 +102,26 @@ export default function OwnerPromotionEditor({
       .replace(/\n{2,}/g, "\n")
       .replace(/\n+$/, "");
 
+  const getTodayDateOnly = () => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return today;
+  };
+
+  const parseDateOnly = (value?: string | null) => {
+    if (!value) return getTodayDateOnly();
+    const [year, month, day] = value.split("-").map(Number);
+    if (!year || !month || !day) return getTodayDateOnly();
+    return new Date(year, month - 1, day);
+  };
+
+  const formatDateOnly = (date: Date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ["images"],
@@ -463,9 +483,7 @@ export default function OwnerPromotionEditor({
                   style={styles.validityRow}
                   onPress={() => {
                     Keyboard.dismiss();
-                    setTempDate(
-                      draft.expiresAt ? new Date(draft.expiresAt) : new Date(),
-                    );
+                    setTempDate(parseDateOnly(draft.expiresAt));
                     setShowDateModal(true);
                   }}
                 >
@@ -649,7 +667,7 @@ export default function OwnerPromotionEditor({
               </Pressable>
               <Pressable
                 onPress={() => {
-                  const iso = tempDate.toISOString().split("T")[0];
+                  const iso = formatDateOnly(tempDate);
                   updateDraft({ expiresAt: iso });
                   clearError("expiresAt");
                   setShowDateModal(false);
@@ -663,7 +681,7 @@ export default function OwnerPromotionEditor({
               value={tempDate}
               mode="date"
               display="spinner"
-              minimumDate={new Date()}
+              minimumDate={getTodayDateOnly()}
               onChange={(_event, selectedDate) => {
                 if (selectedDate) setTempDate(selectedDate);
               }}
