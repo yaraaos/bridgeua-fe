@@ -1,4 +1,5 @@
 import FollowButton from "@/src/components/business/FollowButton/FollowButton";
+import AppLabel from "@/src/components/ui/AppLabel/AppLabel";
 import AppText from "@/src/components/ui/AppText/AppText";
 import type { FollowingFeedCardItem } from "@/src/features/following/types/following.types";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
@@ -16,6 +17,7 @@ type FollowingFeedCardProps = {
   isOwnerNews?: boolean;
   isFeatured?: boolean;
   onFeaturePromotion?: () => void;
+  onDelete?: () => void;
 };
 
 export default function FollowingFeedCard({
@@ -25,6 +27,7 @@ export default function FollowingFeedCard({
   isOwnerNews,
   isFeatured,
   onFeaturePromotion,
+  onDelete,
 }: FollowingFeedCardProps) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
@@ -38,8 +41,8 @@ export default function FollowingFeedCard({
       StyleSheet.create({
         menuWrapper: {
           position: "absolute",
-          top: 8,
-          right: 8,
+          top: 12,
+          right: 14,
           zIndex: 20,
           alignItems: "flex-end",
         },
@@ -108,7 +111,7 @@ export default function FollowingFeedCard({
 
   return (
     <Pressable style={styles.feedCard} onPress={handlePress}>
-      {isOwnerPromotion && (
+      {(isOwnerPromotion || isOwnerNews) && item.status === "published" && (
         <View style={extraStyles.menuWrapper}>
           <Pressable
             style={[
@@ -127,32 +130,54 @@ export default function FollowingFeedCard({
 
           {showMenu && (
             <View style={extraStyles.inlineMenu}>
+              {isOwnerPromotion && (
+                <Pressable
+                  style={extraStyles.inlineMenuRow}
+                  onPress={() => {
+                    if (isAlreadyFeatured) return;
+                    setShowMenu(false);
+                    onFeaturePromotion?.();
+                  }}
+                >
+                  <Ionicons
+                    name={isAlreadyFeatured ? "star" : "star-outline"}
+                    size={16}
+                    color={
+                      isAlreadyFeatured
+                        ? colors.accentOrange
+                        : colors.primaryGreen
+                    }
+                  />
+                  <AppText
+                    style={[
+                      extraStyles.inlineMenuText,
+                      isAlreadyFeatured && { color: colors.textMuted },
+                    ]}
+                  >
+                    {isAlreadyFeatured
+                      ? "Promo added to home banner"
+                      : "Add to home promo banner"}
+                  </AppText>
+                </Pressable>
+              )}
               <Pressable
-                style={extraStyles.inlineMenuRow}
+                style={[
+                  extraStyles.inlineMenuRow,
+                  isOwnerPromotion && {
+                    borderTopWidth: 1,
+                    borderTopColor: "rgba(255,255,255,0.1)",
+                  },
+                ]}
                 onPress={() => {
-                  if (isAlreadyFeatured) return;
                   setShowMenu(false);
-                  onFeaturePromotion?.();
+                  onDelete?.();
                 }}
               >
-                <Ionicons
-                  name={isAlreadyFeatured ? "star" : "star-outline"}
-                  size={16}
-                  color={
-                    isAlreadyFeatured
-                      ? colors.accentOrange
-                      : colors.primaryGreen
-                  }
-                />
+                <Ionicons name="trash-outline" size={16} color={colors.error} />
                 <AppText
-                  style={[
-                    extraStyles.inlineMenuText,
-                    isAlreadyFeatured && { color: colors.textMuted },
-                  ]}
+                  style={[extraStyles.inlineMenuText, { color: colors.error }]}
                 >
-                  {isAlreadyFeatured
-                    ? "Promo added to home banner"
-                    : "Add to home promo banner"}
+                  Delete
                 </AppText>
               </Pressable>
             </View>
@@ -177,13 +202,13 @@ export default function FollowingFeedCard({
           <View
             style={[
               styles.feedTextWrap,
-              isOwnerPromotion && { paddingRight: 28 },
+              (isOwnerPromotion || isOwnerNews) && { paddingRight: 20 },
             ]}
           >
             <View
               style={[
                 styles.titleRow,
-                isOwnerPromotion && extraStyles.titleRowSpaced,
+                (isOwnerPromotion || isOwnerNews) && extraStyles.titleRowSpaced,
               ]}
             >
               <Text style={styles.feedTitle} numberOfLines={2}>
@@ -191,9 +216,16 @@ export default function FollowingFeedCard({
               </Text>
 
               {(isOwnerPromotion || isOwnerNews) && statusLabel ? (
-                <View style={styles.statusBadge}>
-                  <Text style={styles.statusBadgeText}>{statusLabel}</Text>
-                </View>
+                <AppLabel
+                  label={statusLabel}
+                  variant={
+                    item.status === "draft"
+                      ? "draft"
+                      : item.status === "unpublished"
+                        ? "unpublished"
+                        : "published"
+                  }
+                />
               ) : null}
             </View>
 

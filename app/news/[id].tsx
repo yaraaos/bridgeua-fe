@@ -24,7 +24,13 @@ export default function NewsDetailScreen() {
   const { newsItem, isLoading } = useNewsItem(id);
 
   if (isLoading || !newsItem) {
-    return <AppLoader />;
+    return (
+      <AppScreen style={styles.appScreen}>
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+          <AppLoader />
+        </View>
+      </AppScreen>
+    );
   }
 
   const handleShare = async () => {

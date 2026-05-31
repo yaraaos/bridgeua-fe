@@ -1,5 +1,6 @@
 import { FollowButton } from "@/src/components/business";
 import RecommendButton from "@/src/components/business/RecommendButton";
+import AppLabel from "@/src/components/ui/AppLabel/AppLabel";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
@@ -64,14 +65,12 @@ export default function BusinessCard({
       <View style={styles.content}>
         <View style={styles.textContent}>
           <View style={styles.nameRow}>
-            <Text style={styles.name} numberOfLines={1}>
+            <Text style={[styles.name, { flex: 1, marginRight: 8 }]} numberOfLines={1}>
               {business.name}
             </Text>
 
             {isOwnedBusiness ? (
-              <View style={styles.yourBusinessBadge}>
-                <Text style={styles.yourBusinessBadgeText}>Your business</Text>
-              </View>
+              <AppLabel label="Your business" variant="your-business" />
             ) : null}
           </View>
 

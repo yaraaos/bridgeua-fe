@@ -27,6 +27,7 @@ import type {
 
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { useFormValidation } from "@/src/hooks/useFormValidation";
+import { useScrollToError } from "@/src/hooks/useScrollToError";
 import { useEditBusinessStore } from "@/src/store/editBusiness.store";
 
 import { getBusinessServiceLibrary } from "@/src/features/businesses/services/business.service";
@@ -67,8 +68,7 @@ export default function EditServicesTab({
 
   const { members, updateMember } = useTeamStore();
 
-  const scrollRef = useRef<ScrollView>(null);
-  const cardPositions = useRef<Record<string, number>>({});
+  const { scrollRef, registerField, scrollToFirstError } = useScrollToError();
 
   const { showError, errorMessage, triggerError, clearError } =
     useFormValidation();
@@ -177,10 +177,7 @@ export default function EditServicesTab({
         (s) => s.duration.trim() === "" || s.price.trim() === "",
       )?.id;
       if (firstInvalidId !== undefined) {
-        scrollRef.current?.scrollTo({
-          y: (cardPositions.current[firstInvalidId] ?? 0) - spacing.lg,
-          animated: true,
-        });
+      scrollToFirstError([firstInvalidId], { [firstInvalidId]: true });
       }
       return;
     }
@@ -228,9 +225,7 @@ export default function EditServicesTab({
               {services.map((svc) => (
                 <View
                   key={svc.id}
-                  onLayout={(e) => {
-                    cardPositions.current[svc.id] = e.nativeEvent.layout.y;
-                  }}
+                  {...registerField(svc.id)}
                 >
                   <EditBusinessServiceCard
                     service={svc}

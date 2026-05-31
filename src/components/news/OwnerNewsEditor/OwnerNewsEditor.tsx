@@ -8,13 +8,16 @@ import type {
   NewsDraft,
 } from "@/src/features/news/types/news.types";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { useScrollToError } from "@/src/hooks/useScrollToError";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Alert,
   Image,
+  KeyboardAvoidingView,
   Modal,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -55,7 +58,7 @@ export default function OwnerNewsEditor({
   const { business } = useMyBusinessProfile();
 
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const scrollViewRef = useRef<ScrollView>(null);
+  const { scrollRef: scrollViewRef, registerField, scrollToFirstError } = useScrollToError();
 
   useEffect(() => {
     if (visible) {
@@ -72,6 +75,12 @@ export default function OwnerNewsEditor({
   const clearError = (key: string) => {
     if (errors[key]) setErrors((e) => ({ ...e, [key]: "" }));
   };
+
+  const sanitizeWhileTyping = (t: string) =>
+    t.replace(/^\n+/, "").replace(/\n{2,}/g, "\n");
+
+  const sanitizeOnBlur = (t: string) =>
+    t.replace(/^\n+/, "").replace(/\n{2,}/g, "\n").replace(/\n+$/, "");
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -90,21 +99,32 @@ export default function OwnerNewsEditor({
     !!draft.imageUrl &&
     (draft.imageUrl.startsWith("file://") || draft.imageUrl.startsWith("http"));
 
+  const hasDraftContent =
+    !!draft.title?.trim() ||
+    hasImage ||
+    !!draft.content?.trim() ||
+    !!draft.subtitle?.trim();
+
   const validate = () => {
     const newErrors: Record<string, string> = {};
     if (!draft.title?.trim()) newErrors.title = "Title is required";
     if (!draft.subtitle?.trim()) newErrors.subtitle = "Subtitle is required";
     if (!draft.imageUrl) newErrors.image = "Cover image is required";
     if (!draft.content?.trim()) newErrors.content = "Content is required";
-    if (!draft.ctaLabel) newErrors.ctaLabel = "Please select a call to action";
+    if (!draft.ctaLabel?.trim()) newErrors.ctaLabel = "Please choose a Call to Action";
     return newErrors;
   };
+
+  const isPublishReady = Object.keys(validate()).length === 0;
 
   const handlePublish = () => {
     const newErrors = validate();
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
-      scrollViewRef.current?.scrollTo({ y: 0, animated: true });
+      scrollToFirstError(
+        ['title', 'subtitle', 'image', 'content', 'ctaLabel'],
+        newErrors,
+      );
       return;
     }
     setErrors({});
@@ -210,6 +230,11 @@ export default function OwnerNewsEditor({
           </Pressable>
         </View>
 
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          keyboardVerticalOffset={0}
+        >
         <ScrollView
           ref={scrollViewRef}
           keyboardShouldPersistTaps="handled"
@@ -217,15 +242,16 @@ export default function OwnerNewsEditor({
           contentContainerStyle={styles.scrollContent}
         >
           {/* ── Title ── */}
-          <View>
+          <View {...registerField('title')}>
             <TextInput
               placeholder="News title"
               placeholderTextColor={colors.textMuted}
               value={draft.title}
               onChangeText={(t) => {
-                updateDraft({ title: t });
+                updateDraft({ title: sanitizeWhileTyping(t) });
                 clearError("title");
               }}
+              onBlur={() => updateDraft({ title: sanitizeOnBlur(draft.title ?? "") })}
               style={[
                 styles.titleInput,
                 !!errors.title && styles.titleInputError,
@@ -238,16 +264,18 @@ export default function OwnerNewsEditor({
           </View>
 
           {/* ── Subtitle ── */}
-          <View>
+          <View {...registerField('subtitle')}>
             <TextInput
               placeholder="Short subtitle"
               placeholderTextColor={colors.textMuted}
-              value={draft.subtitle ?? ''}
-              onChangeText={(t) => updateDraft({ subtitle: t })}
+              value={draft.subtitle ?? ""}
+              onChangeText={(t) => updateDraft({ subtitle: sanitizeWhileTyping(t) })}
+              onBlur={() => updateDraft({ subtitle: sanitizeOnBlur(draft.subtitle ?? "") })}
               style={[
                 styles.subtitleInput,
                 !!errors.subtitle && styles.fieldError,
               ]}
+              multiline
             />
             {!!errors.subtitle && (
               <AppText style={styles.errorText}>{errors.subtitle}</AppText>
@@ -267,7 +295,7 @@ export default function OwnerNewsEditor({
           </View>
 
           {/* ── Image picker ── */}
-          <View>
+          <View {...registerField('image')}>
             {hasImage ? (
               <View style={styles.imageWrapper}>
                 <Image
@@ -323,7 +351,7 @@ export default function OwnerNewsEditor({
           )}
 
           {/* ── Content card ── */}
-          <View>
+          <View {...registerField('content')}>
             <View
               style={[
                 styles.sectionCard,
@@ -336,9 +364,10 @@ export default function OwnerNewsEditor({
                 placeholderTextColor={colors.textMuted}
                 value={draft.content}
                 onChangeText={(t) => {
-                  updateDraft({ content: t });
+                  updateDraft({ content: sanitizeWhileTyping(t) });
                   clearError("content");
                 }}
+                onBlur={() => updateDraft({ content: sanitizeOnBlur(draft.content ?? "") })}
                 style={styles.textAreaInput}
                 multiline
                 textAlignVertical="top"
@@ -350,8 +379,8 @@ export default function OwnerNewsEditor({
           </View>
 
           {/* ── CTA selector ── */}
-          <View>
-            <AppText style={styles.ctaSectionLabel}>Call to action</AppText>
+          <View {...registerField('ctaLabel')}>
+            <AppText style={styles.ctaSectionLabel}>Choose Call to Action</AppText>
             <View style={styles.ctaRow}>
               {CTA_OPTIONS.map((opt) => (
                 <Pressable
@@ -381,6 +410,7 @@ export default function OwnerNewsEditor({
             )}
           </View>
         </ScrollView>
+        </KeyboardAvoidingView>
 
         {/* ── Footer ── */}
         <View style={styles.footer}>
@@ -388,16 +418,29 @@ export default function OwnerNewsEditor({
             <View style={styles.footerButton}>
               <AppButton title="Cancel" onPress={onCancel} variant="ghost" />
             </View>
-            <View style={styles.footerButton}>
-              <AppButton title="Save draft" onPress={onSave} variant="ghost" />
+            <View
+              style={[styles.footerButton, !hasDraftContent && { opacity: 0.4 }]}
+            >
+              <AppButton
+                title="Save draft"
+                onPress={onSave}
+                variant="ghost"
+                disabled={!hasDraftContent}
+              />
             </View>
           </View>
-          <AppButton
-            title={isPublishing ? "Publishing..." : "Publish"}
-            onPress={handlePublish}
-            variant="primary"
-            disabled={isPublishing}
-          />
+          <View
+            style={
+              !isPublishReady && !isPublishing ? { opacity: 0.5 } : undefined
+            }
+          >
+            <AppButton
+              title={isPublishing ? "Publishing..." : "Publish"}
+              onPress={handlePublish}
+              variant="primary"
+              disabled={isPublishing}
+            />
+          </View>
           {!!draft.id && !!onDelete && (
             <Pressable style={styles.deleteButton} onPress={handleDelete}>
               <AppText style={styles.deleteButtonText}>Delete</AppText>

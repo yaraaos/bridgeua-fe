@@ -27,6 +27,7 @@ import type {
 } from "@/src/features/businesses/types/editBusiness.types";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { useFormValidation } from "@/src/hooks/useFormValidation";
+import { useScrollToError } from "@/src/hooks/useScrollToError";
 import { useActiveAccount } from "@/src/store/account.store";
 import { useEditBusinessStore } from "@/src/store/editBusiness.store";
 
@@ -169,8 +170,7 @@ export default function EditOverviewTab({
     hydratedBusinessIdRef.current = nextBusinessId;
   }, [business, businessId, setOverviewDraft]);
 
-  const scrollRef = useRef<ScrollView>(null);
-  const fieldPositions = useRef<Record<string, number>>({});
+  const { scrollRef, registerField, scrollToFirstError } = useScrollToError();
   const hoursValidity = useRef<Record<string, boolean>>(
     Object.fromEntries(
       draft.hours.map((h) => [
@@ -269,15 +269,10 @@ export default function EditOverviewTab({
     if (Object.values(newErrors).some(Boolean) || !allHoursValid) {
       setErrors(newErrors);
       triggerError("Fill in the required fields");
-      const firstInvalidKey = (
-        ["address", "postalCode", "city", "state"] as const
-      ).find((k) => newErrors[k]);
-      if (firstInvalidKey !== undefined) {
-        scrollRef.current?.scrollTo({
-          y: (fieldPositions.current[firstInvalidKey] ?? 0) - spacing.lg,
-          animated: true,
-        });
-      }
+      scrollToFirstError(
+        ["address", "postalCode", "city", "state"],
+        newErrors,
+      );
       return;
     }
     setErrors(NO_ERRORS);
@@ -367,9 +362,7 @@ export default function EditOverviewTab({
             <View style={styles.addressRow}>
               <View
                 style={[styles.fieldGroup, styles.addressField]}
-                onLayout={(e) => {
-                  fieldPositions.current["address"] = e.nativeEvent.layout.y;
-                }}
+                {...registerField("address")}
               >
                 <AppText style={styles.fieldLabel}>Address</AppText>
                 <AppInput
@@ -386,9 +379,7 @@ export default function EditOverviewTab({
               </View>
               <View
                 style={[styles.fieldGroup, styles.postalField]}
-                onLayout={(e) => {
-                  fieldPositions.current["postalCode"] = e.nativeEvent.layout.y;
-                }}
+                {...registerField("postalCode")}
               >
                 <AppText style={styles.fieldLabel}>Postal Code</AppText>
                 <AppInput
@@ -407,9 +398,7 @@ export default function EditOverviewTab({
             <View style={styles.halfRow}>
               <View
                 style={[styles.fieldGroup, styles.halfField]}
-                onLayout={(e) => {
-                  fieldPositions.current["city"] = e.nativeEvent.layout.y;
-                }}
+                {...registerField("city")}
               >
                 <AppText style={styles.fieldLabel}>City</AppText>
                 <AppInput
@@ -426,9 +415,7 @@ export default function EditOverviewTab({
               </View>
               <View
                 style={[styles.fieldGroup, styles.halfField]}
-                onLayout={(e) => {
-                  fieldPositions.current["state"] = e.nativeEvent.layout.y;
-                }}
+                {...registerField("state")}
               >
                 <AppText style={styles.fieldLabel}>State / Region</AppText>
                 <AppInput

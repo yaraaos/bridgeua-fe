@@ -5,14 +5,19 @@ import type { AppColors } from "@/src/constants/colors";
 import { useMyBusinessProfile } from "@/src/features/businesses/hooks/useBusiness";
 import type { PromotionDraft } from "@/src/features/promotions/types/promotion.types";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { useScrollToError } from "@/src/hooks/useScrollToError";
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import * as ImagePicker from "expo-image-picker";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Alert,
+  Animated,
   Image,
+  Keyboard,
+  KeyboardAvoidingView,
   Modal,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -50,9 +55,35 @@ export default function OwnerPromotionEditor({
   const [showDateModal, setShowDateModal] = useState(false);
   const [tempDate, setTempDate] = useState(new Date());
   const [promoCodeVisible, setPromoCodeVisible] = useState(!!draft.promoCode);
-  const scrollViewRef = useRef<ScrollView>(null);
+  const {
+    scrollRef: scrollViewRef,
+    registerField,
+    scrollToFirstError,
+  } = useScrollToError();
+  const datePickerAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    if (visible) {
+      setErrors({});
+      setPromoCodeVisible(!!draft.promoCode);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [visible]);
 
   const isPublished = draft.status === "published";
+
+  useEffect(() => {
+    if (showDateModal) {
+      Animated.spring(datePickerAnim, {
+        toValue: 1,
+        useNativeDriver: true,
+        tension: 65,
+        friction: 11,
+      }).start();
+    } else {
+      datePickerAnim.setValue(0);
+    }
+  }, [showDateModal, datePickerAnim]);
 
   const updateDraft = (patch: Partial<PromotionDraft>) => {
     onChangeDraft({ ...draft, ...patch });
@@ -60,6 +91,35 @@ export default function OwnerPromotionEditor({
 
   const clearError = (key: string) => {
     if (errors[key]) setErrors((e) => ({ ...e, [key]: "" }));
+  };
+
+  const sanitizeWhileTyping = (t: string) =>
+    t.replace(/^\n+/, "").replace(/\n{2,}/g, "\n");
+
+  const sanitizeOnBlur = (t: string) =>
+    t
+      .replace(/^\n+/, "")
+      .replace(/\n{2,}/g, "\n")
+      .replace(/\n+$/, "");
+
+  const getTodayDateOnly = () => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return today;
+  };
+
+  const parseDateOnly = (value?: string | null) => {
+    if (!value) return getTodayDateOnly();
+    const [year, month, day] = value.split("-").map(Number);
+    if (!year || !month || !day) return getTodayDateOnly();
+    return new Date(year, month - 1, day);
+  };
+
+  const formatDateOnly = (date: Date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
   };
 
   const pickImage = async () => {
@@ -84,23 +144,54 @@ export default function OwnerPromotionEditor({
     !!draft.imageUrl &&
     (draft.imageUrl.startsWith("file://") || draft.imageUrl.startsWith("http"));
 
+  const hasDraftContent =
+    !!draft.title?.trim() ||
+    hasImage ||
+    !!draft.description?.trim() ||
+    !!draft.discountLabel?.trim() ||
+    !!draft.promoCode?.trim() ||
+    !!draft.subtitle?.trim() ||
+    !!draft.offerDetails?.some((o) => o.trim()) ||
+    !!draft.expiresAt;
+
   const validate = () => {
     const newErrors: Record<string, string> = {};
     if (!draft.title?.trim()) newErrors.title = "Title is required";
     if (!draft.subtitle?.trim()) newErrors.subtitle = "Subtitle is required";
-    if (!draft.imageUrl) newErrors.image = "Cover image is required";
+    if (!hasImage) newErrors.image = "Cover image is required";
     if (!draft.offerDetails?.length)
       newErrors.offerDetails = "Offer details are required";
     if (!draft.expiresAt) newErrors.expiresAt = "Expiry date is required";
-    if (!draft.ctaLabel) newErrors.ctaLabel = "Please select a call to action";
+    if (!draft.ctaLabel?.trim())
+      newErrors.ctaLabel = "Please choose a Call to Action";
+    const hasPromoCode = !!draft.promoCode?.trim();
+    const hasDiscount = !!draft.discountLabel?.trim();
+    if (hasPromoCode && !hasDiscount)
+      newErrors.discountLabel = "Discount is required when a promo code is set";
+    if (hasDiscount && !hasPromoCode)
+      newErrors.promoCode = "Promo code is required when a discount is set";
     return newErrors;
   };
+
+  const isPublishReady = Object.keys(validate()).length === 0;
 
   const handlePublish = () => {
     const newErrors = validate();
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
-      scrollViewRef.current?.scrollTo({ y: 0, animated: true });
+      scrollToFirstError(
+        [
+          "title",
+          "subtitle",
+          "image",
+          "offerDetails",
+          "expiresAt",
+          "promoCode",
+          "discountLabel",
+          "ctaLabel",
+        ],
+        newErrors,
+      );
       return;
     }
     setErrors({});
@@ -237,289 +328,357 @@ export default function OwnerPromotionEditor({
           </Pressable>
         </View>
 
-        <ScrollView
-          ref={scrollViewRef}
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.scrollContent}
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          keyboardVerticalOffset={0}
         >
-          {/* ── Title ── */}
-          <View>
-            <TextInput
-              placeholder="Promotion title"
-              placeholderTextColor={colors.textMuted}
-              value={draft.title}
-              onChangeText={(t) => {
-                updateDraft({ title: t });
-                clearError("title");
-              }}
-              style={[
-                styles.titleInput,
-                !!errors.title && styles.titleInputError,
-              ]}
-              multiline
-            />
-            {!!errors.title && (
-              <AppText style={styles.errorText}>{errors.title}</AppText>
-            )}
-          </View>
-
-          {/* ── Subtitle ── */}
-          <View>
-            <TextInput
-              placeholder="Short subtitle"
-              placeholderTextColor={colors.textMuted}
-              value={draft.subtitle}
-              onChangeText={(t) => {
-                updateDraft({ subtitle: t });
-                clearError("subtitle");
-              }}
-              style={[
-                styles.subtitleInput,
-                !!errors.subtitle && styles.fieldError,
-              ]}
-            />
-            {!!errors.subtitle && (
-              <AppText style={styles.errorText}>{errors.subtitle}</AppText>
-            )}
-          </View>
-
-          {/* ── Image picker ── */}
-          <View>
-            {hasImage ? (
-              <View style={styles.imageWrapper}>
-                <Image
-                  source={{ uri: draft.imageUrl }}
-                  style={styles.heroImage}
-                />
-                <Pressable style={styles.imageEditOverlay} onPress={pickImage}>
-                  <Ionicons
-                    name="camera-outline"
-                    size={20}
-                    color={colors.white}
-                  />
-                </Pressable>
-              </View>
-            ) : (
-              <Pressable
-                style={[
-                  styles.imagePlaceholder,
-                  !!errors.image && { borderColor: colors.error },
-                ]}
-                onPress={pickImage}
-              >
-                <Ionicons
-                  name="image-outline"
-                  size={32}
-                  color={colors.textMuted}
-                />
-                <AppText style={styles.imagePlaceholderText}>
-                  Add cover image
-                </AppText>
-              </Pressable>
-            )}
-            {!!errors.image && (
-              <AppText style={styles.errorText}>{errors.image}</AppText>
-            )}
-          </View>
-
-          {/* ── Business card (static) ── */}
-          {!!business && (
-            <View style={styles.businessCard}>
-              <AppAvatar
-                size="sm"
-                imageUrl={business.avatarUrl}
-                name={business.name}
-              />
-              <View style={styles.businessInfo}>
-                <AppText style={styles.businessName}>{business.name}</AppText>
-                <AppText style={styles.businessMeta}>
-                  {business.category}
-                </AppText>
-              </View>
-            </View>
-          )}
-
-          {/* ── Offer details card ── */}
-          <View>
-            <View
-              style={[
-                styles.sectionCard,
-                !!errors.offerDetails && { borderColor: colors.error },
-              ]}
-            >
-              <AppText style={styles.sectionTitle}>Offer details</AppText>
+          <ScrollView
+            ref={scrollViewRef}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={styles.scrollContent}
+          >
+            {/* ── Title ── */}
+            <View {...registerField("title")}>
               <TextInput
-                placeholder="Describe the offer details..."
+                placeholder="Promotion title"
                 placeholderTextColor={colors.textMuted}
-                value={draft.offerDetails?.join("\n") ?? ""}
+                value={draft.title}
                 onChangeText={(t) => {
-                  updateDraft({ offerDetails: t.split("\n") });
-                  clearError("offerDetails");
+                  updateDraft({ title: sanitizeWhileTyping(t) });
+                  clearError("title");
                 }}
-                style={styles.textAreaInput}
+                onBlur={() =>
+                  updateDraft({ title: sanitizeOnBlur(draft.title ?? "") })
+                }
+                style={[
+                  styles.titleInput,
+                  !!errors.title && styles.titleInputError,
+                ]}
                 multiline
-                textAlignVertical="top"
               />
-              {/* Valid until row */}
-              <Pressable
-                style={styles.validityRow}
-                onPress={() => {
-                  setTempDate(
-                    draft.expiresAt ? new Date(draft.expiresAt) : new Date(),
-                  );
-                  setShowDateModal(true);
-                }}
-              >
-                <Ionicons
-                  name="calendar-outline"
-                  size={16}
-                  color={errors.expiresAt ? colors.error : colors.textMuted}
-                />
-                <AppText
-                  style={[
-                    styles.validityText,
-                    {
-                      color: errors.expiresAt ? colors.error : colors.textMuted,
-                    },
-                  ]}
-                >
-                  {formattedValidUntil
-                    ? `Valid until ${formattedValidUntil}`
-                    : "Set expiry date"}
-                </AppText>
-              </Pressable>
+              {!!errors.title && (
+                <AppText style={styles.errorText}>{errors.title}</AppText>
+              )}
             </View>
-            {!!errors.offerDetails && (
-              <AppText style={styles.errorText}>{errors.offerDetails}</AppText>
-            )}
-            {!!errors.expiresAt && (
-              <AppText style={styles.errorText}>{errors.expiresAt}</AppText>
-            )}
-          </View>
 
-          {/* ── Promo code (optional) ── */}
-          {!promoCodeVisible ? (
-            <Pressable
-              style={styles.addRow}
-              onPress={() => setPromoCodeVisible(true)}
-            >
-              <Ionicons
-                name="add-circle-outline"
-                size={20}
-                color={colors.primaryGreen}
+            {/* ── Subtitle ── */}
+            <View {...registerField("subtitle")}>
+              <TextInput
+                placeholder="Short subtitle"
+                placeholderTextColor={colors.textMuted}
+                value={draft.subtitle}
+                onChangeText={(t) => {
+                  updateDraft({ subtitle: sanitizeWhileTyping(t) });
+                  clearError("subtitle");
+                }}
+                onBlur={() =>
+                  updateDraft({
+                    subtitle: sanitizeOnBlur(draft.subtitle ?? ""),
+                  })
+                }
+                style={[
+                  styles.subtitleInput,
+                  !!errors.subtitle && styles.fieldError,
+                ]}
+                multiline
               />
-              <AppText style={styles.addRowText}>Add promo code</AppText>
-            </Pressable>
-          ) : (
-            <View style={styles.sectionCard}>
-              <View style={styles.sectionCardHeader}>
-                <AppText style={styles.sectionTitle}>Promo code</AppText>
+              {!!errors.subtitle && (
+                <AppText style={styles.errorText}>{errors.subtitle}</AppText>
+              )}
+            </View>
+
+            {/* ── Image picker ── */}
+            <View {...registerField("image")}>
+              {hasImage ? (
+                <View style={styles.imageWrapper}>
+                  <Image
+                    source={{ uri: draft.imageUrl }}
+                    style={styles.heroImage}
+                  />
+                  <Pressable
+                    style={styles.imageEditOverlay}
+                    onPress={pickImage}
+                  >
+                    <Ionicons
+                      name="camera-outline"
+                      size={20}
+                      color={colors.white}
+                    />
+                  </Pressable>
+                </View>
+              ) : (
                 <Pressable
-                  hitSlop={8}
+                  style={[
+                    styles.imagePlaceholder,
+                    !!errors.image && { borderColor: colors.error },
+                  ]}
+                  onPress={pickImage}
+                >
+                  <Ionicons
+                    name="image-outline"
+                    size={32}
+                    color={colors.textMuted}
+                  />
+                  <AppText style={styles.imagePlaceholderText}>
+                    Add cover image
+                  </AppText>
+                </Pressable>
+              )}
+              {!!errors.image && (
+                <AppText style={styles.errorText}>{errors.image}</AppText>
+              )}
+            </View>
+
+            {/* ── Business card (static) ── */}
+            {!!business && (
+              <View style={styles.businessCard}>
+                <AppAvatar
+                  size="sm"
+                  imageUrl={business.avatarUrl}
+                  name={business.name}
+                />
+                <View style={styles.businessInfo}>
+                  <AppText style={styles.businessName}>{business.name}</AppText>
+                  <AppText style={styles.businessMeta}>
+                    {business.category}
+                  </AppText>
+                </View>
+              </View>
+            )}
+
+            {/* ── Offer details card ── */}
+            <View {...registerField("offerDetails")}>
+              <View
+                style={[
+                  styles.sectionCard,
+                  !!errors.offerDetails && { borderColor: colors.error },
+                ]}
+              >
+                <AppText style={styles.sectionTitle}>Offer details</AppText>
+                <TextInput
+                  placeholder="Describe the offer details..."
+                  placeholderTextColor={colors.textMuted}
+                  value={draft.offerDetails?.join("\n") ?? ""}
+                  onChangeText={(t) => {
+                    updateDraft({
+                      offerDetails: sanitizeWhileTyping(t).split("\n"),
+                    });
+                    clearError("offerDetails");
+                  }}
+                  onBlur={() =>
+                    updateDraft({
+                      offerDetails: [
+                        sanitizeOnBlur(draft.offerDetails?.join("\n") ?? ""),
+                      ],
+                    })
+                  }
+                  style={styles.textAreaInput}
+                  multiline
+                  textAlignVertical="top"
+                />
+                {/* Valid until row */}
+                <Pressable
+                  style={styles.validityRow}
                   onPress={() => {
-                    setPromoCodeVisible(false);
-                    updateDraft({ promoCode: undefined });
+                    Keyboard.dismiss();
+                    setTempDate(parseDateOnly(draft.expiresAt));
+                    setShowDateModal(true);
                   }}
                 >
                   <Ionicons
-                    name="trash-outline"
-                    size={18}
-                    color={colors.error}
+                    name="calendar-outline"
+                    size={16}
+                    color={errors.expiresAt ? colors.error : colors.textMuted}
                   />
+                  <AppText
+                    style={[
+                      styles.validityText,
+                      {
+                        color: errors.expiresAt
+                          ? colors.error
+                          : colors.textMuted,
+                      },
+                    ]}
+                  >
+                    {formattedValidUntil
+                      ? `Valid until ${formattedValidUntil}`
+                      : "Set expiry date"}
+                  </AppText>
                 </Pressable>
               </View>
-              <View style={styles.promoCodePill}>
-                <TextInput
-                  value={draft.promoCode ?? ""}
-                  onChangeText={(t) => updateDraft({ promoCode: t })}
-                  style={styles.promoCodeInput}
-                  autoCapitalize="characters"
-                  placeholder="BRIDGE20"
-                  placeholderTextColor={colors.accentOrange}
-                />
-              </View>
-              <View style={styles.discountRow}>
-                <AppText style={styles.discountLabel}>Discount</AppText>
-                <View style={styles.discountPill}>
-                  <TextInput
-                    value={draft.discountLabel ?? ""}
-                    onChangeText={(t) => updateDraft({ discountLabel: t })}
-                    style={styles.discountInput}
-                    keyboardType="numeric"
-                    placeholder="0"
-                    placeholderTextColor={colors.textMuted}
-                    maxLength={3}
-                  />
-                  <AppText style={styles.discountPercent}>%</AppText>
-                </View>
-              </View>
+              {!!errors.offerDetails && (
+                <AppText style={styles.errorText}>
+                  {errors.offerDetails}
+                </AppText>
+              )}
+              {!!errors.expiresAt && (
+                <AppText style={styles.errorText}>{errors.expiresAt}</AppText>
+              )}
             </View>
-          )}
 
-          {/* ── CTA selector ── */}
-          <View>
-            <AppText style={styles.ctaSectionLabel}>Call to action</AppText>
-            <View style={styles.ctaRow}>
+            {/* ── Promo code (optional) ── */}
+            <View {...registerField("promoCode")} />
+            {!promoCodeVisible ? (
               <Pressable
-                style={[
-                  styles.ctaPill,
-                  draft.ctaLabel === "Book Now" && styles.ctaPillActive,
-                ]}
-                onPress={() => {
-                  updateDraft({ ctaType: "book_now", ctaLabel: "Book Now" });
-                  clearError("ctaLabel");
-                }}
+                style={styles.addRow}
+                onPress={() => setPromoCodeVisible(true)}
               >
-                <AppText
-                  style={[
-                    styles.ctaPillText,
-                    draft.ctaLabel === "Book Now" && styles.ctaPillTextActive,
-                  ]}
-                >
-                  Book Now
-                </AppText>
+                <Ionicons
+                  name="add-circle-outline"
+                  size={20}
+                  color={colors.primaryGreen}
+                />
+                <AppText style={styles.addRowText}>Add promo code</AppText>
               </Pressable>
-              <Pressable
-                style={[
-                  styles.ctaPill,
-                  draft.ctaLabel === "Order Now" && styles.ctaPillActive,
-                ]}
-                onPress={() => {
-                  updateDraft({ ctaType: "book_now", ctaLabel: "Order Now" });
-                  clearError("ctaLabel");
-                }}
-              >
-                <AppText
-                  style={[
-                    styles.ctaPillText,
-                    draft.ctaLabel === "Order Now" && styles.ctaPillTextActive,
-                  ]}
-                >
-                  Order Now
-                </AppText>
-              </Pressable>
-            </View>
-            <View style={styles.ctaPillViewBusiness}>
-              <AppText style={styles.ctaPillViewBusinessText}>
-                View Business
-              </AppText>
-            </View>
-            {!!errors.ctaLabel && (
-              <AppText style={styles.errorText}>{errors.ctaLabel}</AppText>
+            ) : (
+              <View style={styles.sectionCard}>
+                <View style={styles.sectionCardHeader}>
+                  <AppText style={styles.sectionTitle}>Promo code</AppText>
+                  <Pressable
+                    hitSlop={8}
+                    onPress={() => {
+                      setPromoCodeVisible(false);
+                      updateDraft({ promoCode: undefined });
+                    }}
+                  >
+                    <Ionicons
+                      name="trash-outline"
+                      size={18}
+                      color={colors.error}
+                    />
+                  </Pressable>
+                </View>
+                <View style={styles.promoCodePill}>
+                  <TextInput
+                    value={draft.promoCode ?? ""}
+                    onChangeText={(t) => updateDraft({ promoCode: t })}
+                    style={styles.promoCodeInput}
+                    autoCapitalize="characters"
+                    placeholder="ADD PROMO CODE HERE"
+                    placeholderTextColor={colors.accentOrange + "66"}
+                    maxLength={20}
+                  />
+                </View>
+                <View style={styles.discountRow}>
+                  <AppText style={styles.discountLabel}>Discount</AppText>
+                  <View style={styles.discountPill}>
+                    <TextInput
+                      value={draft.discountLabel ?? ""}
+                      onChangeText={(t) => {
+                        const num = parseInt(t, 10);
+                        if (t === "") {
+                          updateDraft({ discountLabel: "" });
+                        } else if (!isNaN(num) && num >= 1 && num <= 100) {
+                          updateDraft({ discountLabel: String(num) });
+                        }
+                      }}
+                      style={styles.discountInput}
+                      keyboardType="numeric"
+                      placeholder="0"
+                      placeholderTextColor={colors.textMuted}
+                      maxLength={3}
+                    />
+                    <AppText style={styles.discountPercent}>%</AppText>
+                  </View>
+                </View>
+                {!!errors.discountLabel && (
+                  <AppText style={styles.errorText}>
+                    {errors.discountLabel}
+                  </AppText>
+                )}
+                {!!errors.promoCode && (
+                  <AppText style={styles.errorText}>{errors.promoCode}</AppText>
+                )}
+              </View>
             )}
-          </View>
-        </ScrollView>
+
+            {/* ── CTA selector ── */}
+            <View {...registerField("ctaLabel")}>
+              <AppText style={styles.ctaSectionLabel}>
+                Choose Call to Action
+              </AppText>
+              <View style={styles.ctaRow}>
+                <Pressable
+                  style={[
+                    styles.ctaPill,
+                    draft.ctaLabel === "Book Now" && styles.ctaPillActive,
+                  ]}
+                  onPress={() => {
+                    updateDraft({ ctaType: "book_now", ctaLabel: "Book Now" });
+                    clearError("ctaLabel");
+                  }}
+                >
+                  <AppText
+                    style={[
+                      styles.ctaPillText,
+                      draft.ctaLabel === "Book Now" && styles.ctaPillTextActive,
+                    ]}
+                  >
+                    Book Now
+                  </AppText>
+                </Pressable>
+                <Pressable
+                  style={[
+                    styles.ctaPill,
+                    draft.ctaLabel === "Order Now" && styles.ctaPillActive,
+                  ]}
+                  onPress={() => {
+                    updateDraft({ ctaType: "book_now", ctaLabel: "Order Now" });
+                    clearError("ctaLabel");
+                  }}
+                >
+                  <AppText
+                    style={[
+                      styles.ctaPillText,
+                      draft.ctaLabel === "Order Now" &&
+                        styles.ctaPillTextActive,
+                    ]}
+                  >
+                    Order Now
+                  </AppText>
+                </Pressable>
+              </View>
+              <View style={styles.ctaPillViewBusiness}>
+                <AppText style={styles.ctaPillViewBusinessText}>
+                  View Business
+                </AppText>
+                <AppText style={styles.ctaPillViewBusinessDefault}>
+                  Default
+                </AppText>
+              </View>
+              {!!errors.ctaLabel && (
+                <AppText style={styles.errorText}>{errors.ctaLabel}</AppText>
+              )}
+            </View>
+          </ScrollView>
+        </KeyboardAvoidingView>
 
         {showDateModal && (
-          <View style={styles.datePickerContainer}>
+          <Animated.View
+            style={[
+              styles.datePickerContainer,
+              {
+                opacity: datePickerAnim,
+                transform: [
+                  {
+                    translateY: datePickerAnim.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [20, 0],
+                    }),
+                  },
+                ],
+              },
+            ]}
+          >
             <View style={styles.datePickerHeader}>
               <Pressable onPress={() => setShowDateModal(false)} hitSlop={12}>
                 <AppText style={styles.datePickerCancel}>Cancel</AppText>
               </Pressable>
               <Pressable
                 onPress={() => {
-                  const iso = tempDate.toISOString().split("T")[0];
+                  const iso = formatDateOnly(tempDate);
                   updateDraft({ expiresAt: iso });
                   clearError("expiresAt");
                   setShowDateModal(false);
@@ -533,12 +692,12 @@ export default function OwnerPromotionEditor({
               value={tempDate}
               mode="date"
               display="spinner"
-              minimumDate={new Date()}
+              minimumDate={getTodayDateOnly()}
               onChange={(_event, selectedDate) => {
                 if (selectedDate) setTempDate(selectedDate);
               }}
             />
-          </View>
+          </Animated.View>
         )}
 
         {/* ── Footer ── */}
@@ -547,16 +706,32 @@ export default function OwnerPromotionEditor({
             <View style={styles.footerButton}>
               <AppButton title="Cancel" onPress={onCancel} variant="ghost" />
             </View>
-            <View style={styles.footerButton}>
-              <AppButton title="Save draft" onPress={onSave} variant="ghost" />
+            <View
+              style={[
+                styles.footerButton,
+                !hasDraftContent && { opacity: 0.4 },
+              ]}
+            >
+              <AppButton
+                title="Save draft"
+                onPress={onSave}
+                variant="ghost"
+                disabled={!hasDraftContent}
+              />
             </View>
           </View>
-          <AppButton
-            title={isPublishing ? "Publishing..." : "Publish"}
-            onPress={handlePublish}
-            variant="primary"
-            disabled={isPublishing}
-          />
+          <View
+            style={
+              !isPublishReady && !isPublishing ? { opacity: 0.5 } : undefined
+            }
+          >
+            <AppButton
+              title={isPublishing ? "Publishing..." : "Publish"}
+              onPress={handlePublish}
+              variant="primary"
+              disabled={isPublishing}
+            />
+          </View>
           {!!draft.id && !!onDelete && (
             <Pressable style={styles.deleteButton} onPress={handleDelete}>
               <AppText style={styles.deleteButtonText}>Delete</AppText>
@@ -863,6 +1038,14 @@ function createStyles(colors: AppColors) {
       fontWeight: "600",
       color: colors.white,
       textAlign: "center",
+    },
+    ctaPillViewBusinessDefault: {
+      fontSize: 10,
+      fontWeight: '700',
+      color: colors.white,
+      opacity: 0.7,
+      textTransform: 'uppercase',
+      letterSpacing: 0.5,
     },
 
     // Footer

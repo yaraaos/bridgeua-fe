@@ -20,8 +20,8 @@ export type NewsItem = {
   categoryLabel?: string;
   publishedAt: string;
 
-  ctaType: NewsCtaType;
-  ctaLabel: string;
+  ctaType?: NewsCtaType;
+  ctaLabel?: string;
 
   status?: NewsStatus;
   isActive?: boolean;
@@ -42,8 +42,8 @@ export type NewsDraft = {
   categoryLabel?: string;
   publishedAt?: string;
 
-  ctaType: NewsCtaType;
-  ctaLabel: string;
+  ctaType?: NewsCtaType;
+  ctaLabel?: string;
 
   status: NewsStatus;
 };

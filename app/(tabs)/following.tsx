@@ -7,6 +7,7 @@ import AppAddCard from "@/src/components/ui/AppAddCard/AppAddCard";
 import AppEmptyState from "@/src/components/ui/AppEmptyState";
 import AppLoader from "@/src/components/ui/AppLoader/AppLoader";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
+import { PROMO_CATEGORY_LABEL } from "@/src/constants/categories";
 import { AppColors } from "@/src/constants/colors";
 import { DISCOVERY_GRADIENT } from "@/src/constants/gradients";
 import {
@@ -26,7 +27,6 @@ import { apiClient } from "@/src/services/api/client";
 import { API_BASE_URL } from "@/src/services/api/config";
 import { useFollowingStore } from "@/src/store";
 import { useAuthStore } from "@/src/store/auth.store";
-import { PROMO_CATEGORY_LABEL } from "@/src/constants/categories";
 import { useFilterStore } from "@/src/store/filter.store";
 import { useFollowingLocationStore } from "@/src/store/following-location.store";
 import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
@@ -162,7 +162,7 @@ export default function FollowingScreen() {
     title: "",
     subtitle: "",
     description: "",
-    imageUrl: "https://images.unsplash.com/photo-1504674900247-0877df9cc836",
+    imageUrl: "",
     categoryLabel: "Promotion",
     startsAt: "",
     expiresAt: "",
@@ -172,8 +172,8 @@ export default function FollowingScreen() {
     redemptionInstructions: "",
     offerDetails: [],
     terms: [],
-    ctaType: "view_business",
-    ctaLabel: "View",
+    ctaType: undefined,
+    ctaLabel: undefined,
     status: "draft",
   });
 
@@ -184,20 +184,88 @@ export default function FollowingScreen() {
     subtitle: "",
     description: "",
     content: "",
-    imageUrl: "https://images.unsplash.com/photo-1495020689067-958852a7765e",
+    imageUrl: "",
     categoryLabel: "News",
     publishedAt: "",
-    ctaType: "view_business",
-    ctaLabel: "View Business",
+    ctaType: undefined,
+    ctaLabel: undefined,
     status: "draft",
   });
 
-  const closeEditor = () => {
+  const hasPromotionDraftContent = (draft: PromotionDraft): boolean =>
+    Boolean(
+      draft.title?.trim() ||
+      draft.subtitle?.trim() ||
+      draft.description?.trim() ||
+      draft.imageUrl?.trim() ||
+      draft.promoCode?.trim() ||
+      draft.discountLabel?.trim() ||
+      draft.ctaType ||
+      draft.ctaLabel?.trim() ||
+      draft.redemptionInstructions?.trim() ||
+      draft.offerDetails?.some((item) => item.trim()) ||
+      draft.terms?.some((item) => item.trim()) ||
+      draft.startsAt ||
+      draft.expiresAt ||
+      draft.endsAt,
+    );
+
+  const hasNewsDraftContent = (draft: NewsDraft): boolean =>
+    Boolean(
+      draft.title?.trim() ||
+      draft.subtitle?.trim() ||
+      draft.description?.trim() ||
+      draft.content?.trim() ||
+      draft.imageUrl?.trim() ||
+      draft.ctaType ||
+      draft.ctaLabel?.trim() ||
+      draft.publishedAt,
+    );
+
+  const closeEditor = (force = false) => {
+    if (!force && draftPromotion && hasPromotionDraftContent(draftPromotion)) {
+      Alert.alert(
+        "Unsaved changes",
+        "You have unsaved changes. What would you like to do?",
+        [
+          { text: "Keep editing", style: "cancel" },
+          {
+            text: "Save draft",
+            onPress: () => void handleSaveDraft(),
+          },
+          {
+            text: "Discard",
+            style: "destructive",
+            onPress: () => closeEditor(true),
+          },
+        ],
+      );
+      return;
+    }
     setIsEditorOpen(false);
     setDraftPromotion(null);
   };
 
-  const closeNewsEditor = () => {
+  const closeNewsEditor = (force = false) => {
+    if (!force && draftNews && hasNewsDraftContent(draftNews)) {
+      Alert.alert(
+        "Unsaved changes",
+        "You have unsaved changes. What would you like to do?",
+        [
+          { text: "Keep editing", style: "cancel" },
+          {
+            text: "Save draft",
+            onPress: () => void handleSaveNewsDraft(),
+          },
+          {
+            text: "Discard",
+            style: "destructive",
+            onPress: () => closeNewsEditor(true),
+          },
+        ],
+      );
+      return;
+    }
     setIsNewsEditorOpen(false);
     setDraftNews(null);
   };
@@ -251,6 +319,7 @@ export default function FollowingScreen() {
       handleOpenCreateNews();
       router.replace("/(tabs)/following");
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.tab, params.action]);
 
   const handleOpenCreateNews = () => {
@@ -325,7 +394,8 @@ export default function FollowingScreen() {
     if (!draftPromotion) return;
     try {
       const formData = new FormData();
-      Object.entries(draftPromotion).forEach(([key, value]) => {
+      const draftWithStatus = { ...draftPromotion, status: "draft" };
+      Object.entries(draftWithStatus).forEach(([key, value]) => {
         if (key === "id" && !value) return;
         if (value === undefined || value === null || value === "") return;
         if (Array.isArray(value)) {
@@ -357,7 +427,7 @@ export default function FollowingScreen() {
             : p.imageUrl,
         })) as Promotion[],
       );
-      closeEditor();
+      closeEditor(true);
     } catch {
       Alert.alert("Error", "Failed to save promotion. Please try again.");
     }
@@ -406,7 +476,7 @@ export default function FollowingScreen() {
             : p.imageUrl,
         })) as Promotion[],
       );
-      closeEditor();
+      closeEditor(true);
     } catch {
       Alert.alert("Error", "Failed to publish promotion. Please try again.");
     } finally {
@@ -420,7 +490,7 @@ export default function FollowingScreen() {
     const promotion = createPromotionFromDraft(draftPromotion, "unpublished");
 
     upsertOwnerPromotion(promotion);
-    closeEditor();
+    closeEditor(true);
   };
 
   const handleDeletePromotion = async () => {
@@ -431,7 +501,7 @@ export default function FollowingScreen() {
       setOwnerPromotions((prev) =>
         prev.filter((item) => item.id !== idToDelete),
       );
-      closeEditor();
+      closeEditor(true);
     } catch {
       Alert.alert("Error", "Failed to delete promotion. Please try again.");
     }
@@ -441,7 +511,8 @@ export default function FollowingScreen() {
     if (!draftNews) return;
     try {
       const formData = new FormData();
-      Object.entries(draftNews).forEach(([key, value]) => {
+      const draftWithStatus = { ...draftNews, status: "draft" };
+      Object.entries(draftWithStatus).forEach(([key, value]) => {
         if (key === "id" && !value) return;
         if (value === undefined || value === null || value === "") return;
         if (Array.isArray(value)) {
@@ -473,7 +544,7 @@ export default function FollowingScreen() {
             : n.imageUrl,
         })) as NewsItem[],
       );
-      closeNewsEditor();
+      closeNewsEditor(true);
     } catch {
       Alert.alert("Error", "Failed to save news. Please try again.");
     }
@@ -519,7 +590,7 @@ export default function FollowingScreen() {
             : n.imageUrl,
         })) as NewsItem[],
       );
-      closeNewsEditor();
+      closeNewsEditor(true);
     } catch {
       Alert.alert("Error", "Failed to publish news. Please try again.");
     } finally {
@@ -533,7 +604,7 @@ export default function FollowingScreen() {
     const newsItem = createNewsFromDraft(draftNews, "unpublished");
 
     upsertOwnerNews(newsItem);
-    closeNewsEditor();
+    closeNewsEditor(true);
   };
 
   const handleDeleteNews = async () => {
@@ -542,7 +613,7 @@ export default function FollowingScreen() {
     try {
       await apiClient.delete(`/api/news/${idToDelete}`);
       setOwnerNews((prev) => prev.filter((item) => item.id !== idToDelete));
-      closeNewsEditor();
+      closeNewsEditor(true);
     } catch {
       Alert.alert("Error", "Failed to delete news. Please try again.");
     }
@@ -550,36 +621,35 @@ export default function FollowingScreen() {
 
   const ownerFeedItems = useMemo<FollowingFeedCardItem[]>(() => {
     return ownerPromotions.map((promotion) => {
-      
-      return ({
-      id: `owner-promotion-${promotion.id}`,
-      businessId: promotion.businessId,
-      type: "promotion",
-      promotionId: promotion.id,
-      status: promotion.status,
-      isFeatured: promotion.isFeatured === true,
-      title: promotion.title || "Untitled promotion",
-      description:
-        promotion.subtitle ||
-        promotion.description ||
-        (promotion.offerDetails as any)?.[0] ||
-        "No description added yet.",
-      createdAt: new Date().toISOString(),
-      businessName: myBusiness?.name ?? "Your Business",
-      businessCategory: myBusiness?.category ?? "",
-      businessLocation: myBusiness?.location ?? "",
-      businessImage:
-        myBusiness?.avatarUrl ??
-        promotion.imageUrl ??
-        "https://placehold.co/600x400",
-      businessRating: 0,
-      businessDistanceKm: 0,
-      businessPriceLevel: undefined,
-      distanceKm: 0,
-      priceLevel: undefined,
-      recommendedByPreview: [],
-      recommendedByCount: 0,
-    });
+      return {
+        id: `owner-promotion-${promotion.id}`,
+        businessId: promotion.businessId,
+        type: "promotion",
+        promotionId: promotion.id,
+        status: promotion.status,
+        isFeatured: promotion.isFeatured === true,
+        title: promotion.title || "Untitled promotion",
+        description:
+          promotion.subtitle ||
+          promotion.description ||
+          (promotion.offerDetails as any)?.[0] ||
+          "No description added yet.",
+        createdAt: new Date().toISOString(),
+        businessName: myBusiness?.name ?? "Your Business",
+        businessCategory: myBusiness?.category ?? "",
+        businessLocation: myBusiness?.location ?? "",
+        businessImage:
+          myBusiness?.avatarUrl ??
+          promotion.imageUrl ??
+          "https://placehold.co/600x400",
+        businessRating: 0,
+        businessDistanceKm: 0,
+        businessPriceLevel: undefined,
+        distanceKm: 0,
+        priceLevel: undefined,
+        recommendedByPreview: [],
+        recommendedByCount: 0,
+      };
     });
   }, [ownerPromotions, myBusiness]);
 
@@ -936,9 +1006,13 @@ export default function FollowingScreen() {
                 item={item.item}
                 onPress={
                   item.isOwnerPromotion
-                    ? () => openOwnerPromotionEdit(item.item.promotionId)
+                    ? item.item.status === "published"
+                      ? undefined
+                      : () => openOwnerPromotionEdit(item.item.promotionId)
                     : item.isOwnerNews
-                      ? () => openOwnerNewsEdit(item.item.newsId)
+                      ? item.item.status === "published"
+                        ? undefined
+                        : () => openOwnerNewsEdit(item.item.newsId)
                       : undefined
                 }
                 isOwnerPromotion={item.isOwnerPromotion}
@@ -948,25 +1022,98 @@ export default function FollowingScreen() {
                   item.isOwnerPromotion
                     ? () => {
                         void apiClient
-                          .patch(`/api/promotions/${item.item.promotionId}/feature`, { isFeatured: true })
+                          .patch(
+                            `/api/promotions/${item.item.promotionId}/feature`,
+                            { isFeatured: true },
+                          )
                           .then(() => {
-                            void apiClient.get<{ data: any[] }>("/api/promotions/mine").then((res) => {
-                              const data = (res.data.data ?? res.data) as any[];
-                              setOwnerPromotions(
-                                data.map((p) => ({
-                                  ...p,
-                                  imageUrl: p.imageUrl
-                                    ? p.imageUrl.startsWith("http")
-                                      ? p.imageUrl
-                                      : `${API_BASE_URL}${p.imageUrl}`
-                                    : p.imageUrl,
-                                })) as Promotion[],
-                              );
-                            });
+                            void apiClient
+                              .get<{ data: any[] }>("/api/promotions/mine")
+                              .then((res) => {
+                                const data = (res.data.data ??
+                                  res.data) as any[];
+                                setOwnerPromotions(
+                                  data.map((p) => ({
+                                    ...p,
+                                    imageUrl: p.imageUrl
+                                      ? p.imageUrl.startsWith("http")
+                                        ? p.imageUrl
+                                        : `${API_BASE_URL}${p.imageUrl}`
+                                      : p.imageUrl,
+                                  })) as Promotion[],
+                                );
+                              });
                           })
                           .catch(() => {});
                       }
                     : undefined
+                }
+                onDelete={
+                  item.isOwnerPromotion
+                    ? () => {
+                        Alert.alert(
+                          "Delete promotion",
+                          "This cannot be undone.",
+                          [
+                            { text: "Cancel", style: "cancel" },
+                            {
+                              text: "Delete",
+                              style: "destructive",
+                              onPress: () => {
+                                void (async () => {
+                                  if (!item.item.promotionId) return;
+                                  try {
+                                    await apiClient.delete(
+                                      `/api/promotions/${item.item.promotionId}`,
+                                    );
+                                    setOwnerPromotions((prev) =>
+                                      prev.filter(
+                                        (p) => p.id !== item.item.promotionId,
+                                      ),
+                                    );
+                                  } catch {
+                                    Alert.alert(
+                                      "Error",
+                                      "Failed to delete promotion. Please try again.",
+                                    );
+                                  }
+                                })();
+                              },
+                            },
+                          ],
+                        );
+                      }
+                    : item.isOwnerNews
+                      ? () => {
+                          Alert.alert("Delete news", "This cannot be undone.", [
+                            { text: "Cancel", style: "cancel" },
+                            {
+                              text: "Delete",
+                              style: "destructive",
+                              onPress: () => {
+                                void (async () => {
+                                  if (!item.item.newsId) return;
+                                  try {
+                                    await apiClient.delete(
+                                      `/api/news/${item.item.newsId}`,
+                                    );
+                                    setOwnerNews((prev) =>
+                                      prev.filter(
+                                        (n) => n.id !== item.item.newsId,
+                                      ),
+                                    );
+                                  } catch {
+                                    Alert.alert(
+                                      "Error",
+                                      "Failed to delete news. Please try again.",
+                                    );
+                                  }
+                                })();
+                              },
+                            },
+                          ]);
+                        }
+                      : undefined
                 }
               />
             );
@@ -978,7 +1125,7 @@ export default function FollowingScreen() {
         visible={isEditorOpen}
         draft={draftPromotion ?? createEmptyDraft()}
         onChangeDraft={setDraftPromotion}
-        onCancel={closeEditor}
+        onCancel={() => closeEditor()}
         onSave={handleSaveDraft}
         onPublish={handlePublish}
         onUnpublish={handleUnpublish}
@@ -990,7 +1137,7 @@ export default function FollowingScreen() {
         visible={isNewsEditorOpen}
         draft={draftNews ?? createEmptyNewsDraft()}
         onChangeDraft={setDraftNews}
-        onCancel={closeNewsEditor}
+        onCancel={() => closeNewsEditor()}
         onSave={handleSaveNewsDraft}
         onPublish={handlePublishNews}
         onUnpublish={handleUnpublishNews}
