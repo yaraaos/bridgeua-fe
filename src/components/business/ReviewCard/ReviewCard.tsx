@@ -370,7 +370,7 @@ export default function ReviewCard({
               <View style={styles.interactionRow}>
                 <Pressable
                   style={styles.interactionButton}
-                  onPress={handleToggleLike}
+                  onPress={(isPreview || isPreviewMode) ? undefined : handleToggleLike}
                 >
                   <MaterialIcons
                     name={isLiked ? "thumb-up" : "thumb-up-off-alt"}
@@ -562,7 +562,7 @@ export default function ReviewCard({
               <View style={styles.interactionRow}>
                 <Pressable
                   style={styles.interactionButton}
-                  onPress={handleToggleLike}
+                  onPress={(isPreview || isPreviewMode) ? undefined : handleToggleLike}
                 >
                   <MaterialIcons
                     name={isLiked ? "thumb-up" : "thumb-up-off-alt"}
