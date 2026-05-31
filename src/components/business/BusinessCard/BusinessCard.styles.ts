@@ -60,6 +60,7 @@ export function createStyles(colors: AppColors) {
       alignItems: "center",
       gap: 6,
       marginBottom: 2,
+      justifyContent: "space-between",
     },
 
     name: {
@@ -69,21 +70,6 @@ export function createStyles(colors: AppColors) {
       color: colors.textPrimary,
       lineHeight: 20,
       marginBottom: 2,
-    },
-
-    yourBusinessBadge: {
-      flexShrink: 0,
-      paddingHorizontal: 8,
-      paddingVertical: 3,
-      borderRadius: 999,
-      backgroundColor: colors.primaryGreen,
-    },
-
-    yourBusinessBadgeText: {
-      fontSize: 10,
-      fontWeight: "800",
-      color: colors.white,
-      lineHeight: 12,
     },
 
     ratingRow: {

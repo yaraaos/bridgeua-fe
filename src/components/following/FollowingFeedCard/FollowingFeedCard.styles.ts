@@ -56,20 +56,6 @@ export function createStyles(colors: AppColors) {
       lineHeight: 22,
     },
 
-    statusBadge: {
-      paddingHorizontal: 8,
-      paddingVertical: 4,
-      borderRadius: 999,
-      backgroundColor: colors.primaryGreenSoft,
-    },
-
-    statusBadgeText: {
-      fontSize: 10,
-      fontWeight: "800",
-      color: colors.primaryGreen,
-      textTransform: "uppercase",
-    },
-
     feedDescription: {
       fontSize: 13,
       lineHeight: 19,

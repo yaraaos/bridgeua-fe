@@ -1,4 +1,5 @@
 import FollowButton from "@/src/components/business/FollowButton/FollowButton";
+import AppLabel from "@/src/components/ui/AppLabel/AppLabel";
 import AppText from "@/src/components/ui/AppText/AppText";
 import type { FollowingFeedCardItem } from "@/src/features/following/types/following.types";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
@@ -191,25 +192,16 @@ export default function FollowingFeedCard({
               </Text>
 
               {(isOwnerPromotion || isOwnerNews) && statusLabel ? (
-                <View
-                  style={[
-                    styles.statusBadge,
-                    item.status === "draft" && {
-                      backgroundColor: colors.accentOrangeSoft,
-                    },
-                  ]}
-                >
-                  <Text
-                    style={[
-                      styles.statusBadgeText,
-                      item.status === "draft" && {
-                        color: colors.accentOrange,
-                      },
-                    ]}
-                  >
-                    {statusLabel}
-                  </Text>
-                </View>
+                <AppLabel
+                  label={statusLabel}
+                  variant={
+                    item.status === "draft"
+                      ? "draft"
+                      : item.status === "unpublished"
+                        ? "unpublished"
+                        : "published"
+                  }
+                />
               ) : null}
             </View>
 
