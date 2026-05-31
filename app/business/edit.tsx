@@ -1,4 +1,4 @@
-import { Feather } from "@expo/vector-icons";
+import { Feather, Ionicons } from "@expo/vector-icons";
 import { usePreventRemove } from '@react-navigation/core';
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useRef } from "react";
@@ -210,8 +210,8 @@ export default function EditBusinessScreen() {
   return (
     <AppScreen style={styles.screen}>
       <View style={styles.header}>
-        <Pressable onPress={handleBack} style={styles.headerButton} hitSlop={8}>
-          <Feather name="arrow-left" size={22} color={colors.textPrimary} />
+        <Pressable onPress={handleBack} style={[styles.headerButton, { marginLeft: -spacing.xs }]} hitSlop={8}>
+          <Ionicons name="chevron-back" size={28} color={colors.textPrimary} />
         </Pressable>
 
         <AppText style={styles.headerTitle}>Edit Business</AppText>
