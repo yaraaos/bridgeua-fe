@@ -1048,6 +1048,73 @@ export default function FollowingScreen() {
                       }
                     : undefined
                 }
+                onDelete={
+                  item.isOwnerPromotion
+                    ? () => {
+                        Alert.alert(
+                          "Delete promotion",
+                          "This cannot be undone.",
+                          [
+                            { text: "Cancel", style: "cancel" },
+                            {
+                              text: "Delete",
+                              style: "destructive",
+                              onPress: () => {
+                                void (async () => {
+                                  if (!item.item.promotionId) return;
+                                  try {
+                                    await apiClient.delete(
+                                      `/api/promotions/${item.item.promotionId}`,
+                                    );
+                                    setOwnerPromotions((prev) =>
+                                      prev.filter(
+                                        (p) => p.id !== item.item.promotionId,
+                                      ),
+                                    );
+                                  } catch {
+                                    Alert.alert(
+                                      "Error",
+                                      "Failed to delete promotion. Please try again.",
+                                    );
+                                  }
+                                })();
+                              },
+                            },
+                          ],
+                        );
+                      }
+                    : item.isOwnerNews
+                      ? () => {
+                          Alert.alert("Delete news", "This cannot be undone.", [
+                            { text: "Cancel", style: "cancel" },
+                            {
+                              text: "Delete",
+                              style: "destructive",
+                              onPress: () => {
+                                void (async () => {
+                                  if (!item.item.newsId) return;
+                                  try {
+                                    await apiClient.delete(
+                                      `/api/news/${item.item.newsId}`,
+                                    );
+                                    setOwnerNews((prev) =>
+                                      prev.filter(
+                                        (n) => n.id !== item.item.newsId,
+                                      ),
+                                    );
+                                  } catch {
+                                    Alert.alert(
+                                      "Error",
+                                      "Failed to delete news. Please try again.",
+                                    );
+                                  }
+                                })();
+                              },
+                            },
+                          ]);
+                        }
+                      : undefined
+                }
               />
             );
           }}

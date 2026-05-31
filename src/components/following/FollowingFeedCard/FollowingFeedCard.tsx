@@ -17,6 +17,7 @@ type FollowingFeedCardProps = {
   isOwnerNews?: boolean;
   isFeatured?: boolean;
   onFeaturePromotion?: () => void;
+  onDelete?: () => void;
 };
 
 export default function FollowingFeedCard({
@@ -26,6 +27,7 @@ export default function FollowingFeedCard({
   isOwnerNews,
   isFeatured,
   onFeaturePromotion,
+  onDelete,
 }: FollowingFeedCardProps) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
@@ -109,7 +111,7 @@ export default function FollowingFeedCard({
 
   return (
     <Pressable style={styles.feedCard} onPress={handlePress}>
-      {isOwnerPromotion && item.status === "published" && (
+      {(isOwnerPromotion || isOwnerNews) && item.status === "published" && (
         <View style={extraStyles.menuWrapper}>
           <Pressable
             style={[
@@ -128,32 +130,54 @@ export default function FollowingFeedCard({
 
           {showMenu && (
             <View style={extraStyles.inlineMenu}>
+              {isOwnerPromotion && (
+                <Pressable
+                  style={extraStyles.inlineMenuRow}
+                  onPress={() => {
+                    if (isAlreadyFeatured) return;
+                    setShowMenu(false);
+                    onFeaturePromotion?.();
+                  }}
+                >
+                  <Ionicons
+                    name={isAlreadyFeatured ? "star" : "star-outline"}
+                    size={16}
+                    color={
+                      isAlreadyFeatured
+                        ? colors.accentOrange
+                        : colors.primaryGreen
+                    }
+                  />
+                  <AppText
+                    style={[
+                      extraStyles.inlineMenuText,
+                      isAlreadyFeatured && { color: colors.textMuted },
+                    ]}
+                  >
+                    {isAlreadyFeatured
+                      ? "Promo added to home banner"
+                      : "Add to home promo banner"}
+                  </AppText>
+                </Pressable>
+              )}
               <Pressable
-                style={extraStyles.inlineMenuRow}
+                style={[
+                  extraStyles.inlineMenuRow,
+                  isOwnerPromotion && {
+                    borderTopWidth: 1,
+                    borderTopColor: "rgba(255,255,255,0.1)",
+                  },
+                ]}
                 onPress={() => {
-                  if (isAlreadyFeatured) return;
                   setShowMenu(false);
-                  onFeaturePromotion?.();
+                  onDelete?.();
                 }}
               >
-                <Ionicons
-                  name={isAlreadyFeatured ? "star" : "star-outline"}
-                  size={16}
-                  color={
-                    isAlreadyFeatured
-                      ? colors.accentOrange
-                      : colors.primaryGreen
-                  }
-                />
+                <Ionicons name="trash-outline" size={16} color={colors.error} />
                 <AppText
-                  style={[
-                    extraStyles.inlineMenuText,
-                    isAlreadyFeatured && { color: colors.textMuted },
-                  ]}
+                  style={[extraStyles.inlineMenuText, { color: colors.error }]}
                 >
-                  {isAlreadyFeatured
-                    ? "Promo added to home banner"
-                    : "Add to home promo banner"}
+                  Delete
                 </AppText>
               </Pressable>
             </View>
@@ -178,13 +202,13 @@ export default function FollowingFeedCard({
           <View
             style={[
               styles.feedTextWrap,
-              isOwnerPromotion && { paddingRight: 28 },
+              (isOwnerPromotion || isOwnerNews) && { paddingRight: 20 },
             ]}
           >
             <View
               style={[
                 styles.titleRow,
-                isOwnerPromotion && extraStyles.titleRowSpaced,
+                (isOwnerPromotion || isOwnerNews) && extraStyles.titleRowSpaced,
               ]}
             >
               <Text style={styles.feedTitle} numberOfLines={2}>
