@@ -336,10 +336,11 @@ export default function BusinessDetailsScreen() {
             <>
               <BusinessOverviewCard business={viewBusiness} />
 
-              {(viewBusiness.services?.length ?? 0) > 0 && !isEditPreview && (
+              {(viewBusiness.services?.length ?? 0) > 0 && (
                 <BusinessBookingCard
                   businessId={viewBusiness.id}
                   category={viewBusiness.category}
+                  disabled={isEditPreview}
                 />
               )}
 
@@ -378,7 +379,8 @@ export default function BusinessDetailsScreen() {
           {activeTab === "services" ? (
             <BusinessServicesList
               services={services}
-              onPressService={(service) => {
+              disabled={isEditPreview}
+              onPressService={isEditPreview ? undefined : (service) => {
                 router.push({
                   pathname: "/bookings/choose-service",
                   params: {
@@ -411,6 +413,7 @@ export default function BusinessDetailsScreen() {
                   reviewPhotos={allReviewPhotos}
                   focusedReviewId={focusedReviewId}
                   onClearFocusedReview={() => setFocusedReviewId(null)}
+                  isPreview={isEditPreview}
                   onReviewsListLayout={(y) => {
                     reviewsListYRef.current = y;
                   }}

@@ -10,6 +10,7 @@ import { createStyles } from "./BusinessBookingCard.styles";
 type Props = {
   businessId: string;
   category?: string;
+  disabled?: boolean;
 };
 
 type BookingAction = {
@@ -45,7 +46,7 @@ const BOOKING_ACTIONS: BookingAction[] = [
   },
 ];
 
-export default function BusinessBookingCard({ businessId, category }: Props) {
+export default function BusinessBookingCard({ businessId, category, disabled }: Props) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
 
@@ -67,7 +68,7 @@ export default function BusinessBookingCard({ businessId, category }: Props) {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, disabled && { opacity: 0.5 }]}>
       <Text style={styles.title}>Book an appointment</Text>
 
       <View style={styles.actions}>
@@ -78,7 +79,7 @@ export default function BusinessBookingCard({ businessId, category }: Props) {
               styles.actionRow,
               index !== 0 ? styles.actionRowBordered : null,
             ]}
-            onPress={() => handlePress(action.pathname)}
+            onPress={disabled ? undefined : () => handlePress(action.pathname)}
           >
             <View style={styles.iconBox}>
               <Ionicons

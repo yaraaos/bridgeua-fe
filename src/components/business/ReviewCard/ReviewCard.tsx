@@ -33,6 +33,7 @@ type Props =
       isActionMenuOpen?: never;
       onToggleActionMenu?: never;
       onCloseActionMenu?: never;
+      isPreview?: boolean;
     }
   | {
       review: PersonalProfileReview;
@@ -46,6 +47,7 @@ type Props =
       isActionMenuOpen?: boolean;
       onToggleActionMenu?: (reviewId: string) => void;
       onCloseActionMenu?: () => void;
+      isPreview?: boolean;
     };
 
 function isProfileReview(
@@ -72,6 +74,7 @@ export default function ReviewCard({
   onCloseActionMenu,
   onPressReview,
   onPressComment,
+  isPreview: isPreviewMode,
 }: Props) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
@@ -387,7 +390,7 @@ export default function ReviewCard({
 
                 <Pressable
                   style={styles.interactionButton}
-                  onPress={(event) => {
+                  onPress={(isPreview || isPreviewMode) ? undefined : (event) => {
                     event.stopPropagation();
 
                     if (onPressComment) {
@@ -579,7 +582,7 @@ export default function ReviewCard({
 
                 <Pressable
                   style={styles.interactionButton}
-                  onPress={(event) => {
+                  onPress={(isPreview || isPreviewMode) ? undefined : (event) => {
                     event.stopPropagation();
 
                     if (onPressComment) {

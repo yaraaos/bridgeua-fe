@@ -8,11 +8,13 @@ import { createStyles } from "./BusinessServicesList.styles";
 type Props = {
   services: BusinessDetailsService[];
   onPressService?: (service: BusinessDetailsService) => void;
+  disabled?: boolean;
 };
 
 export default function BusinessServicesList({
   services,
   onPressService,
+  disabled,
 }: Props) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
@@ -29,7 +31,7 @@ export default function BusinessServicesList({
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, disabled && { opacity: 0.5 }]}>
       <View>
         {services.map((service, index) => (
           <Pressable
@@ -38,7 +40,7 @@ export default function BusinessServicesList({
               styles.serviceRow,
               index !== 0 ? styles.serviceRowBordered : null,
             ]}
-            onPress={() => onPressService?.(service)}
+            onPress={disabled ? undefined : () => onPressService?.(service)}
             disabled={!onPressService}
           >
             <View style={styles.iconBox}>
