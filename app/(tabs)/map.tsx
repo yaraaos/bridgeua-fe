@@ -20,7 +20,7 @@ import {
   isOwnedBusiness,
   prioritizeOwnedBusiness,
 } from "@/src/features/discovery/utils/ownedBusinessDiscovery";
-import { useBannerPromotions } from "@/src/features/promotions/hooks/useBannerPromotions";
+import { usePromotions } from "@/src/features/promotions/hooks/usePromotions";
 import { useAccountStore, useActiveAccount } from "@/src/store/account.store";
 import { useAuthStore } from "@/src/store/auth.store";
 import { useDiscoveryLocationStore } from "@/src/store/discovery-location";
@@ -137,14 +137,13 @@ export default function MapScreen() {
     };
   }, [currentUser, activeAccount, isHydrated]);
 
-  const { promotions: bannerPromotions } = useBannerPromotions();
-
+  const { promotions: activePromotions } = usePromotions();
   const businessIdsWithPromo = useMemo(() => {
     const followedSet = new Set(followedBusinessIds.map(String));
-    return bannerPromotions
+    return activePromotions
       .map((p) => String(p.businessId))
       .filter((id) => followedSet.has(id));
-  }, [bannerPromotions, followedBusinessIds]);
+  }, [activePromotions, followedBusinessIds]);
 
   const { filteredBusinesses } = useDiscoveryFeed({
     businesses,
