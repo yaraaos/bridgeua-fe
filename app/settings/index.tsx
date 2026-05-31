@@ -161,7 +161,7 @@ export default function SettingsScreen() {
             icon="user"
             title="Profile"
             subtitle="View and edit your profile"
-            onPress={() => router.push("/profile/edit")}
+            onPress={() => router.push(accountType === "business" ? "/business/edit" : "/profile/edit")}
           />
           <View style={styles.divider} />
           <SettingsRow
@@ -325,23 +325,6 @@ export default function SettingsScreen() {
           <Feather name="log-out" size={18} color={colors.accentOrange} />
           <Text style={styles.logoutText}>Log Out</Text>
         </Pressable>
-
-        {business ? (
-          <Pressable
-            style={({ pressed }) => [
-              styles.deleteBusinessBtn,
-              pressed && styles.logoutPressed,
-              isDeletingBusiness && styles.disabledBtn,
-            ]}
-            onPress={handleDeleteBusiness}
-            disabled={isDeletingBusiness}
-          >
-            <Feather name="trash-2" size={18} color={colors.error} />
-            <Text style={styles.deleteBusinessText}>
-              {isDeletingBusiness ? "Deleting..." : "Delete Business"}
-            </Text>
-          </Pressable>
-        ) : null}
 
         <Text style={styles.version}>Version 2.4.7</Text>
       </ScrollView>
