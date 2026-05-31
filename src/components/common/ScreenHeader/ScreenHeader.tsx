@@ -214,7 +214,10 @@ export default function ScreenHeader({
 
             {typeof isOpen === "boolean" ? (
               <View style={styles.businessStatusRow}>
-                <Text style={styles.businessStatus}>
+                <Text style={[
+                  styles.businessStatus,
+                  { color: isOpen ? colors.primaryGreen : colors.error },
+                ]}>
                   {isOpen ? "Open" : "Closed"}
                 </Text>
 

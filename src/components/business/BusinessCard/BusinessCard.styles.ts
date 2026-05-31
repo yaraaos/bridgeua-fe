@@ -108,6 +108,8 @@ export function createStyles(colors: AppColors) {
 
     openStatusRow: {
       marginTop: 2,
+      flexDirection: 'row',
+      alignItems: 'center',
     },
     openStatusText: {
       fontSize: 12,

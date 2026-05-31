@@ -216,7 +216,6 @@ export function createStyles(colors: AppColors) {
       fontSize: 13,
       lineHeight: 17,
       fontWeight: "700",
-      color: colors.primaryGreen,
     },
 
     businessStatusMuted: {
