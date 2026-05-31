@@ -558,6 +558,7 @@ export default function OwnerPromotionEditor({
                     autoCapitalize="characters"
                     placeholder="ADD PROMO CODE HERE"
                     placeholderTextColor={colors.accentOrange + "66"}
+                    maxLength={20}
                   />
                 </View>
                 <View style={styles.discountRow}>
@@ -565,7 +566,14 @@ export default function OwnerPromotionEditor({
                   <View style={styles.discountPill}>
                     <TextInput
                       value={draft.discountLabel ?? ""}
-                      onChangeText={(t) => updateDraft({ discountLabel: t })}
+                      onChangeText={(t) => {
+                        const num = parseInt(t, 10);
+                        if (t === "") {
+                          updateDraft({ discountLabel: "" });
+                        } else if (!isNaN(num) && num >= 1 && num <= 100) {
+                          updateDraft({ discountLabel: String(num) });
+                        }
+                      }}
                       style={styles.discountInput}
                       keyboardType="numeric"
                       placeholder="0"
