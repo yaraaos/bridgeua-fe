@@ -54,7 +54,7 @@ export default function ConfirmEmailScreen() {
 
         <TextInput
           style={styles.input}
-          placeholder="6-digit code"
+          placeholder="4-digit code"
           placeholderTextColor={colors.textMuted}
           keyboardType="numeric"
           maxLength={6}
