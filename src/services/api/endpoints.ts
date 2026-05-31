@@ -41,6 +41,8 @@ export const ENDPOINTS = {
     `/api/businesses/${businessId}/reviews/${reviewId}/comments`,
   REVIEW_COMMENT_BY_ID: (businessId: string, reviewId: string, commentId: string) =>
     `/api/businesses/${businessId}/reviews/${reviewId}/comments/${commentId}`,
+  REVIEW_PHOTOS: (businessId: string, reviewId: string) =>
+    `/api/businesses/${businessId}/reviews/${reviewId}/photos`,
   BUSINESS_FOLLOW: (id: string) => `/api/businesses/${id}/follow`,
 
   // Bookings
