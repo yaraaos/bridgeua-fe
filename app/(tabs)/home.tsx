@@ -19,6 +19,7 @@ import {
 } from "@/src/features/discovery/utils/ownedBusinessDiscovery";
 import { useBannerPromotion } from "@/src/features/promotions/hooks/useBannerPromotion";
 import { useBannerPromotions } from "@/src/features/promotions/hooks/useBannerPromotions";
+import { usePromotions } from "@/src/features/promotions/hooks/usePromotions";
 import type { HomePromotion } from "@/src/features/promotions/types/promotion.types";
 import type { Business } from "@/src/types/business";
 import { useAccountStore, useActiveAccount } from "@/src/store/account.store";
@@ -130,12 +131,13 @@ export default function HomeScreen() {
     (state) => state.followedBusinessIds,
   );
 
+  const { promotions: activePromotions } = usePromotions();
   const businessIdsWithPromo = useMemo(() => {
     const followedSet = new Set(followedBusinessIds.map(String));
-    return bannerPromotions
+    return activePromotions
       .map((p) => String(p.businessId))
       .filter((id) => followedSet.has(id));
-  }, [bannerPromotions, followedBusinessIds]);
+  }, [activePromotions, followedBusinessIds]);
 
   const { filteredBusinesses: discoveryFilteredBusinesses } = useDiscoveryFeed({
     businesses,
@@ -152,10 +154,12 @@ export default function HomeScreen() {
 
   useFocusEffect(
     useCallback(() => {
-      if (category === PROMO_CATEGORY_LABEL) {
+      const currentCategory =
+        useFilterStore.getState().discoveryFilters.category;
+      if (currentCategory === PROMO_CATEGORY_LABEL) {
         useFilterStore.getState().setCategory("discovery", "");
       }
-    }, [category]),
+    }, []),
   );
 
   const filteredBusinesses = normalizedSearchQuery
