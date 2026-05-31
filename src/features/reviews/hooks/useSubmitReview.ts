@@ -1,6 +1,6 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { submitReview } from "../services/review.service";
+import { submitReview, uploadReviewPhoto } from "../services/review.service";
 import type { Review, SubmitReviewPayload } from "../types/review.types";
 
 export const useSubmitReview = () => {
@@ -15,6 +15,12 @@ export const useSubmitReview = () => {
       setIsSubmitting(true);
 
       const review = await submitReview(payload);
+
+      if (payload.photos?.length && review?.id) {
+        for (const uri of payload.photos) {
+          await uploadReviewPhoto(payload.businessId, review.id, uri);
+        }
+      }
 
       await queryClient.invalidateQueries({
         queryKey: ["reviews", payload.businessId],
