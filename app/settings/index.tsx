@@ -289,7 +289,7 @@ export default function SettingsScreen() {
             icon="message-circle"
             title="Contact Us"
             subtitle="Get in touch with our support team"
-            onPress={() => router.push("/settings/help")}
+            onPress={() => router.push("/settings/contact")}
           />
           <View style={styles.divider} />
           <SettingsRow
