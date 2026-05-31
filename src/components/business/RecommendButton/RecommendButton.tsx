@@ -2,6 +2,7 @@ import AppButton from "@/src/components/ui/AppButton/AppButton";
 import AppText from "@/src/components/ui/AppText/AppText";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { apiClient } from "@/src/services/api/client";
+import { useAuthStore } from '@/src/store/auth.store';
 import { useRecommendationsStore } from "@/src/store/recommendations.store";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useRef, useState } from "react";
@@ -43,12 +44,15 @@ export default function RecommendButton({
   const setRecommendations = useRecommendationsStore(
     (s) => s.setRecommendations,
   );
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const isGuest = useAuthStore((state) => state.isGuest);
 
   const normalizedId = String(businessId);
   const isActive = recommendedBusinessIds.includes(normalizedId);
 
   useEffect(() => {
     if (hasFetched.current) return;
+    if (!isAuthenticated || isGuest) return;
     hasFetched.current = true;
     void apiClient
       .get("/api/recommendations/mine")
@@ -59,7 +63,7 @@ export default function RecommendButton({
         );
       })
       .catch(() => {});
-  }, []);
+  }, [isAuthenticated, isGuest, setRecommendations]);
 
   const handlePress = () => {
     if (!isActive) {
