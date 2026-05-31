@@ -80,13 +80,14 @@ export default function AccountScreen() {
   async function handleUpdateEmail() {
     setEmailLoading(true);
     try {
-      await apiClient.patch(ENDPOINTS.ACCOUNT_EMAIL, {
+      const response = await apiClient.patch(ENDPOINTS.ACCOUNT_EMAIL, {
         currentPassword: emailCurrentPassword,
         newEmail,
       });
-      Alert.alert("Email updated successfully");
+      console.log('ACCOUNT_EMAIL response:', response);
       resetEmailForm();
       setEmailOpen(false);
+      router.push({ pathname: "/settings/confirm-email" as never, params: { email: newEmail } });
     } catch (err: unknown) {
       Alert.alert(
         "Could not update email",
