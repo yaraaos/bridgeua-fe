@@ -2,6 +2,7 @@ import * as SecureStore from "expo-secure-store";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
+import type { UserSettings } from "@/src/features/settings/types/settings.types";
 import { personalProfileMock } from "@/src/mocks/profile.mock";
 import { apiClient } from "@/src/services/api/client";
 import { ENDPOINTS } from "@/src/services/api/endpoints";
@@ -9,7 +10,9 @@ import type { PersonalProfile } from "@/src/types/profile";
 
 type ProfileState = {
   profile: PersonalProfile;
+  settings: UserSettings | null;
   setProfile: (profile: PersonalProfile) => void;
+  setSettings: (settings: UserSettings) => void;
   updateProfile: (profile: Partial<PersonalProfile>) => void;
   clearProfile: () => void;
   loadProfile: () => Promise<void>;
@@ -19,8 +22,10 @@ export const useProfileStore = create<ProfileState>()(
   persist(
     (set) => ({
       profile: personalProfileMock,
+      settings: null,
 
       setProfile: (profile) => set({ profile }),
+      setSettings: (settings) => set({ settings }),
 
       updateProfile: (profile) =>
         set((state) => ({
@@ -33,6 +38,7 @@ export const useProfileStore = create<ProfileState>()(
       clearProfile: () =>
         set({
           profile: personalProfileMock,
+          settings: null,
         }),
 
       loadProfile: async () => {
@@ -49,6 +55,7 @@ export const useProfileStore = create<ProfileState>()(
               phoneNumber?: string;
               dateOfBirth?: string;
             } | null;
+            settings: UserSettings | null;
           }>(ENDPOINTS.USERS_ME);
 
           const u = res.data;
@@ -70,6 +77,7 @@ export const useProfileStore = create<ProfileState>()(
               phoneNumber: p.phoneNumber,
               dateOfBirth: p.dateOfBirth,
             },
+            settings: u.settings ?? null,
           });
         } catch {
           // Не сбрасываем профиль при ошибке
