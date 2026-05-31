@@ -106,6 +106,14 @@ export function createStyles(colors: AppColors) {
       lineHeight: 16,
     },
 
+    openStatusRow: {
+      marginTop: 2,
+    },
+    openStatusText: {
+      fontSize: 12,
+      fontWeight: '600',
+    },
+
     recommendedRow: {
       flexDirection: "row",
       alignItems: "center",

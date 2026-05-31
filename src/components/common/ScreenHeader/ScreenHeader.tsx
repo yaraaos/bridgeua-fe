@@ -59,6 +59,7 @@ type Props = {
   location?: string;
   isOpen?: boolean;
   closesAt?: string;
+  opensAt?: string;
   rightSlot?: React.ReactNode;
   leftSlot?: React.ReactNode;
   onPressShare?: () => void;
@@ -100,6 +101,7 @@ export default function ScreenHeader({
   location,
   isOpen,
   closesAt,
+  opensAt,
   rightSlot,
   leftSlot,
   onPressShare,
@@ -216,12 +218,21 @@ export default function ScreenHeader({
                   {isOpen ? "Open" : "Closed"}
                 </Text>
 
-                {!!closesAt ? (
+                {isOpen && !!closesAt ? (
                   <>
                     <Text style={styles.businessStatusSeparator}>•</Text>
 
                     <Text style={styles.businessStatusMuted}>
                       Closes at {closesAt}
+                    </Text>
+                  </>
+                ) : null}
+                {!isOpen && !!opensAt ? (
+                  <>
+                    <Text style={styles.businessStatusSeparator}>•</Text>
+
+                    <Text style={styles.businessStatusMuted}>
+                      Opens at {opensAt}
                     </Text>
                   </>
                 ) : null}

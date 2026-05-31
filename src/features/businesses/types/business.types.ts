@@ -168,6 +168,7 @@ export type BusinessDetails = {
   images: BusinessDetailsImage[];
   isOpen: boolean;
   closesAt: string;
+  opensAt?: string | null;
   isFollowing?: boolean;
   about: BusinessAbout;
   services: BusinessDetailsService[];
