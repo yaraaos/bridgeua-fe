@@ -1,7 +1,10 @@
 import AppAvatar from "@/src/components/ui/AppAvatar";
 import { AuthRequiredModal, useRequireAuth } from "@/src/features/auth";
 import type { BusinessDetailsReview } from "@/src/features/businesses/types/business.types";
-import { likeReview, unlikeReview } from "@/src/features/reviews/services/review.service";
+import {
+  likeReview,
+  unlikeReview,
+} from "@/src/features/reviews/services/review.service";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { useProfileStore } from "@/src/store/profile.store";
 import { useReviewsStore } from "@/src/store/reviews.store";
@@ -74,7 +77,7 @@ export default function ReviewCard({
   onCloseActionMenu,
   onPressReview,
   onPressComment,
-  isPreview: isPreviewMode,
+  isPreview,
 }: Props) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
@@ -82,7 +85,9 @@ export default function ReviewCard({
     useRequireAuth();
 
   const isProfile = variant === "profile";
-  const isPreview = variant === "preview";
+  const isVariantPreview = variant === "preview";
+  const isAnyPreview = isVariantPreview || !!isPreview;
+  const isInteractionDisabled = !!isPreview;
 
   const profileReview = isProfileReview(review) ? review : null;
   const businessReview = isBusinessReview(review) ? review : null;
@@ -106,9 +111,9 @@ export default function ReviewCard({
   const hasReviewText = !!review.text?.trim();
 
   const shouldShowReadMore =
-    !isPreview && hasReviewText && review.text.length > 120;
+    !isVariantPreview && hasReviewText && review.text.length > 120;
 
-  const showPhotos = !isPreview && !!review.photos?.length;
+  const showPhotos = !isVariantPreview && !!review.photos?.length;
 
   const openReviewPhotoViewer = (index: number) => {
     router.push({
@@ -204,7 +209,7 @@ export default function ReviewCard({
   };
 
   const handlePressCard = () => {
-    if (isPreview) return;
+    if (isAnyPreview) return;
 
     if (onPressReview) {
       onPressReview(review.id);
@@ -217,10 +222,10 @@ export default function ReviewCard({
   return (
     <>
       <Pressable
-        disabled={isPreview}
+        disabled={isAnyPreview}
         style={[
           styles.container,
-          isPreview && styles.containerPreview,
+          isVariantPreview && styles.containerPreview,
           isActionMenuOpen && styles.containerMenuOpen,
         ]}
         onPress={handlePressCard}
@@ -367,10 +372,16 @@ export default function ReviewCard({
                   ))}
                 </ScrollView>
               ) : null}
-              <View style={styles.interactionRow}>
+              <View style={[styles.interactionRow, isInteractionDisabled && { opacity: 0.4 }]}>
                 <Pressable
                   style={styles.interactionButton}
-                  onPress={(isPreview || isPreviewMode) ? undefined : handleToggleLike}
+                  onPress={
+                    isAnyPreview
+                      ? undefined
+                      : isInteractionDisabled
+                        ? undefined
+                        : handleToggleLike
+                  }
                 >
                   <MaterialIcons
                     name={isLiked ? "thumb-up" : "thumb-up-off-alt"}
@@ -390,16 +401,20 @@ export default function ReviewCard({
 
                 <Pressable
                   style={styles.interactionButton}
-                  onPress={(isPreview || isPreviewMode) ? undefined : (event) => {
-                    event.stopPropagation();
+                  onPress={
+                    isAnyPreview || isInteractionDisabled
+                      ? undefined
+                      : (event) => {
+                          event.stopPropagation();
 
-                    if (onPressComment) {
-                      onPressComment(review.id);
-                      return;
-                    }
+                          if (onPressComment) {
+                            onPressComment(review.id);
+                            return;
+                          }
 
-                    openReviewThread();
-                  }}
+                          openReviewThread();
+                        }
+                  }
                 >
                   <MaterialIcons
                     name="chat-bubble-outline"
@@ -441,7 +456,7 @@ export default function ReviewCard({
                         ? profile.avatarUrl
                         : businessReview.authorAvatar
                     }
-                    size={isPreview ? "sm" : "md"}
+                    size={isVariantPreview ? "sm" : "md"}
                   />
                 </Pressable>
 
@@ -456,7 +471,7 @@ export default function ReviewCard({
                   <Text
                     style={[
                       styles.authorName,
-                      isPreview && styles.authorNamePreview,
+                      isVariantPreview && styles.authorNamePreview,
                     ]}
                     numberOfLines={1}
                   >
@@ -472,7 +487,7 @@ export default function ReviewCard({
                         <MaterialIcons
                           key={index}
                           name={isFilled ? "star" : "star-border"}
-                          size={isPreview ? 11 : 14}
+                          size={isVariantPreview ? 11 : 14}
                           color={colors.accentOrange}
                         />
                       );
@@ -480,7 +495,7 @@ export default function ReviewCard({
                   </View>
                 </Pressable>
 
-                {!isPreview ? (
+                {!isVariantPreview ? (
                   <>
                     {review.isEdited ? (
                       <Text style={styles.reviewDate}>Edited</Text>
@@ -495,13 +510,15 @@ export default function ReviewCard({
 
               {hasReviewText ? (
                 <Text
-                  style={[styles.text, isPreview && styles.textPreview]}
-                  numberOfLines={isPreview ? 4 : isExpanded ? undefined : 3}
+                  style={[styles.text, isVariantPreview && styles.textPreview]}
+                  numberOfLines={
+                    isVariantPreview ? 4 : isExpanded ? undefined : 3
+                  }
                 >
                   {businessReview.text}
                 </Text>
               ) : null}
-              {isPreview ? (
+              {isVariantPreview ? (
                 <Pressable
                   style={styles.moreButton}
                   onPress={() => onPressMore?.(businessReview.id)}
@@ -550,7 +567,7 @@ export default function ReviewCard({
                 </ScrollView>
               ) : null}
 
-              {!isPreview && businessReview.tags?.length ? (
+              {!isVariantPreview && businessReview.tags?.length ? (
                 <View style={styles.tagsWrap}>
                   {businessReview.tags.map((tag) => (
                     <View key={tag} style={styles.tag}>
@@ -559,10 +576,16 @@ export default function ReviewCard({
                   ))}
                 </View>
               ) : null}
-              <View style={styles.interactionRow}>
+              <View style={[styles.interactionRow, isInteractionDisabled && { opacity: 0.4 }]}>
                 <Pressable
                   style={styles.interactionButton}
-                  onPress={(isPreview || isPreviewMode) ? undefined : handleToggleLike}
+                  onPress={
+                    isAnyPreview
+                      ? undefined
+                      : isInteractionDisabled
+                        ? undefined
+                        : handleToggleLike
+                  }
                 >
                   <MaterialIcons
                     name={isLiked ? "thumb-up" : "thumb-up-off-alt"}
@@ -582,16 +605,20 @@ export default function ReviewCard({
 
                 <Pressable
                   style={styles.interactionButton}
-                  onPress={(isPreview || isPreviewMode) ? undefined : (event) => {
-                    event.stopPropagation();
+                  onPress={
+                    isAnyPreview || isInteractionDisabled
+                      ? undefined
+                      : (event) => {
+                          event.stopPropagation();
 
-                    if (onPressComment) {
-                      onPressComment(review.id);
-                      return;
-                    }
+                          if (onPressComment) {
+                            onPressComment(review.id);
+                            return;
+                          }
 
-                    openReviewThread();
-                  }}
+                          openReviewThread();
+                        }
+                  }
                 >
                   <MaterialIcons
                     name="chat-bubble-outline"
