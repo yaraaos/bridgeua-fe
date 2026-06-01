@@ -284,10 +284,11 @@ export default function MapScreen() {
         animated: true,
       },
     );
-  }, [mappableBusinesses]);
+  }, [locationState, mappableBusinesses]);
 
   useEffect(() => {
     if (!locationState || !mapRef.current) return;
+    setSelectedBusinessId(null);
     const bounds = US_STATE_BOUNDS[locationState];
     if (!bounds) return;
     mapRef.current.animateToRegion(bounds, 500);
