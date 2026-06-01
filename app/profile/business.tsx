@@ -126,7 +126,6 @@ export default function BusinessProfileScreen() {
   );
 
   const businessName = business?.name || "";
-  const handle = business?.category ?? account?.handle ?? "";
   const avatarUrl =
     business?.avatarUrl ?? business?.images?.[0]?.url ?? account?.avatarUrl;
   const businessLocation = business?.location ?? "";
@@ -262,7 +261,6 @@ export default function BusinessProfileScreen() {
             <View style={styles.heroIdentityRow}>
               <AppAvatar
                 name={businessName}
-                username={handle}
                 imageUrl={avatarUrl}
                 size="lg"
               />
