@@ -95,7 +95,7 @@ export const useMyBusinessProfile = () => {
       return;
     }
     try {
-      setIsLoading((current) => (business ? current : true));
+      setIsLoading((current) => current);
       setError(null);
 
       const data = await getMyBusinessProfile();
@@ -107,7 +107,7 @@ export const useMyBusinessProfile = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [business, isAuthenticated, isGuest]);
+  }, [isAuthenticated, isGuest]);
 
   useEffect(() => {
     void loadBusiness();

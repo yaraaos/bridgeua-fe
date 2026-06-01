@@ -190,7 +190,7 @@ export default function EditOverviewTab({
   const successTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const displayedAvatarUrl =
-    draft.avatarUrl || business?.avatarUrl || account.avatarUrl;
+    draft.avatarUrl || business?.avatarUrl || account?.avatarUrl;
 
   async function handlePickAvatar() {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
