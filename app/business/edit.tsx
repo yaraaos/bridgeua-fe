@@ -16,7 +16,6 @@ import AppText from "@/src/components/ui/AppText/AppText";
 import { AppColors } from "@/src/constants/colors";
 import { spacing } from "@/src/constants/spacing";
 import { useMyBusinessProfile } from "@/src/features/businesses";
-import { type DayOfWeek } from "@/src/features/businesses/types/editBusiness.types";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import {
   type EditBusinessTab,
@@ -76,24 +75,6 @@ export default function EditBusinessScreen() {
         telegram: business.socialLinks?.telegram ?? "",
         whatsapp: business.socialLinks?.whatsapp ?? "",
       },
-      hours:
-        business.businessHours?.map((h) => {
-          const DAY_NAMES: DayOfWeek[] = [
-            "sunday",
-            "monday",
-            "tuesday",
-            "wednesday",
-            "thursday",
-            "friday",
-            "saturday",
-          ];
-          return {
-            day: DAY_NAMES[h.day] ?? "monday",
-            isOpen: !h.isClosed,
-            openTime: h.opensAt ?? "09:00",
-            closeTime: h.closesAt ?? "18:00",
-          };
-        }) ?? [],
     });
 
     setGalleryDraft({
