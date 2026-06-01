@@ -670,26 +670,30 @@ function createStyles(colors: AppColors) {
       top: 52,
       left: 0,
       right: 0,
-      backgroundColor: colors.surface,
+      backgroundColor: colors.primaryGreenDark,
       borderRadius: 8,
       borderWidth: 1,
-      borderColor: colors.border,
+      borderColor: colors.primaryGreen,
       zIndex: 999,
       elevation: 10,
       maxHeight: 180,
       overflow: "hidden",
+      shadowColor: "#000",
+      shadowOpacity: 0.25,
+      shadowRadius: 16,
+      shadowOffset: { width: 0, height: 8 },
     },
 
     suggestionItem: {
       paddingHorizontal: 14,
       paddingVertical: 12,
       borderBottomWidth: 1,
-      borderBottomColor: colors.border,
+      borderBottomColor: 'rgba(255,255,255,0.08)',
     },
 
     suggestionText: {
       fontSize: 14,
-      color: colors.textPrimary,
+      color: colors.white,
     },
 
     apiError: {

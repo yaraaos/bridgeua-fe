@@ -123,7 +123,7 @@ export default function LocationSelector({
                           <Ionicons
                             name="locate-outline"
                             size={16}
-                            color={colors.primaryGreen}
+                            color={colors.white}
                           />
                         ) : null}
 
@@ -141,7 +141,7 @@ export default function LocationSelector({
                         <Ionicons
                           name="checkmark"
                           size={16}
-                          color={colors.primaryGreen}
+                          color={colors.white}
                         />
                       ) : null}
                     </Pressable>
