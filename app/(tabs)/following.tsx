@@ -10,10 +10,8 @@ import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
 import { PROMO_CATEGORY_LABEL } from "@/src/constants/categories";
 import { AppColors } from "@/src/constants/colors";
 import { DISCOVERY_GRADIENT } from "@/src/constants/gradients";
-import {
-  DEFAULT_LOCATION_OPTIONS,
-  LocationOption,
-} from "@/src/constants/locations";
+import { LocationOption } from "@/src/constants/locations";
+import { getBusinessStates } from "@/src/features/businesses/services/business.service";
 import { useMyBusinessProfile } from "@/src/features/businesses/hooks/useBusiness";
 import { useFollowingFeed } from "@/src/features/following";
 import type { FollowingFeedCardItem } from "@/src/features/following/types/following.types";
@@ -101,6 +99,7 @@ export default function FollowingScreen() {
 
   const {
     label: selectedLocationLabel,
+    state: locationState,
     setManualLocation,
     setNearbyLocation,
     setPermissionStatus,
@@ -108,6 +107,27 @@ export default function FollowingScreen() {
 
   const { category, sort, cuisines, rating, distance, customDistance } =
     useFilterStore((state) => state.followingFilters);
+
+  const [locationOptions, setLocationOptions] = useState<LocationOption[]>([
+    { label: "All locations", value: "all", type: "manual", state: undefined },
+    { label: "See nearby", value: "nearby", type: "nearby" },
+  ]);
+
+  useEffect(() => {
+    getBusinessStates().then((states) => {
+      const stateOptions: LocationOption[] = states.map((s) => ({
+        label: `${s}, USA`,
+        value: s.toLowerCase().replace(/\s+/g, '-') + '-usa',
+        type: 'manual',
+        state: s,
+      }));
+      setLocationOptions([
+        { label: "All locations", value: "all", type: "manual", state: undefined },
+        { label: "See nearby", value: "nearby", type: "nearby" },
+        ...stateOptions,
+      ]);
+    }).catch(() => {});
+  }, []);
 
   const [visibleBusinessIds, setVisibleBusinessIds] = useState<string[]>([]);
   const [refreshing, setRefreshing] = useState(false);
@@ -146,7 +166,7 @@ export default function FollowingScreen() {
     isLoading,
     isEmpty,
     hasFollowedBusinesses,
-  } = useFollowingFeed({ visibleBusinessIds });
+  } = useFollowingFeed({ visibleBusinessIds, state: locationState });
 
   const shouldShowOwnerPromoTools =
     isBusinessAccount && activeTab === "promotion";
@@ -737,6 +757,7 @@ export default function FollowingScreen() {
     setManualLocation({
       label: option.label,
       value: option.value,
+      state: option.value === "all" ? undefined : option.state,
     });
   };
 
@@ -895,7 +916,7 @@ export default function FollowingScreen() {
       subtitleLabel="Location"
       subtitleValue={selectedLocationLabel}
       showSubtitleChevron
-      locationOptions={DEFAULT_LOCATION_OPTIONS}
+      locationOptions={locationOptions}
       onSelectLocationOption={handleSelectLocationOption}
       onRequestNearby={handleRequestNearby}
       showSearch
