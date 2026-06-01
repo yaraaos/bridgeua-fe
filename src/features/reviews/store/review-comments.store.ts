@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { Alert } from 'react-native';
 
 import { useProfileStore } from "@/src/store/profile.store";
 import { useReviewsStore } from "@/src/store/reviews.store";
@@ -101,7 +102,10 @@ export const useReviewCommentsStore = create<ReviewCommentsState>()(
             ),
           }));
           return real;
-        } catch {
+        } catch (err: any) {
+          if (err?.message === 'Business accounts cannot post comments') {
+            Alert.alert('Not available', 'Business profiles cannot leave comments.', [{ text: 'OK' }]);
+          }
           // Remove optimistic on failure
           set((state) => ({
             comments: state.comments.filter((c) => c.id !== optimisticId),
