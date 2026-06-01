@@ -35,6 +35,8 @@ export type EditBusinessOverviewDraft = {
   phone: string;
   socialLinks: EditBusinessSocialLinks;
   hours: BusinessHourEntry[];
+  latitude?: string;
+  longitude?: string;
 };
 
 export type UpdateBusinessOverviewPayload = {
@@ -48,6 +50,8 @@ export type UpdateBusinessOverviewPayload = {
   phone: string;
   socialLinks: EditBusinessSocialLinks;
   hours: BusinessHourEntry[];
+  latitude?: string;
+  longitude?: string;
 };
 
 export type ServiceLibraryItem = {
