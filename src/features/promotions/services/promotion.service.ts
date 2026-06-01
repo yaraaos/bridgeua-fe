@@ -38,11 +38,9 @@ const normalizeHomePromotion = (promotion: any): HomePromotion => {
   };
 };
 
-export const getActivePromotions = async (): Promise<Promotion[]> => {
-  const res = await apiClient.get<PromotionPublicResponse>(
-    "/api/promotions/public",
-  );
-
+export const getActivePromotions = async (state?: string): Promise<Promotion[]> => {
+  const url = state ? `/api/promotions/public?state=${encodeURIComponent(state)}` : "/api/promotions/public";
+  const res = await apiClient.get<PromotionPublicResponse>(url);
   return getPromotionArray(res.data).map(normalizePromotion);
 };
 
@@ -83,18 +81,9 @@ export const getBannerPromotion = async (
   return promotions[0] ?? null;
 };
 
-export const getBannerPromotions = async (): Promise<HomePromotion[]> => {
-  const res = await apiClient.get<PromotionPublicResponse>(
-    "/api/promotions/public",
-  );
-
-  const promotions = Array.isArray(res.data)
-    ? res.data
-    : (res.data.featured ?? res.data.data ?? []);
-
-  const featuredPromotions = promotions.filter(
-    (promotion) => promotion.isFeatured === true,
-  );
-
-  return featuredPromotions.map(normalizeHomePromotion);
+export const getBannerPromotions = async (state?: string): Promise<HomePromotion[]> => {
+  const url = state ? `/api/promotions/public?state=${encodeURIComponent(state)}` : "/api/promotions/public";
+  const res = await apiClient.get<PromotionPublicResponse>(url);
+  const promotions = Array.isArray(res.data) ? res.data : (res.data.featured ?? res.data.data ?? []);
+  return promotions.filter((p) => p.isFeatured === true).map(normalizeHomePromotion);
 };

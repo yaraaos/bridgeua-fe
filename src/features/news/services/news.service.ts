@@ -17,7 +17,8 @@ export const getNewsById = async (id: string): Promise<NewsItem | null> => {
   return n ? normalizeNews(n) : null;
 };
 
-export const getPublicNews = async (): Promise<NewsItem[]> => {
-  const res = await apiClient.get<{ data: any[] }>("/api/news/public");
+export const getPublicNews = async (state?: string): Promise<NewsItem[]> => {
+  const url = state ? `/api/news/public?state=${encodeURIComponent(state)}` : "/api/news/public";
+  const res = await apiClient.get<{ data: any[] }>(url);
   return (res.data.data ?? res.data).map(normalizeNews);
 };
