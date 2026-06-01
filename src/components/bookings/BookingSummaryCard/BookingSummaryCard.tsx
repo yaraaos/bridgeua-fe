@@ -1,3 +1,4 @@
+import AppLabel from "@/src/components/ui/AppLabel/AppLabel";
 import AppText from "@/src/components/ui/AppText/AppText";
 import type { BookingStatus } from "@/src/features/bookings/types/booking.types";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
@@ -36,9 +37,7 @@ export default function BookingSummaryCard({
       <AppText style={styles.title}>Booking summary</AppText>
 
       {status && (
-        <View style={styles.statusBadge}>
-          <AppText style={styles.statusText}>{status}</AppText>
-        </View>
+        <AppLabel label="Confirmed" variant="confirmed" />
       )}
 
       <View style={styles.rows}>

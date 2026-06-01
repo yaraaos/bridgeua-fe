@@ -14,6 +14,7 @@ export const lightColors = {
   textSecondary: "#5E665F",
   textMuted: "#98A09A",
   error: "#D9534F",
+  errorSoft: "#FADADD",
   statTilePurple: "#EDE7FB",
   statTileBlue: "#E0EEFC",
 };
@@ -32,6 +33,7 @@ export const darkColors: AppColors = {
   textSecondary: "#8FA896",
   textMuted: "#5A7063",
   error: "#D9534F",
+  errorSoft: "#3D1010",
   statTilePurple: "#2A2342",
   statTileBlue: "#1C2D44",
 };

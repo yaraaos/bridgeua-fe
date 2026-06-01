@@ -9,7 +9,11 @@ export type AppLabelVariant =
   | "unpublished"
   | "owner"
   | "your-business"
-  | "featured";
+  | "featured"
+  | "confirmed"
+  | "pending"
+  | "cancelled"
+  | "completed";
 
 type Props = {
   label: string;
@@ -72,5 +76,17 @@ function createStyles(colors: AppColors) {
 
     featured: { backgroundColor: colors.accentOrangeSoft },
     featured_text: { color: colors.accentOrange },
+
+    confirmed: { backgroundColor: colors.primaryGreenSoft },
+    confirmed_text: { color: colors.primaryGreen },
+
+    pending: { backgroundColor: colors.accentOrangeSoft },
+    pending_text: { color: colors.accentOrange },
+
+    cancelled: { backgroundColor: colors.errorSoft },
+    cancelled_text: { color: colors.error },
+
+    completed: { backgroundColor: colors.surface },
+    completed_text: { color: colors.textSecondary },
   });
 }

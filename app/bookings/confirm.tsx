@@ -107,7 +107,7 @@ export default function BookingConfirmScreen() {
         price={price}
         customerName={customerName || "Customer"}
         phoneNumber={params.phoneNumber ?? "Phone not added"}
-        status="pending"
+        status="confirmed"
       />
 
       {!!error && (

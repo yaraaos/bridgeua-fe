@@ -56,20 +56,6 @@ export function createStyles(colors: AppColors) {
       color: colors.textMuted,
     },
 
-    statusBadge: {
-      paddingHorizontal: spacing.sm,
-      paddingVertical: 3,
-      borderRadius: 999,
-      backgroundColor: colors.primaryGreenSoft,
-    },
-
-    statusText: {
-      fontSize: 11,
-      fontWeight: "800",
-      color: colors.primaryGreen,
-      textTransform: "capitalize",
-    },
-
     rebookButton: {
       alignSelf: "flex-start",
       marginTop: spacing.sm,
