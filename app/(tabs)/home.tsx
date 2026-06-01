@@ -47,6 +47,7 @@ const RECENT_SEARCHES_KEY = "home-recent-searches";
 export default function HomeScreen() {
   const {
     label: selectedLocationLabel,
+    state: locationState,
     setManualLocation,
     setNearbyLocation,
     setPermissionStatus,
@@ -65,8 +66,9 @@ export default function HomeScreen() {
     const params: Record<string, string | number> = {};
     if (sort && sort !== "relevance" && sort !== "distance") params.sort = sort;
     if (rating && rating !== "custom") params.minRating = Number(rating);
+    if (locationState) params.state = locationState;
     return params;
-  }, [sort, rating]);
+  }, [sort, rating, locationState]);
 
   const businessVersion = useFilterStore((s) => s.businessVersion);
 

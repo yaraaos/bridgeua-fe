@@ -267,3 +267,8 @@ export const updateBusinessDefaultPhotos = async (
 export const deleteBusiness = async (businessId: string): Promise<void> => {
   await apiClient.delete(ENDPOINTS.BUSINESS_BY_ID(businessId));
 };
+
+export const getBusinessStates = async (): Promise<string[]> => {
+  const res = await apiClient.get<string[]>(ENDPOINTS.BUSINESSES_STATES);
+  return res.data;
+};

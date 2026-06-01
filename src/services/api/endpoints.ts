@@ -23,6 +23,7 @@ export const ENDPOINTS = {
 
   // Businessessrc/features/businesses/types/business.types.ts
   BUSINESSES: "/api/businesses",
+  BUSINESSES_STATES: "/api/businesses/states",
   BUSINESSES_ME: "/api/businesses/me",
   BUSINESSES_ME_AVATAR: "/api/businesses/me/avatar",
   BUSINESSES_ME_ABOUT: "/api/businesses/me/about",

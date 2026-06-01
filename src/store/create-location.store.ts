@@ -7,11 +7,12 @@ export type LocationState = {
   mode: LocationMode;
   label: string;
   value: string;
+  state?: string;
   latitude?: number;
   longitude?: number;
   permissionStatus: PermissionStatus;
 
-  setManualLocation: (payload: { label: string; value: string }) => void;
+  setManualLocation: (payload: { label: string; value: string; state?: string }) => void;
   setNearbyLocation: (payload: {
     label: string;
     value: string;
@@ -27,6 +28,7 @@ export const createLocationStore = () => {
     mode: "manual" as LocationMode,
     label: "California, USA",
     value: "california-usa",
+    state: undefined,
     latitude: undefined,
     longitude: undefined,
     permissionStatus: "unknown" as PermissionStatus,
@@ -35,11 +37,12 @@ export const createLocationStore = () => {
   return create<LocationState>((set) => ({
     ...initialState,
 
-    setManualLocation: ({ label, value }) =>
+    setManualLocation: ({ label, value, state }) =>
       set({
         mode: "manual",
         label,
         value,
+        state,
         latitude: undefined,
         longitude: undefined,
       }),
