@@ -79,6 +79,8 @@ export type BusinessAbout = {
   title?: string;
   description: string;
   isOpen?: boolean;
+  closesAt?: string;
+  opensAt?: string;
   openingHours?: BusinessOpeningHour[];
   contacts: BusinessContactItem[];
   languages?: string[];
@@ -156,6 +158,8 @@ export type BusinessDetails = {
   zipCode?: string;
   city?: string;
   state?: string;
+  latitude?: number;
+  longitude?: number;
   phone?: string;
   avatarUrl?: string;
   website: string;
@@ -168,6 +172,7 @@ export type BusinessDetails = {
   images: BusinessDetailsImage[];
   isOpen: boolean;
   closesAt: string;
+  opensAt?: string | null;
   isFollowing?: boolean;
   about: BusinessAbout;
   services: BusinessDetailsService[];

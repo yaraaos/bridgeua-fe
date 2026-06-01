@@ -2,6 +2,7 @@ import ScreenHeader from "@/src/components/common/ScreenHeader/ScreenHeader";
 import { AppColors } from "@/src/constants/colors";
 import { radius } from "@/src/constants/radius";
 import { spacing } from "@/src/constants/spacing";
+import { useSettings } from "@/src/features/settings/hooks/useSettings";
 import { useMyBusinessProfile } from "@/src/features/businesses/hooks/useBusiness";
 import { deleteBusiness } from "@/src/features/businesses/services/business.service";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
@@ -95,6 +96,8 @@ export default function SettingsScreen() {
   const router = useRouter();
   const setThemeMode = useAppStore((s) => s.setThemeMode);
   const clearUser = useAuthStore((state) => state.clearUser);
+  const accountType = useAuthStore((state) => state.user?.accountType);
+  const { settings, updateSetting } = useSettings();
 
   const [isDeletingBusiness, setIsDeletingBusiness] = useState(false);
   const { business } = useMyBusinessProfile();
@@ -158,7 +161,7 @@ export default function SettingsScreen() {
             icon="user"
             title="Profile"
             subtitle="View and edit your profile"
-            onPress={() => router.push("/profile/edit")}
+            onPress={() => router.push(accountType === "business" ? "/business/edit" : "/profile/edit")}
           />
           <View style={styles.divider} />
           <SettingsRow
@@ -172,7 +175,7 @@ export default function SettingsScreen() {
             icon="credit-card"
             title="Payment Methods"
             subtitle="Manage your saved payment methods"
-            onPress={() => router.push("/settings/account")}
+            onPress={() => router.push("/settings/payment-methods")}
           />
           <View style={styles.divider} />
           <SettingsRow
@@ -192,7 +195,9 @@ export default function SettingsScreen() {
             onPress={() => router.push("/settings/language")}
             rightElement={
               <View style={styles.rowRight}>
-                <Text style={styles.rowValue}>English</Text>
+                <Text style={styles.rowValue}>
+                  {settings?.language === "uk" ? "Українська" : "English"}
+                </Text>
                 <Feather
                   name="chevron-right"
                   size={18}
@@ -221,6 +226,56 @@ export default function SettingsScreen() {
           />
         </SettingsSection>
 
+        {/* Business */}
+        {accountType === "business" && (
+          <SettingsSection label="Business">
+            <SettingsRow
+              icon="refresh-cw"
+              title="Auto-confirm Bookings"
+              subtitle="Automatically confirm new booking requests"
+              rightElement={
+                <Switch
+                  value={settings?.bookingAutoConfirm ?? false}
+                  onValueChange={(val) => updateSetting("bookingAutoConfirm", val)}
+                  trackColor={{ false: colors.textMuted, true: colors.primaryGreen }}
+                  thumbColor={colors.white}
+                  ios_backgroundColor={colors.textMuted}
+                />
+              }
+            />
+            <View style={styles.divider} />
+            <SettingsRow
+              icon="map-pin"
+              title="Show in Discovery"
+              subtitle="Display your business on the map and search"
+              rightElement={
+                <Switch
+                  value={settings?.profileVisible ?? true}
+                  onValueChange={(val) => updateSetting("profileVisible", val)}
+                  trackColor={{ false: colors.textMuted, true: colors.primaryGreen }}
+                  thumbColor={colors.white}
+                  ios_backgroundColor={colors.textMuted}
+                />
+              }
+            />
+            <View style={styles.divider} />
+            <SettingsRow
+              icon="tag"
+              title="Show Price Level"
+              subtitle="Display price level on your business profile"
+              rightElement={
+                <Switch
+                  value={settings?.showPriceLevel ?? true}
+                  onValueChange={(val) => updateSetting("showPriceLevel", val)}
+                  trackColor={{ false: colors.textMuted, true: colors.primaryGreen }}
+                  thumbColor={colors.white}
+                  ios_backgroundColor={colors.textMuted}
+                />
+              }
+            />
+          </SettingsSection>
+        )}
+
         {/* Support */}
         <SettingsSection label="Support">
           <SettingsRow
@@ -234,7 +289,7 @@ export default function SettingsScreen() {
             icon="message-circle"
             title="Contact Us"
             subtitle="Get in touch with our support team"
-            onPress={() => router.push("/settings/help")}
+            onPress={() => router.push("/settings/contact")}
           />
           <View style={styles.divider} />
           <SettingsRow
@@ -270,23 +325,6 @@ export default function SettingsScreen() {
           <Feather name="log-out" size={18} color={colors.accentOrange} />
           <Text style={styles.logoutText}>Log Out</Text>
         </Pressable>
-
-        {business ? (
-          <Pressable
-            style={({ pressed }) => [
-              styles.deleteBusinessBtn,
-              pressed && styles.logoutPressed,
-              isDeletingBusiness && styles.disabledBtn,
-            ]}
-            onPress={handleDeleteBusiness}
-            disabled={isDeletingBusiness}
-          >
-            <Feather name="trash-2" size={18} color={colors.error} />
-            <Text style={styles.deleteBusinessText}>
-              {isDeletingBusiness ? "Deleting..." : "Delete Business"}
-            </Text>
-          </Pressable>
-        ) : null}
 
         <Text style={styles.version}>Version 2.4.7</Text>
       </ScrollView>

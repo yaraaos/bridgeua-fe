@@ -151,6 +151,8 @@ export default function EditOverviewTab({
       city: business.city ?? "",
       state: business.state ?? "",
       phone: business.phone ?? "",
+      latitude: business.latitude != null ? String(business.latitude) : "",
+      longitude: business.longitude != null ? String(business.longitude) : "",
 
       socialLinks: {
         ...currentDraft.socialLinks,
@@ -429,6 +431,27 @@ export default function EditOverviewTab({
                     This field is required
                   </AppText>
                 )}
+              </View>
+            </View>
+
+            <View style={styles.halfRow}>
+              <View style={[styles.fieldGroup, styles.halfField]}>
+                <AppText style={styles.fieldLabel}>Latitude</AppText>
+                <AppInput
+                  value={draft.latitude ?? ""}
+                  onChangeText={onField("latitude")}
+                  placeholder="e.g. 34.0549"
+                  keyboardType="decimal-pad"
+                />
+              </View>
+              <View style={[styles.fieldGroup, styles.halfField]}>
+                <AppText style={styles.fieldLabel}>Longitude</AppText>
+                <AppInput
+                  value={draft.longitude ?? ""}
+                  onChangeText={onField("longitude")}
+                  placeholder="e.g. -118.2426"
+                  keyboardType="decimal-pad"
+                />
               </View>
             </View>
 

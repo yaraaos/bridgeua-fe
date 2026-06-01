@@ -262,6 +262,18 @@ export default function ProfileReviewsScreen() {
                 isActionMenuOpen={openActionMenuReviewId === item.id}
                 onToggleActionMenu={handleToggleActionMenu}
                 onCloseActionMenu={handleCloseActionMenu}
+                onPressReview={(reviewId) => {
+                  const review = reviews.find((r) => r.id === reviewId);
+                  if (!review) return;
+                  router.push({
+                    pathname: "/business/[id]",
+                    params: {
+                      id: review.businessId,
+                      tab: "reviews",
+                      focusedReviewId: reviewId,
+                    },
+                  });
+                }}
               />
             </View>
           )}

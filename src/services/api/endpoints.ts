@@ -23,9 +23,11 @@ export const ENDPOINTS = {
 
   // Businessessrc/features/businesses/types/business.types.ts
   BUSINESSES: "/api/businesses",
+  BUSINESSES_STATES: "/api/businesses/states",
   BUSINESSES_ME: "/api/businesses/me",
   BUSINESSES_ME_AVATAR: "/api/businesses/me/avatar",
   BUSINESSES_ME_ABOUT: "/api/businesses/me/about",
+  BUSINESSES_ME_ANALYTICS: "/api/businesses/me/analytics",
   BUSINESSES_ME_SERVICE_LIBRARY: "/api/businesses/me/service-library",
   BUSINESSES_ME_SERVICES: "/api/businesses/me/services",
   BUSINESS_BY_ID: (id: string) => `/api/businesses/${id}`,
@@ -41,6 +43,8 @@ export const ENDPOINTS = {
     `/api/businesses/${businessId}/reviews/${reviewId}/comments`,
   REVIEW_COMMENT_BY_ID: (businessId: string, reviewId: string, commentId: string) =>
     `/api/businesses/${businessId}/reviews/${reviewId}/comments/${commentId}`,
+  REVIEW_PHOTOS: (businessId: string, reviewId: string) =>
+    `/api/businesses/${businessId}/reviews/${reviewId}/photos`,
   BUSINESS_FOLLOW: (id: string) => `/api/businesses/${id}/follow`,
 
   // Bookings

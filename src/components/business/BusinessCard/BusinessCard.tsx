@@ -94,6 +94,22 @@ export default function BusinessCard({
             </Text>
           </View>
 
+          {typeof business.isOpen === 'boolean' ? (
+            <View style={styles.openStatusRow}>
+              <Text style={[
+                styles.openStatusText,
+                { color: business.isOpen ? colors.primaryGreen : colors.error },
+              ]}>
+                {business.isOpen ? 'Open' : 'Closed'}
+              </Text>
+              {(business.isOpen ? business.closesAt : business.opensAt) ? (
+                <Text style={[styles.openStatusText, { color: colors.white }]}>
+                  {` · ${business.isOpen ? `Closes at ${business.closesAt}` : `Opens at ${business.opensAt}`}`}
+                </Text>
+              ) : null}
+            </View>
+          ) : null}
+
           {!!recommendedByPreview.length && (
             <View style={styles.recommendedRow}>
               <Text style={styles.recommendedLabel} numberOfLines={1}>

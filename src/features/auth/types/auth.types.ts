@@ -60,6 +60,8 @@ export type RegisterBusinessPayload = {
   zipCode: string;
   city: string;
   state: string;
+  latitude?: number;
+  longitude?: number;
 };
 
 export type RegisterBusinessResponse = RegisterResponse;

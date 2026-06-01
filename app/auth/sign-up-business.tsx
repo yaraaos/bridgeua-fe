@@ -61,6 +61,8 @@ export default function SignUpBusinessScreen() {
   const [zipCode, setZipCode] = useState("");
   const [city, setCity] = useState("");
   const [state, setState] = useState("");
+  const [latitude, setLatitude] = useState("");
+  const [longitude, setLongitude] = useState("");
   const [categoryModalVisible, setCategoryModalVisible] = useState(false);
 
   const [agree, setAgree] = useState(false);
@@ -109,6 +111,8 @@ export default function SignUpBusinessScreen() {
       zipCode,
       city,
       state,
+      latitude: latitude ? parseFloat(latitude) : undefined,
+      longitude: longitude ? parseFloat(longitude) : undefined,
     });
 
     if (response) {
@@ -293,6 +297,28 @@ export default function SignUpBusinessScreen() {
             {errors.state ? (
               <Text style={styles.errorText}>{errors.state}</Text>
             ) : null}
+          </View>
+
+          <View>
+            <AppInput
+              placeholder="Latitude"
+              value={latitude}
+              onChangeText={setLatitude}
+              keyboardType="decimal-pad"
+              disabled={isLoading}
+            />
+            <Text style={styles.helperText}>Optional — helps place your business on the map</Text>
+          </View>
+
+          <View>
+            <AppInput
+              placeholder="Longitude"
+              value={longitude}
+              onChangeText={setLongitude}
+              keyboardType="decimal-pad"
+              disabled={isLoading}
+            />
+            <Text style={styles.helperText}>Optional — helps place your business on the map</Text>
           </View>
 
           <View>

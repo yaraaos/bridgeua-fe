@@ -56,7 +56,7 @@ export default function BusinessOverviewCard({ business }: Props) {
           id: "contact-hours",
           type: "hours",
           label: "Hours",
-          value: business.about.isOpen ? "Open now" : "Business hours",
+          value: "",
         },
       ]
     : baseOverviewContacts;
@@ -155,15 +155,18 @@ export default function BusinessOverviewCard({ business }: Props) {
               statusText={
                 isHoursRow
                   ? business.about.isOpen
-                    ? "Open now"
-                    : "Closed"
+                    ? `Open now${business.about.closesAt ? `  ·  Closes at ${business.about.closesAt}` : ''}`
+                    : `Closed${business.about.opensAt ? `  ·  Opens at ${business.about.opensAt}` : ''}`
                   : undefined
               }
               statusColor={
                 isHoursRow
-                  ? business.about.isOpen
-                    ? colors.primaryGreen
-                    : "#D9534F"
+                  ? (business.about.isOpen && business.about.closesAt) ||
+                    (!business.about.isOpen && business.about.opensAt)
+                    ? colors.white
+                    : business.about.isOpen
+                      ? colors.primaryGreen
+                      : "#D9534F"
                   : undefined
               }
               isExpanded={isHoursRow ? areHoursExpanded : false}

@@ -1,6 +1,7 @@
 // app/profile/business.tsx
 
 import { Feather, Ionicons } from "@expo/vector-icons";
+import { useQueryClient } from "@tanstack/react-query";
 import { router, useFocusEffect } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import {
@@ -21,6 +22,7 @@ import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
 import AppText from "@/src/components/ui/AppText/AppText";
 import { AppColors } from "@/src/constants/colors";
 import { spacing } from "@/src/constants/spacing";
+import { useBusinessAnalytics } from "@/src/features/businesses/hooks/useAnalytics";
 import { useMyBusinessProfile } from "@/src/features/businesses/hooks/useBusiness";
 import { useReviews } from "@/src/features/reviews/hooks/useReviews";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
@@ -44,6 +46,12 @@ type UpcomingBooking = {
   service: string;
   status: "confirmed" | "pending";
 };
+
+function formatDelta(current: number, lastMonth: number): string {
+  const diff = current - lastMonth;
+  const sign = diff >= 0 ? "+" : "";
+  return `${sign}${diff} vs last month`;
+}
 
 function formatDelta(current: number, lastMonth: number): string {
   const diff = current - lastMonth;
@@ -91,10 +99,18 @@ export default function BusinessProfileScreen() {
       });
   }, [business?.id]);
   const { members: teamMembers, setMembers } = useTeamStore();
+  const { analytics } = useBusinessAnalytics();
+  const queryClient = useQueryClient();
   useFocusEffect(
     useCallback(() => {
       void refetch();
     }, [refetch]),
+  );
+
+  useFocusEffect(
+    useCallback(() => {
+      void queryClient.invalidateQueries({ queryKey: ["business-analytics"] });
+    }, [queryClient]),
   );
 
   useFocusEffect(
@@ -122,7 +138,6 @@ export default function BusinessProfileScreen() {
   );
 
   const businessName = business?.name || "";
-  const handle = business?.category ?? account?.handle ?? "";
   const avatarUrl =
     business?.avatarUrl ?? business?.images?.[0]?.url ?? account?.avatarUrl;
   const businessLocation = business?.location ?? "";
@@ -258,7 +273,6 @@ export default function BusinessProfileScreen() {
             <View style={styles.heroIdentityRow}>
               <AppAvatar
                 name={businessName}
-                username={handle}
                 imageUrl={avatarUrl}
                 size="lg"
               />
@@ -270,7 +284,7 @@ export default function BusinessProfileScreen() {
 
                 <View style={styles.heroRatingRow}>
                   {Array.from({ length: 5 }).map((_, index) => {
-                    const isFilled = index < 4;
+                    const isFilled = index < Math.round(businessRating);
                     return (
                       <Ionicons
                         key={index}
@@ -359,14 +373,28 @@ export default function BusinessProfileScreen() {
       >
         <View style={styles.card}>
           <View style={styles.cardHeader}>
-            <AppText style={styles.cardTitle}>This week</AppText>
-            <AppText style={styles.cardCaption}>Apr 10 — Apr 15</AppText>
+            <AppText style={styles.cardTitle}>Analytics</AppText>
           </View>
 
           <BusinessDashboardStats
-            bookings={24}
-            newClients={6}
-            profileViews={92}
+            bookings={analytics?.bookings.current ?? 0}
+            bookingsDelta={
+              analytics
+                ? formatDelta(analytics.bookings.current, analytics.bookings.lastMonth)
+                : undefined
+            }
+            newClients={analytics?.newClients.current ?? 0}
+            newClientsDelta={
+              analytics
+                ? formatDelta(analytics.newClients.current, analytics.newClients.lastMonth)
+                : undefined
+            }
+            followers={analytics?.followers.current ?? 0}
+            followersDelta={
+              analytics
+                ? formatDelta(analytics.followers.current, analytics.followers.lastMonth)
+                : undefined
+            }
           />
         </View>
 
@@ -590,14 +618,14 @@ export default function BusinessProfileScreen() {
                     <AppText style={styles.reviewReplyText}>Reply</AppText>
                   </Pressable>
 
-                  <Pressable
+                  {false && <Pressable
                     style={[
                       styles.reviewActionButton,
                       styles.reviewReportButton,
                     ]}
                   >
                     <AppText style={styles.reviewReportText}>Report</AppText>
-                  </Pressable>
+                  </Pressable>}
                 </View>
               </View>
             </View>

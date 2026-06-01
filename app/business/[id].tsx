@@ -261,6 +261,7 @@ export default function BusinessDetailsScreen() {
         location={viewBusiness.location}
         isOpen={viewBusiness.isOpen}
         closesAt={viewBusiness.closesAt}
+        opensAt={viewBusiness.opensAt ?? undefined}
         gradientColors={DISCOVERY_GRADIENT}
         onPressShare={isEditPreview ? undefined : handleShareBusiness}
         rightSlot={
@@ -380,15 +381,19 @@ export default function BusinessDetailsScreen() {
             <BusinessServicesList
               services={services}
               disabled={isEditPreview}
-              onPressService={isEditPreview ? undefined : (service) => {
-                router.push({
-                  pathname: "/bookings/choose-service",
-                  params: {
-                    businessId: viewBusiness.id,
-                    serviceId: service.id,
-                  },
-                });
-              }}
+              onPressService={
+                isEditPreview
+                  ? undefined
+                  : (service) => {
+                      router.push({
+                        pathname: "/bookings/choose-service",
+                        params: {
+                          businessId: viewBusiness.id,
+                          serviceId: service.id,
+                        },
+                      });
+                    }
+              }
             />
           ) : null}
 

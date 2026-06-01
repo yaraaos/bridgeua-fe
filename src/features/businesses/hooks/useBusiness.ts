@@ -2,6 +2,7 @@ import type {
   Business,
   BusinessDetails,
 } from "@/src/features/businesses/types/business.types";
+import { useAuthStore } from "@/src/store/auth.store";
 import { useCallback, useEffect, useState } from "react";
 import {
   getBusinessDetailsById,
@@ -10,7 +11,10 @@ import {
   type GetBusinessesParams,
 } from "../services/business.service";
 
-export const useBusinesses = (params?: GetBusinessesParams, refetchTrigger?: number) => {
+export const useBusinesses = (
+  params?: GetBusinessesParams,
+  refetchTrigger?: number,
+) => {
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -27,7 +31,9 @@ export const useBusinesses = (params?: GetBusinessesParams, refetchTrigger?: num
         }
       } catch (e) {
         if (!cancelled) {
-          setError(e instanceof Error ? e.message : "Failed to load businesses");
+          setError(
+            e instanceof Error ? e.message : "Failed to load businesses",
+          );
           setIsInitialLoad(false);
         }
       }
@@ -35,7 +41,9 @@ export const useBusinesses = (params?: GetBusinessesParams, refetchTrigger?: num
 
     void loadBusinesses();
 
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(params), refetchTrigger]);
 
@@ -78,8 +86,14 @@ export const useMyBusinessProfile = () => {
   const [business, setBusiness] = useState<BusinessDetails | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const isGuest = useAuthStore((state) => state.isGuest);
 
   const loadBusiness = useCallback(async () => {
+    if (!isAuthenticated || isGuest) {
+      setIsLoading(false);
+      return;
+    }
     try {
       setIsLoading((current) => (business ? current : true));
       setError(null);
@@ -93,7 +107,7 @@ export const useMyBusinessProfile = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [business]);
+  }, [business, isAuthenticated, isGuest]);
 
   useEffect(() => {
     void loadBusiness();

@@ -1,4 +1,5 @@
 import AppAvatar from "@/src/components/ui/AppAvatar";
+import AppLabel from "@/src/components/ui/AppLabel/AppLabel";
 import { AuthRequiredModal, useRequireAuth } from "@/src/features/auth";
 import type { ReviewComment } from "@/src/features/reviews/types/review-comment.types";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
@@ -62,6 +63,8 @@ export default function ReviewCommentCard({
             <Text style={[styles.username, { color: colors.textPrimary }]}>
               {comment.author.username}
             </Text>
+
+            {comment.isOwnerReply && <AppLabel label="Owner" variant="owner" />}
 
             <Text style={[styles.date, { color: colors.textMuted }]}>
               {formatRelativeTime(comment.createdAt)}
