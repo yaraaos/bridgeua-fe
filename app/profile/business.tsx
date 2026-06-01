@@ -76,10 +76,9 @@ const upcomingBookings: UpcomingBooking[] = [
 ];
 
 function formatDelta(current: number, lastMonth: number): string {
-  if (lastMonth === 0) return current > 0 ? "+100% vs last month" : "— vs last month";
-  const pct = Math.round(((current - lastMonth) / lastMonth) * 100);
-  const sign = pct >= 0 ? "+" : "";
-  return `${sign}${pct}% vs last month`;
+  const diff = current - lastMonth;
+  const sign = diff >= 0 ? "+" : "";
+  return `${sign}${diff} vs last month`;
 }
 
 export default function BusinessProfileScreen() {
