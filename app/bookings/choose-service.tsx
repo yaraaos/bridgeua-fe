@@ -45,6 +45,7 @@ export default function ChooseServiceScreen() {
         businessId,
         serviceId: selectedService?.serviceId ?? selectedServiceId,
         serviceName: selectedService?.name,
+        price: selectedService?.priceFrom ?? (selectedService as any)?.price ?? "Price on request",
         promotionId,
         promoCode,
       },

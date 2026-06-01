@@ -20,6 +20,8 @@ export default function BookingPersonalDetailsScreen() {
     serviceId?: string;
     serviceName?: string;
     specialistId?: string;
+    specialistName?: string;
+    price?: string;
     date?: string;
     timeSlotId?: string;
     time?: string;
