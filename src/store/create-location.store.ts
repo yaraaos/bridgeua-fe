@@ -26,8 +26,8 @@ export type LocationState = {
 export const createLocationStore = () => {
   const initialState = {
     mode: "manual" as LocationMode,
-    label: "California, USA",
-    value: "california-usa",
+    label: "All locations",
+    value: "all",
     state: undefined,
     latitude: undefined,
     longitude: undefined,
