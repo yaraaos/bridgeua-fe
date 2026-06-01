@@ -5,7 +5,7 @@ export function useBusinessAnalytics() {
   const { data, isLoading, error } = useQuery({
     queryKey: ["business-analytics"],
     queryFn: fetchBusinessAnalytics,
-    staleTime: 60_000,
+    staleTime: 0,
   });
 
   return {
