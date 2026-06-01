@@ -8,6 +8,7 @@ import {
 import AppLoader from "@/src/components/ui/AppLoader/AppLoader";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
 import { PROMO_CATEGORY_LABEL } from "@/src/constants/categories";
+import { US_STATE_BOUNDS } from "@/src/constants/stateBounds";
 import {
   DEFAULT_LOCATION_OPTIONS,
   LocationOption,
@@ -91,6 +92,7 @@ export default function MapScreen() {
 
   const {
     label: selectedLocationLabel,
+    state: locationState,
     latitude: locationLatitude,
     longitude: locationLongitude,
     setManualLocation,
@@ -117,7 +119,10 @@ export default function MapScreen() {
   );
   const businessVersion = useFilterStore((s) => s.businessVersion);
 
-  const { businesses, isLoading } = useBusinesses(undefined, businessVersion);
+  const { businesses, isLoading } = useBusinesses(
+    locationState ? { state: locationState } : undefined,
+    businessVersion,
+  );
 
   const currentUser = useAuthStore((state) => state.user);
   const activeAccount = useActiveAccount();
@@ -263,8 +268,15 @@ export default function MapScreen() {
     );
   }, [mappableBusinesses]);
 
+  useEffect(() => {
+    if (!locationState || !mapRef.current) return;
+    const bounds = US_STATE_BOUNDS[locationState];
+    if (!bounds) return;
+    mapRef.current.animateToRegion(bounds, 500);
+  }, [locationState]);
+
   const handleSelectLocationOption = (option: LocationOption) => {
-    setManualLocation({ label: option.label, value: option.value });
+    setManualLocation({ label: option.label, value: option.value, state: option.state });
   };
 
   const handleRequestNearby = () => {
