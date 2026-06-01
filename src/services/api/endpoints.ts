@@ -45,4 +45,15 @@ export const ENDPOINTS = {
 
   // Bookings
   BOOKINGS: "/api/bookings",
+  BOOKINGS_ME: "/api/bookings/me",
+  BOOKINGS_AVAILABILITY: "/api/bookings/availability",
+  BOOKING_STATUS: (id: string) => `/api/bookings/${id}/status`,
+  BUSINESS_BOOKINGS: (businessId: string) => `/api/businesses/${businessId}/bookings`,
+
+  // Settings & Account
+  SETTINGS: '/api/settings',
+  ACCOUNT_EMAIL: '/api/account/email',
+  ACCOUNT_CONFIRM_EMAIL: '/api/account/confirm-email',
+  ACCOUNT_PASSWORD: '/api/account/password',
+  ACCOUNT_DELETE: '/api/account',
 } as const;

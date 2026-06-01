@@ -15,6 +15,7 @@ export type AuthUser = {
   isEmailConfirmed?: boolean;
   ownedBusinessIds?: string[];
   activeBusinessId?: string | null;
+  businessName?: string | null;
   ownedBusiness?: {
     id: string;
     categoryId: string;

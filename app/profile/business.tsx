@@ -2,7 +2,7 @@
 
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { router, useFocusEffect } from "expo-router";
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Image,
   Pressable,
@@ -27,7 +27,9 @@ import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { apiClient } from "@/src/services/api/client";
 import { API_BASE_URL } from "@/src/services/api/config";
 import { useActiveAccount } from "@/src/store/account.store";
+import { useAuthStore } from "@/src/store/auth.store";
 import { useTeamStore } from "@/src/store/team.store";
+import { ENDPOINTS } from "@/src/services/api/endpoints";
 import type { TeamMember } from "@/src/types/team";
 
 import BusinessQuickActions from "@/src/components/profile/BusinessQuickActions/BusinessQuickActions";
@@ -36,48 +38,58 @@ import type { QuickActionId } from "@/src/components/profile/BusinessQuickAction
 type UpcomingBooking = {
   id: string;
   customerName: string;
-  customerAvatar: string;
-  day: "Today" | "Tomorrow";
-  time: string;
+  customerAvatar?: string;
+  date: string;
+  startTime: string;
   service: string;
   status: "confirmed" | "pending";
 };
 
-const upcomingBookings: UpcomingBooking[] = [
-  {
-    id: "booking-1",
-    customerName: "Oleg Novak",
-    customerAvatar: "https://i.pravatar.cc/100?img=12",
-    day: "Today",
-    time: "14:00",
-    service: "Manicure",
-    status: "confirmed",
-  },
-  {
-    id: "booking-2",
-    customerName: "Olena Chris",
-    customerAvatar: "https://i.pravatar.cc/100?img=47",
-    day: "Today",
-    time: "17:00",
-    service: "Manicure",
-    status: "confirmed",
-  },
-  {
-    id: "booking-3",
-    customerName: "Kyril Novak",
-    customerAvatar: "https://i.pravatar.cc/100?img=33",
-    day: "Tomorrow",
-    time: "11:00",
-    service: "Manicure",
-    status: "pending",
-  },
-];
+function formatDelta(current: number, lastMonth: number): string {
+  const diff = current - lastMonth;
+  const sign = diff >= 0 ? "+" : "";
+  return `${sign}${diff} vs last month`;
+}
 
 export default function BusinessProfileScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
   const account = useActiveAccount();
+  const user = useAuthStore((s) => s.user);
   const { business, isLoading, error, refetch } = useMyBusinessProfile();
+  const [upcomingBookings, setUpcomingBookings] = useState<UpcomingBooking[]>([]);
+
+  useEffect(() => {
+    const businessId = business?.id;
+    console.log("[Bookings] business?.id =", businessId, "| user?.activeBusinessId =", user?.activeBusinessId);
+    if (!businessId) return;
+
+    void apiClient
+      .get<any[]>(ENDPOINTS.BUSINESS_BOOKINGS(String(businessId)))
+      .then((res) => {
+        console.log("[Bookings] API response:", JSON.stringify(res.data));
+        const data = res.data ?? [];
+        const upcoming = data
+          .filter((b) => ["pending", "confirmed"].includes(b.status))
+          .slice(0, 3)
+          .map((b) => ({
+            id: String(b.id),
+            customerName: b.user?.profile
+              ? [b.user.profile.firstName, b.user.profile.lastName].filter(Boolean).join(" ") || b.user.email
+              : b.user?.email ?? "Client",
+            customerAvatar: b.user?.profile?.avatarUrl ?? undefined,
+            date: b.date,
+            startTime: b.startTime?.slice(0, 5) ?? "",
+            service: b.service?.name ?? "Service",
+            status: b.status as "confirmed" | "pending",
+          }));
+        setUpcomingBookings(upcoming);
+      })
+      .catch((err) => {
+        console.log("[Bookings] API error:", err?.message);
+        setUpcomingBookings([]);
+      });
+  }, [business?.id]);
   const { members: teamMembers, setMembers } = useTeamStore();
   useFocusEffect(
     useCallback(() => {
@@ -395,17 +407,23 @@ export default function BusinessProfileScreen() {
           </View>
 
           <View style={styles.bookingsList}>
+            {upcomingBookings.length === 0 ? (
+              <AppText style={{ color: colors.textMuted, fontSize: 14 }}>
+                No upcoming bookings yet
+              </AppText>
+            ) : null}
             {upcomingBookings.map((booking) => (
               <View key={booking.id} style={styles.bookingRow}>
-                <Image
-                  source={{ uri: booking.customerAvatar }}
-                  style={styles.bookingAvatar}
+                <AppAvatar
+                  size="sm"
+                  name={booking.customerName}
+                  imageUrl={booking.customerAvatar}
                 />
 
                 <View style={styles.bookingInfo}>
                   <View style={styles.bookingTitleRow}>
-                    <AppText style={styles.bookingDay}>{booking.day}</AppText>
-                    <AppText style={styles.bookingTime}>{booking.time}</AppText>
+                    <AppText style={styles.bookingDay}>{booking.date}</AppText>
+                    <AppText style={styles.bookingTime}>{booking.startTime}</AppText>
                   </View>
 
                   <AppText style={styles.bookingCustomer} numberOfLines={1}>
