@@ -259,6 +259,7 @@ export default function MapScreen() {
   }, [selectedBusinessId, selectedBusiness]);
 
   useEffect(() => {
+    if (locationState) return;
     if (!mapRef.current) return;
     if (mappableBusinesses.length === 0) return;
 

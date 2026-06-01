@@ -276,6 +276,7 @@ export default function HomeScreen() {
     setManualLocation({
       label: option.label,
       value: option.value,
+      state: option.state,
     });
   };
 
