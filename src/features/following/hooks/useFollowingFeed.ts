@@ -12,10 +12,12 @@ import {
 
 type UseFollowingFeedParams = {
   visibleBusinessIds?: string[];
+  state?: string;
 };
 
 export const useFollowingFeed = ({
   visibleBusinessIds,
+  state,
 }: UseFollowingFeedParams = {}) => {
   const { businesses, isLoading } = useBusinesses();
 
@@ -41,9 +43,10 @@ export const useFollowingFeed = ({
 
     const followedIds = followedBusinessIds.map(String);
 
+    const stateQuery = state ? `?state=${encodeURIComponent(state)}` : '';
     void Promise.all([
-      apiClient.get("/api/promotions/public").catch(() => ({ data: [] })),
-      apiClient.get("/api/news/public").catch(() => ({ data: [] })),
+      apiClient.get(`/api/promotions/public${stateQuery}`).catch(() => ({ data: [] })),
+      apiClient.get(`/api/news/public${stateQuery}`).catch(() => ({ data: [] })),
     ]).then(([promoRes, newsRes]) => {
       const promos = ((promoRes.data as any).data ?? promoRes.data) as any[];
       const news = ((newsRes.data as any).data ?? newsRes.data) as any[];
@@ -104,7 +107,7 @@ export const useFollowingFeed = ({
 
       setApiFeedItems([...promoItems, ...newsItems]);
     });
-  }, [followedBusinessIds]);
+  }, [followedBusinessIds, state]);
 
   const feedItems = apiFeedItems;
 

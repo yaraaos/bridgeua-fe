@@ -8,12 +8,11 @@ import {
 import AppLoader from "@/src/components/ui/AppLoader/AppLoader";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
 import { PROMO_CATEGORY_LABEL } from "@/src/constants/categories";
-import {
-  DEFAULT_LOCATION_OPTIONS,
-  LocationOption,
-} from "@/src/constants/locations";
+import { US_STATE_BOUNDS } from "@/src/constants/stateBounds";
+import { LocationOption } from "@/src/constants/locations";
 import type { AuthUser } from "@/src/features/auth/types/auth.types";
 import { useBusinesses } from "@/src/features/businesses";
+import { getBusinessStates } from "@/src/features/businesses/services/business.service";
 import { useCategories } from "@/src/features/categories/hooks/useCategories";
 import { useDiscoveryFeed } from "@/src/features/discovery/hooks/useDiscoveryFeed";
 import {
@@ -89,8 +88,29 @@ function BusinessMarker({
 export default function MapScreen() {
   const mapRef = useRef<MapView | null>(null);
 
+  const [locationOptions, setLocationOptions] = useState<LocationOption[]>([
+    { label: "See nearby", value: "nearby", type: "nearby" },
+  ]);
+
+  useEffect(() => {
+    getBusinessStates().then((states) => {
+      const stateOptions: LocationOption[] = states.map((s) => ({
+        label: `${s}, USA`,
+        value: s.toLowerCase().replace(/\s+/g, '-') + '-usa',
+        type: 'manual',
+        state: s,
+      }));
+      setLocationOptions([
+        { label: "All locations", value: "all", type: "manual", state: undefined },
+        { label: "See nearby", value: "nearby", type: "nearby" },
+        ...stateOptions,
+      ]);
+    }).catch(() => {});
+  }, []);
+
   const {
     label: selectedLocationLabel,
+    state: locationState,
     latitude: locationLatitude,
     longitude: locationLongitude,
     setManualLocation,
@@ -117,7 +137,10 @@ export default function MapScreen() {
   );
   const businessVersion = useFilterStore((s) => s.businessVersion);
 
-  const { businesses, isLoading } = useBusinesses(undefined, businessVersion);
+  const { businesses, isLoading } = useBusinesses(
+    locationState ? { state: locationState } : undefined,
+    businessVersion,
+  );
 
   const currentUser = useAuthStore((state) => state.user);
   const activeAccount = useActiveAccount();
@@ -237,6 +260,7 @@ export default function MapScreen() {
   }, [selectedBusinessId, selectedBusiness]);
 
   useEffect(() => {
+    if (locationState) return;
     if (!mapRef.current) return;
     if (mappableBusinesses.length === 0) return;
 
@@ -261,10 +285,22 @@ export default function MapScreen() {
         animated: true,
       },
     );
-  }, [mappableBusinesses]);
+  }, [locationState, mappableBusinesses]);
+
+  useEffect(() => {
+    if (!locationState || !mapRef.current) return;
+    setSelectedBusinessId(null);
+    const bounds = US_STATE_BOUNDS[locationState];
+    if (!bounds) return;
+    mapRef.current.animateToRegion(bounds, 500);
+  }, [locationState]);
 
   const handleSelectLocationOption = (option: LocationOption) => {
-    setManualLocation({ label: option.label, value: option.value });
+    setManualLocation({
+      label: option.label,
+      value: option.value,
+      state: option.value === "all" ? undefined : option.state,
+    });
   };
 
   const handleRequestNearby = () => {
@@ -347,7 +383,7 @@ export default function MapScreen() {
       titleSubtitle="Discover on the map"
       subtitleValue={selectedLocationLabel}
       showSubtitleChevron
-      locationOptions={DEFAULT_LOCATION_OPTIONS}
+      locationOptions={locationOptions}
       onSelectLocationOption={handleSelectLocationOption}
       onRequestNearby={handleRequestNearby}
       showSearch

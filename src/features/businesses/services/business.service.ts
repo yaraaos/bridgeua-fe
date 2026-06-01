@@ -22,6 +22,7 @@ export type GetBusinessesParams = {
   search?: string;
   page?: number;
   limit?: number;
+  state?: string;
 };
 
 const getAbsoluteImageUrl = (url: string) => {
@@ -66,6 +67,7 @@ export const getBusinesses = async (
     if (params.search) query.set("search", params.search);
     if (params.page) query.set("page", String(params.page));
     if (params.limit) query.set("limit", String(params.limit));
+    if (params.state) query.set("state", params.state);
 
     const qs = query.toString();
     if (qs) url = `${url}?${qs}`;
@@ -135,6 +137,8 @@ export const updateBusinessOverview = async (
         closesAt: hour.isOpen ? hour.closeTime : null,
         isClosed: !hour.isOpen,
       })),
+      latitude: payload.latitude ? parseFloat(payload.latitude) : undefined,
+      longitude: payload.longitude ? parseFloat(payload.longitude) : undefined,
     },
   );
 
@@ -262,4 +266,9 @@ export const updateBusinessDefaultPhotos = async (
 
 export const deleteBusiness = async (businessId: string): Promise<void> => {
   await apiClient.delete(ENDPOINTS.BUSINESS_BY_ID(businessId));
+};
+
+export const getBusinessStates = async (): Promise<string[]> => {
+  const res = await apiClient.get<string[]>(ENDPOINTS.BUSINESSES_STATES);
+  return res.data;
 };

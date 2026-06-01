@@ -158,6 +158,8 @@ export type BusinessDetails = {
   zipCode?: string;
   city?: string;
   state?: string;
+  latitude?: number;
+  longitude?: number;
   phone?: string;
   avatarUrl?: string;
   website: string;
