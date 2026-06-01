@@ -6,11 +6,9 @@ import HomePromotionModal from "@/src/components/home/HomePromotionModal/HomePro
 import AppEmptyState from "@/src/components/ui/AppEmptyState";
 import AppLoader from "@/src/components/ui/AppLoader/AppLoader";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
-import {
-  DEFAULT_LOCATION_OPTIONS,
-  LocationOption,
-} from "@/src/constants/locations";
+import { LocationOption } from "@/src/constants/locations";
 import { useBusinesses } from "@/src/features/businesses";
+import { getBusinessStates } from "@/src/features/businesses/services/business.service";
 import { useCategories } from "@/src/features/categories/hooks/useCategories";
 import { useDiscoveryFeed } from "@/src/features/discovery/hooks/useDiscoveryFeed";
 import {
@@ -54,6 +52,25 @@ export default function HomeScreen() {
   } = useDiscoveryLocationStore();
 
   const scrollY = useRef(new Animated.Value(0)).current;
+
+  const [locationOptions, setLocationOptions] = useState<LocationOption[]>([
+    { label: "See nearby", value: "nearby", type: "nearby" },
+  ]);
+
+  useEffect(() => {
+    getBusinessStates().then((states) => {
+      const stateOptions: LocationOption[] = states.map((s) => ({
+        label: `${s}, USA`,
+        value: s.toLowerCase().replace(/\s+/g, '-') + '-usa',
+        type: 'manual',
+        state: s,
+      }));
+      setLocationOptions([
+        { label: "See nearby", value: "nearby", type: "nearby" },
+        ...stateOptions,
+      ]);
+    }).catch(() => {});
+  }, []);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
@@ -320,7 +337,7 @@ export default function HomeScreen() {
       subtitleValue={selectedLocationLabel}
       onSubtitlePress={handleLocationPress}
       showSubtitleChevron
-      locationOptions={DEFAULT_LOCATION_OPTIONS}
+      locationOptions={locationOptions}
       onSelectLocationOption={handleSelectLocationOption}
       onRequestNearby={handleRequestNearby}
       showSearch
