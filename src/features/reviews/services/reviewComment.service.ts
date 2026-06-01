@@ -18,7 +18,9 @@ const mapComment = (raw: {
   author: {
     id: String(raw.user.id),
     name: `${raw.user.firstName} ${raw.user.lastName}`.trim(),
-    username: raw.user.firstName?.toLowerCase() ?? "",
+    username: (raw as any).isOwnerReply
+      ? (raw.user.firstName ?? "")
+      : (raw.user.firstName?.toLowerCase() ?? ""),
     avatarUrl: raw.user.avatarUrl ?? undefined,
   },
   text: raw.text,
@@ -33,12 +35,12 @@ export const getComments = async (
   businessId: string,
   reviewId: string,
 ): Promise<ReviewComment[]> => {
-  const res = await apiClient.get<{ success: boolean; data: ReturnType<typeof Object>[] }>(
+  const res = await apiClient.get<any>(
     ENDPOINTS.REVIEW_COMMENTS(businessId, reviewId),
   );
 
   const flat: ReviewComment[] = [];
-  for (const comment of res.data as any[]) {
+  for (const comment of res.data) {
     flat.push(mapComment(comment));
     for (const reply of comment.replies ?? []) {
       flat.push(mapComment(reply));
@@ -53,7 +55,7 @@ export const addComment = async (
   text: string,
   parentId?: string,
 ): Promise<ReviewComment> => {
-  const res = await apiClient.post<{ success: boolean; data: any }>(
+  const res = await apiClient.post<any>(
     ENDPOINTS.REVIEW_COMMENTS(businessId, reviewId),
     { text, parentId: parentId ? Number(parentId) : null },
   );
