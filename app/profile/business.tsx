@@ -53,12 +53,6 @@ function formatDelta(current: number, lastMonth: number): string {
   return `${sign}${diff} vs last month`;
 }
 
-function formatDelta(current: number, lastMonth: number): string {
-  const diff = current - lastMonth;
-  const sign = diff >= 0 ? "+" : "";
-  return `${sign}${diff} vs last month`;
-}
-
 export default function BusinessProfileScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
