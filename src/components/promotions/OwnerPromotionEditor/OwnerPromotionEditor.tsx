@@ -1,8 +1,6 @@
-import AppAvatar from "@/src/components/ui/AppAvatar/AppAvatar";
 import AppButton from "@/src/components/ui/AppButton/AppButton";
 import AppText from "@/src/components/ui/AppText/AppText";
 import type { AppColors } from "@/src/constants/colors";
-import { useMyBusinessProfile } from "@/src/features/businesses/hooks/useBusiness";
 import type { PromotionDraft } from "@/src/features/promotions/types/promotion.types";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { useScrollToError } from "@/src/hooks/useScrollToError";
@@ -49,8 +47,6 @@ export default function OwnerPromotionEditor({
 }: Props) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
-  const { business } = useMyBusinessProfile();
-
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [showDateModal, setShowDateModal] = useState(false);
   const [tempDate, setTempDate] = useState(new Date());
@@ -242,21 +238,6 @@ export default function OwnerPromotionEditor({
                 style={styles.heroImage}
               />
             )}
-            {!!business && (
-              <View style={styles.businessCard}>
-                <AppAvatar
-                  size="sm"
-                  imageUrl={business.avatarUrl}
-                  name={business.name}
-                />
-                <View style={styles.businessInfo}>
-                  <AppText style={styles.businessName}>{business.name}</AppText>
-                  <AppText style={styles.businessMeta}>
-                    {business.category}
-                  </AppText>
-                </View>
-              </View>
-            )}
             {(!!draft.offerDetails?.length || !!formattedValidUntil) && (
               <View style={styles.sectionCard}>
                 <AppText style={styles.sectionTitle}>Offer details</AppText>
@@ -430,23 +411,6 @@ export default function OwnerPromotionEditor({
                 <AppText style={styles.errorText}>{errors.image}</AppText>
               )}
             </View>
-
-            {/* ── Business card (static) ── */}
-            {!!business && (
-              <View style={styles.businessCard}>
-                <AppAvatar
-                  size="sm"
-                  imageUrl={business.avatarUrl}
-                  name={business.name}
-                />
-                <View style={styles.businessInfo}>
-                  <AppText style={styles.businessName}>{business.name}</AppText>
-                  <AppText style={styles.businessMeta}>
-                    {business.category}
-                  </AppText>
-                </View>
-              </View>
-            )}
 
             {/* ── Offer details card ── */}
             <View {...registerField("offerDetails")}>
@@ -835,31 +799,6 @@ function createStyles(colors: AppColors) {
     imagePlaceholderText: {
       fontSize: 14,
       color: colors.textMuted,
-    },
-
-    // Business card
-    businessCard: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 12,
-      padding: 12,
-      borderRadius: 16,
-      borderWidth: 1,
-      borderColor: colors.border,
-      backgroundColor: colors.surface,
-    },
-    businessInfo: {
-      flex: 1,
-    },
-    businessName: {
-      fontSize: 14,
-      fontWeight: "800",
-      color: colors.textPrimary,
-    },
-    businessMeta: {
-      fontSize: 12,
-      color: colors.textSecondary,
-      marginTop: 2,
     },
 
     // Section cards
