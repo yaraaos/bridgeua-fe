@@ -214,7 +214,7 @@ export default function AccountScreen() {
                 keyboardType="email-address"
                 autoCapitalize="none"
                 value={newEmail}
-                onChangeText={setNewEmail}
+                onChangeText={(value) => setNewEmail(value.toLowerCase().trim())}
               />
               <Pressable
                 style={({ pressed }) => [

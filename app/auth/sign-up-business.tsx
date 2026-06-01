@@ -392,7 +392,7 @@ export default function SignUpBusinessScreen() {
                   placeholder="Email address"
                   value={email}
                   onChangeText={(value) => {
-                    setEmail(value);
+                    setEmail(value.toLowerCase().trim());
                     clearFieldError("email");
                   }}
                   keyboardType="email-address"

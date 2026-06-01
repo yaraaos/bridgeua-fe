@@ -60,7 +60,7 @@ export default function ForgotPasswordScreen() {
             placeholder="Email address"
             value={email}
             onChangeText={(value) => {
-              setEmail(value);
+              setEmail(value.toLowerCase().trim());
               setErrors((current) => ({
                 ...current,
                 email: undefined,
