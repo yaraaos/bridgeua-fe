@@ -101,6 +101,7 @@ export default function MapScreen() {
         state: s,
       }));
       setLocationOptions([
+        { label: "All locations", value: "all", type: "manual", state: undefined },
         { label: "See nearby", value: "nearby", type: "nearby" },
         ...stateOptions,
       ]);
@@ -295,7 +296,11 @@ export default function MapScreen() {
   }, [locationState]);
 
   const handleSelectLocationOption = (option: LocationOption) => {
-    setManualLocation({ label: option.label, value: option.value, state: option.state });
+    setManualLocation({
+      label: option.label,
+      value: option.value,
+      state: option.value === "all" ? undefined : option.state,
+    });
   };
 
   const handleRequestNearby = () => {

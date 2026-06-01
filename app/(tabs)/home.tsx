@@ -66,6 +66,7 @@ export default function HomeScreen() {
         state: s,
       }));
       setLocationOptions([
+        { label: "All locations", value: "all", type: "manual", state: undefined },
         { label: "See nearby", value: "nearby", type: "nearby" },
         ...stateOptions,
       ]);
@@ -276,7 +277,7 @@ export default function HomeScreen() {
     setManualLocation({
       label: option.label,
       value: option.value,
-      state: option.state,
+      state: option.value === "all" ? undefined : option.state,
     });
   };
 
