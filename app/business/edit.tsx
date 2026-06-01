@@ -42,7 +42,6 @@ export default function EditBusinessScreen() {
   const resetAll = useEditBusinessStore((s) => s.resetAll);
   const setOverviewDraft = useEditBusinessStore((s) => s.setOverviewDraft);
   const setGalleryDraft = useEditBusinessStore((s) => s.setGalleryDraft);
-  const setServicesDraft = useEditBusinessStore((s) => s.setServicesDraft);
   const setAboutDraft = useEditBusinessStore((s) => s.setAboutDraft);
 
   useEffect(() => {
@@ -90,22 +89,12 @@ export default function EditBusinessScreen() {
       deletedPhotoIds: [],
     });
 
-    setServicesDraft({
-      services:
-        business.services?.map((svc) => ({
-          id: svc.id,
-          name: svc.name,
-          duration: svc.duration ?? "",
-          price: String(svc.price ?? ""),
-        })) ?? [],
-    });
-
     setAboutDraft({
       description: business.about?.description ?? "",
       languages: business.about?.languages ?? [],
       amenities: business.about?.amenities?.map((a) => a.label) ?? [],
     });
-  }, [business, setOverviewDraft, setGalleryDraft, setServicesDraft, setAboutDraft]);
+  }, [business, setOverviewDraft, setGalleryDraft, setAboutDraft]);
 
   const hasUnsaved: boolean = Object.values(dirty).some(Boolean);
 

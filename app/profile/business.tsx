@@ -17,6 +17,7 @@ import ScreenHeader from "@/src/components/common/ScreenHeader/ScreenHeader";
 import BusinessDashboardStats from "@/src/components/profile/BusinessDashboardStats/BusinessDashboardStats";
 import AppAvatar from "@/src/components/ui/AppAvatar";
 import AppLoader from "@/src/components/ui/AppLoader/AppLoader";
+import AppLabel from "@/src/components/ui/AppLabel/AppLabel";
 import AppRatingStars from "@/src/components/ui/AppRatingStars";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
 import AppText from "@/src/components/ui/AppText/AppText";
@@ -46,12 +47,6 @@ type UpcomingBooking = {
   service: string;
   status: "confirmed" | "pending";
 };
-
-function formatDelta(current: number, lastMonth: number): string {
-  const diff = current - lastMonth;
-  const sign = diff >= 0 ? "+" : "";
-  return `${sign}${diff} vs last month`;
-}
 
 function formatDelta(current: number, lastMonth: number): string {
   const diff = current - lastMonth;
@@ -459,25 +454,10 @@ export default function BusinessProfileScreen() {
                   </AppText>
                 </View>
 
-                <View
-                  style={[
-                    styles.statusPill,
-                    booking.status === "confirmed"
-                      ? styles.statusPillConfirmed
-                      : styles.statusPillPending,
-                  ]}
-                >
-                  <AppText
-                    style={[
-                      styles.statusPillText,
-                      booking.status === "confirmed"
-                        ? styles.statusPillTextConfirmed
-                        : styles.statusPillTextPending,
-                    ]}
-                  >
-                    {booking.status === "confirmed" ? "Confirmed" : "Pending"}
-                  </AppText>
-                </View>
+                <AppLabel
+                  label="Confirmed"
+                  variant="confirmed"
+                />
               </View>
             ))}
           </View>
@@ -894,28 +874,6 @@ function createStyles(colors: AppColors) {
       fontSize: 12,
       color: colors.textSecondary,
     },
-    statusPill: {
-      paddingHorizontal: 10,
-      paddingVertical: 4,
-      borderRadius: 999,
-    },
-    statusPillConfirmed: {
-      backgroundColor: colors.primaryGreenSoft,
-    },
-    statusPillPending: {
-      backgroundColor: colors.accentOrangeSoft,
-    },
-    statusPillText: {
-      fontSize: 11,
-      fontWeight: "800",
-    },
-    statusPillTextConfirmed: {
-      color: colors.primaryGreen,
-    },
-    statusPillTextPending: {
-      color: colors.accentOrange,
-    },
-
     reviewRow: {
       flexDirection: "row",
       gap: spacing.md,

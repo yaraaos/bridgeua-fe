@@ -1,6 +1,9 @@
 import { z } from "zod";
 
+import { US_STATE_BOUNDS } from "@/src/constants/stateBounds";
 import { businessNameSchema } from "@/src/features/businesses/validation/businessProfile.validation";
+
+const VALID_STATES = Object.keys(US_STATE_BOUNDS);
 
 export const signUpBusinessSchema = z
   .object({
@@ -20,7 +23,12 @@ export const signUpBusinessSchema = z
     address: z.string().trim().min(1, "Address is required"),
     zipCode: z.string().trim().min(1, "ZIP code is required"),
     city: z.string().trim().min(1, "City is required"),
-    state: z.string().trim().min(1, "State is required"),
+    state: z
+      .string()
+      .trim()
+      .refine((val) => VALID_STATES.includes(val.trim()), {
+        message: "Please select a valid US state from the suggestions",
+      }),
     agree: z.boolean().refine((value) => value, {
       message: "You must agree to continue",
     }),

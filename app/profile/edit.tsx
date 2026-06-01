@@ -233,7 +233,7 @@ export default function EditProfileScreen() {
           <ProfileField label="Username" errorText={usernameError}>
             <ClearableInput
               value={username}
-              onChangeText={setUsername}
+              onChangeText={(value) => setUsername(value.toLowerCase().replace(/\s/g, ""))}
               onClear={() => setUsername("")}
               placeholder="Enter username"
               autoCapitalize="none"

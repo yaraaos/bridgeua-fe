@@ -18,11 +18,12 @@ export default function ChooseSpecialistScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
 
-  const { businessId, serviceId, serviceName, promotionId, promoCode } =
+  const { businessId, serviceId, serviceName, price, promotionId, promoCode } =
     useLocalSearchParams<{
       businessId?: string;
       serviceId?: string;
       serviceName?: string;
+      price?: string;
       promotionId?: string;
       promoCode?: string;
     }>();
@@ -72,7 +73,13 @@ export default function ChooseSpecialistScreen() {
         businessId,
         serviceId,
         serviceName,
+        price,
         specialistId: selectedSpecialistId,
+        specialistName: selectedSpecialistId === "any"
+          ? "Any specialist"
+          : specialists.find((s) => String(s.id) === selectedSpecialistId)
+              ? `${specialists.find((s) => String(s.id) === selectedSpecialistId)!.firstName} ${specialists.find((s) => String(s.id) === selectedSpecialistId)!.lastName}`
+              : "Selected specialist",
         promotionId,
         promoCode,
       },

@@ -38,7 +38,7 @@ export const useAvailability = (params: BookingAvailabilityParams | null) => {
         });
 
         if (isMounted) {
-          setSlots(result);
+          setSlots(Array.isArray(result) ? result : []);
         }
       } catch (e) {
         if (isMounted) {

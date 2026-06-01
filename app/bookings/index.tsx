@@ -6,12 +6,11 @@ import AppTabsPills, {
 } from "@/src/components/ui/AppTabsPills/AppTabsPills";
 import type { AppColors } from "@/src/constants/colors";
 import { spacing } from "@/src/constants/spacing";
-import type { BookingStatus } from "@/src/features/bookings/types/booking.types";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import type { StoredBooking } from "@/src/store/bookings.store";
 import { useBookingsStore } from "@/src/store/bookings.store";
-import { router } from "expo-router";
-import React, { useMemo, useState } from "react";
+import { router, useFocusEffect } from "expo-router";
+import React, { useCallback, useMemo, useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 
 type BookingFilter = "active" | "past" | "cancelled";
@@ -22,9 +21,6 @@ const BOOKING_TABS: AppTabPillItem<BookingFilter>[] = [
   { label: "Cancelled", value: "cancelled" },
 ];
 
-const ACTIVE_STATUSES: BookingStatus[] = ["pending", "confirmed", "active"];
-const PAST_STATUSES: BookingStatus[] = ["completed", "past"];
-const CANCELLED_STATUSES: BookingStatus[] = ["cancelled"];
 
 export default function BookingsScreen() {
   const { colors } = useAppTheme();
@@ -32,18 +28,24 @@ export default function BookingsScreen() {
 
   const [activeFilter, setActiveFilter] = useState<BookingFilter>("active");
   const bookings = useBookingsStore((state) => state.bookings);
+  const fetchBookings = useBookingsStore((state) => state.fetchBookings);
+
+  useFocusEffect(
+    useCallback(() => {
+      void fetchBookings();
+    }, [fetchBookings])
+  );
 
   const filteredBookings = useMemo(() => {
+    const today = new Date().toISOString().split("T")[0];
     return bookings.filter((booking) => {
       if (activeFilter === "active") {
-        return ACTIVE_STATUSES.includes(booking.status);
+        return ["pending", "confirmed"].includes(booking.status) && booking.date >= today;
       }
-
       if (activeFilter === "past") {
-        return PAST_STATUSES.includes(booking.status);
+        return booking.status === "completed" || (["pending", "confirmed"].includes(booking.status) && booking.date < today);
       }
-
-      return CANCELLED_STATUSES.includes(booking.status);
+      return booking.status === "cancelled";
     });
   }, [activeFilter, bookings]);
 
