@@ -64,6 +64,7 @@ export const useReviewCommentsStore = create<ReviewCommentsState>()(
           likedByMe: false,
           repliesCount: 0,
           createdAt: new Date().toISOString(),
+          isOwnerReply: false,
         };
 
         set((state) => ({ comments: [...state.comments, optimistic] }));

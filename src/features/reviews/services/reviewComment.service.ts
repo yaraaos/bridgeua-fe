@@ -10,6 +10,7 @@ const mapComment = (raw: {
   createdAt: string;
   user: { id: number; firstName: string; lastName: string; avatarUrl?: string | null };
   replies?: unknown[];
+  isOwnerReply?: boolean;
 }): ReviewComment => ({
   id: String(raw.id),
   reviewId: String(raw.reviewId),
@@ -25,6 +26,7 @@ const mapComment = (raw: {
   likedByMe: false,
   repliesCount: raw.replies?.length ?? 0,
   createdAt: raw.createdAt,
+  isOwnerReply: raw.isOwnerReply ?? false,
 });
 
 export const getComments = async (
