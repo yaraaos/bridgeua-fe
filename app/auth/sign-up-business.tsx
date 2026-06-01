@@ -1,4 +1,5 @@
 import { AppColors } from "@/src/constants/colors";
+import { US_STATE_BOUNDS } from "@/src/constants/stateBounds";
 import { useCategories } from "@/src/features/categories/hooks/useCategories";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { useEditBusinessStore } from "@/src/store/editBusiness.store";
@@ -25,6 +26,8 @@ import {
   BUSINESS_NAME_RECOMMENDED_LIMIT,
   isBusinessNameNearLimit,
 } from "../../src/features/businesses/validation/businessProfile.validation";
+
+const US_STATES = Object.keys(US_STATE_BOUNDS);
 
 const FALLBACK_CATEGORIES = [
   "Beauty",
@@ -61,6 +64,7 @@ export default function SignUpBusinessScreen() {
   const [zipCode, setZipCode] = useState("");
   const [city, setCity] = useState("");
   const [state, setState] = useState("");
+  const [stateQuery, setStateQuery] = useState("");
   const [latitude, setLatitude] = useState("");
   const [longitude, setLongitude] = useState("");
   const [categoryModalVisible, setCategoryModalVisible] = useState(false);
@@ -131,6 +135,12 @@ export default function SignUpBusinessScreen() {
       });
     }
   };
+
+  const stateSuggestions = stateQuery.trim().length >= 1
+    ? US_STATES.filter((s) =>
+        s.toLowerCase().startsWith(stateQuery.trim().toLowerCase())
+      )
+    : [];
 
   const selectedCategoryLabel =
     categoryOptions.find((o) => o.value === selectedCategory)?.label ?? "";
@@ -286,17 +296,34 @@ export default function SignUpBusinessScreen() {
           <View>
             <AppInput
               placeholder="State / Region"
-              value={state}
+              value={stateQuery}
               onChangeText={(value) => {
-                setState(value);
+                setStateQuery(value);
+                setState("");
                 clearFieldError("state");
               }}
-              disabled={isLoading}
-              error={Boolean(errors.state)}
+              error={!!errors.state}
             />
-            {errors.state ? (
+            {stateSuggestions.length > 0 && (
+              <View style={styles.suggestionsContainer}>
+                {stateSuggestions.map((suggestion) => (
+                  <Pressable
+                    key={suggestion}
+                    style={styles.suggestionItem}
+                    onPress={() => {
+                      setState(suggestion);
+                      setStateQuery(suggestion);
+                      clearFieldError("state");
+                    }}
+                  >
+                    <Text style={styles.suggestionText}>{suggestion}</Text>
+                  </Pressable>
+                ))}
+              </View>
+            )}
+            {!!errors.state && (
               <Text style={styles.errorText}>{errors.state}</Text>
-            ) : null}
+            )}
           </View>
 
           <View>
@@ -587,6 +614,28 @@ function createStyles(colors: AppColors) {
       marginTop: 4,
       fontSize: 12,
       color: colors.error,
+    },
+
+    suggestionsContainer: {
+      backgroundColor: colors.surface,
+      borderRadius: 8,
+      borderWidth: 1,
+      borderColor: colors.border,
+      marginTop: 4,
+      maxHeight: 180,
+      overflow: "hidden",
+    },
+
+    suggestionItem: {
+      paddingHorizontal: 14,
+      paddingVertical: 12,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+    },
+
+    suggestionText: {
+      fontSize: 14,
+      color: colors.textPrimary,
     },
 
     apiError: {
