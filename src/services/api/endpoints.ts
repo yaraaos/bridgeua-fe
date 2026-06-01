@@ -26,6 +26,7 @@ export const ENDPOINTS = {
   BUSINESSES_ME: "/api/businesses/me",
   BUSINESSES_ME_AVATAR: "/api/businesses/me/avatar",
   BUSINESSES_ME_ABOUT: "/api/businesses/me/about",
+  BUSINESSES_ME_ANALYTICS: "/api/businesses/me/analytics",
   BUSINESSES_ME_SERVICE_LIBRARY: "/api/businesses/me/service-library",
   BUSINESSES_ME_SERVICES: "/api/businesses/me/services",
   BUSINESS_BY_ID: (id: string) => `/api/businesses/${id}`,

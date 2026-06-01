@@ -1,4 +1,5 @@
 import { apiClient } from "@/src/services/api/client";
+import { ENDPOINTS } from "@/src/services/api/endpoints";
 
 export type AnalyticsStat = { current: number; lastMonth: number };
 
@@ -9,4 +10,4 @@ export type BusinessAnalyticsData = {
 };
 
 export const fetchBusinessAnalytics = (): Promise<{ data: BusinessAnalyticsData }> =>
-  apiClient.get<BusinessAnalyticsData>("/api/businesses/me/analytics");
+  apiClient.get<BusinessAnalyticsData>(ENDPOINTS.BUSINESSES_ME_ANALYTICS);
