@@ -491,7 +491,7 @@ export default function SignUpBusinessScreen() {
           <Modal
             visible={categoryModalVisible}
             transparent
-            animationType="slide"
+            animationType="fade"
             onRequestClose={() => setCategoryModalVisible(false)}
           >
             <Pressable
