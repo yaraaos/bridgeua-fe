@@ -71,6 +71,13 @@ export default function BookingConfirmScreen() {
 
     addBooking({
       ...booking,
+      // API returns startTime, store expects time
+      time: (booking as any).startTime ?? payload.time,
+      date: (booking as any).date ?? payload.date,
+      customer: payload.customer,
+      businessId: payload.businessId,
+      serviceId: payload.serviceId,
+      specialistId: payload.specialistId,
       businessName: business?.name ?? "Selected business",
       serviceName,
       specialistName,

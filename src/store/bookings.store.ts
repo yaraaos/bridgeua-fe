@@ -2,7 +2,7 @@ import * as SecureStore from "expo-secure-store";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
-import type { Booking } from "@/src/features/bookings/types/booking.types";
+import type { Booking, BookingStatus } from "@/src/features/bookings/types/booking.types";
 
 export type StoredBooking = Booking & {
   businessName: string;
@@ -14,6 +14,7 @@ export type StoredBooking = Booking & {
 type BookingsState = {
   bookings: StoredBooking[];
   addBooking: (booking: StoredBooking) => void;
+  updateBookingStatus: (id: string, status: BookingStatus) => void;
   clearBookings: () => void;
 };
 
@@ -27,13 +28,20 @@ export const useBookingsStore = create<BookingsState>()(
           bookings: [booking, ...state.bookings],
         })),
 
+      updateBookingStatus: (id, status) =>
+        set((state) => ({
+          bookings: state.bookings.map((b) =>
+            String(b.id) === String(id) ? { ...b, status } : b,
+          ),
+        })),
+
       clearBookings: () =>
         set({
           bookings: [],
         }),
     }),
     {
-      name: "bookings-storage",
+      name: "bookings-storage-v2",
       storage: createJSONStorage(() => ({
         getItem: SecureStore.getItemAsync,
         setItem: SecureStore.setItemAsync,
