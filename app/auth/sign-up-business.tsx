@@ -136,7 +136,7 @@ export default function SignUpBusinessScreen() {
     }
   };
 
-  const stateSuggestions = stateQuery.trim().length >= 1
+  const stateSuggestions = stateQuery.trim().length >= 1 && !US_STATES.includes(stateQuery.trim())
     ? US_STATES.filter((s) =>
         s.toLowerCase().startsWith(stateQuery.trim().toLowerCase())
       )
