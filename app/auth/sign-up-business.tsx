@@ -322,17 +322,18 @@ export default function SignUpBusinessScreen() {
                 </View>
               </View>
 
-              <View>
+              <View style={{ position: "relative", zIndex: 100 }}>
                 <AppInput
                   placeholder="State / Region"
                   value={stateQuery}
                   onChangeText={(value) => {
-                    setStateQuery(value);
+                    const trimmed = value.replace(/\s+$/, "");
+                    setStateQuery(trimmed);
                     setState("");
                     clearFieldError("state");
                     setTimeout(
                       () =>
-                        scrollRef.current?.scrollTo({ y: 320, animated: true }),
+                        scrollRef.current?.scrollTo({ y: 140, animated: true }),
                       100,
                     );
                   }}
@@ -665,11 +666,16 @@ function createStyles(colors: AppColors) {
     },
 
     suggestionsContainer: {
+      position: "absolute",
+      top: 52,
+      left: 0,
+      right: 0,
       backgroundColor: colors.surface,
       borderRadius: 8,
       borderWidth: 1,
       borderColor: colors.border,
-      marginTop: 4,
+      zIndex: 999,
+      elevation: 10,
       maxHeight: 180,
       overflow: "hidden",
     },
