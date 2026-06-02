@@ -176,6 +176,9 @@ export default function EditOverviewTab({
   }, [business, businessId, setOverviewDraft]);
 
   const [stateQuery, setStateQuery] = useState(draft.state ?? "");
+  const [scrollOffset, setScrollOffset] = useState(0);
+  const [scrollViewHeight, setScrollViewHeight] = useState(0);
+  const [contentHeight, setContentHeight] = useState(0);
 
   useEffect(() => {
     setStateQuery(draft.state ?? "");
@@ -184,7 +187,7 @@ export default function EditOverviewTab({
   const stateSuggestions =
     stateQuery.trim().length >= 1 && !US_STATES.includes(stateQuery.trim())
       ? US_STATES.filter((s) =>
-          s.toLowerCase().startsWith(stateQuery.trim().toLowerCase())
+          s.toLowerCase().startsWith(stateQuery.trim().toLowerCase()),
         )
       : [];
 
@@ -289,10 +292,7 @@ export default function EditOverviewTab({
     if (Object.values(newErrors).some(Boolean) || !allHoursValid) {
       setErrors(newErrors);
       triggerError("Fill in the required fields");
-      scrollToFirstError(
-        ["address", "postalCode", "city", "state"],
-        newErrors,
-      );
+      scrollToFirstError(["address", "postalCode", "city", "state"], newErrors);
       return;
     }
     setErrors(NO_ERRORS);
@@ -433,7 +433,13 @@ export default function EditOverviewTab({
                   </AppText>
                 )}
               </View>
-              <View style={[styles.fieldGroup, styles.halfField, { position: "relative", zIndex: 100 }]}>
+              <View
+                style={[
+                  styles.fieldGroup,
+                  styles.halfField,
+                  { position: "relative", zIndex: 100 },
+                ]}
+              >
                 <AppText style={styles.fieldLabel}>State / Region</AppText>
                 <AppInput
                   value={stateQuery}
@@ -449,24 +455,57 @@ export default function EditOverviewTab({
                 />
                 {stateSuggestions.length > 0 && (
                   <View style={styles.suggestionsContainer}>
-                    {stateSuggestions.map((suggestion) => (
-                      <Pressable
-                        key={suggestion}
-                        style={styles.suggestionItem}
-                        onPress={() => {
-                          setStateQuery(suggestion);
-                          onStateChange(suggestion);
-                          setErrors((prev) => ({ ...prev, state: false }));
-                          clearError();
-                        }}
-                      >
-                        <AppText style={styles.suggestionText}>{suggestion}</AppText>
-                      </Pressable>
-                    ))}
+                    <ScrollView
+                      keyboardShouldPersistTaps="handled"
+                      showsVerticalScrollIndicator={false}
+                      style={{ maxHeight: 180 }}
+                      onScroll={(e) => setScrollOffset(e.nativeEvent.contentOffset.y)}
+                      onLayout={(e) => setScrollViewHeight(e.nativeEvent.layout.height)}
+                      onContentSizeChange={(_, h) => setContentHeight(h)}
+                      scrollEventThrottle={16}
+                    >
+                      {stateSuggestions.map((suggestion) => (
+                        <Pressable
+                          key={suggestion}
+                          style={styles.suggestionItem}
+                          onPress={() => {
+                            setStateQuery(suggestion);
+                            onStateChange(suggestion);
+                            setErrors((prev) => ({ ...prev, state: false }));
+                            clearError();
+                          }}
+                        >
+                          <AppText style={styles.suggestionText}>
+                            {suggestion}
+                          </AppText>
+                        </Pressable>
+                      ))}
+                    </ScrollView>
+                    {contentHeight > scrollViewHeight && (() => {
+                      const trackHeight = scrollViewHeight - 12;
+                      const thumbHeight = Math.max(20, (scrollViewHeight / contentHeight) * trackHeight);
+                      const maxThumbTop = trackHeight - thumbHeight;
+                      const thumbTop = Math.min(
+                        maxThumbTop,
+                        Math.max(0, (scrollOffset / (contentHeight - scrollViewHeight)) * maxThumbTop),
+                      );
+                      return (
+                        <View style={styles.scrollTrack}>
+                          <View
+                            style={[
+                              styles.scrollThumb,
+                              { height: thumbHeight, top: thumbTop },
+                            ]}
+                          />
+                        </View>
+                      );
+                    })()}
                   </View>
                 )}
                 {errors.state && (
-                  <AppText style={styles.errorText}>This field is required</AppText>
+                  <AppText style={styles.errorText}>
+                    This field is required
+                  </AppText>
                 )}
               </View>
             </View>
@@ -778,8 +817,6 @@ function createStyles(colors: AppColors) {
       borderColor: colors.primaryGreen,
       zIndex: 999,
       elevation: 10,
-      maxHeight: 180,
-      overflow: "hidden",
       shadowColor: "#000",
       shadowOpacity: 0.25,
       shadowRadius: 16,
@@ -794,6 +831,21 @@ function createStyles(colors: AppColors) {
     suggestionText: {
       fontSize: 14,
       color: colors.white,
+    },
+    scrollTrack: {
+      position: "absolute",
+      right: 4,
+      top: 6,
+      bottom: 6,
+      width: 3,
+      borderRadius: 2,
+      backgroundColor: "rgba(255,255,255,0.15)",
+    },
+    scrollThumb: {
+      position: "absolute",
+      width: 3,
+      borderRadius: 2,
+      backgroundColor: "rgba(255,255,255,0.5)",
     },
   });
 }
