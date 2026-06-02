@@ -110,6 +110,7 @@ export default function SignUpBusinessScreen() {
       password,
       confirmPassword,
       category: selectedCategory,
+      cuisine: selectedCuisine,
       address,
       zipCode,
       city,
@@ -276,6 +277,17 @@ export default function SignUpBusinessScreen() {
                   <Text style={styles.errorText}>{errors.category}</Text>
                 ) : (
                   <Text style={styles.helperText}>Cannot be changed later</Text>
+                )}
+                {selectedCategory === "Food" && !selectedCuisine && errors.cuisine && (
+                  <Text style={styles.errorText}>{errors.cuisine}</Text>
+                )}
+                {selectedCategory === "Food" && !!selectedCuisine && (
+                  <Pressable onPress={() => setCuisineModalVisible(true)}>
+                    <Text style={styles.helperText}>
+                      <Text style={{ color: colors.white, fontWeight: "700" }}>{selectedCuisine}</Text>
+                      <Text style={{ color: colors.primaryGreen, fontWeight: "700" }}> · tap to change</Text>
+                    </Text>
+                  </Pressable>
                 )}
               </View>
 

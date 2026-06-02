@@ -20,6 +20,7 @@ export const signUpBusinessSchema = z
     password: z.string().trim().min(1, "Password is required"),
     confirmPassword: z.string().trim().min(1, "Confirm password is required"),
     category: z.string().trim().min(1, "Category is required"),
+    cuisine: z.string().optional(),
     address: z.string().trim().min(1, "Address is required"),
     zipCode: z.string().trim().min(1, "ZIP code is required"),
     city: z.string().trim().min(1, "City is required"),
@@ -36,6 +37,15 @@ export const signUpBusinessSchema = z
   .refine((values) => values.password === values.confirmPassword, {
     path: ["confirmPassword"],
     message: "Passwords do not match",
+  })
+  .superRefine((values, ctx) => {
+    if (values.category === "Food" && !values.cuisine?.trim()) {
+      ctx.addIssue({
+        path: ["cuisine"],
+        code: z.ZodIssueCode.custom,
+        message: "Please select a cuisine type",
+      });
+    }
   });
 
 export type SignUpBusinessFormValues = z.infer<typeof signUpBusinessSchema>;
