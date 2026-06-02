@@ -51,6 +51,8 @@ export function useEditBusiness(businessId?: string) {
       phone: overviewDraft.phone,
       socialLinks: overviewDraft.socialLinks,
       hours: overviewDraft.hours,
+      latitude: overviewDraft.latitude,
+      longitude: overviewDraft.longitude,
     };
 
     try {

@@ -151,6 +151,8 @@ export default function SignUpBusinessScreen() {
         city,
         state,
         postalCode: zipCode,
+        latitude: latitude || undefined,
+        longitude: longitude || undefined,
       });
       setNotificationsAccountType("business");
       router.push({
