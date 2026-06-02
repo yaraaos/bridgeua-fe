@@ -81,12 +81,13 @@ export default function HomeScreen() {
     useFilterStore((state) => state.discoveryFilters);
 
   const serverParams = useMemo(() => {
-    const params: Record<string, string | number> = {};
+    const params: Record<string, string | number | string[]> = {};
     if (sort && sort !== "relevance" && sort !== "distance") params.sort = sort;
     if (rating && rating !== "custom") params.minRating = Number(rating);
     if (locationState) params.state = locationState;
+    if (cuisines?.length) params.cuisines = cuisines;
     return params;
-  }, [sort, rating, locationState]);
+  }, [sort, rating, locationState, cuisines]);
 
   const businessVersion = useFilterStore((s) => s.businessVersion);
 
