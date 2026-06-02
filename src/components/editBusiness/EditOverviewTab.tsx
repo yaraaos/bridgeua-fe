@@ -31,9 +31,12 @@ import { useScrollToError } from "@/src/hooks/useScrollToError";
 import { useActiveAccount } from "@/src/store/account.store";
 import { useEditBusinessStore } from "@/src/store/editBusiness.store";
 
+import { US_STATE_BOUNDS } from "@/src/constants/stateBounds";
 import { BusinessDetails } from "@/src/features/businesses/types/business.types";
 import EditBusinessHourRow from "./EditBusinessHourRow";
 import EditBusinessSocialRow from "./EditBusinessSocialRow";
+
+const US_STATES = Object.keys(US_STATE_BOUNDS);
 
 const DAY_LABELS: Record<DayOfWeek, string> = {
   monday: "Monday",
@@ -172,6 +175,19 @@ export default function EditOverviewTab({
     hydratedBusinessIdRef.current = nextBusinessId;
   }, [business, businessId, setOverviewDraft]);
 
+  const [stateQuery, setStateQuery] = useState(draft.state ?? "");
+
+  useEffect(() => {
+    setStateQuery(draft.state ?? "");
+  }, [draft.state]);
+
+  const stateSuggestions =
+    stateQuery.trim().length >= 1 && !US_STATES.includes(stateQuery.trim())
+      ? US_STATES.filter((s) =>
+          s.toLowerCase().startsWith(stateQuery.trim().toLowerCase())
+        )
+      : [];
+
   const { scrollRef, registerField, scrollToFirstError } = useScrollToError();
   const hoursValidity = useRef<Record<string, boolean>>(
     Object.fromEntries(
@@ -236,6 +252,8 @@ export default function EditOverviewTab({
       }
     };
   }
+
+  const onStateChange = onField("state");
 
   function onSocialField(key: keyof EditBusinessSocialLinks) {
     return (value: string) => {
@@ -415,21 +433,40 @@ export default function EditOverviewTab({
                   </AppText>
                 )}
               </View>
-              <View
-                style={[styles.fieldGroup, styles.halfField]}
-                {...registerField("state")}
-              >
+              <View style={[styles.fieldGroup, styles.halfField, { position: "relative", zIndex: 100 }]}>
                 <AppText style={styles.fieldLabel}>State / Region</AppText>
                 <AppInput
-                  value={draft.state}
-                  onChangeText={onField("state")}
+                  value={stateQuery}
+                  onChangeText={(value) => {
+                    const trimmed = value.replace(/\s+$/, "");
+                    setStateQuery(trimmed);
+                    onStateChange("");
+                    setErrors((prev) => ({ ...prev, state: false }));
+                    clearError();
+                  }}
                   placeholder="State"
                   error={errors.state}
                 />
+                {stateSuggestions.length > 0 && (
+                  <View style={styles.suggestionsContainer}>
+                    {stateSuggestions.map((suggestion) => (
+                      <Pressable
+                        key={suggestion}
+                        style={styles.suggestionItem}
+                        onPress={() => {
+                          setStateQuery(suggestion);
+                          onStateChange(suggestion);
+                          setErrors((prev) => ({ ...prev, state: false }));
+                          clearError();
+                        }}
+                      >
+                        <AppText style={styles.suggestionText}>{suggestion}</AppText>
+                      </Pressable>
+                    ))}
+                  </View>
+                )}
                 {errors.state && (
-                  <AppText style={styles.errorText}>
-                    This field is required
-                  </AppText>
+                  <AppText style={styles.errorText}>This field is required</AppText>
                 )}
               </View>
             </View>
@@ -728,6 +765,35 @@ function createStyles(colors: AppColors) {
       color: colors.error,
       textAlign: "center",
       marginBottom: spacing.sm,
+    },
+
+    suggestionsContainer: {
+      position: "absolute",
+      top: 72,
+      left: 0,
+      right: 0,
+      backgroundColor: colors.primaryGreenDark,
+      borderRadius: 8,
+      borderWidth: 1,
+      borderColor: colors.primaryGreen,
+      zIndex: 999,
+      elevation: 10,
+      maxHeight: 180,
+      overflow: "hidden",
+      shadowColor: "#000",
+      shadowOpacity: 0.25,
+      shadowRadius: 16,
+      shadowOffset: { width: 0, height: 8 },
+    },
+    suggestionItem: {
+      paddingHorizontal: 14,
+      paddingVertical: 12,
+      borderBottomWidth: 1,
+      borderBottomColor: "rgba(255,255,255,0.08)",
+    },
+    suggestionText: {
+      fontSize: 14,
+      color: colors.white,
     },
   });
 }
