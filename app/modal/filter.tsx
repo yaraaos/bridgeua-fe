@@ -59,10 +59,10 @@ export default function FilterModalScreen() {
   const sheetHeight = useRef(new Animated.Value(HALF_HEIGHT)).current;
 
   const params = useLocalSearchParams<{ scope?: string }>();
-  const scope = params.scope === "following" ? "following" : "discovery";
+  const scope = params.scope === "following" ? "following" : params.scope === "profileFollowing" ? "profileFollowing" : "discovery";
 
   const filters = useFilterStore((state) =>
-    scope === "following" ? state.followingFilters : state.discoveryFilters,
+    scope === "following" ? state.followingFilters : scope === "profileFollowing" ? state.profileFollowingFilters : state.discoveryFilters,
   );
   const { category, sort, cuisines, rating, distance } = filters;
   const {

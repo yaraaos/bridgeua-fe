@@ -73,7 +73,7 @@ export default function ProfileFollowingScreen() {
   );
 
   const { category, sort, cuisines, rating, distance } =
-    useFilterStore((state) => state.followingFilters);
+    useFilterStore((state) => state.profileFollowingFilters);
 
   const activeFilterCount = useMemo(() => {
     let count = 0;
@@ -182,7 +182,7 @@ export default function ProfileFollowingScreen() {
   const handleFilterPress = () => {
     router.push({
       pathname: "/modal/filter",
-      params: { scope: "following" },
+      params: { scope: "profileFollowing" },
     });
   };
 

@@ -24,7 +24,7 @@ export type RatingOption =
 
 export type DistanceOption = "" | "nearby" | "1" | "5" | "10" | "25" | "50" | "100";
 
-export type FilterScope = "discovery" | "following";
+export type FilterScope = "discovery" | "following" | "profileFollowing";
 
 export type CategoryFilters = {
   food: {
@@ -57,6 +57,7 @@ const defaultFilters: FilterValues = {
 type FilterState = {
   discoveryFilters: FilterValues;
   followingFilters: FilterValues;
+  profileFollowingFilters: FilterValues;
   businessVersion: number;
   bumpBusinessVersion: () => void;
   resetDiscoveryFilters: () => void;
@@ -70,15 +71,16 @@ type FilterState = {
 };
 
 const getScopeKey = (scope: FilterScope) =>
-  scope === "discovery" ? "discoveryFilters" : "followingFilters";
+  scope === "discovery" ? "discoveryFilters" : scope === "following" ? "followingFilters" : "profileFollowingFilters";
 
 export const useFilterStore = create<FilterState>((set) => ({
   discoveryFilters: defaultFilters,
   followingFilters: defaultFilters,
+  profileFollowingFilters: defaultFilters,
   businessVersion: 0,
   bumpBusinessVersion: () => set((s) => ({ businessVersion: s.businessVersion + 1 })),
   resetDiscoveryFilters: () => set({ discoveryFilters: defaultFilters }),
-  resetAllFilters: () => set({ discoveryFilters: defaultFilters, followingFilters: defaultFilters }),
+  resetAllFilters: () => set({ discoveryFilters: defaultFilters, followingFilters: defaultFilters, profileFollowingFilters: defaultFilters }),
   setCategory: (scope, value) =>
     set((state) => {
       const key = getScopeKey(scope);
