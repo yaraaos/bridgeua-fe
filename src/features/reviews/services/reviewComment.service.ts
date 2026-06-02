@@ -8,7 +8,7 @@ const mapComment = (raw: {
   parentId: number | null;
   text: string;
   createdAt: string;
-  user: { id: number; firstName: string; lastName: string; avatarUrl?: string | null };
+  user: { id: number; firstName: string; lastName: string; avatarUrl?: string | null; username?: string | null };
   replies?: unknown[];
   isOwnerReply?: boolean;
 }): ReviewComment => ({
@@ -18,9 +18,7 @@ const mapComment = (raw: {
   author: {
     id: String(raw.user.id),
     name: `${raw.user.firstName} ${raw.user.lastName}`.trim(),
-    username: (raw as any).isOwnerReply
-      ? (raw.user.firstName ?? "")
-      : (raw.user.firstName?.toLowerCase() ?? ""),
+    username: raw.user.username ?? raw.user.firstName?.toLowerCase() ?? "",
     avatarUrl: raw.user.avatarUrl ?? undefined,
   },
   text: raw.text,
