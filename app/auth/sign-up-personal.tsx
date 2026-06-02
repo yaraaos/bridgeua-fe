@@ -105,7 +105,7 @@ export default function SignUpPersonalScreen() {
 
     setErrors((current) => ({
       ...current,
-      username: validateSignUpPersonalUsername(value),
+      username: validateSignUpPersonalUsername(normalizedUsername),
     }));
   };
 
