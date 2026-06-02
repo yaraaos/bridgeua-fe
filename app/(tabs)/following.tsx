@@ -863,7 +863,7 @@ export default function FollowingScreen() {
   };
 
   const handleRegisterPress = () => {
-    router.push({
+    router.replace({
       pathname: "/auth/sign-in",
       params: {
         source: "guest_promotions_tab",

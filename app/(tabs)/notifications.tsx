@@ -122,7 +122,7 @@ export default function NotificationsScreen() {
   const emptyState = EMPTY_STATE_BY_TAB[activeTab];
 
   const handleRegisterPress = () => {
-    router.push({
+    router.replace({
       pathname: "/auth/sign-in",
       params: {
         source: "guest_notifications_tab",

@@ -24,6 +24,12 @@ function RootLayoutInner() {
         <Stack.Screen name="index" />
         <Stack.Screen name="(tabs)" />
         <Stack.Screen
+          name="auth"
+          options={{
+            gestureEnabled: false,
+          }}
+        />
+        <Stack.Screen
           name="modal/filter"
           options={{
             presentation: "transparentModal",
