@@ -73,10 +73,10 @@ export default function OwnerNewsEditor({
   };
 
   const sanitizeWhileTyping = (t: string) =>
-    t.replace(/^\n+/, "").replace(/\n{2,}/g, "\n");
+    t.replace(/^\n+/, "");
 
   const sanitizeOnBlur = (t: string) =>
-    t.replace(/^\n+/, "").replace(/\n{2,}/g, "\n").replace(/\n+$/, "");
+    t.replace(/^\n+/, "").replace(/\n+$/, "");
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
