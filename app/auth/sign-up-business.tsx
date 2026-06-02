@@ -86,6 +86,9 @@ export default function SignUpBusinessScreen() {
   const [categoryModalVisible, setCategoryModalVisible] = useState(false);
   const [selectedCuisine, setSelectedCuisine] = useState("");
   const [cuisineModalVisible, setCuisineModalVisible] = useState(false);
+  const [stateScrollOffset, setStateScrollOffset] = useState(0);
+  const [stateScrollViewHeight, setStateScrollViewHeight] = useState(0);
+  const [stateContentHeight, setStateContentHeight] = useState(0);
   const scrollRef = useRef<ScrollView>(null);
 
   const [agree, setAgree] = useState(false);
@@ -361,19 +364,43 @@ export default function SignUpBusinessScreen() {
                 />
                 {stateSuggestions.length > 0 && (
                   <View style={styles.suggestionsContainer}>
-                    {stateSuggestions.map((suggestion) => (
-                      <Pressable
-                        key={suggestion}
-                        style={styles.suggestionItem}
-                        onPress={() => {
-                          setState(suggestion);
-                          setStateQuery(suggestion);
-                          clearFieldError("state");
-                        }}
-                      >
-                        <Text style={styles.suggestionText}>{suggestion}</Text>
-                      </Pressable>
-                    ))}
+                    <ScrollView
+                      keyboardShouldPersistTaps="handled"
+                      showsVerticalScrollIndicator={false}
+                      style={{ maxHeight: 180 }}
+                      onScroll={(e) => setStateScrollOffset(e.nativeEvent.contentOffset.y)}
+                      onLayout={(e) => setStateScrollViewHeight(e.nativeEvent.layout.height)}
+                      onContentSizeChange={(_, h) => setStateContentHeight(h)}
+                      scrollEventThrottle={16}
+                    >
+                      {stateSuggestions.map((suggestion) => (
+                        <Pressable
+                          key={suggestion}
+                          style={styles.suggestionItem}
+                          onPress={() => {
+                            setState(suggestion);
+                            setStateQuery(suggestion);
+                            clearFieldError("state");
+                          }}
+                        >
+                          <Text style={styles.suggestionText}>{suggestion}</Text>
+                        </Pressable>
+                      ))}
+                    </ScrollView>
+                    {stateContentHeight > stateScrollViewHeight && (() => {
+                      const trackHeight = stateScrollViewHeight - 12;
+                      const thumbHeight = Math.max(20, (stateScrollViewHeight / stateContentHeight) * trackHeight);
+                      const maxThumbTop = trackHeight - thumbHeight;
+                      const thumbTop = Math.min(
+                        maxThumbTop,
+                        Math.max(0, (stateScrollOffset / (stateContentHeight - stateScrollViewHeight)) * maxThumbTop),
+                      );
+                      return (
+                        <View style={styles.scrollTrack}>
+                          <View style={[styles.scrollThumb, { height: thumbHeight, top: thumbTop }]} />
+                        </View>
+                      );
+                    })()}
                   </View>
                 )}
                 {!!errors.state && (
@@ -734,12 +761,25 @@ function createStyles(colors: AppColors) {
       borderColor: colors.primaryGreen,
       zIndex: 999,
       elevation: 10,
-      maxHeight: 180,
-      overflow: "hidden",
       shadowColor: "#000",
       shadowOpacity: 0.25,
       shadowRadius: 16,
       shadowOffset: { width: 0, height: 8 },
+    },
+    scrollTrack: {
+      position: "absolute",
+      right: 4,
+      top: 6,
+      bottom: 6,
+      width: 3,
+      borderRadius: 2,
+      backgroundColor: "rgba(255,255,255,0.15)",
+    },
+    scrollThumb: {
+      position: "absolute",
+      width: 3,
+      borderRadius: 2,
+      backgroundColor: "rgba(255,255,255,0.5)",
     },
 
     suggestionItem: {
