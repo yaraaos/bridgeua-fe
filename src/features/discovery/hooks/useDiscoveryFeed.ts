@@ -81,14 +81,18 @@ export function useDiscoveryFeed({
             : true
           : category === "Food"
             ? cuisines.length > 0
-              ? cuisines.includes(businessCategory)
-              : [
+              ? cuisines.some(c =>
+                  businessCategory === c ||
+                  businessCategory === "Food"
+                )
+              : businessCategory === "Food" || [
                 "American",
                 "Chinese",
                 "Italian",
                 "Japanese",
                 "Mediterranean",
                 "Mexican",
+                "Ukrainian",
                 "Vegan",
               ].includes(businessCategory)
             : businessCategory === category);

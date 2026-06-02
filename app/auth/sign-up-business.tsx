@@ -38,6 +38,11 @@ import {
 
 const US_STATES = Object.keys(US_STATE_BOUNDS);
 
+const CUISINE_OPTIONS = [
+  "American", "Chinese", "Italian", "Japanese",
+  "Mediterranean", "Mexican", "Ukrainian", "Vegan",
+].map(c => ({ label: c, value: c }));
+
 const FALLBACK_CATEGORIES = [
   "Beauty",
   "Food",
@@ -79,6 +84,8 @@ export default function SignUpBusinessScreen() {
   const [latitude, setLatitude] = useState("");
   const [longitude, setLongitude] = useState("");
   const [categoryModalVisible, setCategoryModalVisible] = useState(false);
+  const [selectedCuisine, setSelectedCuisine] = useState("");
+  const [cuisineModalVisible, setCuisineModalVisible] = useState(false);
   const scrollRef = useRef<ScrollView>(null);
 
   const [agree, setAgree] = useState(false);
@@ -123,6 +130,7 @@ export default function SignUpBusinessScreen() {
       email,
       password,
       category: selectedCategory,
+      cuisine: selectedCuisine,
       address,
       zipCode,
       city,
@@ -508,6 +516,9 @@ export default function SignUpBusinessScreen() {
                       setSelectedCategory(option.value);
                       clearFieldError("category");
                       setCategoryModalVisible(false);
+                      if (option.value === "Food") {
+                        setCuisineModalVisible(true);
+                      }
                     }}
                   >
                     <Text
@@ -526,6 +537,41 @@ export default function SignUpBusinessScreen() {
                         color={colors.primaryGreen}
                       />
                     )}
+                  </Pressable>
+                ))}
+              </View>
+            </Pressable>
+          </Modal>
+
+          <Modal
+            visible={cuisineModalVisible}
+            transparent
+            animationType="fade"
+            onRequestClose={() => setCuisineModalVisible(false)}
+          >
+            <Pressable
+              style={styles.modalOverlay}
+              onPress={() => setCuisineModalVisible(false)}
+            >
+              <View style={styles.modalSheet}>
+                <Text style={styles.modalTitle}>Select Cuisine</Text>
+                {CUISINE_OPTIONS.map((option) => (
+                  <Pressable
+                    key={option.value}
+                    style={styles.modalOption}
+                    onPress={() => {
+                      setSelectedCuisine(option.value);
+                      setCuisineModalVisible(false);
+                    }}
+                  >
+                    <Text
+                      style={[
+                        styles.modalOptionText,
+                        selectedCuisine === option.value && styles.modalOptionTextActive,
+                      ]}
+                    >
+                      {option.label}
+                    </Text>
                   </Pressable>
                 ))}
               </View>
