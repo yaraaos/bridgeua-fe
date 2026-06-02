@@ -661,7 +661,7 @@ export default function FollowingScreen() {
           myBusiness?.avatarUrl ??
           promotion.imageUrl ??
           "https://placehold.co/600x400",
-        businessRating: 0,
+        businessRating: myBusiness?.rating ?? 0,
         businessDistanceKm: 0,
         businessPriceLevel: undefined,
         distanceKm: 0,
@@ -692,7 +692,7 @@ export default function FollowingScreen() {
         myBusiness?.avatarUrl ??
         newsItem.imageUrl ??
         "https://placehold.co/600x400",
-      businessRating: 0,
+      businessRating: myBusiness?.rating ?? 0,
       businessDistanceKm: 0,
       businessPriceLevel: undefined,
       distanceKm: 0,

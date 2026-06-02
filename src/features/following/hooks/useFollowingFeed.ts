@@ -70,7 +70,7 @@ export const useFollowingFeed = ({
               ? p.business.avatarUrl
               : `${API_BASE_URL}${p.business.avatarUrl}`
             : "",
-          businessRating: 0,
+          businessRating: p.business?.averageRating ?? 0,
           businessDistanceKm: 0,
           distanceKm: 0,
           recommendedByPreview: [],
@@ -98,7 +98,7 @@ export const useFollowingFeed = ({
               ? n.business.avatarUrl
               : `${API_BASE_URL}${n.business.avatarUrl}`
             : "",
-          businessRating: 0,
+          businessRating: n.business?.averageRating ?? 0,
           businessDistanceKm: 0,
           distanceKm: 0,
           recommendedByPreview: [],
