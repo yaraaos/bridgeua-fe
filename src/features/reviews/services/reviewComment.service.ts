@@ -18,7 +18,7 @@ const mapComment = (raw: {
   author: {
     id: String(raw.user.id),
     name: `${raw.user.firstName} ${raw.user.lastName}`.trim(),
-    username: raw.user.username ?? raw.user.firstName?.toLowerCase() ?? "",
+    username: raw.user.username ?? raw.user.firstName ?? "",
     avatarUrl: raw.user.avatarUrl ?? undefined,
   },
   text: raw.text,
