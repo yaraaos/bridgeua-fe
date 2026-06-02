@@ -15,8 +15,8 @@ import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { useActiveAccount } from "@/src/store/account.store";
 import { useAuthStore } from "@/src/store/auth.store";
 import { useNotificationsStore } from "@/src/store/notifications.store";
-import { router } from "expo-router";
-import { useEffect, useState } from "react";
+import { router, useLocalSearchParams, useFocusEffect } from "expo-router";
+import { useEffect, useState, useCallback } from "react";
 import {
   ActivityIndicator,
   SectionList,
@@ -76,6 +76,7 @@ export default function NotificationsScreen() {
   const styles = createStyles(colors);
   const isGuest = useAuthStore((state) => state.isGuest);
   const activeAccount = useActiveAccount();
+  const { tab } = useLocalSearchParams<{ tab?: string }>();
 
   useEffect(() => {
     if (activeAccount) {
@@ -84,6 +85,14 @@ export default function NotificationsScreen() {
   }, [activeAccount?.kind]);
 
   const [activeTab, setActiveTab] = useState<NotificationTab>("all");
+
+  useFocusEffect(
+    useCallback(() => {
+      if (tab === "unread") {
+        setActiveTab("unread");
+      }
+    }, [tab])
+  );
 
   const {
     newNotifications,

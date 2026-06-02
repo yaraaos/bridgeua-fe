@@ -395,7 +395,10 @@ export default function BusinessProfileScreen() {
 
         <Pressable
           style={styles.notificationsCard}
-          onPress={() => router.push("/(tabs)/notifications")}
+          onPress={() => router.push({
+            pathname: "/(tabs)/notifications",
+            params: { tab: "unread" },
+          })}
         >
           <View style={styles.notificationsIcon}>
             <Ionicons
