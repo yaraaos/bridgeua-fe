@@ -26,8 +26,8 @@ import { useDiscoveryLocationStore } from "@/src/store/discovery-location";
 import { useFilterStore } from "@/src/store/filter.store";
 import { useFollowingStore } from "@/src/store/following.store";
 import { Business } from "@/src/types/business";
-import { router } from "expo-router";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import { router, useFocusEffect } from "expo-router";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Alert, StyleSheet, View } from "react-native";
 import MapView, { MapMarkerProps, Marker, Region } from "react-native-maps";
 
@@ -46,6 +46,19 @@ type BusinessMarkerProps = {
   isOwned?: boolean;
   onPress: NonNullable<MapMarkerProps["onPress"]>;
 };
+
+function haversineKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const R = 6371;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
 
 function BusinessMarker({
   business,
@@ -113,6 +126,7 @@ export default function MapScreen() {
     state: locationState,
     latitude: locationLatitude,
     longitude: locationLongitude,
+    permissionStatus,
     setManualLocation,
     setNearbyLocation,
     setPermissionStatus,
@@ -300,7 +314,7 @@ export default function MapScreen() {
     });
   };
 
-  const handleRequestNearby = () => {
+  const handleRequestNearby = useCallback(() => {
     Alert.alert(
       "Use your location?",
       "Allow location access to find businesses near you.",
@@ -324,7 +338,15 @@ export default function MapScreen() {
         },
       ],
     );
-  };
+  }, [setPermissionStatus, setNearbyLocation]);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (permissionStatus === "unknown") {
+        handleRequestNearby();
+      }
+    }, [permissionStatus, handleRequestNearby]),
+  );
 
   const handleFilterPress = () => {
     router.push({
@@ -443,7 +465,23 @@ export default function MapScreen() {
         {selectedBusiness ? (
           <View style={styles.calloutWrap} pointerEvents="box-none">
             <MapBusinessCallout
-              business={selectedBusiness}
+              business={{
+                ...selectedBusiness,
+                distanceKm:
+                  typeof locationLatitude === "number" &&
+                  typeof locationLongitude === "number" &&
+                  typeof selectedBusiness.coordinates?.latitude === "number" &&
+                  typeof selectedBusiness.coordinates?.longitude === "number"
+                    ? parseFloat(
+                        haversineKm(
+                          locationLatitude,
+                          locationLongitude,
+                          selectedBusiness.coordinates.latitude,
+                          selectedBusiness.coordinates.longitude,
+                        ).toFixed(1),
+                      )
+                    : null,
+              }}
               onClose={() => setSelectedBusinessId(null)}
               onPressDetails={() => handleDetailsPress(selectedBusiness.id)}
               isOwned={isOwnedBusiness(selectedBusiness, effectiveUser)}

@@ -10,7 +10,7 @@ export type Business = {
   avatarUrl?: string | null;
   ownerId?: string | number | null;
   isOwnedByMe?: boolean;
-  distanceKm: number;
+  distanceKm: number | null;
   priceLevel: number;
   coordinates: {
     latitude: number;

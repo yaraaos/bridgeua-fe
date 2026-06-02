@@ -108,13 +108,14 @@ export default function MapBusinessCallout({
             </Text>
           </View>
 
-          <View style={styles.distanceRow}>
-            <Feather name="map-pin" size={12} color={colors.textMuted} />
-
-            <Text style={styles.distanceText}>
-              {business.distanceKm} km away
-            </Text>
-          </View>
+          {business.distanceKm != null ? (
+            <View style={styles.distanceRow}>
+              <Feather name="map-pin" size={12} color={colors.textMuted} />
+              <Text style={styles.distanceText}>
+                {business.distanceKm} km away
+              </Text>
+            </View>
+          ) : null}
         </View>
       </Pressable>
 
