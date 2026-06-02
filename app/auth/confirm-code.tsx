@@ -1,6 +1,5 @@
 import { AppColors } from "@/src/constants/colors";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
-import { saveAuthTokens } from "@/src/services/auth/tokens";
 import { useAuthStore } from "@/src/store/auth.store";
 import { useFollowingStore } from "@/src/store/following.store";
 import { useProfileStore } from "@/src/store/profile.store";
@@ -40,10 +39,14 @@ export default function ConfirmCodeScreen() {
   const { submitConfirmCode, isLoading, apiError, setApiError } =
     useConfirmCode();
   const { submitResendCode, isLoading: isResending } = useResendCode();
+
   const setUser = useAuthStore((state) => state.setUser);
+
   const profile = useProfileStore((state) => state.profile);
   const loadProfile = useProfileStore((state) => state.loadProfile);
+
   const resetFollowing = useFollowingStore((state) => state.resetFollowing);
+  const syncFollowing = useFollowingStore((state) => state.syncWithServer);
 
   const clearReviews = useReviewsStore((state) => state.clearReviews);
 
@@ -72,6 +75,7 @@ export default function ConfirmCodeScreen() {
 
   const handleSubmit = async () => {
     if (isLoading) return;
+
     if (code.length !== OTP_LENGTH) {
       setLocalError("Enter the 4-digit code");
       return;
@@ -79,23 +83,35 @@ export default function ConfirmCodeScreen() {
 
     const response = await submitConfirmCode({ email, code });
 
-    if (response?.verified) {
-      resetFollowing();
-      clearReviews();
+    if (!response?.verified) return;
 
-      if (response.accessToken) {
-        await saveAuthTokens(response.accessToken, response.refreshToken);
-      }
+    resetFollowing();
+    clearReviews();
 
+    const confirmedUser = response.user;
+
+    if (confirmedUser) {
+      setUser(
+        confirmedUser,
+        response.accessToken && response.refreshToken
+          ? {
+              accessToken: response.accessToken,
+              refreshToken: response.refreshToken,
+            }
+          : undefined,
+      );
+    } else {
       setUser({
         id: profile.id,
         email: profile.email ?? email,
         name: profile.displayName,
       });
-      await loadProfile();
-
-      router.replace("/(tabs)/home");
     }
+
+    await loadProfile();
+    await syncFollowing();
+
+    router.replace("/(tabs)/profile");
   };
 
   const handleResend = async () => {

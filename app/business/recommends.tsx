@@ -16,7 +16,7 @@ export default function RecommendsScreen() {
   const { businessId } = useLocalSearchParams<{ businessId?: string }>();
   const { business, isLoading } = useBusinessDetails(businessId);
 
-  const recommends = business?.about?.recommendedBy ?? [];
+  const recommends = business?.about?.recommends ?? [];
 
   return (
     <AppScreen withTopInset={false} style={styles.container}>
@@ -85,6 +85,7 @@ function createStyles(colors: AppColors) {
     },
     card: {
       paddingHorizontal: spacing.lg,
+      paddingVertical: spacing.md,
       borderRadius: 20,
       backgroundColor: colors.surface,
       borderWidth: 1,

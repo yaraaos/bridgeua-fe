@@ -55,14 +55,18 @@ export default function ChooseDateScreen() {
     businessId,
     serviceId,
     serviceName,
+    price,
     specialistId,
+    specialistName,
     promotionId,
     promoCode,
   } = useLocalSearchParams<{
     businessId?: string;
     serviceId?: string;
     serviceName?: string;
+    price?: string;
     specialistId?: string;
+    specialistName?: string;
     promotionId?: string;
     promoCode?: string;
   }>();
@@ -105,7 +109,9 @@ export default function ChooseDateScreen() {
         businessId,
         serviceId,
         serviceName,
+        price,
         specialistId,
+        specialistName,
         date: selectedDate,
         timeSlotId: selectedTimeSlot.id,
         time: selectedTimeSlot.time,

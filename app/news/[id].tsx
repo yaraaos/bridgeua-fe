@@ -24,7 +24,13 @@ export default function NewsDetailScreen() {
   const { newsItem, isLoading } = useNewsItem(id);
 
   if (isLoading || !newsItem) {
-    return <AppLoader />;
+    return (
+      <AppScreen style={styles.appScreen}>
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+          <AppLoader />
+        </View>
+      </AppScreen>
+    );
   }
 
   const handleShare = async () => {
@@ -74,6 +80,9 @@ export default function NewsDetailScreen() {
         </AppText>
 
         <AppText style={styles.title}>{newsItem.title}</AppText>
+        {!!newsItem.subtitle && (
+          <AppText style={styles.subtitle}>{newsItem.subtitle}</AppText>
+        )}
 
         <AppText style={styles.time}>
           {new Date(newsItem.publishedAt).toLocaleDateString()}
@@ -101,7 +110,7 @@ export default function NewsDetailScreen() {
               <View style={styles.metaRow}>
                 <Ionicons name="star" size={14} color={colors.accentOrange} />
                 <AppText style={styles.metaText}>
-                  {newsItem.business.rating.toFixed(1)}
+                  {((newsItem.business as any)?.averageRating ?? (newsItem.business as any)?.rating ?? 0).toFixed(1)}
                 </AppText>
                 <AppText style={styles.dot}>•</AppText>
                 <AppText style={styles.metaText} numberOfLines={1}>
@@ -172,6 +181,12 @@ function createStyles(colors: AppColors) {
       lineHeight: 34,
       fontWeight: "900",
       color: colors.textPrimary,
+    },
+    subtitle: {
+      fontSize: 15,
+      lineHeight: 22,
+      color: colors.textSecondary,
+      marginTop: 4,
     },
     time: {
       fontSize: 13,

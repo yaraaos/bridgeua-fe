@@ -14,9 +14,12 @@ const amenityIcons: Record<
 > = {
   wifi: "wifi-outline",
   parking: "car-outline",
+  ac: "snow-outline",
   pet: "paw-outline",
   accessibility: "accessibility-outline",
   coffee: "cafe-outline",
+  tv: "tv-outline",
+  outdoor: "umbrella-outline",
 };
 
 export default function BusinessAmenitiesSection({ amenities }: Props) {

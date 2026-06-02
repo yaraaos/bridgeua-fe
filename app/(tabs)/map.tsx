@@ -7,13 +7,21 @@ import {
 } from "@/src/components/map";
 import AppLoader from "@/src/components/ui/AppLoader/AppLoader";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
-import { HOME_CATEGORIES } from "@/src/constants/categories";
-import {
-  DEFAULT_LOCATION_OPTIONS,
-  LocationOption,
-} from "@/src/constants/locations";
+import { PROMO_CATEGORY_LABEL } from "@/src/constants/categories";
+import { US_STATE_BOUNDS } from "@/src/constants/stateBounds";
+import { LocationOption } from "@/src/constants/locations";
+import type { AuthUser } from "@/src/features/auth/types/auth.types";
 import { useBusinesses } from "@/src/features/businesses";
+import { getBusinessStates } from "@/src/features/businesses/services/business.service";
+import { useCategories } from "@/src/features/categories/hooks/useCategories";
 import { useDiscoveryFeed } from "@/src/features/discovery/hooks/useDiscoveryFeed";
+import {
+  isOwnedBusiness,
+  prioritizeOwnedBusiness,
+} from "@/src/features/discovery/utils/ownedBusinessDiscovery";
+import { usePromotions } from "@/src/features/promotions/hooks/usePromotions";
+import { useAccountStore, useActiveAccount } from "@/src/store/account.store";
+import { useAuthStore } from "@/src/store/auth.store";
 import { useDiscoveryLocationStore } from "@/src/store/discovery-location";
 import { useFilterStore } from "@/src/store/filter.store";
 import { useFollowingStore } from "@/src/store/following.store";
@@ -21,7 +29,7 @@ import { Business } from "@/src/types/business";
 import { router } from "expo-router";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Alert, StyleSheet, View } from "react-native";
-import MapView, { Marker, MapMarkerProps, Region } from "react-native-maps";
+import MapView, { MapMarkerProps, Marker, Region } from "react-native-maps";
 
 const DEFAULT_REGION: Region = {
   latitude: 34.0549,
@@ -35,34 +43,42 @@ const FOCUSED_DELTA = 0.05;
 type BusinessMarkerProps = {
   business: Business;
   isFollowed: boolean;
+  isOwned?: boolean;
   onPress: NonNullable<MapMarkerProps["onPress"]>;
 };
 
-function BusinessMarker({ business, isFollowed, onPress }: BusinessMarkerProps) {
+function BusinessMarker({
+  business,
+  isFollowed,
+  isOwned = false,
+  onPress,
+}: BusinessMarkerProps) {
   const [imageLoaded, setImageLoaded] = useState(false);
-  const [followChangePending, setFollowChangePending] = useState(false);
-  const isFirstFollowEffect = useRef(true);
+  const [stylingChangePending, setStylingChangePending] = useState(false);
+  const isFirstStylingEffect = useRef(true);
 
   useEffect(() => {
-    if (isFirstFollowEffect.current) {
-      isFirstFollowEffect.current = false;
+    if (isFirstStylingEffect.current) {
+      isFirstStylingEffect.current = false;
       return;
     }
-    setFollowChangePending(true);
-    const timer = setTimeout(() => setFollowChangePending(false), 120);
+    setStylingChangePending(true);
+    const timer = setTimeout(() => setStylingChangePending(false), 120);
     return () => clearTimeout(timer);
-  }, [isFollowed]);
+  }, [isFollowed, isOwned]);
 
   return (
     <Marker
       coordinate={business.coordinates}
       onPress={onPress}
       anchor={{ x: 0.5, y: MAP_MARKER_ANCHOR_Y }}
-      tracksViewChanges={!imageLoaded || followChangePending}
+      tracksViewChanges={!imageLoaded || stylingChangePending}
+      zIndex={isOwned ? 10 : 1}
     >
       <MapMarkerPin
-        imageUrl={business.image}
+        imageUrl={business.avatarUrl ?? business.image}
         isFollowed={isFollowed}
+        isOwned={isOwned}
         onImageLoad={() => setImageLoaded(true)}
       />
     </Marker>
@@ -72,8 +88,29 @@ function BusinessMarker({ business, isFollowed, onPress }: BusinessMarkerProps) 
 export default function MapScreen() {
   const mapRef = useRef<MapView | null>(null);
 
+  const [locationOptions, setLocationOptions] = useState<LocationOption[]>([
+    { label: "See nearby", value: "nearby", type: "nearby" },
+  ]);
+
+  useEffect(() => {
+    getBusinessStates().then((states) => {
+      const stateOptions: LocationOption[] = states.map((s) => ({
+        label: `${s}, USA`,
+        value: s.toLowerCase().replace(/\s+/g, '-') + '-usa',
+        type: 'manual',
+        state: s,
+      }));
+      setLocationOptions([
+        { label: "All locations", value: "all", type: "manual", state: undefined },
+        { label: "See nearby", value: "nearby", type: "nearby" },
+        ...stateOptions,
+      ]);
+    }).catch(() => {});
+  }, []);
+
   const {
     label: selectedLocationLabel,
+    state: locationState,
     latitude: locationLatitude,
     longitude: locationLongitude,
     setManualLocation,
@@ -98,7 +135,38 @@ export default function MapScreen() {
   const followedBusinessIds = useFollowingStore(
     (state) => state.followedBusinessIds,
   );
-  const { businesses, isLoading } = useBusinesses();
+  const businessVersion = useFilterStore((s) => s.businessVersion);
+
+  const { businesses, isLoading } = useBusinesses(
+    locationState ? { state: locationState } : undefined,
+    businessVersion,
+  );
+
+  const currentUser = useAuthStore((state) => state.user);
+  const activeAccount = useActiveAccount();
+  const isHydrated = useAccountStore((s) => s.isHydrated);
+  // Same FE fallback as Home until BU-198 (BE ownership metadata) lands.
+  const effectiveUser = useMemo<AuthUser | null>(() => {
+    if (!isHydrated || activeAccount?.kind !== "business") return currentUser;
+
+    const fallbackOwnedId = activeAccount.ownedBusinessId;
+    const base = currentUser ?? ({ id: activeAccount.id, email: "" } as AuthUser);
+
+    return {
+      ...base,
+      accountType: "business",
+      activeBusinessId: fallbackOwnedId ?? null,
+      ownedBusinessIds: fallbackOwnedId ? [fallbackOwnedId] : [],
+    };
+  }, [currentUser, activeAccount, isHydrated]);
+
+  const { promotions: activePromotions } = usePromotions();
+  const businessIdsWithPromo = useMemo(() => {
+    const followedSet = new Set(followedBusinessIds.map(String));
+    return activePromotions
+      .map((p) => String(p.businessId))
+      .filter((id) => followedSet.has(id));
+  }, [activePromotions, followedBusinessIds]);
 
   const { filteredBusinesses } = useDiscoveryFeed({
     businesses,
@@ -108,6 +176,7 @@ export default function MapScreen() {
     rating,
     distance,
     customDistance,
+    businessIdsWithPromo,
   });
 
   const markerKeyPrefix = useMemo(
@@ -146,8 +215,23 @@ export default function MapScreen() {
     return result;
   }, [filteredBusinesses]);
 
+  const selectedHomeCategory = category || "All Categories";
+
+  const prioritizedMappableBusinesses = useMemo(
+    () =>
+      prioritizeOwnedBusiness(
+        mappableBusinesses,
+        selectedHomeCategory,
+        effectiveUser,
+      ),
+    [mappableBusinesses, selectedHomeCategory, effectiveUser],
+  );
+
   const initialRegion: Region = useMemo(() => {
-    if (typeof locationLatitude === "number" && typeof locationLongitude === "number") {
+    if (
+      typeof locationLatitude === "number" &&
+      typeof locationLongitude === "number"
+    ) {
       return {
         latitude: locationLatitude,
         longitude: locationLongitude,
@@ -164,7 +248,8 @@ export default function MapScreen() {
   );
 
   const selectedBusiness: Business | undefined = useMemo(
-    () => mappableBusinesses.find((business) => business.id === selectedBusinessId),
+    () =>
+      mappableBusinesses.find((business) => business.id === selectedBusinessId),
     [mappableBusinesses, selectedBusinessId],
   );
 
@@ -175,6 +260,7 @@ export default function MapScreen() {
   }, [selectedBusinessId, selectedBusiness]);
 
   useEffect(() => {
+    if (locationState) return;
     if (!mapRef.current) return;
     if (mappableBusinesses.length === 0) return;
 
@@ -199,10 +285,22 @@ export default function MapScreen() {
         animated: true,
       },
     );
-  }, [mappableBusinesses]);
+  }, [locationState, mappableBusinesses]);
+
+  useEffect(() => {
+    if (!locationState || !mapRef.current) return;
+    setSelectedBusinessId(null);
+    const bounds = US_STATE_BOUNDS[locationState];
+    if (!bounds) return;
+    mapRef.current.animateToRegion(bounds, 500);
+  }, [locationState]);
 
   const handleSelectLocationOption = (option: LocationOption) => {
-    setManualLocation({ label: option.label, value: option.value });
+    setManualLocation({
+      label: option.label,
+      value: option.value,
+      state: option.value === "all" ? undefined : option.state,
+    });
   };
 
   const handleRequestNearby = () => {
@@ -238,22 +336,23 @@ export default function MapScreen() {
     });
   };
 
-  const selectedCategory = !category
-    ? "All Categories"
-    : category === "Automotive"
-      ? "Auto"
-      : category;
+  const isGuest = useAuthStore((state) => state.isGuest);
+  const isBusinessAccount = effectiveUser?.accountType === "business";
+  const canUsePromoFilter = !isBusinessAccount && !isGuest;
+
+  const { categories } = useCategories();
+  const categoryNames = [
+    "All Categories",
+    ...(canUsePromoFilter ? [PROMO_CATEGORY_LABEL] : []),
+    ...categories.map((c) => c.name),
+  ];
+
+  const selectedCategory = category || "All Categories";
 
   const handleSelectCategory = (selectedCategoryLabel: string) => {
     setSelectedBusinessId(null);
-
     const mappedCategory =
-      selectedCategoryLabel === "All Categories"
-        ? ""
-        : selectedCategoryLabel === "Auto"
-          ? "Automotive"
-          : selectedCategoryLabel;
-
+      selectedCategoryLabel === "All Categories" ? "" : selectedCategoryLabel;
     useFilterStore.getState().setCategory("discovery", mappedCategory);
   };
 
@@ -284,7 +383,7 @@ export default function MapScreen() {
       titleSubtitle="Discover on the map"
       subtitleValue={selectedLocationLabel}
       showSubtitleChevron
-      locationOptions={DEFAULT_LOCATION_OPTIONS}
+      locationOptions={locationOptions}
       onSelectLocationOption={handleSelectLocationOption}
       onRequestNearby={handleRequestNearby}
       showSearch
@@ -313,16 +412,18 @@ export default function MapScreen() {
             showsMyLocationButton={false}
             onPress={() => setSelectedBusinessId(null)}
           >
-            {mappableBusinesses.map((business) => {
+            {prioritizedMappableBusinesses.map((business) => {
               const isFollowed = followedBusinessIds.includes(
                 String(business.id),
               );
+              const isOwned = isOwnedBusiness(business, effectiveUser);
 
               return (
                 <BusinessMarker
                   key={`${markerKeyPrefix}-${String(business.id)}`}
                   business={business}
                   isFollowed={isFollowed}
+                  isOwned={isOwned}
                   onPress={(event) => {
                     event.stopPropagation();
                     handleMarkerPress(business);
@@ -335,7 +436,7 @@ export default function MapScreen() {
 
         <View style={styles.categoryWrap} pointerEvents="box-none">
           <CategoryScroller
-            categories={HOME_CATEGORIES}
+            categories={categoryNames}
             selectedCategory={selectedCategory}
             onSelectCategory={handleSelectCategory}
             overlay
@@ -343,14 +444,13 @@ export default function MapScreen() {
         </View>
 
         {selectedBusiness ? (
-          <View
-            style={styles.calloutWrap}
-            pointerEvents="box-none"
-          >
+          <View style={styles.calloutWrap} pointerEvents="box-none">
             <MapBusinessCallout
               business={selectedBusiness}
               onClose={() => setSelectedBusinessId(null)}
               onPressDetails={() => handleDetailsPress(selectedBusiness.id)}
+              isOwned={isOwnedBusiness(selectedBusiness, effectiveUser)}
+              isBusinessAccount={effectiveUser?.accountType === "business"}
             />
           </View>
         ) : null}

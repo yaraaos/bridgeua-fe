@@ -13,9 +13,24 @@ export type AuthUser = {
   name?: string;
   accountType?: "personal" | "business";
   isEmailConfirmed?: boolean;
+  ownedBusinessIds?: string[];
+  activeBusinessId?: string | null;
+  businessName?: string | null;
+  ownedBusiness?: {
+    id: string;
+    categoryId: string;
+    categorySlug?: string | null;
+    categoryName?: string | null;
+    city?: string | null;
+    state?: string | null;
+    latitude?: number | null;
+    longitude?: number | null;
+  } | null;
 };
 
 export type SignInResponse = {
+  accessToken: string;
+  refreshToken: string;
   user: AuthUser;
   token: string;
 };
@@ -32,6 +47,7 @@ export type RegisterResponse = {
   userId: string;
   email: string;
   verificationRequired: boolean;
+  confirmationCode?: string;
 };
 
 export type RegisterBusinessPayload = {
@@ -39,7 +55,13 @@ export type RegisterBusinessPayload = {
   ownerName: string;
   email: string;
   password: string;
-  category?: string;
+  category: string;
+  address: string;
+  zipCode: string;
+  city: string;
+  state: string;
+  latitude?: number;
+  longitude?: number;
 };
 
 export type RegisterBusinessResponse = RegisterResponse;
@@ -52,6 +74,7 @@ export type ConfirmCodePayload = {
 export type ConfirmCodeResponse = {
   verified: boolean;
   accessToken?: string;
+  refreshToken?: string;
   user?: AuthUser;
 };
 

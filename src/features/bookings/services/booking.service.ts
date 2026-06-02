@@ -7,8 +7,8 @@ import type {
     CreateBookingPayload,
 } from "../types/booking.types";
 
-const USE_MOCK_BOOKING_RESPONSE = true;
-const USE_MOCK_AVAILABILITY_RESPONSE = true;
+const USE_MOCK_BOOKING_RESPONSE = false;
+const USE_MOCK_AVAILABILITY_RESPONSE = false;
 
 const fallbackSlots: BookingTimeSlot[] = [
   { id: "09-00", time: "09:00", isAvailable: true },
@@ -37,7 +37,7 @@ export const getBookingAvailability = async (
   });
 
   const res = await apiClient.get<BookingTimeSlot[]>(
-    `${ENDPOINTS.BOOKINGS}/availability?${query.toString()}`,
+    `${ENDPOINTS.BOOKINGS_AVAILABILITY}?${query.toString()}`,
   );
 
   return res.data;

@@ -2,12 +2,18 @@ import ScreenHeader from "@/src/components/common/ScreenHeader/ScreenHeader";
 import { AppColors } from "@/src/constants/colors";
 import { radius } from "@/src/constants/radius";
 import { spacing } from "@/src/constants/spacing";
+import { useSettings } from "@/src/features/settings/hooks/useSettings";
+import { useMyBusinessProfile } from "@/src/features/businesses/hooks/useBusiness";
+import { deleteBusiness } from "@/src/features/businesses/services/business.service";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { useAppStore } from "@/src/store/app.store";
 import { useAuthStore } from "@/src/store/auth.store";
+import { useAccountStore } from "@/src/store/account.store";
 import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { useState } from "react";
 import {
+  Alert,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -90,6 +96,50 @@ export default function SettingsScreen() {
   const router = useRouter();
   const setThemeMode = useAppStore((s) => s.setThemeMode);
   const clearUser = useAuthStore((state) => state.clearUser);
+  const accountType = useAuthStore((state) => state.user?.accountType);
+  const { settings, updateSetting } = useSettings();
+
+  const [isDeletingBusiness, setIsDeletingBusiness] = useState(false);
+  const { business } = useMyBusinessProfile();
+  const handleDeleteBusiness = () => {
+    if (!business?.id || isDeletingBusiness) return;
+
+    Alert.alert(
+      "Delete business?",
+      "This will permanently delete your business profile. This action cannot be undone.",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              setIsDeletingBusiness(true);
+              await deleteBusiness(business.id);
+              const currentUser = useAuthStore.getState().user;
+              if (currentUser?.id) {
+                await useAccountStore.getState().removeAccount(String(currentUser.id));
+              }
+              await clearUser();
+              router.replace("/auth/sign-in");
+            } catch (error) {
+              Alert.alert(
+                "Could not delete business",
+                error instanceof Error
+                  ? error.message
+                  : "Please try again later.",
+              );
+            } finally {
+              setIsDeletingBusiness(false);
+            }
+          },
+        },
+      ],
+    );
+  };
 
   return (
     <View style={styles.safeArea}>
@@ -111,7 +161,7 @@ export default function SettingsScreen() {
             icon="user"
             title="Profile"
             subtitle="View and edit your profile"
-            onPress={() => router.push("/profile/edit")}
+            onPress={() => router.push(accountType === "business" ? "/business/edit" : "/profile/edit")}
           />
           <View style={styles.divider} />
           <SettingsRow
@@ -125,7 +175,7 @@ export default function SettingsScreen() {
             icon="credit-card"
             title="Payment Methods"
             subtitle="Manage your saved payment methods"
-            onPress={() => router.push("/settings/account")}
+            onPress={() => router.push("/settings/payment-methods")}
           />
           <View style={styles.divider} />
           <SettingsRow
@@ -145,7 +195,9 @@ export default function SettingsScreen() {
             onPress={() => router.push("/settings/language")}
             rightElement={
               <View style={styles.rowRight}>
-                <Text style={styles.rowValue}>English</Text>
+                <Text style={styles.rowValue}>
+                  {settings?.language === "uk" ? "Українська" : "English"}
+                </Text>
                 <Feather
                   name="chevron-right"
                   size={18}
@@ -174,6 +226,56 @@ export default function SettingsScreen() {
           />
         </SettingsSection>
 
+        {/* Business */}
+        {accountType === "business" && (
+          <SettingsSection label="Business">
+            <SettingsRow
+              icon="refresh-cw"
+              title="Auto-confirm Bookings"
+              subtitle="Automatically confirm new booking requests"
+              rightElement={
+                <Switch
+                  value={settings?.bookingAutoConfirm ?? false}
+                  onValueChange={(val) => updateSetting("bookingAutoConfirm", val)}
+                  trackColor={{ false: colors.textMuted, true: colors.primaryGreen }}
+                  thumbColor={colors.white}
+                  ios_backgroundColor={colors.textMuted}
+                />
+              }
+            />
+            <View style={styles.divider} />
+            <SettingsRow
+              icon="map-pin"
+              title="Show in Discovery"
+              subtitle="Display your business on the map and search"
+              rightElement={
+                <Switch
+                  value={settings?.profileVisible ?? true}
+                  onValueChange={(val) => updateSetting("profileVisible", val)}
+                  trackColor={{ false: colors.textMuted, true: colors.primaryGreen }}
+                  thumbColor={colors.white}
+                  ios_backgroundColor={colors.textMuted}
+                />
+              }
+            />
+            <View style={styles.divider} />
+            <SettingsRow
+              icon="tag"
+              title="Show Price Level"
+              subtitle="Display price level on your business profile"
+              rightElement={
+                <Switch
+                  value={settings?.showPriceLevel ?? true}
+                  onValueChange={(val) => updateSetting("showPriceLevel", val)}
+                  trackColor={{ false: colors.textMuted, true: colors.primaryGreen }}
+                  thumbColor={colors.white}
+                  ios_backgroundColor={colors.textMuted}
+                />
+              }
+            />
+          </SettingsSection>
+        )}
+
         {/* Support */}
         <SettingsSection label="Support">
           <SettingsRow
@@ -187,7 +289,7 @@ export default function SettingsScreen() {
             icon="message-circle"
             title="Contact Us"
             subtitle="Get in touch with our support team"
-            onPress={() => router.push("/settings/help")}
+            onPress={() => router.push("/settings/contact")}
           />
           <View style={styles.divider} />
           <SettingsRow
@@ -212,6 +314,10 @@ export default function SettingsScreen() {
             pressed && styles.logoutPressed,
           ]}
           onPress={async () => {
+            const currentUser = useAuthStore.getState().user;
+            if (currentUser?.id) {
+              await useAccountStore.getState().removeAccount(String(currentUser.id));
+            }
             await clearUser();
             router.replace("/auth/sign-in");
           }}
@@ -326,6 +432,29 @@ function createStyles(colors: AppColors) {
       fontWeight: "600",
       color: colors.accentOrange,
     },
+
+    deleteBusinessBtn: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: spacing.sm,
+      marginHorizontal: spacing.lg,
+      marginBottom: spacing.md,
+      paddingVertical: 14,
+      borderRadius: radius.lg,
+      borderWidth: 1,
+      borderColor: colors.error,
+      backgroundColor: colors.surface,
+    },
+    deleteBusinessText: {
+      fontSize: 15,
+      fontWeight: "600",
+      color: colors.error,
+    },
+    disabledBtn: {
+      opacity: 0.6,
+    },
+
     version: {
       textAlign: "center",
       fontSize: 12,

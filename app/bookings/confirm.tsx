@@ -25,22 +25,17 @@ export default function BookingConfirmScreen() {
   const addBooking = useBookingsStore((state) => state.addBooking);
 
   const selectedService = business?.services.find(
-    (service) => service.id === params.serviceId,
-  );
-
-  const selectedSpecialist = business?.bookingSpecialists?.find(
-    (specialist) => specialist.id === params.specialistId,
+    (service) => service.serviceId === params.serviceId || service.id === params.serviceId,
   );
 
   const specialistName =
-    params.specialistId === "any"
-      ? "Any specialist"
-      : (selectedSpecialist?.name ?? "Selected specialist");
+    params.specialistName ??
+    (params.specialistId === "any" ? "Any specialist" : "Selected specialist");
 
   const serviceName =
     params.serviceName ?? selectedService?.name ?? "Selected service";
 
-  const price = selectedService?.priceFrom ?? "Price on request";
+  const price = params.price ?? "Price on request";
 
   const customerName = useMemo(() => {
     return [params.firstName, params.lastName].filter(Boolean).join(" ");
@@ -71,6 +66,13 @@ export default function BookingConfirmScreen() {
 
     addBooking({
       ...booking,
+      // API returns startTime, store expects time
+      time: (booking as any).startTime ?? payload.time,
+      date: (booking as any).date ?? payload.date,
+      customer: payload.customer,
+      businessId: payload.businessId,
+      serviceId: payload.serviceId,
+      specialistId: payload.specialistId,
       businessName: business?.name ?? "Selected business",
       serviceName,
       specialistName,
@@ -100,7 +102,6 @@ export default function BookingConfirmScreen() {
         price={price}
         customerName={customerName || "Customer"}
         phoneNumber={params.phoneNumber ?? "Phone not added"}
-        status="pending"
       />
 
       {!!error && (

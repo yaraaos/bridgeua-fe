@@ -15,17 +15,49 @@ export const ENDPOINTS = {
   // Users
   USERS_ME: "/api/users/me",
   USERS_ME_AVATAR: "/api/users/me/avatar",
+  USERS_ME_REVIEWS: "/api/users/me/reviews",
+  USERS_ME_FOLLOWING: "/api/users/me/following",
 
   // Categories
   CATEGORIES: "/api/categories",
 
-  // Businesses
+  // Businessessrc/features/businesses/types/business.types.ts
   BUSINESSES: "/api/businesses",
+  BUSINESSES_STATES: "/api/businesses/states",
+  BUSINESSES_ME: "/api/businesses/me",
+  BUSINESSES_ME_AVATAR: "/api/businesses/me/avatar",
+  BUSINESSES_ME_ABOUT: "/api/businesses/me/about",
+  BUSINESSES_ME_ANALYTICS: "/api/businesses/me/analytics",
+  BUSINESSES_ME_SERVICE_LIBRARY: "/api/businesses/me/service-library",
+  BUSINESSES_ME_SERVICES: "/api/businesses/me/services",
   BUSINESS_BY_ID: (id: string) => `/api/businesses/${id}`,
   BUSINESS_PHOTOS: (id: string) => `/api/businesses/${id}/photos`,
   BUSINESS_PHOTO_BY_ID: (id: string, photoId: string) =>
     `/api/businesses/${id}/photos/${photoId}`,
+  BUSINESS_REVIEWS: (id: string) => `/api/businesses/${id}/reviews`,
+  REVIEW_BY_ID: (businessId: string, reviewId: string) =>
+    `/api/businesses/${businessId}/reviews/${reviewId}`,
+  REVIEW_LIKE: (businessId: string, reviewId: string) =>
+    `/api/businesses/${businessId}/reviews/${reviewId}/like`,
+  REVIEW_COMMENTS: (businessId: string, reviewId: string) =>
+    `/api/businesses/${businessId}/reviews/${reviewId}/comments`,
+  REVIEW_COMMENT_BY_ID: (businessId: string, reviewId: string, commentId: string) =>
+    `/api/businesses/${businessId}/reviews/${reviewId}/comments/${commentId}`,
+  REVIEW_PHOTOS: (businessId: string, reviewId: string) =>
+    `/api/businesses/${businessId}/reviews/${reviewId}/photos`,
+  BUSINESS_FOLLOW: (id: string) => `/api/businesses/${id}/follow`,
 
   // Bookings
   BOOKINGS: "/api/bookings",
+  BOOKINGS_ME: "/api/bookings/me",
+  BOOKINGS_AVAILABILITY: "/api/bookings/availability",
+  BOOKING_STATUS: (id: string) => `/api/bookings/${id}/status`,
+  BUSINESS_BOOKINGS: (businessId: string) => `/api/businesses/${businessId}/bookings`,
+
+  // Settings & Account
+  SETTINGS: '/api/settings',
+  ACCOUNT_EMAIL: '/api/account/email',
+  ACCOUNT_CONFIRM_EMAIL: '/api/account/confirm-email',
+  ACCOUNT_PASSWORD: '/api/account/password',
+  ACCOUNT_DELETE: '/api/account',
 } as const;

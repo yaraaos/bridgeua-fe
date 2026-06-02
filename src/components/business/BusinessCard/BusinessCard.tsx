@@ -1,10 +1,13 @@
 import { FollowButton } from "@/src/components/business";
+import RecommendButton from "@/src/components/business/RecommendButton";
+import AppLabel from "@/src/components/ui/AppLabel/AppLabel";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Image, Pressable, Text, View } from "react-native";
 
 import { useBusinessReviewSummary } from "@/src/features/reviews/hooks/useBusinessReviewSummary";
+import { useAuthStore } from "@/src/store/auth.store";
 import { Business } from "@/src/types/business";
 import { createStyles } from "./BusinessCard.styles";
 
@@ -13,16 +16,20 @@ type Props = {
   onPress?: () => void;
   variant?: "default" | "compact" | "embedded";
   showFollowButton?: boolean;
+  isOwnedBusiness?: boolean;
 };
 
 export default function BusinessCard({
-  business,
-  onPress,
-  variant = "default",
-  showFollowButton = true,
-}: Props) {
+                                       business,
+                                       onPress,
+                                       variant = "default",
+                                       showFollowButton = true,
+                                       isOwnedBusiness = false,
+                                     }: Props) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+  const accountType = useAuthStore((state) => state.user?.accountType);
+  const isBusinessAccount = accountType === "business";
 
   const recommendedByPreview = business.recommendedByPreview ?? [];
   const recommendedByCount = business.recommendedByCount ?? 0;
@@ -37,6 +44,7 @@ export default function BusinessCard({
     <Pressable
       style={[
         styles.card,
+        isOwnedBusiness && styles.ownedCard,
         variant === "compact" && styles.cardCompact,
         variant === "embedded" && styles.cardEmbedded,
       ]}
@@ -44,7 +52,9 @@ export default function BusinessCard({
       disabled={!onPress}
     >
       <Image
-        source={{ uri: business.image }}
+        source={{
+          uri: business.avatarUrl ?? business.image,
+        }}
         style={[
           styles.image,
           variant === "compact" && styles.imageCompact,
@@ -54,9 +64,15 @@ export default function BusinessCard({
 
       <View style={styles.content}>
         <View style={styles.textContent}>
-          <Text style={styles.name} numberOfLines={1}>
-            {business.name}
-          </Text>
+          <View style={styles.nameRow}>
+            <Text style={[styles.name, { flex: 1, marginRight: 8 }]} numberOfLines={1}>
+              {business.name}
+            </Text>
+
+            {isOwnedBusiness ? (
+              <AppLabel label="Your business" variant="your-business" />
+            ) : null}
+          </View>
 
           <View style={styles.ratingRow}>
             <Ionicons name="star" size={13} color={colors.accentOrange} />
@@ -78,6 +94,22 @@ export default function BusinessCard({
             </Text>
           </View>
 
+          {typeof business.isOpen === 'boolean' ? (
+            <View style={styles.openStatusRow}>
+              <Text style={[
+                styles.openStatusText,
+                { color: business.isOpen ? colors.primaryGreen : colors.error },
+              ]}>
+                {business.isOpen ? 'Open' : 'Closed'}
+              </Text>
+              {(business.isOpen ? business.closesAt : business.opensAt) ? (
+                <Text style={[styles.openStatusText, { color: colors.white }]}>
+                  {` · ${business.isOpen ? `Closes at ${business.closesAt}` : `Opens at ${business.opensAt}`}`}
+                </Text>
+              ) : null}
+            </View>
+          ) : null}
+
           {!!recommendedByPreview.length && (
             <View style={styles.recommendedRow}>
               <Text style={styles.recommendedLabel} numberOfLines={1}>
@@ -93,13 +125,17 @@ export default function BusinessCard({
           )}
         </View>
 
-        {showFollowButton ? (
+        {showFollowButton && !isOwnedBusiness ? (
           <View style={styles.actionSlot}>
-            <FollowButton
-              businessId={String(business.id)}
-              size="icon"
-              variant="soft"
-            />
+            {isBusinessAccount ? (
+              <RecommendButton businessId={String(business.id)} businessName={business.name} />
+            ) : (
+              <FollowButton
+                businessId={String(business.id)}
+                size="icon"
+                variant="soft"
+              />
+            )}
           </View>
         ) : null}
       </View>

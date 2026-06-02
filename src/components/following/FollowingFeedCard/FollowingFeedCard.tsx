@@ -1,35 +1,190 @@
 import FollowButton from "@/src/components/business/FollowButton/FollowButton";
+import AppLabel from "@/src/components/ui/AppLabel/AppLabel";
+import AppText from "@/src/components/ui/AppText/AppText";
 import type { FollowingFeedCardItem } from "@/src/features/following/types/following.types";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { useAuthStore } from "@/src/store/auth.store";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import { Image, Pressable, Text, View } from "react-native";
+import { useMemo, useState } from "react";
+import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 import { createStyles } from "./FollowingFeedCard.styles";
 
 type FollowingFeedCardProps = {
   item: FollowingFeedCardItem;
+  onPress?: () => void;
+  isOwnerPromotion?: boolean;
+  isOwnerNews?: boolean;
+  isFeatured?: boolean;
+  onFeaturePromotion?: () => void;
+  onDelete?: () => void;
 };
 
-export default function FollowingFeedCard({ item }: FollowingFeedCardProps) {
+export default function FollowingFeedCard({
+  item,
+  onPress,
+  isOwnerPromotion,
+  isOwnerNews,
+  isFeatured,
+  onFeaturePromotion,
+  onDelete,
+}: FollowingFeedCardProps) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+  const accountType = useAuthStore((state) => state.user?.accountType);
+  const isBusinessOwner = accountType === "business";
+  const [showMenu, setShowMenu] = useState(false);
+  const isAlreadyFeatured = isFeatured === true;
+
+  const extraStyles = useMemo(
+    () =>
+      StyleSheet.create({
+        menuWrapper: {
+          position: "absolute",
+          top: 12,
+          right: 14,
+          zIndex: 20,
+          alignItems: "flex-end",
+        },
+        menuButton: {
+          backgroundColor: "rgba(0,0,0,0.4)",
+          borderRadius: 999,
+          padding: 4,
+        },
+        menuButtonActive: {
+          backgroundColor: colors.white,
+        },
+        inlineMenu: {
+          marginTop: 4,
+          borderRadius: 14,
+          borderWidth: 1,
+          borderColor: colors.border,
+          backgroundColor: colors.white,
+          overflow: "hidden",
+          minWidth: 200,
+        },
+        inlineMenuRow: {
+          paddingHorizontal: 16,
+          paddingVertical: 12,
+          flexDirection: "row",
+          alignItems: "center",
+          gap: 10,
+        },
+        inlineMenuText: {
+          fontSize: 14,
+          fontWeight: "700",
+          color: colors.primaryGreen,
+        },
+        titleRowSpaced: {
+          justifyContent: "space-between",
+          alignItems: "center",
+        },
+      }),
+    [colors],
+  );
+
+  const handlePress = () => {
+    if (onPress) {
+      onPress();
+      return;
+    }
+
+    router.push({
+      pathname: item.type === "promotion" ? "/promotions/[id]" : "/news/[id]",
+      params: {
+        id:
+          item.type === "promotion"
+            ? (item.promotionId ?? item.id)
+            : (item.newsId ?? item.id),
+      },
+    });
+  };
+
+  const statusLabel =
+    item.status === "draft"
+      ? "Draft"
+      : item.status === "unpublished"
+        ? "Unpublished"
+        : item.status === "published"
+          ? "Published"
+          : null;
 
   return (
-    <Pressable
-      style={styles.feedCard}
-      onPress={() =>
-        router.push({
-          pathname:
-            item.type === "promotion" ? "/promotions/[id]" : "/news/[id]",
-          params: {
-            id:
-              item.type === "promotion"
-                ? (item.promotionId ?? item.id)
-                : (item.newsId ?? item.id),
-          },
-        })
-      }
-    >
+    <Pressable style={styles.feedCard} onPress={handlePress}>
+      {(isOwnerPromotion || isOwnerNews) && item.status === "published" && (
+        <View style={extraStyles.menuWrapper}>
+          <Pressable
+            style={[
+              extraStyles.menuButton,
+              showMenu && extraStyles.menuButtonActive,
+            ]}
+            onPress={() => setShowMenu((v) => !v)}
+            hitSlop={8}
+          >
+            <Ionicons
+              name="ellipsis-horizontal"
+              size={16}
+              color={showMenu ? colors.primaryGreen : colors.white}
+            />
+          </Pressable>
+
+          {showMenu && (
+            <View style={extraStyles.inlineMenu}>
+              {isOwnerPromotion && (
+                <Pressable
+                  style={extraStyles.inlineMenuRow}
+                  onPress={() => {
+                    if (isAlreadyFeatured) return;
+                    setShowMenu(false);
+                    onFeaturePromotion?.();
+                  }}
+                >
+                  <Ionicons
+                    name={isAlreadyFeatured ? "star" : "star-outline"}
+                    size={16}
+                    color={
+                      isAlreadyFeatured
+                        ? colors.accentOrange
+                        : colors.primaryGreen
+                    }
+                  />
+                  <AppText
+                    style={[
+                      extraStyles.inlineMenuText,
+                      isAlreadyFeatured && { color: colors.textMuted },
+                    ]}
+                  >
+                    {isAlreadyFeatured
+                      ? "Promo added to home banner"
+                      : "Add to home promo banner"}
+                  </AppText>
+                </Pressable>
+              )}
+              <Pressable
+                style={[
+                  extraStyles.inlineMenuRow,
+                  isOwnerPromotion && {
+                    borderTopWidth: 1,
+                    borderTopColor: "rgba(255,255,255,0.1)",
+                  },
+                ]}
+                onPress={() => {
+                  setShowMenu(false);
+                  onDelete?.();
+                }}
+              >
+                <Ionicons name="trash-outline" size={16} color={colors.error} />
+                <AppText
+                  style={[extraStyles.inlineMenuText, { color: colors.error }]}
+                >
+                  Delete
+                </AppText>
+              </Pressable>
+            </View>
+          )}
+        </View>
+      )}
+
       <View style={styles.feedHeader}>
         <View style={styles.feedContentRow}>
           <View style={styles.feedIcon}>
@@ -44,10 +199,35 @@ export default function FollowingFeedCard({ item }: FollowingFeedCardProps) {
             />
           </View>
 
-          <View style={styles.feedTextWrap}>
-            <Text style={styles.feedTitle} numberOfLines={2}>
-              {item.title}
-            </Text>
+          <View
+            style={[
+              styles.feedTextWrap,
+              (isOwnerPromotion || isOwnerNews) && { paddingRight: 20 },
+            ]}
+          >
+            <View
+              style={[
+                styles.titleRow,
+                (isOwnerPromotion || isOwnerNews) && extraStyles.titleRowSpaced,
+              ]}
+            >
+              <Text style={styles.feedTitle} numberOfLines={2}>
+                {item.title}
+              </Text>
+
+              {(isOwnerPromotion || isOwnerNews) && statusLabel ? (
+                <AppLabel
+                  label={statusLabel}
+                  variant={
+                    item.status === "draft"
+                      ? "draft"
+                      : item.status === "unpublished"
+                        ? "unpublished"
+                        : "published"
+                  }
+                />
+              ) : null}
+            </View>
 
             <Text style={styles.feedDescription} numberOfLines={3}>
               {item.description}
@@ -55,11 +235,13 @@ export default function FollowingFeedCard({ item }: FollowingFeedCardProps) {
           </View>
         </View>
 
-        <FollowButton
-          businessId={String(item.businessId)}
-          size="icon"
-          variant="soft"
-        />
+        {!isBusinessOwner && (
+          <FollowButton
+            businessId={String(item.businessId)}
+            size="icon"
+            variant="soft"
+          />
+        )}
       </View>
 
       <View style={styles.feedBody}>

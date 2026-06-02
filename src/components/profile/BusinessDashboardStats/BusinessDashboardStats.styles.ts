@@ -19,10 +19,10 @@ export function createStyles(colors: AppColors) {
       backgroundColor: colors.primaryGreenSoft,
     },
     tilePurple: {
-      backgroundColor: "#EDE7FB",
+      backgroundColor: colors.statTilePurple,
     },
     tileBlue: {
-      backgroundColor: "#E0EEFC",
+      backgroundColor: colors.statTileBlue,
     },
     value: {
       marginTop: 2,

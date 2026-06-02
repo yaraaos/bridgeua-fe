@@ -22,11 +22,13 @@ export function createStyles(colors: AppColors) {
     },
     grid: {
       flexDirection: "row",
-      gap: spacing.sm,
+      flexWrap: "wrap",
+      rowGap: spacing.lg,
     },
     item: {
-      flex: 1,
+      width: "25%",
       alignItems: "center",
+      paddingHorizontal: spacing.xs,
     },
     iconWrap: {
       width: 36,

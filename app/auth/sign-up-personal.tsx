@@ -97,7 +97,7 @@ export default function SignUpPersonalScreen() {
   }, [debouncedUsername, errors.username]);
 
   const handleUsernameChange = (value: string) => {
-    const normalizedUsername = value.toLowerCase();
+    const normalizedUsername = value.toLowerCase().replace(/\s/g, "");
 
     setUsername(normalizedUsername);
     setApiError(null);
@@ -269,7 +269,7 @@ export default function SignUpPersonalScreen() {
               placeholder="Email address"
               value={email}
               onChangeText={(value) => {
-                setEmail(value);
+                setEmail(value.toLowerCase().trim());
                 clearFieldError("email");
               }}
               keyboardType="email-address"

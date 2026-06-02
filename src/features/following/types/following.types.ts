@@ -23,4 +23,6 @@ export type FollowingFeedCardItem = FollowingFeedItem & {
   priceLevel?: number;
   recommendedByPreview: string[];
   recommendedByCount: number;
+  status?: "draft" | "published" | "unpublished";
+  isFeatured?: boolean;
 };

@@ -1,6 +1,7 @@
 export type LocationOption = {
   label: string;
   value: string;
+  state?: string;
   type?: "manual" | "nearby";
 };
 

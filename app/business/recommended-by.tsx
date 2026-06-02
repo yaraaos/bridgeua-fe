@@ -89,6 +89,7 @@ function createStyles(colors: AppColors) {
     },
     card: {
       paddingHorizontal: spacing.lg,
+      paddingVertical: spacing.md,
       borderRadius: 20,
       backgroundColor: colors.surface,
       borderWidth: 1,

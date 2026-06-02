@@ -10,16 +10,23 @@ export function useRegisterBusiness() {
   const [apiError, setApiError] = useState<string | null>(null);
 
   const submitRegisterBusiness = async (
-    payload: RegisterBusinessPayload
+    payload: RegisterBusinessPayload,
   ): Promise<RegisterBusinessResponse | null> => {
     try {
       setIsLoading(true);
       setApiError(null);
 
-      return await registerBusiness(payload);
+      const response = await registerBusiness(payload);
+
+      console.log(
+        "[registerBusiness] confirmationCode:",
+        response.confirmationCode,
+      );
+
+      return response;
     } catch (error) {
       setApiError(
-        error instanceof Error ? error.message : "Something went wrong"
+        error instanceof Error ? error.message : "Something went wrong",
       );
 
       return null;

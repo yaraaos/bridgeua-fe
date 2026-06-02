@@ -6,14 +6,13 @@ import AppEmptyState from "@/src/components/ui/AppEmptyState";
 import AppLoader from "@/src/components/ui/AppLoader/AppLoader";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
 import { AuthRequiredModal, useRequireAuth } from "@/src/features/auth";
-import { getReviewById } from "@/src/features/reviews/services/review.service";
 import { useReviewCommentsStore } from "@/src/features/reviews/store/review-comments.store";
 import { ReviewComment } from "@/src/features/reviews/types/review-comment.types";
 import type { Review } from "@/src/features/reviews/types/review.types";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { MaterialIcons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { ScrollView as ScrollViewType } from "react-native";
 import {
   Alert,
@@ -30,84 +29,67 @@ export default function ReviewThreadScreen() {
   const { colors } = useAppTheme();
   const { isAuthModalVisible, closeAuthModal, confirmAuthModal, requireAuth } =
     useRequireAuth();
-  const { reviewId } = useLocalSearchParams<{ reviewId: string }>();
+  const { reviewId, reviewData } = useLocalSearchParams<{ reviewId: string; reviewData: string }>();
 
   const [review, setReview] = useState<Review | null>(null);
-  const [expandedReplies, setExpandedReplies] = useState<
-    Record<string, boolean>
-  >({});
+  const [expandedReplies, setExpandedReplies] = useState<Record<string, boolean>>({});
   const [isLoading, setIsLoading] = useState(true);
-  const [replyingToComment, setReplyingToComment] =
-    useState<ReviewComment | null>(null);
+  const [replyingToComment, setReplyingToComment] = useState<ReviewComment | null>(null);
   const [isReplyingToReview, setIsReplyingToReview] = useState(false);
+
   const scrollViewRef = useRef<ScrollViewType | null>(null);
   const composerRef = useRef<ReviewCommentComposerRef | null>(null);
+
   const comments = useReviewCommentsStore((state) => state.comments);
   const addComment = useReviewCommentsStore((state) => state.addComment);
-
-  const toggleCommentLike = useReviewCommentsStore(
-    (state) => state.toggleCommentLike,
-  );
+  const loadComments = useReviewCommentsStore((state) => state.loadComments);
+  const toggleCommentLike = useReviewCommentsStore((state) => state.toggleCommentLike);
   const deleteComment = useReviewCommentsStore((state) => state.deleteComment);
+
   const handleDeleteComment = (commentId: string) => {
+    if (!review?.businessId || !reviewId) return;
     Alert.alert("Delete comment?", "This action cannot be undone.", [
-      {
-        text: "Cancel",
-        style: "cancel",
-      },
+      { text: "Cancel", style: "cancel" },
       {
         text: "Delete",
         style: "destructive",
         onPress: () => {
-          deleteComment(commentId);
+          deleteComment(review.businessId!, reviewId, commentId);
         },
       },
     ]);
   };
 
-  const reviewComments = useMemo(() => {
-    if (!reviewId) return [];
+  const reviewRootComments = comments
+    .filter((c) => c.reviewId === reviewId && !c.parentCommentId)
+    .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
 
-    const commentsForReview = comments.filter(
-      (comment) => comment.reviewId === reviewId,
-    );
-
-    const rootComments = commentsForReview
-      .filter((comment) => !comment.parentCommentId)
-      .sort(
-        (a, b) =>
-          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
-      );
-
-    return rootComments.flatMap((comment) => {
-      const replies = commentsForReview
-        .filter((reply) => reply.parentCommentId === comment.id)
-        .sort(
-          (a, b) =>
-            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
-        );
-
-      return [comment, ...replies];
-    });
-  }, [comments, reviewId]);
+  const getReplies = (parentId: string) =>
+    comments
+      .filter((c) => c.parentCommentId === parentId)
+      .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
 
   useEffect(() => {
-    const loadReview = async () => {
-      if (!reviewId) {
-        setIsLoading(false);
-        return;
+    if (!reviewId) {
+      setIsLoading(false);
+      return;
+    }
+
+    const load = async () => {
+      try {
+        const parsed = reviewData ? JSON.parse(reviewData) : null;
+        setReview(parsed as Review);
+        if (parsed?.businessId && reviewId) {
+          await loadComments(parsed.businessId, reviewId);
+        }
+      } catch {
+        setReview(null);
       }
-
-      setIsLoading(true);
-
-      const data = await getReviewById(reviewId);
-
-      setReview(data);
       setIsLoading(false);
     };
 
-    loadReview();
-  }, [reviewId]);
+    void load();
+  }, [reviewId, reviewData]);
 
   const toggleReplies = (commentId: string) => {
     setExpandedReplies((current) => ({
@@ -119,11 +101,12 @@ export default function ReviewThreadScreen() {
   const handleAddComment = (text: string) => {
     requireAuth(
       () => {
-        if (!reviewId) return;
+        if (!reviewId || !review?.businessId) return;
 
         const parentCommentId = replyingToComment?.id;
 
         addComment({
+          businessId: review.businessId,
           reviewId,
           parentCommentId,
           text,
@@ -143,9 +126,7 @@ export default function ReviewThreadScreen() {
           scrollViewRef.current?.scrollToEnd({ animated: true });
         }, 100);
       },
-      {
-        action: "comment",
-      },
+      { action: "comment" },
     );
   };
 
@@ -159,7 +140,6 @@ export default function ReviewThreadScreen() {
             color={colors.textPrimary}
           />
         </Pressable>
-
         <View style={styles.headerTextWrap}>
           <Text style={[styles.title, { color: colors.textPrimary }]}>
             Review
@@ -193,96 +173,69 @@ export default function ReviewThreadScreen() {
                 onPressComment={() => {
                   setReplyingToComment(null);
                   setIsReplyingToReview(true);
-
                   requestAnimationFrame(() => {
                     composerRef.current?.focus();
                   });
                 }}
               />
-              <View
-                style={[styles.divider, { backgroundColor: colors.border }]}
-              />
+              <View style={[styles.divider, { backgroundColor: colors.border }]} />
 
-              <Text
-                style={[styles.sectionTitle, { color: colors.textPrimary }]}
-              >
+              <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>
                 Comments
               </Text>
 
-              {reviewComments.length > 0 ? (
-                reviewComments
-                  .filter((comment) => !comment.parentCommentId)
-                  .map((comment) => {
-                    const replies = reviewComments.filter(
-                      (reply) => reply.parentCommentId === comment.id,
-                    );
-
-                    return (
-                      <View key={comment.id}>
-                        <ReviewCommentCard
-                          comment={comment}
-                          onReply={(comment) => {
-                            setIsReplyingToReview(false);
-                            setReplyingToComment(comment);
-
-                            requestAnimationFrame(() => {
-                              composerRef.current?.focus();
-                            });
-                          }}
-                          onToggleLike={toggleCommentLike}
-                          onDelete={handleDeleteComment}
-                        />
-
-                        {replies.length > 0 ? (
-                          <>
-                            <Pressable
-                              style={styles.repliesToggle}
-                              onPress={() => toggleReplies(comment.id)}
-                            >
-                              <Text
-                                style={[
-                                  styles.repliesToggleText,
-                                  { color: colors.primaryGreen },
-                                ]}
-                              >
-                                {expandedReplies[comment.id]
-                                  ? "Hide replies"
-                                  : `View ${replies.length} repl${
-                                      replies.length === 1 ? "y" : "ies"
-                                    }`}
-                              </Text>
-                            </Pressable>
-
-                            {expandedReplies[comment.id]
-                              ? replies.map((reply) => (
-                                  <ReviewCommentCard
-                                    key={reply.id}
-                                    comment={reply}
-                                    onReply={(comment) => {
-                                      setIsReplyingToReview(false);
-                                      setReplyingToComment(comment);
-
-                                      requestAnimationFrame(() => {
-                                        composerRef.current?.focus();
-                                      });
-                                    }}
-                                    onToggleLike={toggleCommentLike}
-                                    onDelete={handleDeleteComment}
-                                  />
-                                ))
-                              : null}
-                          </>
-                        ) : null}
-
-                        <View
-                          style={[
-                            styles.commentGroupDivider,
-                            { backgroundColor: colors.border },
-                          ]}
-                        />
-                      </View>
-                    );
-                  })
+              {reviewRootComments.length > 0 ? (
+                reviewRootComments.map((comment) => {
+                  const replies = getReplies(comment.id);
+                  return (
+                    <View key={comment.id}>
+                      <ReviewCommentCard
+                        comment={comment}
+                        onReply={(c) => {
+                          setIsReplyingToReview(false);
+                          setReplyingToComment(c);
+                          requestAnimationFrame(() => {
+                            composerRef.current?.focus();
+                          });
+                        }}
+                        onToggleLike={toggleCommentLike}
+                        onDelete={handleDeleteComment}
+                      />
+                      {replies.length > 0 ? (
+                        <>
+                          <Pressable
+                            style={styles.repliesToggle}
+                            onPress={() => toggleReplies(comment.id)}
+                          >
+                            <Text style={[styles.repliesToggleText, { color: colors.primaryGreen }]}>
+                              {expandedReplies[comment.id]
+                                ? "Hide replies"
+                                : `View ${replies.length} repl${replies.length === 1 ? "y" : "ies"}`}
+                            </Text>
+                          </Pressable>
+                          {expandedReplies[comment.id]
+                            ? replies.map((reply) => (
+                                <ReviewCommentCard
+                                  key={reply.id}
+                                  comment={reply}
+                                  onReply={(c) => {
+                                    setIsReplyingToReview(false);
+                                    setReplyingToComment(c);
+                                    requestAnimationFrame(() => {
+                                      composerRef.current?.focus();
+                                    });
+                                  }}
+                                  onToggleLike={toggleCommentLike}
+                                  onDelete={handleDeleteComment}
+                                />
+                              ))
+                            : null}
+                        </>
+                      ) : null}
+                      <View style={[styles.commentGroupDivider, { backgroundColor: colors.border }]} />
+                    </View>
+                  );
+                })
               ) : (
                 <AppEmptyState
                   title="No comments yet"
@@ -292,21 +245,13 @@ export default function ReviewThreadScreen() {
             </ScrollView>
 
             {replyingToComment || isReplyingToReview ? (
-              <View
-                style={[styles.replyBanner, { borderColor: colors.border }]}
-              >
-                <Text
-                  style={[
-                    styles.replyBannerText,
-                    { color: colors.textSecondary },
-                  ]}
-                >
+              <View style={[styles.replyBanner, { borderColor: colors.border }]}>
+                <Text style={[styles.replyBannerText, { color: colors.textSecondary }]}>
                   Replying to @
                   {replyingToComment?.author.username ??
                     review.authorUsername ??
                     review.authorName}
                 </Text>
-
                 <Pressable
                   onPress={() => {
                     setReplyingToComment(null);
@@ -314,11 +259,7 @@ export default function ReviewThreadScreen() {
                   }}
                   hitSlop={8}
                 >
-                  <MaterialIcons
-                    name="close"
-                    size={18}
-                    color={colors.textSecondary}
-                  />
+                  <MaterialIcons name="close" size={18} color={colors.textSecondary} />
                 </Pressable>
               </View>
             ) : null}
@@ -408,7 +349,6 @@ const styles = StyleSheet.create({
     marginTop: -2,
     marginBottom: 4,
   },
-
   repliesToggleText: {
     fontSize: 12,
     fontWeight: "700",

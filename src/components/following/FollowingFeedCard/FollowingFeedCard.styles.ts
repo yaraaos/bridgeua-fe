@@ -41,12 +41,19 @@ export function createStyles(colors: AppColors) {
       justifyContent: "center",
     },
 
+    titleRow: {
+      flexDirection: "row",
+      alignItems: "flex-start",
+      gap: 8,
+      marginBottom: 4,
+    },
+
     feedTitle: {
+      flex: 1,
       fontSize: 17,
       fontWeight: "700",
       color: colors.textPrimary,
       lineHeight: 22,
-      marginBottom: 4,
     },
 
     feedDescription: {

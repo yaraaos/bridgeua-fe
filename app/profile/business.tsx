@@ -1,85 +1,261 @@
 // app/profile/business.tsx
 
 import { Feather, Ionicons } from "@expo/vector-icons";
-import { router } from "expo-router";
-import React from "react";
-import { Image, Pressable, ScrollView, StyleSheet, View } from "react-native";
+import { useQueryClient } from "@tanstack/react-query";
+import { router, useFocusEffect } from "expo-router";
+import React, { useCallback, useEffect, useState } from "react";
+import {
+  Image,
+  Pressable,
+  ScrollView,
+  Share,
+  StyleSheet,
+  View,
+} from "react-native";
 
 import ScreenHeader from "@/src/components/common/ScreenHeader/ScreenHeader";
 import BusinessDashboardStats from "@/src/components/profile/BusinessDashboardStats/BusinessDashboardStats";
 import AppAvatar from "@/src/components/ui/AppAvatar";
+import AppLoader from "@/src/components/ui/AppLoader/AppLoader";
+import AppLabel from "@/src/components/ui/AppLabel/AppLabel";
+import AppRatingStars from "@/src/components/ui/AppRatingStars";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
 import AppText from "@/src/components/ui/AppText/AppText";
 import { AppColors } from "@/src/constants/colors";
 import { spacing } from "@/src/constants/spacing";
+import { useBusinessAnalytics } from "@/src/features/businesses/hooks/useAnalytics";
+import { useMyBusinessProfile } from "@/src/features/businesses/hooks/useBusiness";
+import { useReviews } from "@/src/features/reviews/hooks/useReviews";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { apiClient } from "@/src/services/api/client";
+import { API_BASE_URL } from "@/src/services/api/config";
 import { useActiveAccount } from "@/src/store/account.store";
+import { useAuthStore } from "@/src/store/auth.store";
+import { useTeamStore } from "@/src/store/team.store";
+import { ENDPOINTS } from "@/src/services/api/endpoints";
+import type { TeamMember } from "@/src/types/team";
+
+import BusinessQuickActions from "@/src/components/profile/BusinessQuickActions/BusinessQuickActions";
+import type { QuickActionId } from "@/src/components/profile/BusinessQuickActions/types";
 
 type UpcomingBooking = {
   id: string;
   customerName: string;
-  customerAvatar: string;
-  day: "Today" | "Tomorrow";
-  time: string;
+  customerAvatar?: string;
+  date: string;
+  startTime: string;
   service: string;
   status: "confirmed" | "pending";
 };
 
-const upcomingBookings: UpcomingBooking[] = [
-  {
-    id: "booking-1",
-    customerName: "Oleg Novak",
-    customerAvatar: "https://i.pravatar.cc/100?img=12",
-    day: "Today",
-    time: "14:00",
-    service: "Manicure",
-    status: "confirmed",
-  },
-  {
-    id: "booking-2",
-    customerName: "Olena Chris",
-    customerAvatar: "https://i.pravatar.cc/100?img=47",
-    day: "Today",
-    time: "17:00",
-    service: "Manicure",
-    status: "confirmed",
-  },
-  {
-    id: "booking-3",
-    customerName: "Kyril Novak",
-    customerAvatar: "https://i.pravatar.cc/100?img=33",
-    day: "Tomorrow",
-    time: "11:00",
-    service: "Manicure",
-    status: "pending",
-  },
-];
-
-const featuredReview = {
-  id: "review-1",
-  authorName: "Sarah M.",
-  authorAvatar: "https://i.pravatar.cc/100?img=5",
-  rating: 4,
-  postedAgo: "2 days ago",
-  text: "I've been looking for a place I can truly trust — and I finally found it. Everything was explained clearly, th...",
-};
-
-const quickActions = [
-  { id: "edit-services", label: "Edit services", icon: "create-outline" },
-  { id: "manage-photos", label: "Manage photos", icon: "images-outline" },
-  { id: "business-info", label: "Business info", icon: "briefcase-outline" },
-  { id: "team", label: "Team", icon: "people-outline" },
-  { id: "add-promo", label: "Add promotions", icon: "megaphone-outline" },
-] as const;
+function formatDelta(current: number, lastMonth: number): string {
+  const diff = current - lastMonth;
+  const sign = diff >= 0 ? "+" : "";
+  return `${sign}${diff} vs last month`;
+}
 
 export default function BusinessProfileScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
   const account = useActiveAccount();
+  const user = useAuthStore((s) => s.user);
+  const { business, isLoading, error, refetch } = useMyBusinessProfile();
+  const [upcomingBookings, setUpcomingBookings] = useState<UpcomingBooking[]>([]);
 
-  const businessName = account.displayName;
-  const handle = account.handle;
-  const avatarUrl = account.avatarUrl;
+  useEffect(() => {
+    const businessId = business?.id;
+    console.log("[Bookings] business?.id =", businessId, "| user?.activeBusinessId =", user?.activeBusinessId);
+    if (!businessId) return;
+
+    void apiClient
+      .get<any[]>(ENDPOINTS.BUSINESS_BOOKINGS(String(businessId)))
+      .then((res) => {
+        console.log("[Bookings] API response:", JSON.stringify(res.data));
+        const data = res.data ?? [];
+        const upcoming = data
+          .filter((b) => ["pending", "confirmed"].includes(b.status))
+          .slice(0, 3)
+          .map((b) => ({
+            id: String(b.id),
+            customerName: b.user?.profile
+              ? [b.user.profile.firstName, b.user.profile.lastName].filter(Boolean).join(" ") || b.user.email
+              : b.user?.email ?? "Client",
+            customerAvatar: b.user?.profile?.avatarUrl ?? undefined,
+            date: b.date,
+            startTime: b.startTime?.slice(0, 5) ?? "",
+            service: b.service?.name ?? "Service",
+            status: b.status as "confirmed" | "pending",
+          }));
+        setUpcomingBookings(upcoming);
+      })
+      .catch((err) => {
+        console.log("[Bookings] API error:", err?.message);
+        setUpcomingBookings([]);
+      });
+  }, [business?.id]);
+  const { members: teamMembers, setMembers } = useTeamStore();
+  const { analytics } = useBusinessAnalytics();
+  const queryClient = useQueryClient();
+  useFocusEffect(
+    useCallback(() => {
+      void refetch();
+    }, [refetch]),
+  );
+
+  useFocusEffect(
+    useCallback(() => {
+      void queryClient.invalidateQueries({ queryKey: ["business-analytics"] });
+    }, [queryClient]),
+  );
+
+  useFocusEffect(
+    useCallback(() => {
+      if (!business?.id) return;
+      void apiClient
+        .get<TeamMember[]>(`/api/businesses/${business.id}/team`)
+        .then((res) => {
+          setMembers(
+            res.data.map((m) => ({
+              ...m,
+              photoUrl: m.photoUrl
+                ? m.photoUrl.startsWith("http")
+                  ? m.photoUrl
+                  : `${API_BASE_URL}${m.photoUrl}`
+                : undefined,
+              serviceIds: Array.isArray(m.serviceIds)
+                ? m.serviceIds.map(String)
+                : [],
+            })),
+          );
+        })
+        .catch(() => {});
+    }, [business?.id, setMembers]),
+  );
+
+  const businessName = business?.name || "";
+  const avatarUrl =
+    business?.avatarUrl ?? business?.images?.[0]?.url ?? account?.avatarUrl;
+  const businessLocation = business?.location ?? "";
+  const businessRating = business?.rating ?? 0;
+  const businessReviewCount = business?.reviewCount ?? 0;
+  const publicBusinessId = business?.id ?? account?.id ?? "";
+
+  const { reviews, isLoading: isReviewsLoading } = useReviews({
+    businessId: String(publicBusinessId),
+    limit: 1,
+  });
+  const latestReview = reviews[0] ?? null;
+
+  if (isLoading) {
+    return (
+      <AppScreen style={styles.container} withTopInset={false}>
+        <View style={styles.centerState}>
+          <AppLoader />
+        </View>
+      </AppScreen>
+    );
+  }
+
+  if (error) {
+    return (
+      <AppScreen style={styles.container} withTopInset={false}>
+        <View style={styles.centerState}>
+          <AppText style={styles.errorText}>{error}</AppText>
+        </View>
+      </AppScreen>
+    );
+  }
+
+  const handleQuickActionPress = (actionId: QuickActionId) => {
+    if (actionId === "add-promo") {
+      router.push({
+        pathname: "/(tabs)/following",
+        params: {
+          tab: "promotion",
+          action: "create",
+        },
+      });
+      return;
+    }
+
+    if (actionId === "add-news") {
+      router.push({
+        pathname: "/(tabs)/following",
+        params: {
+          tab: "news",
+          action: "create",
+        },
+      });
+      return;
+    }
+
+    if (actionId === "edit-services") {
+      router.push({ pathname: "/business/edit", params: { tab: "services" } });
+      return;
+    }
+
+    if (actionId === "edit-business") {
+      router.push({ pathname: "/business/edit", params: { tab: "overview" } });
+      return;
+    }
+
+    if (actionId === "edit-gallery") {
+      router.push({ pathname: "/business/edit", params: { tab: "gallery" } });
+      return;
+    }
+
+    if (actionId === "view-bookings") {
+      router.push("/business/bookings");
+      return;
+    }
+
+    if (actionId === "view-reviews") {
+      router.push({
+        pathname: "/business/[id]",
+        params: {
+          id: String(publicBusinessId),
+          tab: "reviews",
+        },
+      });
+      return;
+    }
+
+    if (actionId === "share-business") {
+      void Share.share({
+        message: `Check out ${business?.name} on BridgeUA\nhttps://bridgeua.app/business/${publicBusinessId}`,
+      });
+      return;
+    }
+
+    if (actionId === "view-public-profile") {
+      router.push({
+        pathname: "/business/[id]",
+        params: { id: String(publicBusinessId) },
+      });
+      return;
+    }
+
+    if (actionId === "edit-team") {
+      router.push("/profile/team");
+      return;
+    }
+
+    if (actionId === "view-recommends") {
+      router.push({
+        pathname: "/business/recommends",
+        params: { businessId: String(publicBusinessId) },
+      });
+      return;
+    }
+
+    if (actionId === "view-recommended-by") {
+      router.push({
+        pathname: "/business/recommended-by",
+        params: { businessId: String(publicBusinessId) },
+      });
+      return;
+    }
+  };
 
   return (
     <AppScreen style={styles.container} withTopInset={false}>
@@ -92,7 +268,6 @@ export default function BusinessProfileScreen() {
             <View style={styles.heroIdentityRow}>
               <AppAvatar
                 name={businessName}
-                username={handle}
                 imageUrl={avatarUrl}
                 size="lg"
               />
@@ -104,7 +279,7 @@ export default function BusinessProfileScreen() {
 
                 <View style={styles.heroRatingRow}>
                   {Array.from({ length: 5 }).map((_, index) => {
-                    const isFilled = index < 4;
+                    const isFilled = index < Math.round(businessRating);
                     return (
                       <Ionicons
                         key={index}
@@ -114,12 +289,16 @@ export default function BusinessProfileScreen() {
                       />
                     );
                   })}
-                  <AppText style={styles.heroRatingValue}>4.5</AppText>
-                  <AppText style={styles.heroRatingCount}>(28 reviews)</AppText>
+                  <AppText style={styles.heroRatingValue}>
+                    {businessRating.toFixed(1)}
+                  </AppText>
+                  <AppText style={styles.heroRatingCount}>
+                    ({businessReviewCount} reviews)
+                  </AppText>
                 </View>
 
                 <AppText style={styles.heroSubInfo} numberOfLines={1}>
-                  Beverly Hills / California
+                  {businessLocation || "Location not added yet"}
                 </AppText>
               </View>
 
@@ -169,7 +348,7 @@ export default function BusinessProfileScreen() {
                 onPress={() =>
                   router.push({
                     pathname: "/business/[id]",
-                    params: { id: account.id },
+                    params: { id: publicBusinessId },
                   })
                 }
               >
@@ -189,27 +368,29 @@ export default function BusinessProfileScreen() {
       >
         <View style={styles.card}>
           <View style={styles.cardHeader}>
-            <AppText style={styles.cardTitle}>This week</AppText>
-            <AppText style={styles.cardCaption}>Apr 10 — Apr 15</AppText>
+            <AppText style={styles.cardTitle}>Analytics</AppText>
           </View>
 
           <BusinessDashboardStats
-            bookings={24}
-            newClients={6}
-            profileViews={92}
+            bookings={analytics?.bookings.current ?? 0}
+            bookingsDelta={
+              analytics
+                ? formatDelta(analytics.bookings.current, analytics.bookings.lastMonth)
+                : undefined
+            }
+            newClients={analytics?.newClients.current ?? 0}
+            newClientsDelta={
+              analytics
+                ? formatDelta(analytics.newClients.current, analytics.newClients.lastMonth)
+                : undefined
+            }
+            followers={analytics?.followers.current ?? 0}
+            followersDelta={
+              analytics
+                ? formatDelta(analytics.followers.current, analytics.followers.lastMonth)
+                : undefined
+            }
           />
-
-          <Pressable
-            style={styles.cardFooterLink}
-            onPress={() => router.push("/business/analytics")}
-          >
-            <AppText style={styles.cardFooterLinkText}>View analytics</AppText>
-            <Ionicons
-              name="chevron-forward"
-              size={16}
-              color={colors.textPrimary}
-            />
-          </Pressable>
         </View>
 
         <Pressable
@@ -243,23 +424,29 @@ export default function BusinessProfileScreen() {
         <View style={styles.card}>
           <View style={styles.cardHeader}>
             <AppText style={styles.cardTitle}>Upcoming bookings</AppText>
-            <Pressable onPress={() => router.push("/business/analytics")}>
-              <AppText style={styles.cardLink}>View calendar</AppText>
+            <Pressable onPress={() => router.push("/business/bookings")}>
+              <AppText style={styles.cardLink}>View all</AppText>
             </Pressable>
           </View>
 
           <View style={styles.bookingsList}>
+            {upcomingBookings.length === 0 ? (
+              <AppText style={{ color: colors.textMuted, fontSize: 14 }}>
+                No upcoming bookings yet
+              </AppText>
+            ) : null}
             {upcomingBookings.map((booking) => (
               <View key={booking.id} style={styles.bookingRow}>
-                <Image
-                  source={{ uri: booking.customerAvatar }}
-                  style={styles.bookingAvatar}
+                <AppAvatar
+                  size="sm"
+                  name={booking.customerName}
+                  imageUrl={booking.customerAvatar}
                 />
 
                 <View style={styles.bookingInfo}>
                   <View style={styles.bookingTitleRow}>
-                    <AppText style={styles.bookingDay}>{booking.day}</AppText>
-                    <AppText style={styles.bookingTime}>{booking.time}</AppText>
+                    <AppText style={styles.bookingDay}>{booking.date}</AppText>
+                    <AppText style={styles.bookingTime}>{booking.startTime}</AppText>
                   </View>
 
                   <AppText style={styles.bookingCustomer} numberOfLines={1}>
@@ -267,32 +454,17 @@ export default function BusinessProfileScreen() {
                   </AppText>
                 </View>
 
-                <View
-                  style={[
-                    styles.statusPill,
-                    booking.status === "confirmed"
-                      ? styles.statusPillConfirmed
-                      : styles.statusPillPending,
-                  ]}
-                >
-                  <AppText
-                    style={[
-                      styles.statusPillText,
-                      booking.status === "confirmed"
-                        ? styles.statusPillTextConfirmed
-                        : styles.statusPillTextPending,
-                    ]}
-                  >
-                    {booking.status === "confirmed" ? "Confirmed" : "Pending"}
-                  </AppText>
-                </View>
+                <AppLabel
+                  label="Confirmed"
+                  variant="confirmed"
+                />
               </View>
             ))}
           </View>
 
           <Pressable
             style={styles.cardFooterLink}
-            onPress={() => router.push("/business/analytics")}
+            onPress={() => router.push("/business/bookings")}
           >
             <AppText style={styles.cardFooterLinkText}>
               View all bookings
@@ -307,12 +479,69 @@ export default function BusinessProfileScreen() {
 
         <View style={styles.card}>
           <View style={styles.cardHeader}>
+            <AppText style={styles.cardTitle}>My Team</AppText>
+            <Pressable onPress={() => router.push("/profile/team")}>
+              <AppText style={styles.cardLink}>View all</AppText>
+            </Pressable>
+          </View>
+
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{ gap: 12 }}
+          >
+            {teamMembers.length === 0 ? (
+              <AppText
+                style={{
+                  color: colors.textMuted,
+                  fontSize: 13,
+                  fontStyle: "italic",
+                }}
+              >
+                No team members yet
+              </AppText>
+            ) : (
+              teamMembers.map((member) => (
+                <Pressable
+                  key={member.id}
+                  style={{ alignItems: "center", gap: 4 }}
+                  onPress={() =>
+                    router.push({
+                      pathname: "/profile/team-member",
+                      params: { memberId: member.id },
+                    })
+                  }
+                >
+                  <AppAvatar
+                    name={`${member.firstName} ${member.lastName}`}
+                    imageUrl={member.photoUrl}
+                    size="md"
+                  />
+                  <AppText
+                    style={{
+                      fontSize: 11,
+                      fontWeight: "700",
+                      color: colors.textPrimary,
+                      textAlign: "center",
+                    }}
+                    numberOfLines={2}
+                  >
+                    {member.firstName} {member.lastName}
+                  </AppText>
+                </Pressable>
+              ))
+            )}
+          </ScrollView>
+        </View>
+
+        <View style={styles.card}>
+          <View style={styles.cardHeader}>
             <AppText style={styles.cardTitle}>Reviews</AppText>
             <Pressable
               onPress={() =>
                 router.push({
                   pathname: "/business/[id]",
-                  params: { id: account.id, tab: "reviews" },
+                  params: { id: String(publicBusinessId), tab: "reviews" },
                 })
               }
             >
@@ -320,100 +549,82 @@ export default function BusinessProfileScreen() {
             </Pressable>
           </View>
 
-          <View style={styles.reviewRow}>
-            <Image
-              source={{ uri: featuredReview.authorAvatar }}
-              style={styles.reviewAvatar}
-            />
+          {latestReview ? (
+            <View style={styles.reviewRow}>
+              <Image
+                source={
+                  latestReview.authorAvatar
+                    ? { uri: latestReview.authorAvatar }
+                    : undefined
+                }
+                style={styles.reviewAvatar}
+              />
 
-            <View style={styles.reviewBody}>
-              <View style={styles.reviewHeader}>
-                <AppText style={styles.reviewAuthor}>
-                  {featuredReview.authorName}
+              <View style={styles.reviewBody}>
+                <View style={styles.reviewHeader}>
+                  <AppText style={styles.reviewAuthor}>
+                    {latestReview.authorName}
+                  </AppText>
+
+                  <View style={styles.reviewStarsRow}>
+                    <AppRatingStars rating={latestReview.rating} size={11} />
+                    <AppText style={styles.reviewAgo}>
+                      {" "}
+                      · {new Date(latestReview.createdAt).toLocaleDateString()}
+                    </AppText>
+                  </View>
+                </View>
+
+                <AppText style={styles.reviewText} numberOfLines={3}>
+                  {latestReview.text}
                 </AppText>
 
-                <View style={styles.reviewStarsRow}>
-                  {Array.from({ length: 5 }).map((_, index) => {
-                    const isFilled = index < featuredReview.rating;
-                    return (
-                      <Ionicons
-                        key={index}
-                        name={isFilled ? "star" : "star-outline"}
-                        size={11}
-                        color={colors.accentOrange}
-                      />
-                    );
-                  })}
-                  <AppText style={styles.reviewAgo}>
-                    {" "}
-                    · {featuredReview.postedAgo}
-                  </AppText>
+                <View style={styles.reviewActionsRow}>
+                  <Pressable
+                    style={[
+                      styles.reviewActionButton,
+                      styles.reviewReplyButton,
+                    ]}
+                    onPress={() =>
+                      router.push({
+                        pathname: "/business/review/[reviewId]",
+                        params: {
+                          reviewId: String(latestReview?.id ?? ""),
+                          reviewData: JSON.stringify(latestReview),
+                        },
+                      })
+                    }
+                  >
+                    <AppText style={styles.reviewReplyText}>Reply</AppText>
+                  </Pressable>
+
+                  {false && <Pressable
+                    style={[
+                      styles.reviewActionButton,
+                      styles.reviewReportButton,
+                    ]}
+                  >
+                    <AppText style={styles.reviewReportText}>Report</AppText>
+                  </Pressable>}
                 </View>
-              </View>
-
-              <AppText style={styles.reviewText} numberOfLines={3}>
-                {featuredReview.text}
-              </AppText>
-
-              <View style={styles.reviewActionsRow}>
-                <Pressable
-                  style={[styles.reviewActionButton, styles.reviewReplyButton]}
-                  onPress={() =>
-                    router.push({
-                      pathname: "/business/review/[reviewId]",
-                      params: { reviewId: featuredReview.id },
-                    })
-                  }
-                >
-                  <AppText style={styles.reviewReplyText}>Reply</AppText>
-                </Pressable>
-
-                <Pressable
-                  style={[styles.reviewActionButton, styles.reviewReportButton]}
-                >
-                  <AppText style={styles.reviewReportText}>Report</AppText>
-                </Pressable>
               </View>
             </View>
-          </View>
+          ) : isReviewsLoading ? null : (
+            <AppText
+              style={{
+                color: colors.textMuted,
+                fontSize: 13,
+                fontStyle: "italic",
+              }}
+            >
+              No reviews yet.
+            </AppText>
+          )}
         </View>
-
-        <View style={styles.card}>
-          <View style={styles.cardHeader}>
-            <AppText style={styles.cardTitle}>Quick actions</AppText>
-          </View>
-
-          <View style={styles.actionsGrid}>
-            {quickActions.map((action) => (
-              <Pressable
-                key={action.id}
-                style={styles.actionItem}
-                onPress={() => {
-                  if (action.id === "edit-services") {
-                    router.push("/business/services");
-                  } else if (action.id === "manage-photos") {
-                    router.push("/business/photos");
-                  } else if (action.id === "business-info") {
-                    router.push("/business/edit");
-                  } else if (action.id === "add-promo") {
-                    router.push("/business/promotions");
-                  }
-                }}
-              >
-                <View style={styles.actionIconWrap}>
-                  <Ionicons
-                    name={action.icon as keyof typeof Ionicons.glyphMap}
-                    size={20}
-                    color={colors.primaryGreen}
-                  />
-                </View>
-                <AppText style={styles.actionLabel} numberOfLines={1}>
-                  {action.label}
-                </AppText>
-              </Pressable>
-            ))}
-          </View>
-        </View>
+        <BusinessQuickActions
+          businessId={String(publicBusinessId)}
+          onActionPress={handleQuickActionPress}
+        />
       </ScrollView>
     </AppScreen>
   );
@@ -424,6 +635,18 @@ function createStyles(colors: AppColors) {
     container: {
       padding: 0,
       backgroundColor: colors.background,
+    },
+    centerState: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+      paddingHorizontal: spacing.lg,
+    },
+    errorText: {
+      textAlign: "center",
+      color: colors.error,
+      fontSize: 14,
+      fontWeight: "600",
     },
     content: {
       paddingHorizontal: spacing.lg,
@@ -651,28 +874,6 @@ function createStyles(colors: AppColors) {
       fontSize: 12,
       color: colors.textSecondary,
     },
-    statusPill: {
-      paddingHorizontal: 10,
-      paddingVertical: 4,
-      borderRadius: 999,
-    },
-    statusPillConfirmed: {
-      backgroundColor: colors.primaryGreenSoft,
-    },
-    statusPillPending: {
-      backgroundColor: colors.accentOrangeSoft,
-    },
-    statusPillText: {
-      fontSize: 11,
-      fontWeight: "800",
-    },
-    statusPillTextConfirmed: {
-      color: colors.primaryGreen,
-    },
-    statusPillTextPending: {
-      color: colors.accentOrange,
-    },
-
     reviewRow: {
       flexDirection: "row",
       gap: spacing.md,

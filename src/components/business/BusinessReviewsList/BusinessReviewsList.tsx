@@ -24,6 +24,7 @@ type Props = {
   onClearFocusedReview?: () => void;
   onReviewsListLayout?: (y: number) => void;
   onExpandReview?: (reviewOffsetY: number) => void;
+  isPreview?: boolean;
 };
 
 function getReviewRelevanceScore(review: BusinessDetailsReview) {
@@ -51,6 +52,7 @@ export default function BusinessReviewsList({
   onPressWriteReview,
   onReviewsListLayout,
   onExpandReview,
+  isPreview,
 }: Props) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
@@ -127,7 +129,7 @@ export default function BusinessReviewsList({
           styles.containerWithoutExtras,
       ]}
     >
-      <View style={styles.writeCard}>
+      <View style={[styles.writeCard, isPreview && { opacity: 0.4 }]}>
         <Text style={styles.writeTitle}>Write a review</Text>
 
         <View style={styles.writeStars}>
@@ -222,6 +224,7 @@ export default function BusinessReviewsList({
                 review={review}
                 onExpandReview={() => handleExpandReview(review.id)}
                 onPressMore={() => {}}
+                isPreview={isPreview}
               />
 
               {index < displayedReviews.length - 1 ? (

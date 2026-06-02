@@ -6,23 +6,31 @@ import HomePromotionModal from "@/src/components/home/HomePromotionModal/HomePro
 import AppEmptyState from "@/src/components/ui/AppEmptyState";
 import AppLoader from "@/src/components/ui/AppLoader/AppLoader";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
-import { HOME_CATEGORIES } from "@/src/constants/categories";
-import {
-  DEFAULT_LOCATION_OPTIONS,
-  LocationOption,
-} from "@/src/constants/locations";
+import { LocationOption } from "@/src/constants/locations";
 import { useBusinesses } from "@/src/features/businesses";
+import { getBusinessStates } from "@/src/features/businesses/services/business.service";
+import { useCategories } from "@/src/features/categories/hooks/useCategories";
 import { useDiscoveryFeed } from "@/src/features/discovery/hooks/useDiscoveryFeed";
+import {
+  isOwnedBusiness,
+  prioritizeOwnedBusiness,
+} from "@/src/features/discovery/utils/ownedBusinessDiscovery";
 import { useBannerPromotion } from "@/src/features/promotions/hooks/useBannerPromotion";
 import { useBannerPromotions } from "@/src/features/promotions/hooks/useBannerPromotions";
+import { usePromotions } from "@/src/features/promotions/hooks/usePromotions";
 import type { HomePromotion } from "@/src/features/promotions/types/promotion.types";
+import type { Business } from "@/src/types/business";
+import { useAccountStore, useActiveAccount } from "@/src/store/account.store";
+import { useFollowingStore } from "@/src/store/following.store";
 import { useAuthStore } from "@/src/store/auth.store";
+import type { AuthUser } from "@/src/features/auth/types/auth.types";
 import { useDiscoveryLocationStore } from "@/src/store/discovery-location";
 import { useFilterStore } from "@/src/store/filter.store";
 import { Feather } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { router } from "expo-router";
-import { useEffect, useRef, useState } from "react";
+import { router, useFocusEffect } from "expo-router";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { PROMO_CATEGORY_LABEL } from "@/src/constants/categories";
 import {
   Alert,
   Animated,
@@ -37,12 +45,33 @@ const RECENT_SEARCHES_KEY = "home-recent-searches";
 export default function HomeScreen() {
   const {
     label: selectedLocationLabel,
+    state: locationState,
     setManualLocation,
     setNearbyLocation,
     setPermissionStatus,
   } = useDiscoveryLocationStore();
 
   const scrollY = useRef(new Animated.Value(0)).current;
+
+  const [locationOptions, setLocationOptions] = useState<LocationOption[]>([
+    { label: "See nearby", value: "nearby", type: "nearby" },
+  ]);
+
+  useEffect(() => {
+    getBusinessStates().then((states) => {
+      const stateOptions: LocationOption[] = states.map((s) => ({
+        label: `${s}, USA`,
+        value: s.toLowerCase().replace(/\s+/g, '-') + '-usa',
+        type: 'manual',
+        state: s,
+      }));
+      setLocationOptions([
+        { label: "All locations", value: "all", type: "manual", state: undefined },
+        { label: "See nearby", value: "nearby", type: "nearby" },
+        ...stateOptions,
+      ]);
+    }).catch(() => {});
+  }, []);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
@@ -51,9 +80,49 @@ export default function HomeScreen() {
   const { category, sort, cuisines, rating, distance, customDistance } =
     useFilterStore((state) => state.discoveryFilters);
 
-  const { businesses, isLoading } = useBusinesses();
+  const serverParams = useMemo(() => {
+    const params: Record<string, string | number> = {};
+    if (sort && sort !== "relevance" && sort !== "distance") params.sort = sort;
+    if (rating && rating !== "custom") params.minRating = Number(rating);
+    if (locationState) params.state = locationState;
+    return params;
+  }, [sort, rating, locationState]);
+
+  const businessVersion = useFilterStore((s) => s.businessVersion);
+
+  const { businesses, isLoading } = useBusinesses(
+    Object.keys(serverParams).length > 0 ? serverParams : undefined,
+    businessVersion,
+  );
 
   const isGuest = useAuthStore((state) => state.isGuest);
+  const currentUser = useAuthStore((state) => state.user);
+  const activeAccount = useActiveAccount();
+  const isHydrated = useAccountStore((s) => s.isHydrated);
+
+  const effectiveUser = useMemo<AuthUser | null>(() => {
+    if (!isHydrated || activeAccount?.kind !== "business") return currentUser;
+
+    const fallbackOwnedId = activeAccount.ownedBusinessId;
+    const base = currentUser ?? ({ id: activeAccount.id, email: "" } as AuthUser);
+
+    return {
+      ...base,
+      accountType: "business",
+      activeBusinessId: fallbackOwnedId ?? null,
+      ownedBusinessIds: fallbackOwnedId ? [fallbackOwnedId] : [],
+    };
+  }, [currentUser, activeAccount, isHydrated]);
+
+  const isBusinessAccount = effectiveUser?.accountType === "business";
+  const canUsePromoFilter = !isBusinessAccount && !isGuest;
+
+  const { categories } = useCategories();
+  const categoryNames = [
+    "All Categories",
+    ...(canUsePromoFilter ? [PROMO_CATEGORY_LABEL] : []),
+    ...categories.map((c) => c.name),
+  ];
 
   useEffect(() => {
     const loadRecentSearches = async () => {
@@ -69,26 +138,6 @@ export default function HomeScreen() {
 
   const normalizedSearchQuery = searchQuery.trim().toLowerCase();
 
-  const { filteredBusinesses: discoveryFilteredBusinesses } = useDiscoveryFeed({
-    businesses,
-    category,
-    sort,
-    cuisines,
-    rating,
-    distance,
-    customDistance,
-  });
-
-  const filteredBusinesses = normalizedSearchQuery
-    ? discoveryFilteredBusinesses.filter((business) =>
-        business.name?.toLowerCase().startsWith(normalizedSearchQuery),
-      )
-    : discoveryFilteredBusinesses;
-
-  const visibleBusinesses = isGuest
-    ? filteredBusinesses.slice(0, 10)
-    : filteredBusinesses;
-
   const {
     promotion,
     isVisible: isPromotionVisible,
@@ -97,6 +146,57 @@ export default function HomeScreen() {
 
   const { promotions: bannerPromotions, isVisible: isBannerVisible } =
     useBannerPromotions();
+
+  const followedBusinessIds = useFollowingStore(
+    (state) => state.followedBusinessIds,
+  );
+
+  const { promotions: activePromotions } = usePromotions();
+  const businessIdsWithPromo = useMemo(() => {
+    const followedSet = new Set(followedBusinessIds.map(String));
+    return activePromotions
+      .map((p) => String(p.businessId))
+      .filter((id) => followedSet.has(id));
+  }, [activePromotions, followedBusinessIds]);
+
+  const { filteredBusinesses: discoveryFilteredBusinesses } = useDiscoveryFeed({
+    businesses,
+    category,
+    sort: sort === "distance" ? "distance" : "relevance",
+    cuisines,
+    rating: "",
+    distance,
+    customDistance,
+    businessIdsWithPromo,
+  });
+
+  const selectedHomeCategory = category || "All Categories";
+
+  useFocusEffect(
+    useCallback(() => {
+      const currentCategory =
+        useFilterStore.getState().discoveryFilters.category;
+      if (currentCategory === PROMO_CATEGORY_LABEL) {
+        useFilterStore.getState().setCategory("discovery", "");
+      }
+    }, []),
+  );
+
+  const filteredBusinesses = normalizedSearchQuery
+    ? discoveryFilteredBusinesses.filter((business) =>
+      business.name?.toLowerCase().startsWith(normalizedSearchQuery),
+    )
+    : discoveryFilteredBusinesses;
+
+  const prioritizedBusinesses = prioritizeOwnedBusiness(
+    filteredBusinesses,
+    selectedHomeCategory,
+    effectiveUser,
+  );
+
+  const visibleBusinesses = isGuest
+    ? prioritizedBusinesses.slice(0, 10)
+    : prioritizedBusinesses;
 
   const saveRecentSearch = async (value: string) => {
     const trimmed = value.trim();
@@ -133,13 +233,18 @@ export default function HomeScreen() {
     setIsSearchFocused(false);
   };
 
-  const handleBusinessPress = (businessId: string) => {
+  const handleBusinessPress = (business: Business) => {
     saveRecentSearch(searchQuery);
     setIsSearchFocused(false);
 
+    const owned = isOwnedBusiness(business, effectiveUser);
+
     router.push({
       pathname: "/business/[id]",
-      params: { id: businessId },
+      params: {
+        id: String(business.id),
+        preview: owned ? "owner" : undefined,
+      },
     });
   };
 
@@ -172,6 +277,7 @@ export default function HomeScreen() {
     setManualLocation({
       label: option.label,
       value: option.value,
+      state: option.value === "all" ? undefined : option.state,
     });
   };
 
@@ -212,20 +318,9 @@ export default function HomeScreen() {
     });
   };
 
-  const selectedHomeCategory = !category
-    ? "All Categories"
-    : category === "Automotive"
-      ? "Auto"
-      : category;
-
   const handleSelectCategory = (selectedCategory: string) => {
     const mappedCategory =
-      selectedCategory === "All Categories"
-        ? ""
-        : selectedCategory === "Auto"
-          ? "Automotive"
-          : selectedCategory;
-
+      selectedCategory === "All Categories" ? "" : selectedCategory;
     useFilterStore.getState().setCategory("discovery", mappedCategory);
   };
 
@@ -244,7 +339,7 @@ export default function HomeScreen() {
       subtitleValue={selectedLocationLabel}
       onSubtitlePress={handleLocationPress}
       showSubtitleChevron
-      locationOptions={DEFAULT_LOCATION_OPTIONS}
+      locationOptions={locationOptions}
       onSelectLocationOption={handleSelectLocationOption}
       onRequestNearby={handleRequestNearby}
       showSearch
@@ -293,7 +388,7 @@ export default function HomeScreen() {
 
   const categoryBar = (
     <CategoryScroller
-      categories={HOME_CATEGORIES}
+      categories={categoryNames}
       selectedCategory={selectedHomeCategory}
       onSelectCategory={handleSelectCategory}
     />
@@ -334,15 +429,21 @@ export default function HomeScreen() {
           )}
           scrollEventThrottle={16}
         >
-          {isBannerVisible && !searchQuery.trim() ? (
-            <View style={styles.bannerWrap}>
-              <HomePromotionBanner
-                promotions={bannerPromotions}
-                visible={isBannerVisible}
-                onPressPromotion={handlePromotionBannerPress}
-              />
-            </View>
-          ) : null}
+          <View
+            style={[
+              styles.bannerWrap,
+              (!isBannerVisible || searchQuery.trim()) && {
+                height: 0,
+                overflow: "hidden",
+              },
+            ]}
+          >
+            <HomePromotionBanner
+              promotions={bannerPromotions}
+              visible={isBannerVisible && !searchQuery.trim()}
+              onPressPromotion={handlePromotionBannerPress}
+            />
+          </View>
 
           <View style={styles.stickyCategoryWrap}>{categoryBar}</View>
 
@@ -378,7 +479,8 @@ export default function HomeScreen() {
                 <BusinessCard
                   key={String(item.id)}
                   business={item}
-                  onPress={() => handleBusinessPress(String(item.id))}
+                  onPress={() => handleBusinessPress(item)}
+                  isOwnedBusiness={isOwnedBusiness(item, effectiveUser)}
                 />
               ))
             )}
@@ -420,7 +522,6 @@ const styles = StyleSheet.create({
 
   bannerWrap: {
     overflow: "hidden",
-    marginBottom: -10,
   },
 
   stickyCategoryWrap: {

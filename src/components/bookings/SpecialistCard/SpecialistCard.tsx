@@ -9,8 +9,6 @@ import { createStyles } from "./SpecialistCard.styles";
 export type SpecialistCardProps = {
   name: string;
   role: string;
-  rating: number;
-  reviewsCount: number;
   description?: string;
   avatarUrl?: string;
   isSelected?: boolean;
@@ -21,8 +19,6 @@ export type SpecialistCardProps = {
 export default function SpecialistCard({
   name,
   role,
-  rating,
-  reviewsCount,
   description,
   avatarUrl,
   isSelected = false,
@@ -60,14 +56,7 @@ export default function SpecialistCard({
             ) : null}
           </View>
 
-          <View style={styles.ratingRow}>
-            <MaterialIcons name="star" size={14} color={colors.accentOrange} />
-            <Text style={styles.ratingText}>
-              {rating.toFixed(1)} ({reviewsCount} reviews)
-            </Text>
-          </View>
-
-          {!!description && (
+{!!description && (
             <Text style={styles.description} numberOfLines={2}>
               {description}
             </Text>

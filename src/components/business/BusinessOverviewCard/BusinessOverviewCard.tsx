@@ -43,27 +43,90 @@ export default function BusinessOverviewCard({ business }: Props) {
 
   const [areHoursExpanded, setAreHoursExpanded] = useState(false);
 
-  const overviewContacts = business.about.contacts.filter((item) =>
-    ["address", "hours", "phone"].includes(item.type),
+  const baseOverviewContacts = business.about.contacts.filter((item) =>
+    ["address", "phone"].includes(item.type),
   );
+
+  const hasOpeningHours = Boolean(business.about.openingHours?.length);
+
+  const overviewContacts: BusinessContactItem[] = hasOpeningHours
+    ? [
+        ...baseOverviewContacts,
+        {
+          id: "contact-hours",
+          type: "hours",
+          label: "Hours",
+          value: "",
+        },
+      ]
+    : baseOverviewContacts;
 
   const websiteUrl = business.about.contacts.find(
     (item) => item.type === "website",
   )?.actionUrl;
 
   const overviewSocialLinks: BusinessSocialLink[] = [
-    ...(websiteUrl
+    ...(business.socialLinks?.website || websiteUrl
       ? [
           {
             id: "website",
             label: "Website",
             icon: "website" as const,
-            url: websiteUrl,
+            url: business.socialLinks?.website ?? websiteUrl ?? "",
           },
         ]
       : []),
+
+    ...(business.socialLinks?.instagram
+      ? [
+          {
+            id: "instagram",
+            label: "Instagram",
+            icon: "instagram" as const,
+            url: business.socialLinks.instagram,
+          },
+        ]
+      : []),
+
+    ...(business.socialLinks?.facebook
+      ? [
+          {
+            id: "facebook",
+            label: "Facebook",
+            icon: "facebook" as const,
+            url: business.socialLinks.facebook,
+          },
+        ]
+      : []),
+
+    ...(business.socialLinks?.telegram
+      ? [
+          {
+            id: "telegram",
+            label: "Telegram",
+            icon: "telegram" as const,
+            url: business.socialLinks.telegram,
+          },
+        ]
+      : []),
+
+    ...(business.socialLinks?.whatsapp
+      ? [
+          {
+            id: "whatsapp",
+            label: "WhatsApp",
+            icon: "whatsapp" as const,
+            url: business.socialLinks.whatsapp,
+          },
+        ]
+      : []),
+
     ...(business.about.socialLinks ?? []).filter(
-      (item) => item.icon !== "telegram",
+      (item) =>
+        item.icon !== "telegram" &&
+        item.icon !== "instagram" &&
+        item.icon !== "whatsapp" &&
+        item.icon !== "website",
     ),
   ];
 
@@ -92,15 +155,18 @@ export default function BusinessOverviewCard({ business }: Props) {
               statusText={
                 isHoursRow
                   ? business.about.isOpen
-                    ? "Open now"
-                    : "Closed"
+                    ? `Open now${business.about.closesAt ? `  ·  Closes at ${business.about.closesAt}` : ''}`
+                    : `Closed${business.about.opensAt ? `  ·  Opens at ${business.about.opensAt}` : ''}`
                   : undefined
               }
               statusColor={
                 isHoursRow
-                  ? business.about.isOpen
-                    ? colors.primaryGreen
-                    : "#D9534F"
+                  ? (business.about.isOpen && business.about.closesAt) ||
+                    (!business.about.isOpen && business.about.opensAt)
+                    ? colors.white
+                    : business.about.isOpen
+                      ? colors.primaryGreen
+                      : "#D9534F"
                   : undefined
               }
               isExpanded={isHoursRow ? areHoursExpanded : false}

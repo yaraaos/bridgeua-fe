@@ -14,6 +14,7 @@ type Props = {
 export default function PromotionCard({ promotion, onPress }: Props) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+  console.log('promo card:', promotion.title, promotion.subtitle, promotion.description);
 
   return (
     <Pressable style={styles.card} onPress={onPress}>
@@ -31,7 +32,7 @@ export default function PromotionCard({ promotion, onPress }: Props) {
         <AppText style={styles.title}>{promotion.title}</AppText>
 
         <AppText style={styles.description} numberOfLines={2}>
-          {promotion.description}
+          {promotion.subtitle ?? promotion.description}
         </AppText>
 
         <View style={styles.businessRow}>

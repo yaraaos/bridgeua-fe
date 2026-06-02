@@ -1,11 +1,10 @@
 import { AppColors } from "@/src/constants/colors";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
-import { saveAuthTokens } from "@/src/services/auth/tokens";
 import { useAuthStore } from "@/src/store/auth.store";
 import { useFollowingStore } from "@/src/store/following.store";
 import { useProfileStore } from "@/src/store/profile.store";
 import { useReviewsStore } from "@/src/store/reviews.store";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
@@ -24,10 +23,15 @@ export default function SignInScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
 
+  const { mode } = useLocalSearchParams<{ mode?: string }>();
+
   const { submitSignIn, isLoading, apiError, setApiError } = useSignIn();
+
   const setUser = useAuthStore((state) => state.setUser);
   const enterGuestMode = useAuthStore((state) => state.enterGuestMode);
+
   const resetFollowing = useFollowingStore((state) => state.resetFollowing);
+  const syncFollowing = useFollowingStore((state) => state.syncWithServer);
   const loadProfile = useProfileStore((state) => state.loadProfile);
   const clearReviews = useReviewsStore((state) => state.clearReviews);
 
@@ -37,6 +41,7 @@ export default function SignInScreen() {
 
   const handleSubmit = async () => {
     if (isLoading) return;
+
     const values = { email, password };
     const validationErrors = validateSignInForm(values);
 
@@ -47,17 +52,20 @@ export default function SignInScreen() {
 
     const response = await submitSignIn(values);
 
-    if (response) {
-      resetFollowing();
-      clearReviews();
+    if (!response) return;
 
-      await saveAuthTokens(response.accessToken, response.refreshToken);
+    resetFollowing();
+    clearReviews();
 
-      setUser(response.user);
-      await loadProfile();
+    setUser(response.user, {
+      accessToken: response.accessToken,
+      refreshToken: response.refreshToken,
+    });
 
-      router.replace("/(tabs)/home");
-    }
+    await loadProfile();
+    await syncFollowing();
+
+    router.replace("/(tabs)/profile");
   };
 
   const handleSkipForNow = async () => {
@@ -79,7 +87,7 @@ export default function SignInScreen() {
             placeholder="Email address"
             value={email}
             onChangeText={(value) => {
-              setEmail(value);
+              setEmail(value.toLowerCase().trim());
               setErrors((current) => ({ ...current, email: undefined }));
               setApiError(null);
             }}
@@ -88,6 +96,7 @@ export default function SignInScreen() {
             error={Boolean(errors.email)}
             disabled={isLoading}
           />
+
           {errors.email ? (
             <Text style={styles.errorText}>{errors.email}</Text>
           ) : null}
@@ -105,6 +114,7 @@ export default function SignInScreen() {
             error={Boolean(errors.password)}
             disabled={isLoading}
           />
+
           {errors.password ? (
             <Text style={styles.errorText}>{errors.password}</Text>
           ) : null}
@@ -124,11 +134,14 @@ export default function SignInScreen() {
         ) : (
           <AppButton title="Login" onPress={handleSubmit} />
         )}
-        <AppButton
-          title="Skip for now"
-          variant="ghost"
-          onPress={handleSkipForNow}
-        />
+
+        {mode !== "add-account" ? (
+          <AppButton
+            title="Skip for now"
+            variant="ghost"
+            onPress={handleSkipForNow}
+          />
+        ) : null}
       </View>
 
       <Text style={styles.footer}>

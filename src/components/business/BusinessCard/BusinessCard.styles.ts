@@ -16,6 +16,11 @@ export function createStyles(colors: AppColors) {
       marginBottom: spacing.cardGap,
       minHeight: 96,
     },
+    ownedCard: {
+      borderColor: colors.accentOrange,
+      backgroundColor: colors.accentOrangeSoft,
+    },
+
     cardCompact: {
       padding: 8,
       gap: 10,
@@ -50,7 +55,16 @@ export function createStyles(colors: AppColors) {
       flexShrink: 0,
     },
 
+    nameRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6,
+      marginBottom: 2,
+      justifyContent: "space-between",
+    },
+
     name: {
+      flexShrink: 1,
       fontSize: 16,
       fontWeight: "700",
       color: colors.textPrimary,
@@ -90,6 +104,16 @@ export function createStyles(colors: AppColors) {
       color: colors.textMuted,
       marginHorizontal: 6,
       lineHeight: 16,
+    },
+
+    openStatusRow: {
+      marginTop: 2,
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    openStatusText: {
+      fontSize: 12,
+      fontWeight: '600',
     },
 
     recommendedRow: {

@@ -14,7 +14,6 @@ export function createStyles(colors: AppColors) {
       height: HOME_PROMOTION_BANNER_HEIGHT,
       marginHorizontal: HOME_PROMOTION_BANNER_HORIZONTAL_MARGIN,
       marginTop: 12,
-      marginBottom: 12,
     },
     window: {
       width: "100%",

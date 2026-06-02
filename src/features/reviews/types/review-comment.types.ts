@@ -15,9 +15,11 @@ export type ReviewComment = {
   likedByMe: boolean;
   repliesCount: number;
   createdAt: string;
+  isOwnerReply: boolean;
 };
 
 export type CreateReviewCommentPayload = {
+  businessId: string;
   reviewId: string;
   parentCommentId?: string;
   text: string;

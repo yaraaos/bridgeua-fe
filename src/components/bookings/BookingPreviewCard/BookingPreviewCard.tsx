@@ -1,3 +1,4 @@
+import AppLabel from "@/src/components/ui/AppLabel/AppLabel";
 import AppText from "@/src/components/ui/AppText/AppText";
 import type { BookingStatus } from "@/src/features/bookings/types/booking.types";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
@@ -57,9 +58,10 @@ export default function BookingPreviewCard({
               {specialistName} · {price}
             </AppText>
 
-            <View style={styles.statusBadge}>
-              <AppText style={styles.statusText}>{status}</AppText>
-            </View>
+            <AppLabel
+              label={status === "confirmed" || status === "pending" ? "Confirmed" : status.charAt(0).toUpperCase() + status.slice(1)}
+              variant={status === "pending" ? "confirmed" : status as any}
+            />
           </View>
         </View>
 

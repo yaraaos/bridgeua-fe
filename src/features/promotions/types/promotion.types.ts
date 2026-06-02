@@ -5,6 +5,8 @@ import type {
 
 export type PromotionCtaType = "book_now" | "view_business";
 
+export type PromotionStatus = "draft" | "published" | "unpublished";
+
 export type Promotion = {
   id: string;
   businessId: string;
@@ -21,6 +23,8 @@ export type Promotion = {
   endsAt?: string;
 
   isActive: boolean;
+  isFeatured?: boolean;
+  status?: PromotionStatus;
 
   promoCode?: string;
   discountLabel?: string;
@@ -39,4 +43,8 @@ export type Promotion = {
 export type HomePromotion = Promotion & {
   businessName: string;
   businessCategory: string;
+};
+
+export type PromotionDraft = Omit<Promotion, "business" | "isActive"> & {
+  status: PromotionStatus;
 };
