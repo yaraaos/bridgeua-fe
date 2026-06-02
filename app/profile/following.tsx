@@ -32,16 +32,18 @@ const CATEGORY_ALIASES: Record<string, string[]> = {
 };
 
 const getBusinessSubcategories = (business: Business) => {
-  return [business.category].filter(Boolean);
+  return [(business as any).cuisine, business.category].filter(Boolean);
 };
 
 const doesBusinessMatchCategory = (business: Business, category: string) => {
-  if (!category) {
-    return true;
+  if (!category) return true;
+  if (category === "Food") {
+    return business.category === "Food" ||
+      ["American", "Chinese", "Italian", "Japanese",
+       "Mediterranean", "Mexican", "Ukrainian", "Vegan"]
+      .includes(business.category ?? "");
   }
-
   const allowedCategories = CATEGORY_ALIASES[category] ?? [category];
-
   return allowedCategories.includes(business.category);
 };
 
