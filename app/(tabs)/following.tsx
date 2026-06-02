@@ -979,9 +979,17 @@ export default function FollowingScreen() {
             activeTab === "promotion" ? "promotions" : "news"
           } found`}
           description={
-            activeTab === "promotion"
-              ? "There are no promotions at this time. Check the News!"
-              : "There is no news at this time. Check the Promotions!"
+            activeFilterCount > 0
+              ? "Try adjusting or clearing your filters."
+              : activeTab === "promotion"
+                ? "There are no promotions at this time. Check the News!"
+                : "There is no news at this time. Check the Promotions!"
+          }
+          actionLabel={activeFilterCount > 0 ? "Clear filters" : undefined}
+          onPressAction={
+            activeFilterCount > 0
+              ? () => useFilterStore.getState().reset("following")
+              : undefined
           }
         />
       ) : (

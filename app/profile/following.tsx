@@ -227,7 +227,17 @@ export default function ProfileFollowingScreen() {
         ListEmptyComponent={
           <AppEmptyState
             title="No followed businesses found"
-            description="Try changing your filters or follow more businesses."
+            description={
+              activeFilterCount > 0
+                ? "Try adjusting or clearing your filters."
+                : "Follow businesses to see them here."
+            }
+            actionLabel={activeFilterCount > 0 ? "Clear filters" : undefined}
+            onPressAction={
+              activeFilterCount > 0
+                ? () => useFilterStore.getState().reset("profileFollowing")
+                : undefined
+            }
           />
         }
       />
