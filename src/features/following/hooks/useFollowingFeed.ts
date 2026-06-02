@@ -76,6 +76,7 @@ export const useFollowingFeed = ({
           recommendedByPreview: [],
           recommendedByCount: 0,
           status: p.status,
+          businessCuisine: (p.business as any)?.cuisine ?? "",
         }));
 
       const newsItems: FollowingFeedCardItem[] = news
@@ -103,6 +104,7 @@ export const useFollowingFeed = ({
           recommendedByPreview: [],
           recommendedByCount: 0,
           status: n.status,
+          businessCuisine: (n.business as any)?.cuisine ?? "",
         }));
 
       setApiFeedItems([...promoItems, ...newsItems]);
@@ -133,27 +135,20 @@ export const useFollowingFeed = ({
         const businessDistance = Number(item.businessDistanceKm ?? 0);
 
         const cuisineMatch =
-          cuisines.length === 0 || cuisines.includes(item.businessCategory);
-
-        const businessCategory = String(item.businessCategory ?? "").trim();
-
-        const foodCategories = [
-          "American",
-          "Chinese",
-          "Italian",
-          "Japanese",
-          "Mediterranean",
-          "Mexican",
-          "Vegan",
-        ];
+          cuisines.length === 0 ||
+          cuisines.includes(item.businessCuisine ?? "") ||
+          cuisines.includes(item.businessCategory);
 
         const categoryMatch =
           !category ||
           (category === "Food"
             ? cuisines.length > 0
-              ? cuisines.includes(businessCategory)
-              : foodCategories.includes(businessCategory)
-            : businessCategory === category);
+              ? cuisines.includes(item.businessCuisine ?? "") || item.businessCategory === "Food"
+              : item.businessCategory === "Food" || [
+                  "American", "Chinese", "Italian", "Japanese",
+                  "Mediterranean", "Mexican", "Ukrainian", "Vegan",
+                ].includes(item.businessCategory)
+            : item.businessCategory === category);
 
         const ratingMatch =
           selectedRatingValue === null || businessRating >= selectedRatingValue;

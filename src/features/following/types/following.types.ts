@@ -25,4 +25,5 @@ export type FollowingFeedCardItem = FollowingFeedItem & {
   recommendedByCount: number;
   status?: "draft" | "published" | "unpublished";
   isFeatured?: boolean;
+  businessCuisine?: string;
 };
