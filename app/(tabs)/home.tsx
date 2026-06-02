@@ -77,13 +77,13 @@ export default function HomeScreen() {
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
 
-  const { category, sort, cuisines, rating, distance, customDistance } =
+  const { category, sort, cuisines, rating, distance } =
     useFilterStore((state) => state.discoveryFilters);
 
   const serverParams = useMemo(() => {
     const params: Record<string, string | number | string[]> = {};
     if (sort && sort !== "relevance" && sort !== "distance") params.sort = sort;
-    if (rating && rating !== "custom") params.minRating = Number(rating);
+    if (rating) params.minRating = Number(rating);
     if (locationState) params.state = locationState;
     if (cuisines?.length) params.cuisines = cuisines;
     return params;
@@ -167,7 +167,6 @@ export default function HomeScreen() {
     cuisines,
     rating: "",
     distance,
-    customDistance,
     businessIdsWithPromo,
   });
 
@@ -330,8 +329,7 @@ export default function HomeScreen() {
     (sort !== "relevance" ? 1 : 0) +
     cuisines.length +
     (rating ? 1 : 0) +
-    (distance ? 1 : 0) +
-    (distance === "custom" && customDistance ? 1 : 0);
+    (distance ? 1 : 0);
 
   const header = (
     <ScreenHeader

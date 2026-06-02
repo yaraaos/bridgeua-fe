@@ -20,10 +20,9 @@ export type RatingOption =
   | "3.5"
   | "4"
   | "4.5"
-  | "5"
-  | "custom";
+  | "5";
 
-export type DistanceOption = "" | "nearby" | "1" | "5" | "10" | "25" | "custom";
+export type DistanceOption = "" | "nearby" | "1" | "5" | "10" | "25" | "50" | "100";
 
 export type FilterScope = "discovery" | "following";
 
@@ -40,7 +39,6 @@ export type FilterValues = {
   categoryFilters: CategoryFilters;
   rating: RatingOption;
   distance: DistanceOption;
-  customDistance: string;
 };
 
 const defaultFilters: FilterValues = {
@@ -54,7 +52,6 @@ const defaultFilters: FilterValues = {
   },
   rating: "",
   distance: "",
-  customDistance: "",
 };
 
 type FilterState = {
@@ -69,7 +66,6 @@ type FilterState = {
   toggleCuisine: (scope: FilterScope, value: string) => void;
   setRating: (scope: FilterScope, value: RatingOption) => void;
   setDistance: (scope: FilterScope, value: DistanceOption) => void;
-  setCustomDistance: (scope: FilterScope, value: string) => void;
   reset: (scope: FilterScope) => void;
 };
 
@@ -148,14 +144,6 @@ export const useFilterStore = create<FilterState>((set) => ({
       [getScopeKey(scope)]: {
         ...state[getScopeKey(scope)],
         distance: value,
-      },
-    })),
-
-  setCustomDistance: (scope, value) =>
-    set((state) => ({
-      [getScopeKey(scope)]: {
-        ...state[getScopeKey(scope)],
-        customDistance: value,
       },
     })),
 

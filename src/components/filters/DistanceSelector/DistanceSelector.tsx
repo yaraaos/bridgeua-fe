@@ -1,5 +1,5 @@
 import React from "react";
-import { Pressable, Text, TextInput, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { DISTANCE_OPTIONS } from "@/src/constants/filters";
@@ -8,17 +8,10 @@ import { createStyles } from "./DistanceSelector.styles";
 
 type Props = {
   value: DistanceOption;
-  customValue: string;
   onChange: (value: DistanceOption) => void;
-  onChangeCustom: (value: string) => void;
 };
 
-export default function DistanceSelector({
-  value,
-  customValue,
-  onChange,
-  onChangeCustom,
-}: Props) {
+export default function DistanceSelector({ value, onChange }: Props) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
 
@@ -47,30 +40,6 @@ export default function DistanceSelector({
           );
         })}
 
-        <View style={styles.optionRow}>
-          <View
-            style={[
-              styles.radioOuter,
-              value === "custom" && styles.radioOuterActive,
-            ]}
-          >
-            {value === "custom" ? <View style={styles.radioInner} /> : null}
-          </View>
-
-          <View style={styles.customWrap}>
-            <TextInput
-              value={customValue}
-              onChangeText={(text) => {
-                onChange("custom");
-                onChangeCustom(text);
-              }}
-              placeholder="Custom range"
-              placeholderTextColor={colors.textMuted}
-              style={styles.input}
-            />
-            <Text style={styles.kmText}>km</Text>
-          </View>
-        </View>
       </View>
     </View>
   );

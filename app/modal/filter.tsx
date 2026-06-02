@@ -64,15 +64,13 @@ export default function FilterModalScreen() {
   const filters = useFilterStore((state) =>
     scope === "following" ? state.followingFilters : state.discoveryFilters,
   );
-  const { category, sort, cuisines, rating, distance, customDistance } =
-    filters;
+  const { category, sort, cuisines, rating, distance } = filters;
   const {
     setCategory,
     setSort,
     toggleCuisine,
     setRating,
     setDistance,
-    setCustomDistance,
     reset,
   } = useFilterStore();
 
@@ -229,9 +227,7 @@ export default function FilterModalScreen() {
     return (
       <DistanceSelector
         value={distance}
-        customValue={customDistance}
         onChange={(value) => setDistance(scope, value)}
-        onChangeCustom={(value) => setCustomDistance(scope, value)}
       />
     );
   };
@@ -299,17 +295,13 @@ export default function FilterModalScreen() {
               cuisines={cuisines}
               rating={rating}
               distance={distance}
-              customDistance={customDistance}
               onClearCategory={() =>
                 useFilterStore.getState().setCategory(scope, "")
               }
               onClearSort={() => setSort(scope, "relevance")}
               onRemoveCuisine={(value) => toggleCuisine(scope, value)}
               onClearRating={() => setRating(scope, "")}
-              onClearDistance={() => {
-                setDistance(scope, "");
-                setCustomDistance(scope, "");
-              }}
+              onClearDistance={() => setDistance(scope, "")}
             />
             <View style={styles.footerDivider} />
             <View style={styles.footerActions}>

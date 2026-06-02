@@ -19,6 +19,8 @@ export const SORT_OPTIONS: FilterOption<SortOption>[] = [
 
 export const RATING_OPTIONS: FilterOption<RatingOption>[] = [
   { label: "Any rating", value: "" },
+  { label: "3.0+", value: "3" },
+  { label: "3.5+", value: "3.5" },
   { label: "4.0+", value: "4" },
   { label: "4.5+", value: "4.5" },
   { label: "5.0", value: "5" },
@@ -30,6 +32,8 @@ export const DISTANCE_OPTIONS: FilterOption<DistanceOption>[] = [
   { label: "5 km", value: "5" },
   { label: "10 km", value: "10" },
   { label: "25 km", value: "25" },
+  { label: "50 km", value: "50" },
+  { label: "100 km", value: "100" },
 ];
 
 export const BUSINESS_CATEGORY_OPTIONS = [

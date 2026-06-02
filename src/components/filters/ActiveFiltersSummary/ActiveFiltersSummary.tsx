@@ -23,7 +23,6 @@ type Props = {
   cuisines: string[];
   rating: RatingOption;
   distance: DistanceOption;
-  customDistance: string;
   onClearSort: () => void;
   onClearCategory: () => void;
   onRemoveCuisine: (value: string) => void;
@@ -48,7 +47,6 @@ export default function ActiveFiltersSummary({
   cuisines,
   rating,
   distance,
-  customDistance,
   onClearSort,
   onClearCategory,
   onRemoveCuisine,
@@ -95,10 +93,7 @@ export default function ActiveFiltersSummary({
   if (distance) {
     chips.push({
       key: `distance-${distance}`,
-      label:
-        distance === "custom" && customDistance
-          ? `${customDistance} km`
-          : getLabel(DISTANCE_OPTIONS, distance),
+      label: getLabel(DISTANCE_OPTIONS, distance),
       onRemove: onClearDistance,
     });
   }

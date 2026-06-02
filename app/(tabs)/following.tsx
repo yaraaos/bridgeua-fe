@@ -105,7 +105,7 @@ export default function FollowingScreen() {
     setPermissionStatus,
   } = useFollowingLocationStore();
 
-  const { category, sort, cuisines, rating, distance, customDistance } =
+  const { category, sort, cuisines, rating, distance } =
     useFilterStore((state) => state.followingFilters);
 
   const [locationOptions, setLocationOptions] = useState<LocationOption[]>([
@@ -152,10 +152,9 @@ export default function FollowingScreen() {
     if (cuisines.length > 0) count += cuisines.length;
     if (rating) count += 1;
     if (distance) count += 1;
-    if (distance === "custom" && customDistance) count += 1;
 
     return count;
-  }, [category, sort, cuisines, rating, distance, customDistance]);
+  }, [category, sort, cuisines, rating, distance]);
 
   const {
     activeTab,

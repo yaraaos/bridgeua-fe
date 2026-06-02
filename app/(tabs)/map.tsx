@@ -118,7 +118,7 @@ export default function MapScreen() {
     setPermissionStatus,
   } = useDiscoveryLocationStore();
 
-  const { category, sort, cuisines, rating, distance, customDistance } =
+  const { category, sort, cuisines, rating, distance } =
     useFilterStore((state) => state.discoveryFilters);
 
   const activeFilterCount = useMemo(() => {
@@ -128,9 +128,8 @@ export default function MapScreen() {
     if (cuisines.length > 0) count += cuisines.length;
     if (rating) count += 1;
     if (distance) count += 1;
-    if (distance === "custom" && customDistance) count += 1;
     return count;
-  }, [category, sort, cuisines, rating, distance, customDistance]);
+  }, [category, sort, cuisines, rating, distance]);
 
   const followedBusinessIds = useFollowingStore(
     (state) => state.followedBusinessIds,
@@ -175,7 +174,6 @@ export default function MapScreen() {
     cuisines,
     rating,
     distance,
-    customDistance,
     businessIdsWithPromo,
   });
 
@@ -187,9 +185,8 @@ export default function MapScreen() {
         cuisines.join(","),
         rating,
         distance,
-        customDistance,
       ].join("|"),
-    [category, sort, cuisines, rating, distance, customDistance],
+    [category, sort, cuisines, rating, distance],
   );
 
   const mappableBusinesses = useMemo(() => {

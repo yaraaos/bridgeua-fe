@@ -27,7 +27,7 @@ export const useFollowingFeed = ({
 
   const feedBusinessIds = visibleBusinessIds ?? followedBusinessIds.map(String);
 
-  const { category, sort, cuisines, rating, distance, customDistance } =
+  const { category, sort, cuisines, rating, distance } =
     useFilterStore((state) => state.followingFilters);
 
   const [activeTab, setActiveTab] = useState<FollowingFeedType>("promotion");
@@ -117,16 +117,13 @@ export const useFollowingFeed = ({
     const normalizedQuery = searchQuery.trim().toLowerCase();
 
     const selectedDistanceKm =
-      distance === "custom"
-        ? Number(customDistance || 0)
-        : distance === "nearby"
-          ? 1
-          : distance
-            ? Number(distance)
-            : null;
+      distance === "nearby"
+        ? 1
+        : distance
+          ? Number(distance)
+          : null;
 
-    const selectedRatingValue =
-      rating && rating !== "custom" ? Number(rating) : null;
+    const selectedRatingValue = rating ? Number(rating) : null;
 
     return feedItems
       .filter((item) => item.type === activeTab)
@@ -212,7 +209,6 @@ export const useFollowingFeed = ({
     cuisines,
     rating,
     distance,
-    customDistance,
   ]);
 
   return {
