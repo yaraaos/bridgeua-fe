@@ -60,6 +60,7 @@ export default function ChooseDateScreen() {
     specialistName,
     promotionId,
     promoCode,
+    discountLabel,
   } = useLocalSearchParams<{
     businessId?: string;
     serviceId?: string;
@@ -69,6 +70,7 @@ export default function ChooseDateScreen() {
     specialistName?: string;
     promotionId?: string;
     promoCode?: string;
+    discountLabel?: string;
   }>();
 
   const dateOptions = useMemo(() => buildDateOptions(), []);
@@ -117,6 +119,7 @@ export default function ChooseDateScreen() {
         time: selectedTimeSlot.time,
         promotionId,
         promoCode,
+        discountLabel,
       },
     });
   };

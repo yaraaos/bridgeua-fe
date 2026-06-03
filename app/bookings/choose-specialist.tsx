@@ -18,7 +18,7 @@ export default function ChooseSpecialistScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
 
-  const { businessId, serviceId, serviceName, price, promotionId, promoCode } =
+  const { businessId, serviceId, serviceName, price, promotionId, promoCode, discountLabel } =
     useLocalSearchParams<{
       businessId?: string;
       serviceId?: string;
@@ -26,6 +26,7 @@ export default function ChooseSpecialistScreen() {
       price?: string;
       promotionId?: string;
       promoCode?: string;
+      discountLabel?: string;
     }>();
 
   const { business } = useBusinessDetails(businessId);
@@ -82,6 +83,7 @@ export default function ChooseSpecialistScreen() {
               : "Selected specialist",
         promotionId,
         promoCode,
+        discountLabel,
       },
     });
   };

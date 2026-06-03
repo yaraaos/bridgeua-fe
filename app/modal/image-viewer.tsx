@@ -34,9 +34,10 @@ export default function ImageViewerScreen() {
   }>();
 
   const images: ImageItem[] = params.images ? JSON.parse(params.images) : [];
-  const initialIndex = params.initialIndex
-    ? parseInt(params.initialIndex, 10)
-    : 0;
+  const initialIndex = Math.min(
+    params.initialIndex ? parseInt(params.initialIndex, 10) : 0,
+    Math.max(0, images.length - 1),
+  );
 
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const translateY = useRef(new Animated.Value(0)).current;
