@@ -29,7 +29,7 @@ export function useRequireAuth() {
   const confirmAuthModal = () => {
     setIsAuthModalVisible(false);
 
-    router.push({
+    router.replace({
       pathname: "/auth/sign-in",
       params: {
         redirectTo: pendingRedirectTo,

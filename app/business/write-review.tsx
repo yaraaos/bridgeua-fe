@@ -157,13 +157,22 @@ export default function WriteReviewScreen() {
   const handleSubmit = async () => {
     if (!canSubmit || !business) return;
 
-    const submittedReview = await submit({
+    const { review: submittedReview, error } = await submit({
       businessId: business.id,
       rating,
       text: review.trim(),
       tags: selectedTags,
       photos,
     });
+
+    if (error) {
+      if (error.toLowerCase().includes("already reviewed")) {
+        Alert.alert("Already reviewed", "You've already reviewed this business.");
+      } else {
+        Alert.alert("Could not submit review", error || "Something went wrong. Please try again.");
+      }
+      return;
+    }
 
     if (!submittedReview) return;
 

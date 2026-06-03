@@ -30,7 +30,7 @@ export default function ProfileTabScreen() {
   const effectiveAccountKind = account?.kind ?? user?.accountType ?? "personal";
 
   const handleRegisterPress = () => {
-    router.push({
+    router.replace({
       pathname: "/auth/sign-in",
       params: {
         source: "guest_profile_tab",

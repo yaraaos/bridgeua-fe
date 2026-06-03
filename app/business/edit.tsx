@@ -67,6 +67,8 @@ export default function EditBusinessScreen() {
       city: business.city ?? "",
       state: business.state ?? "",
       phone: business.phone ?? "",
+      latitude: business.latitude != null ? String(business.latitude) : "",
+      longitude: business.longitude != null ? String(business.longitude) : "",
       socialLinks: {
         website: business.socialLinks?.website ?? "",
         instagram: business.socialLinks?.instagram ?? "",

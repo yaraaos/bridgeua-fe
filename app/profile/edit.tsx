@@ -12,6 +12,7 @@ import { AppColors } from "@/src/constants/colors";
 import { DISCOVERY_GRADIENT } from "@/src/constants/gradients";
 import { radius } from "@/src/constants/radius";
 import { spacing } from "@/src/constants/spacing";
+import { validateSignUpPersonalUsername } from "@/src/features/auth/validation/signUpPersonal.validation";
 import { useEditProfile } from "@/src/features/profile/hooks/useEditProfile";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { personalProfileMock } from "@/src/mocks/profile.mock";
@@ -101,9 +102,9 @@ export default function EditProfileScreen() {
   });
 
   const usernameError =
-    username.trim().length > 0 && !/^[a-zA-Z0-9._]{3,20}$/.test(username.trim())
-      ? "Username must be 3–20 characters and can only use letters, numbers, dots, or underscores."
-      : "";
+    username.trim().length > 0
+      ? validateSignUpPersonalUsername(username.trim())
+      : undefined;
 
   const phoneError =
     phoneNumber.trim().length > 0 && !isPhoneValid

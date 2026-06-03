@@ -476,6 +476,7 @@ function ReviewCard({
                     return nextValue;
                   });
                 }}
+                style={{ alignSelf: "flex-end" }}
               >
                 <AppText style={styles.reviewReadMore}>
                   {isExpanded ? "Show less" : "Read more"}

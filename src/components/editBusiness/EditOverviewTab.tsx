@@ -31,9 +31,12 @@ import { useScrollToError } from "@/src/hooks/useScrollToError";
 import { useActiveAccount } from "@/src/store/account.store";
 import { useEditBusinessStore } from "@/src/store/editBusiness.store";
 
+import { US_STATE_BOUNDS } from "@/src/constants/stateBounds";
 import { BusinessDetails } from "@/src/features/businesses/types/business.types";
 import EditBusinessHourRow from "./EditBusinessHourRow";
 import EditBusinessSocialRow from "./EditBusinessSocialRow";
+
+const US_STATES = Object.keys(US_STATE_BOUNDS);
 
 const DAY_LABELS: Record<DayOfWeek, string> = {
   monday: "Monday",
@@ -172,6 +175,22 @@ export default function EditOverviewTab({
     hydratedBusinessIdRef.current = nextBusinessId;
   }, [business, businessId, setOverviewDraft]);
 
+  const [stateQuery, setStateQuery] = useState(draft.state ?? "");
+  const [scrollOffset, setScrollOffset] = useState(0);
+  const [scrollViewHeight, setScrollViewHeight] = useState(0);
+  const [contentHeight, setContentHeight] = useState(0);
+
+  useEffect(() => {
+    setStateQuery(draft.state ?? "");
+  }, [draft.state]);
+
+  const stateSuggestions =
+    stateQuery.trim().length >= 1 && !US_STATES.includes(stateQuery.trim())
+      ? US_STATES.filter((s) =>
+          s.toLowerCase().startsWith(stateQuery.trim().toLowerCase()),
+        )
+      : [];
+
   const { scrollRef, registerField, scrollToFirstError } = useScrollToError();
   const hoursValidity = useRef<Record<string, boolean>>(
     Object.fromEntries(
@@ -190,7 +209,7 @@ export default function EditOverviewTab({
   const successTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const displayedAvatarUrl =
-    draft.avatarUrl || business?.avatarUrl || account.avatarUrl;
+    draft.avatarUrl || business?.avatarUrl || account?.avatarUrl;
 
   async function handlePickAvatar() {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -237,6 +256,8 @@ export default function EditOverviewTab({
     };
   }
 
+  const onStateChange = onField("state");
+
   function onSocialField(key: keyof EditBusinessSocialLinks) {
     return (value: string) => {
       setOverviewDraft({ socialLinks: { ...draft.socialLinks, [key]: value } });
@@ -271,10 +292,7 @@ export default function EditOverviewTab({
     if (Object.values(newErrors).some(Boolean) || !allHoursValid) {
       setErrors(newErrors);
       triggerError("Fill in the required fields");
-      scrollToFirstError(
-        ["address", "postalCode", "city", "state"],
-        newErrors,
-      );
+      scrollToFirstError(["address", "postalCode", "city", "state"], newErrors);
       return;
     }
     setErrors(NO_ERRORS);
@@ -416,16 +434,74 @@ export default function EditOverviewTab({
                 )}
               </View>
               <View
-                style={[styles.fieldGroup, styles.halfField]}
-                {...registerField("state")}
+                style={[
+                  styles.fieldGroup,
+                  styles.halfField,
+                  { position: "relative", zIndex: 100 },
+                ]}
               >
                 <AppText style={styles.fieldLabel}>State / Region</AppText>
                 <AppInput
-                  value={draft.state}
-                  onChangeText={onField("state")}
+                  value={stateQuery}
+                  onChangeText={(value) => {
+                    const trimmed = value.replace(/\s+$/, "");
+                    setStateQuery(trimmed);
+                    onStateChange("");
+                    setErrors((prev) => ({ ...prev, state: false }));
+                    clearError();
+                  }}
                   placeholder="State"
                   error={errors.state}
                 />
+                {stateSuggestions.length > 0 && (
+                  <View style={styles.suggestionsContainer}>
+                    <ScrollView
+                      keyboardShouldPersistTaps="handled"
+                      showsVerticalScrollIndicator={false}
+                      style={{ maxHeight: 180 }}
+                      onScroll={(e) => setScrollOffset(e.nativeEvent.contentOffset.y)}
+                      onLayout={(e) => setScrollViewHeight(e.nativeEvent.layout.height)}
+                      onContentSizeChange={(_, h) => setContentHeight(h)}
+                      scrollEventThrottle={16}
+                    >
+                      {stateSuggestions.map((suggestion) => (
+                        <Pressable
+                          key={suggestion}
+                          style={styles.suggestionItem}
+                          onPress={() => {
+                            setStateQuery(suggestion);
+                            onStateChange(suggestion);
+                            setErrors((prev) => ({ ...prev, state: false }));
+                            clearError();
+                          }}
+                        >
+                          <AppText style={styles.suggestionText}>
+                            {suggestion}
+                          </AppText>
+                        </Pressable>
+                      ))}
+                    </ScrollView>
+                    {contentHeight > scrollViewHeight && (() => {
+                      const trackHeight = scrollViewHeight - 12;
+                      const thumbHeight = Math.max(20, (scrollViewHeight / contentHeight) * trackHeight);
+                      const maxThumbTop = trackHeight - thumbHeight;
+                      const thumbTop = Math.min(
+                        maxThumbTop,
+                        Math.max(0, (scrollOffset / (contentHeight - scrollViewHeight)) * maxThumbTop),
+                      );
+                      return (
+                        <View style={styles.scrollTrack}>
+                          <View
+                            style={[
+                              styles.scrollThumb,
+                              { height: thumbHeight, top: thumbTop },
+                            ]}
+                          />
+                        </View>
+                      );
+                    })()}
+                  </View>
+                )}
                 {errors.state && (
                   <AppText style={styles.errorText}>
                     This field is required
@@ -728,6 +804,48 @@ function createStyles(colors: AppColors) {
       color: colors.error,
       textAlign: "center",
       marginBottom: spacing.sm,
+    },
+
+    suggestionsContainer: {
+      position: "absolute",
+      top: 72,
+      left: 0,
+      right: 0,
+      backgroundColor: colors.primaryGreenDark,
+      borderRadius: 8,
+      borderWidth: 1,
+      borderColor: colors.primaryGreen,
+      zIndex: 999,
+      elevation: 10,
+      shadowColor: "#000",
+      shadowOpacity: 0.25,
+      shadowRadius: 16,
+      shadowOffset: { width: 0, height: 8 },
+    },
+    suggestionItem: {
+      paddingHorizontal: 14,
+      paddingVertical: 12,
+      borderBottomWidth: 1,
+      borderBottomColor: "rgba(255,255,255,0.08)",
+    },
+    suggestionText: {
+      fontSize: 14,
+      color: colors.white,
+    },
+    scrollTrack: {
+      position: "absolute",
+      right: 4,
+      top: 6,
+      bottom: 6,
+      width: 3,
+      borderRadius: 2,
+      backgroundColor: "rgba(255,255,255,0.15)",
+    },
+    scrollThumb: {
+      position: "absolute",
+      width: 3,
+      borderRadius: 2,
+      backgroundColor: "rgba(255,255,255,0.5)",
     },
   });
 }

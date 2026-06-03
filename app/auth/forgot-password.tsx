@@ -40,6 +40,7 @@ export default function ForgotPasswordScreen() {
     const response = await submitForgotPassword(values);
 
     if (response) {
+      console.log('[DEV] Reset password code:', (response as any).resetPasswordCode);
       router.push("/auth/reset-password");
     }
   };

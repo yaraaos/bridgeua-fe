@@ -113,6 +113,7 @@ export default function BusinessDetailsScreen() {
     reviews,
     reviewCount,
     summary: reviewsSummary,
+    isLoading: isReviewsLoading,
   } = useReviews({
     businessId: id,
   });
@@ -419,6 +420,7 @@ export default function BusinessDetailsScreen() {
                   focusedReviewId={focusedReviewId}
                   onClearFocusedReview={() => setFocusedReviewId(null)}
                   isPreview={isEditPreview}
+                  isLoadingReviews={isReviewsLoading}
                   onReviewsListLayout={(y) => {
                     reviewsListYRef.current = y;
                   }}

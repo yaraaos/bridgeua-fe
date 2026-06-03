@@ -6,6 +6,7 @@ import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { useProfileStore } from "@/src/store/profile.store";
 import { formatRelativeTime } from "@/src/utils/formatRelativeTime";
 import { MaterialIcons } from "@expo/vector-icons";
+import { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 type Props = {
@@ -30,6 +31,10 @@ export default function ReviewCommentCard({
 
   const avatarUrl = isOwnComment ? profile.avatarUrl : comment.author.avatarUrl;
 
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [textLineCount, setTextLineCount] = useState(0);
+  const shouldShowReadMore = textLineCount > 3;
+
   const handleToggleLike = () => {
     requireAuth(() => onToggleLike(comment.id), {
       action: "comment",
@@ -50,6 +55,19 @@ export default function ReviewCommentCard({
 
   return (
     <>
+      <View style={{ height: 0, overflow: 'hidden' }}>
+        <Text
+          style={styles.text}
+          onTextLayout={(e) => {
+            if (textLineCount === 0) {
+              setTextLineCount(e.nativeEvent.lines.length);
+            }
+          }}
+        >
+          {comment.text}
+        </Text>
+      </View>
+
       <View style={[styles.container, isReply && styles.replyContainer]}>
         <AppAvatar
           name={comment.author.name}
@@ -71,9 +89,20 @@ export default function ReviewCommentCard({
             </Text>
           </View>
 
-          <Text style={[styles.text, { color: colors.textSecondary }]}>
+          <Text
+            style={[styles.text, { color: colors.textSecondary }]}
+            numberOfLines={isExpanded ? undefined : 3}
+          >
             {comment.text}
           </Text>
+
+          {shouldShowReadMore ? (
+            <Pressable onPress={() => setIsExpanded((v) => !v)} style={{ alignSelf: "flex-end" }}>
+              <Text style={[styles.readMoreText, { color: colors.primaryGreen }]}>
+                {isExpanded ? "Show less" : "Read more"}
+              </Text>
+            </Pressable>
+          ) : null}
 
           <View style={styles.actionsRow}>
             <Pressable
@@ -197,5 +226,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 5,
+  },
+  readMoreText: {
+    fontSize: 12,
+    fontWeight: "700",
+    marginTop: 2,
   },
 });

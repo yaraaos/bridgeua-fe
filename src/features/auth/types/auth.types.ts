@@ -56,6 +56,7 @@ export type RegisterBusinessPayload = {
   email: string;
   password: string;
   category: string;
+  cuisine?: string;
   address: string;
   zipCode: string;
   city: string;

@@ -1,5 +1,6 @@
 import { AuthRequiredModal, useRequireAuth } from "@/src/features/auth";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { useAuthStore } from "@/src/store/auth.store";
 import { useFollowingStore } from "@/src/store/following.store";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
@@ -32,8 +33,11 @@ export default function FollowButton({
     (state) => state.toggleFollowBusiness,
   );
 
+  const isGuest = useAuthStore((state) => state.isGuest);
+
   const normalizedId = String(businessId);
   const isFollowing = followedBusinessIds.includes(normalizedId);
+  const displayIsFollowing = isGuest ? false : isFollowing;
 
   const handlePress = () => {
     requireAuth(() => toggleFollowBusiness(normalizedId), {
@@ -41,14 +45,14 @@ export default function FollowButton({
     });
   };
 
-  const useFilledStyle = variant === "filled" || isFollowing;
+  const useFilledStyle = variant === "filled" || displayIsFollowing;
 
   if (size === "icon") {
     return (
       <>
         <Pressable onPress={handlePress} style={[styles.iconButton, style]}>
           <Ionicons
-            name={isFollowing ? "heart" : "heart-outline"}
+            name={displayIsFollowing ? "heart" : "heart-outline"}
             size={16}
             color={colors.white}
           />
@@ -81,7 +85,7 @@ export default function FollowButton({
             useFilledStyle ? styles.buttonTextFilled : styles.buttonTextOutline,
           ]}
         >
-          {isFollowing ? "Following" : "Follow"}
+          {displayIsFollowing ? "Following" : "Follow"}
         </Text>
       </Pressable>
 

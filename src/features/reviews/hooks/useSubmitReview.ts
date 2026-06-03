@@ -10,7 +10,7 @@ export const useSubmitReview = () => {
 
   const handleSubmit = async (
     payload: SubmitReviewPayload,
-  ): Promise<Review | null> => {
+  ): Promise<{ review: Review | null; error: string | null }> => {
     try {
       setIsSubmitting(true);
 
@@ -26,11 +26,11 @@ export const useSubmitReview = () => {
         queryKey: ["reviews", payload.businessId],
       });
 
-      return review;
+      return { review, error: null };
     } catch (e) {
       console.error("Submit review failed", e);
-
-      return null;
+      const error = e instanceof Error ? e.message : "Failed to submit review";
+      return { review: null, error };
     } finally {
       setIsSubmitting(false);
     }

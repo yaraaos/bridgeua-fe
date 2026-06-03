@@ -32,16 +32,18 @@ const CATEGORY_ALIASES: Record<string, string[]> = {
 };
 
 const getBusinessSubcategories = (business: Business) => {
-  return [business.category].filter(Boolean);
+  return [(business as any).cuisine, business.category].filter(Boolean);
 };
 
 const doesBusinessMatchCategory = (business: Business, category: string) => {
-  if (!category) {
-    return true;
+  if (!category) return true;
+  if (category === "Food") {
+    return business.category === "Food" ||
+      ["American", "Chinese", "Italian", "Japanese",
+       "Mediterranean", "Mexican", "Ukrainian", "Vegan"]
+      .includes(business.category ?? "");
   }
-
   const allowedCategories = CATEGORY_ALIASES[category] ?? [category];
-
   return allowedCategories.includes(business.category);
 };
 
@@ -70,8 +72,8 @@ export default function ProfileFollowingScreen() {
     (state) => state.followedBusinessIds,
   );
 
-  const { category, sort, cuisines, rating, distance, customDistance } =
-    useFilterStore((state) => state.followingFilters);
+  const { category, sort, cuisines, rating, distance } =
+    useFilterStore((state) => state.profileFollowingFilters);
 
   const activeFilterCount = useMemo(() => {
     let count = 0;
@@ -81,10 +83,9 @@ export default function ProfileFollowingScreen() {
     if (cuisines.length > 0) count += cuisines.length;
     if (rating) count += 1;
     if (distance) count += 1;
-    if (distance === "custom" && customDistance) count += 1;
 
     return count;
-  }, [category, sort, cuisines, rating, distance, customDistance]);
+  }, [category, sort, cuisines, rating, distance]);
 
   const [visibleBusinessIds, setVisibleBusinessIds] = useState<string[]>([]);
 
@@ -96,16 +97,13 @@ export default function ProfileFollowingScreen() {
     const normalizedSearch = search.trim().toLowerCase();
 
     const selectedDistanceKm =
-      distance === "custom"
-        ? Number(customDistance || 0)
-        : distance === "nearby"
-          ? 1
-          : distance
-            ? Number(distance)
-            : null;
+      distance === "nearby"
+        ? 1
+        : distance
+          ? Number(distance)
+          : null;
 
-    const selectedRatingValue =
-      rating && rating !== "custom" ? Number(rating) : null;
+    const selectedRatingValue = rating ? Number(rating) : null;
 
     return businesses
       .filter((business) => visibleBusinessIds.includes(String(business.id)))
@@ -169,7 +167,6 @@ export default function ProfileFollowingScreen() {
     cuisines,
     rating,
     distance,
-    customDistance,
   ]);
 
   const handleRefresh = () => {
@@ -185,7 +182,7 @@ export default function ProfileFollowingScreen() {
   const handleFilterPress = () => {
     router.push({
       pathname: "/modal/filter",
-      params: { scope: "following" },
+      params: { scope: "profileFollowing" },
     });
   };
 
@@ -230,7 +227,17 @@ export default function ProfileFollowingScreen() {
         ListEmptyComponent={
           <AppEmptyState
             title="No followed businesses found"
-            description="Try changing your filters or follow more businesses."
+            description={
+              activeFilterCount > 0
+                ? "Try adjusting or clearing your filters."
+                : "Follow businesses to see them here."
+            }
+            actionLabel={activeFilterCount > 0 ? "Clear filters" : undefined}
+            onPressAction={
+              activeFilterCount > 0
+                ? () => useFilterStore.getState().reset("profileFollowing")
+                : undefined
+            }
           />
         }
       />

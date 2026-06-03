@@ -20,12 +20,11 @@ export type RatingOption =
   | "3.5"
   | "4"
   | "4.5"
-  | "5"
-  | "custom";
+  | "5";
 
-export type DistanceOption = "" | "nearby" | "1" | "5" | "10" | "25" | "custom";
+export type DistanceOption = "" | "nearby" | "1" | "5" | "10" | "25" | "50" | "100";
 
-export type FilterScope = "discovery" | "following";
+export type FilterScope = "discovery" | "following" | "profileFollowing";
 
 export type CategoryFilters = {
   food: {
@@ -40,7 +39,6 @@ export type FilterValues = {
   categoryFilters: CategoryFilters;
   rating: RatingOption;
   distance: DistanceOption;
-  customDistance: string;
 };
 
 const defaultFilters: FilterValues = {
@@ -54,12 +52,12 @@ const defaultFilters: FilterValues = {
   },
   rating: "",
   distance: "",
-  customDistance: "",
 };
 
 type FilterState = {
   discoveryFilters: FilterValues;
   followingFilters: FilterValues;
+  profileFollowingFilters: FilterValues;
   businessVersion: number;
   bumpBusinessVersion: () => void;
   resetDiscoveryFilters: () => void;
@@ -69,20 +67,20 @@ type FilterState = {
   toggleCuisine: (scope: FilterScope, value: string) => void;
   setRating: (scope: FilterScope, value: RatingOption) => void;
   setDistance: (scope: FilterScope, value: DistanceOption) => void;
-  setCustomDistance: (scope: FilterScope, value: string) => void;
   reset: (scope: FilterScope) => void;
 };
 
 const getScopeKey = (scope: FilterScope) =>
-  scope === "discovery" ? "discoveryFilters" : "followingFilters";
+  scope === "discovery" ? "discoveryFilters" : scope === "following" ? "followingFilters" : "profileFollowingFilters";
 
 export const useFilterStore = create<FilterState>((set) => ({
   discoveryFilters: defaultFilters,
   followingFilters: defaultFilters,
+  profileFollowingFilters: defaultFilters,
   businessVersion: 0,
   bumpBusinessVersion: () => set((s) => ({ businessVersion: s.businessVersion + 1 })),
   resetDiscoveryFilters: () => set({ discoveryFilters: defaultFilters }),
-  resetAllFilters: () => set({ discoveryFilters: defaultFilters, followingFilters: defaultFilters }),
+  resetAllFilters: () => set({ discoveryFilters: defaultFilters, followingFilters: defaultFilters, profileFollowingFilters: defaultFilters }),
   setCategory: (scope, value) =>
     set((state) => {
       const key = getScopeKey(scope);
@@ -148,14 +146,6 @@ export const useFilterStore = create<FilterState>((set) => ({
       [getScopeKey(scope)]: {
         ...state[getScopeKey(scope)],
         distance: value,
-      },
-    })),
-
-  setCustomDistance: (scope, value) =>
-    set((state) => ({
-      [getScopeKey(scope)]: {
-        ...state[getScopeKey(scope)],
-        customDistance: value,
       },
     })),
 

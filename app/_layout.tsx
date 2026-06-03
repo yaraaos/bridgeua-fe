@@ -6,7 +6,13 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useState } from "react";
+import { LogBox } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+
+LogBox.ignoreLogs([
+  "already reviewed",
+  "You have already reviewed",
+]);
 
 function RootLayoutInner() {
   const { colors, isDark } = useAppTheme();
@@ -23,6 +29,12 @@ function RootLayoutInner() {
       >
         <Stack.Screen name="index" />
         <Stack.Screen name="(tabs)" />
+        <Stack.Screen
+          name="auth"
+          options={{
+            gestureEnabled: false,
+          }}
+        />
         <Stack.Screen
           name="modal/filter"
           options={{

@@ -38,6 +38,11 @@ import {
 
 const US_STATES = Object.keys(US_STATE_BOUNDS);
 
+const CUISINE_OPTIONS = [
+  "American", "Chinese", "Italian", "Japanese",
+  "Mediterranean", "Mexican", "Ukrainian", "Vegan",
+].map(c => ({ label: c, value: c }));
+
 const FALLBACK_CATEGORIES = [
   "Beauty",
   "Food",
@@ -79,6 +84,11 @@ export default function SignUpBusinessScreen() {
   const [latitude, setLatitude] = useState("");
   const [longitude, setLongitude] = useState("");
   const [categoryModalVisible, setCategoryModalVisible] = useState(false);
+  const [selectedCuisine, setSelectedCuisine] = useState("");
+  const [cuisineModalVisible, setCuisineModalVisible] = useState(false);
+  const [stateScrollOffset, setStateScrollOffset] = useState(0);
+  const [stateScrollViewHeight, setStateScrollViewHeight] = useState(0);
+  const [stateContentHeight, setStateContentHeight] = useState(0);
   const scrollRef = useRef<ScrollView>(null);
 
   const [agree, setAgree] = useState(false);
@@ -103,6 +113,7 @@ export default function SignUpBusinessScreen() {
       password,
       confirmPassword,
       category: selectedCategory,
+      cuisine: selectedCuisine,
       address,
       zipCode,
       city,
@@ -123,6 +134,7 @@ export default function SignUpBusinessScreen() {
       email,
       password,
       category: selectedCategory,
+      cuisine: selectedCuisine,
       address,
       zipCode,
       city,
@@ -139,6 +151,8 @@ export default function SignUpBusinessScreen() {
         city,
         state,
         postalCode: zipCode,
+        latitude: latitude || undefined,
+        longitude: longitude || undefined,
       });
       setNotificationsAccountType("business");
       router.push({
@@ -269,6 +283,17 @@ export default function SignUpBusinessScreen() {
                 ) : (
                   <Text style={styles.helperText}>Cannot be changed later</Text>
                 )}
+                {selectedCategory === "Food" && !selectedCuisine && errors.cuisine && (
+                  <Text style={styles.errorText}>{errors.cuisine}</Text>
+                )}
+                {selectedCategory === "Food" && !!selectedCuisine && (
+                  <Pressable onPress={() => setCuisineModalVisible(true)}>
+                    <Text style={styles.helperText}>
+                      <Text style={{ color: colors.white, fontWeight: "700" }}>{selectedCuisine}</Text>
+                      <Text style={{ color: colors.primaryGreen, fontWeight: "700" }}> · tap to change</Text>
+                    </Text>
+                  </Pressable>
+                )}
               </View>
 
               <View>
@@ -341,19 +366,43 @@ export default function SignUpBusinessScreen() {
                 />
                 {stateSuggestions.length > 0 && (
                   <View style={styles.suggestionsContainer}>
-                    {stateSuggestions.map((suggestion) => (
-                      <Pressable
-                        key={suggestion}
-                        style={styles.suggestionItem}
-                        onPress={() => {
-                          setState(suggestion);
-                          setStateQuery(suggestion);
-                          clearFieldError("state");
-                        }}
-                      >
-                        <Text style={styles.suggestionText}>{suggestion}</Text>
-                      </Pressable>
-                    ))}
+                    <ScrollView
+                      keyboardShouldPersistTaps="handled"
+                      showsVerticalScrollIndicator={false}
+                      style={{ maxHeight: 180 }}
+                      onScroll={(e) => setStateScrollOffset(e.nativeEvent.contentOffset.y)}
+                      onLayout={(e) => setStateScrollViewHeight(e.nativeEvent.layout.height)}
+                      onContentSizeChange={(_, h) => setStateContentHeight(h)}
+                      scrollEventThrottle={16}
+                    >
+                      {stateSuggestions.map((suggestion) => (
+                        <Pressable
+                          key={suggestion}
+                          style={styles.suggestionItem}
+                          onPress={() => {
+                            setState(suggestion);
+                            setStateQuery(suggestion);
+                            clearFieldError("state");
+                          }}
+                        >
+                          <Text style={styles.suggestionText}>{suggestion}</Text>
+                        </Pressable>
+                      ))}
+                    </ScrollView>
+                    {stateContentHeight > stateScrollViewHeight && (() => {
+                      const trackHeight = stateScrollViewHeight - 12;
+                      const thumbHeight = Math.max(20, (stateScrollViewHeight / stateContentHeight) * trackHeight);
+                      const maxThumbTop = trackHeight - thumbHeight;
+                      const thumbTop = Math.min(
+                        maxThumbTop,
+                        Math.max(0, (stateScrollOffset / (stateContentHeight - stateScrollViewHeight)) * maxThumbTop),
+                      );
+                      return (
+                        <View style={styles.scrollTrack}>
+                          <View style={[styles.scrollThumb, { height: thumbHeight, top: thumbTop }]} />
+                        </View>
+                      );
+                    })()}
                   </View>
                 )}
                 {!!errors.state && (
@@ -491,7 +540,7 @@ export default function SignUpBusinessScreen() {
           <Modal
             visible={categoryModalVisible}
             transparent
-            animationType="slide"
+            animationType="fade"
             onRequestClose={() => setCategoryModalVisible(false)}
           >
             <Pressable
@@ -508,6 +557,9 @@ export default function SignUpBusinessScreen() {
                       setSelectedCategory(option.value);
                       clearFieldError("category");
                       setCategoryModalVisible(false);
+                      if (option.value === "Food") {
+                        setCuisineModalVisible(true);
+                      }
                     }}
                   >
                     <Text
@@ -526,6 +578,41 @@ export default function SignUpBusinessScreen() {
                         color={colors.primaryGreen}
                       />
                     )}
+                  </Pressable>
+                ))}
+              </View>
+            </Pressable>
+          </Modal>
+
+          <Modal
+            visible={cuisineModalVisible}
+            transparent
+            animationType="fade"
+            onRequestClose={() => setCuisineModalVisible(false)}
+          >
+            <Pressable
+              style={styles.modalOverlay}
+              onPress={() => setCuisineModalVisible(false)}
+            >
+              <View style={styles.modalSheet}>
+                <Text style={styles.modalTitle}>Select Cuisine</Text>
+                {CUISINE_OPTIONS.map((option) => (
+                  <Pressable
+                    key={option.value}
+                    style={styles.modalOption}
+                    onPress={() => {
+                      setSelectedCuisine(option.value);
+                      setCuisineModalVisible(false);
+                    }}
+                  >
+                    <Text
+                      style={[
+                        styles.modalOptionText,
+                        selectedCuisine === option.value && styles.modalOptionTextActive,
+                      ]}
+                    >
+                      {option.label}
+                    </Text>
                   </Pressable>
                 ))}
               </View>
@@ -670,26 +757,43 @@ function createStyles(colors: AppColors) {
       top: 52,
       left: 0,
       right: 0,
-      backgroundColor: colors.surface,
+      backgroundColor: colors.primaryGreenDark,
       borderRadius: 8,
       borderWidth: 1,
-      borderColor: colors.border,
+      borderColor: colors.primaryGreen,
       zIndex: 999,
       elevation: 10,
-      maxHeight: 180,
-      overflow: "hidden",
+      shadowColor: "#000",
+      shadowOpacity: 0.25,
+      shadowRadius: 16,
+      shadowOffset: { width: 0, height: 8 },
+    },
+    scrollTrack: {
+      position: "absolute",
+      right: 4,
+      top: 6,
+      bottom: 6,
+      width: 3,
+      borderRadius: 2,
+      backgroundColor: "rgba(255,255,255,0.15)",
+    },
+    scrollThumb: {
+      position: "absolute",
+      width: 3,
+      borderRadius: 2,
+      backgroundColor: "rgba(255,255,255,0.5)",
     },
 
     suggestionItem: {
       paddingHorizontal: 14,
       paddingVertical: 12,
       borderBottomWidth: 1,
-      borderBottomColor: colors.border,
+      borderBottomColor: 'rgba(255,255,255,0.08)',
     },
 
     suggestionText: {
       fontSize: 14,
-      color: colors.textPrimary,
+      color: colors.white,
     },
 
     apiError: {

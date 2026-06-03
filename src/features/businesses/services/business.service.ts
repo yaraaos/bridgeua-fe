@@ -23,6 +23,7 @@ export type GetBusinessesParams = {
   page?: number;
   limit?: number;
   state?: string;
+  cuisines?: string[];
 };
 
 const getAbsoluteImageUrl = (url: string) => {
@@ -68,6 +69,7 @@ export const getBusinesses = async (
     if (params.page) query.set("page", String(params.page));
     if (params.limit) query.set("limit", String(params.limit));
     if (params.state) query.set("state", params.state);
+    if (params.cuisines?.length) query.set("cuisines", params.cuisines.join(","));
 
     const qs = query.toString();
     if (qs) url = `${url}?${qs}`;

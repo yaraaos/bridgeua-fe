@@ -105,7 +105,7 @@ export default function FollowingScreen() {
     setPermissionStatus,
   } = useFollowingLocationStore();
 
-  const { category, sort, cuisines, rating, distance, customDistance } =
+  const { category, sort, cuisines, rating, distance } =
     useFilterStore((state) => state.followingFilters);
 
   const [locationOptions, setLocationOptions] = useState<LocationOption[]>([
@@ -152,10 +152,9 @@ export default function FollowingScreen() {
     if (cuisines.length > 0) count += cuisines.length;
     if (rating) count += 1;
     if (distance) count += 1;
-    if (distance === "custom" && customDistance) count += 1;
 
     return count;
-  }, [category, sort, cuisines, rating, distance, customDistance]);
+  }, [category, sort, cuisines, rating, distance]);
 
   const {
     activeTab,
@@ -662,7 +661,7 @@ export default function FollowingScreen() {
           myBusiness?.avatarUrl ??
           promotion.imageUrl ??
           "https://placehold.co/600x400",
-        businessRating: 0,
+        businessRating: myBusiness?.rating ?? 0,
         businessDistanceKm: 0,
         businessPriceLevel: undefined,
         distanceKm: 0,
@@ -693,7 +692,7 @@ export default function FollowingScreen() {
         myBusiness?.avatarUrl ??
         newsItem.imageUrl ??
         "https://placehold.co/600x400",
-      businessRating: 0,
+      businessRating: myBusiness?.rating ?? 0,
       businessDistanceKm: 0,
       businessPriceLevel: undefined,
       distanceKm: 0,
@@ -864,7 +863,7 @@ export default function FollowingScreen() {
   };
 
   const handleRegisterPress = () => {
-    router.push({
+    router.replace({
       pathname: "/auth/sign-in",
       params: {
         source: "guest_promotions_tab",
@@ -980,9 +979,17 @@ export default function FollowingScreen() {
             activeTab === "promotion" ? "promotions" : "news"
           } found`}
           description={
-            activeTab === "promotion"
-              ? "There are no promotions at this time. Check the News!"
-              : "There is no news at this time. Check the Promotions!"
+            activeFilterCount > 0
+              ? "Try adjusting or clearing your filters."
+              : activeTab === "promotion"
+                ? "There are no promotions at this time. Check the News!"
+                : "There is no news at this time. Check the Promotions!"
+          }
+          actionLabel={activeFilterCount > 0 ? "Clear filters" : undefined}
+          onPressAction={
+            activeFilterCount > 0
+              ? () => useFilterStore.getState().reset("following")
+              : undefined
           }
         />
       ) : (
