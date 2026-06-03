@@ -132,6 +132,10 @@ export default function BookingDetailsScreen() {
             customerName={storedBooking.customer ? `${storedBooking.customer.firstName} ${storedBooking.customer.lastName}` : ""}
             phoneNumber={storedBooking.customer?.phoneNumber ?? ""}
             status={storedBooking.status}
+            originalPrice={storedBooking.originalPrice}
+            discountPercentage={storedBooking.discountPercentage}
+            discountAmount={storedBooking.discountAmount}
+            finalPrice={storedBooking.finalPrice}
           />
 
           {canCancel && (

@@ -98,6 +98,10 @@ export default function BookingConfirmScreen() {
       serviceName,
       specialistName,
       price,
+      originalPrice: originalPriceDisplay,
+      discountPercentage: discountPercentage ?? undefined,
+      discountAmount: discountAmountDisplay,
+      finalPrice: finalPriceDisplay,
     });
 
     router.dismissAll();
