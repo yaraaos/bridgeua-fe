@@ -37,6 +37,27 @@ export default function BookingConfirmScreen() {
 
   const price = params.price ?? "Price on request";
 
+  const servicePrice = selectedService?.price ?? null;
+  const discountPercentage =
+    params.discountLabel ? parseFloat(params.discountLabel) : null;
+
+  const discountAmount =
+    servicePrice != null && discountPercentage != null && discountPercentage > 0
+      ? servicePrice * (discountPercentage / 100)
+      : null;
+
+  const finalPrice =
+    servicePrice != null && discountAmount != null
+      ? servicePrice - discountAmount
+      : null;
+
+  const originalPriceDisplay =
+    servicePrice != null ? `$${servicePrice.toFixed(2)}` : undefined;
+  const discountAmountDisplay =
+    discountAmount != null ? `$${discountAmount.toFixed(2)}` : undefined;
+  const finalPriceDisplay =
+    finalPrice != null ? `$${finalPrice.toFixed(2)}` : undefined;
+
   const customerName = useMemo(() => {
     return [params.firstName, params.lastName].filter(Boolean).join(" ");
   }, [params.firstName, params.lastName]);
@@ -77,6 +98,10 @@ export default function BookingConfirmScreen() {
       serviceName,
       specialistName,
       price,
+      originalPrice: originalPriceDisplay,
+      discountPercentage: discountPercentage ?? undefined,
+      discountAmount: discountAmountDisplay,
+      finalPrice: finalPriceDisplay,
     });
 
     router.dismissAll();
@@ -102,6 +127,10 @@ export default function BookingConfirmScreen() {
         price={price}
         customerName={customerName || "Customer"}
         phoneNumber={params.phoneNumber ?? "Phone not added"}
+        originalPrice={originalPriceDisplay}
+        discountPercentage={discountPercentage ?? undefined}
+        discountAmount={discountAmountDisplay}
+        finalPrice={finalPriceDisplay}
       />
 
       {!!error && (

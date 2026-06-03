@@ -9,6 +9,10 @@ export type StoredBooking = Booking & {
   serviceName: string;
   specialistName: string;
   price: string;
+  originalPrice?: string;
+  discountPercentage?: number;
+  discountAmount?: string;
+  finalPrice?: string;
 };
 
 type BookingsState = {
@@ -21,7 +25,7 @@ type BookingsState = {
 
 export const useBookingsStore = create<BookingsState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       bookings: [],
 
       addBooking: (booking) =>
@@ -44,20 +48,29 @@ export const useBookingsStore = create<BookingsState>()(
       fetchBookings: async () => {
         const { apiClient } = await import("@/src/services/api/client");
         const res = await apiClient.get<{ success: boolean; data: any[] }>("/api/bookings/me");
-        const bookings = ((res as any).data ?? []).map((b: any) => ({
-          id: String(b.id),
-          businessId: String(b.businessId),
-          serviceId: String(b.serviceId),
-          specialistId: b.professionalId ? String(b.professionalId) : "any",
-          date: b.date,
-          time: b.startTime,
-          status: b.status,
-          businessName: b.business?.name ?? "Business",
-          serviceName: b.service?.name ?? "Service",
-          specialistName: b.professional ? `${b.professional.firstName} ${b.professional.lastName}` : "Any specialist",
-          price: b.service?.price ? `$${b.service.price}` : "Price on request",
-          customer: { firstName: "", lastName: "", phoneNumber: "" },
-        }));
+        const existing = get().bookings;
+        const bookings = ((res as any).data ?? []).map((b: any) => {
+          const existingBooking = existing.find((e: StoredBooking) => String(e.id) === String(b.id));
+          return {
+            id: String(b.id),
+            businessId: String(b.businessId),
+            serviceId: String(b.serviceId),
+            specialistId: b.professionalId ? String(b.professionalId) : "any",
+            date: b.date,
+            time: b.startTime,
+            status: b.status,
+            businessName: b.business?.name ?? "Business",
+            serviceName: b.service?.name ?? "Service",
+            specialistName: b.professional ? `${b.professional.firstName} ${b.professional.lastName}` : "Any specialist",
+            price: b.service?.price ? `$${b.service.price}` : "Price on request",
+            customer: existingBooking?.customer ?? { firstName: "", lastName: "", phoneNumber: "" },
+            // Preserve discount fields from local store
+            originalPrice: existingBooking?.originalPrice,
+            discountPercentage: existingBooking?.discountPercentage,
+            discountAmount: existingBooking?.discountAmount,
+            finalPrice: existingBooking?.finalPrice,
+          };
+        });
         set({ bookings });
       },
     }),

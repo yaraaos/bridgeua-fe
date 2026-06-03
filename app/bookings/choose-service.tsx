@@ -17,12 +17,13 @@ export default function ChooseServiceScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
 
-  const { businessId, serviceId, promotionId, promoCode } =
+  const { businessId, serviceId, promotionId, promoCode, discountLabel } =
     useLocalSearchParams<{
       businessId?: string;
       serviceId?: string;
       promotionId?: string;
       promoCode?: string;
+      discountLabel?: string;
     }>();
 
   const { business, isLoading } = useBusinessDetails(businessId);
@@ -48,6 +49,7 @@ export default function ChooseServiceScreen() {
         price: selectedService?.priceFrom ?? (selectedService as any)?.price ?? "Price on request",
         promotionId,
         promoCode,
+        discountLabel,
       },
     });
   };

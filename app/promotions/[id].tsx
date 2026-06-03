@@ -159,6 +159,7 @@ export default function PromotionDetailScreen() {
                   businessId: promotion.businessId,
                   promotionId: promotion.id,
                   promoCode: promotion.promoCode,
+                  discountLabel: promotion.discountLabel ?? "",
                 },
               })
             }
