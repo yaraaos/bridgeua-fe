@@ -25,12 +25,11 @@ export default function BookingConfirmScreen() {
   const addBooking = useBookingsStore((state) => state.addBooking);
 
   const selectedService = business?.services.find(
-    (service) => service.serviceId === params.serviceId || service.id === params.serviceId,
+    (service) =>
+      service.serviceId === params.serviceId || service.id === params.serviceId,
   );
 
-  const specialistName =
-    params.specialistName ??
-    (params.specialistId === "any" ? "Any specialist" : "Selected specialist");
+  const specialistName = params.specialistName ?? "Selected specialist";
 
   const serviceName =
     params.serviceName ?? selectedService?.name ?? "Selected service";
@@ -38,8 +37,9 @@ export default function BookingConfirmScreen() {
   const price = params.price ?? "Price on request";
 
   const servicePrice = selectedService?.price ?? null;
-  const discountPercentage =
-    params.discountLabel ? parseFloat(params.discountLabel) : null;
+  const discountPercentage = params.discountLabel
+    ? parseFloat(params.discountLabel)
+    : null;
 
   const discountAmount =
     servicePrice != null && discountPercentage != null && discountPercentage > 0
@@ -64,11 +64,12 @@ export default function BookingConfirmScreen() {
 
   const handleConfirm = async () => {
     if (!canCreateBooking || isCreating) return;
+    if (!params.specialistId || params.specialistId === "any") return;
 
     const payload: CreateBookingPayload = {
       businessId: params.businessId!,
       serviceId: params.serviceId!,
-      specialistId: params.specialistId!,
+      specialistId: params.specialistId,
       date: params.date!,
       timeSlotId: params.timeSlotId!,
       time: params.time!,
@@ -87,7 +88,6 @@ export default function BookingConfirmScreen() {
 
     addBooking({
       ...booking,
-      // API returns startTime, store expects time
       time: (booking as any).startTime ?? payload.time,
       date: (booking as any).date ?? payload.date,
       customer: payload.customer,
@@ -107,6 +107,7 @@ export default function BookingConfirmScreen() {
     router.dismissAll();
     router.replace("/(tabs)/profile");
   };
+
   return (
     <AppScreen scroll style={styles.container}>
       <BookingStepper currentStep={5} />
@@ -155,9 +156,21 @@ export default function BookingConfirmScreen() {
         </View>
       )}
 
+      {params.specialistId === "any" && (
+        <View style={styles.errorBox}>
+          <AppText style={styles.errorTitle}>Select a specialist</AppText>
+          <AppText style={styles.errorText}>
+            Please go back and choose a real specialist before confirming this
+            booking.
+          </AppText>
+        </View>
+      )}
+
       <AppButton
         title={isCreating ? "Confirming..." : "Confirm booking"}
-        disabled={!canCreateBooking || isCreating}
+        disabled={
+          !canCreateBooking || isCreating || params.specialistId === "any"
+        }
         onPress={handleConfirm}
       />
     </AppScreen>
