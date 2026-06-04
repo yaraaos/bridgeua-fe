@@ -11,16 +11,17 @@ import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
-    ActivityIndicator,
-    Alert,
-    Linking,
-    Pressable,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    View,
+  ActivityIndicator,
+  Alert,
+  Linking,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View
 } from "react-native";
+
+import ClearableInput from "@/src/components/ui/ClearableInput";
 
 // ─── SettingsSection ─────────────────────────────────────────────────────────
 
@@ -85,10 +86,13 @@ export default function AccountScreen() {
         currentPassword: emailCurrentPassword,
         newEmail,
       });
-      console.log('ACCOUNT_EMAIL response:', response);
+      console.log("ACCOUNT_EMAIL response:", response);
       resetEmailForm();
       setEmailOpen(false);
-      router.push({ pathname: "/settings/confirm-email" as never, params: { email: newEmail } });
+      router.push({
+        pathname: "/settings/confirm-email" as never,
+        params: { email: newEmail },
+      });
     } catch (err: unknown) {
       Alert.alert(
         "Could not update email",
@@ -199,22 +203,26 @@ export default function AccountScreen() {
 
           {emailOpen && (
             <View style={styles.formPanel}>
-              <TextInput
+              <ClearableInput
                 style={styles.input}
                 placeholder="Current password"
                 placeholderTextColor={colors.textMuted}
                 secureTextEntry
                 value={emailCurrentPassword}
                 onChangeText={setEmailCurrentPassword}
+                onClear={() => setEmailCurrentPassword("")}
               />
-              <TextInput
+              <ClearableInput
                 style={styles.input}
                 placeholder="New email address"
                 placeholderTextColor={colors.textMuted}
                 keyboardType="email-address"
                 autoCapitalize="none"
                 value={newEmail}
-                onChangeText={(value) => setNewEmail(value.toLowerCase().trim())}
+                onChangeText={(value) =>
+                  setNewEmail(value.toLowerCase().trim())
+                }
+                onClear={() => setNewEmail("")}
               />
               <Pressable
                 style={({ pressed }) => [
@@ -259,15 +267,16 @@ export default function AccountScreen() {
 
           {passwordOpen && (
             <View style={styles.formPanel}>
-              <TextInput
+              <ClearableInput
                 style={styles.input}
                 placeholder="Current password"
                 placeholderTextColor={colors.textMuted}
                 secureTextEntry
                 value={currentPassword}
                 onChangeText={setCurrentPassword}
+                onClear={() => setCurrentPassword("")}
               />
-              <TextInput
+              <ClearableInput
                 style={styles.input}
                 placeholder="New password"
                 placeholderTextColor={colors.textMuted}
@@ -277,8 +286,9 @@ export default function AccountScreen() {
                   setNewPassword(val);
                   setPasswordError(null);
                 }}
+                onClear={() => setNewPassword("")}
               />
-              <TextInput
+              <ClearableInput
                 style={styles.input}
                 placeholder="Confirm new password"
                 placeholderTextColor={colors.textMuted}
@@ -288,6 +298,7 @@ export default function AccountScreen() {
                   setConfirmPassword(val);
                   setPasswordError(null);
                 }}
+                onClear={() => setConfirmPassword("")}
               />
               {passwordError && (
                 <Text style={styles.errorText}>{passwordError}</Text>

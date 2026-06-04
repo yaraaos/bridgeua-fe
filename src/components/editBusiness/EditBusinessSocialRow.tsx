@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
-import { StyleSheet, TextInput, View } from "react-native";
+import { Keyboard, Pressable, StyleSheet, TextInput, View } from "react-native";
 
 import AppText from "@/src/components/ui/AppText/AppText";
 import { AppColors } from "@/src/constants/colors";
@@ -26,6 +26,11 @@ export default function EditBusinessSocialRow({
   const styles = createStyles(colors);
   const isFilled = value.trim().length > 0;
 
+  const handleClear = () => {
+    Keyboard.dismiss();
+    onChangeText("");
+  };
+
   return (
     <View style={styles.row}>
       <Ionicons
@@ -33,7 +38,9 @@ export default function EditBusinessSocialRow({
         size={20}
         color={isFilled ? colors.primaryGreen : colors.textMuted}
       />
+
       <AppText style={styles.label}>{label}</AppText>
+
       <TextInput
         style={styles.input}
         value={value}
@@ -44,6 +51,16 @@ export default function EditBusinessSocialRow({
         autoCorrect={false}
         keyboardType="url"
       />
+
+      {isFilled ? (
+        <Pressable
+          onPress={handleClear}
+          hitSlop={10}
+          style={styles.clearButton}
+        >
+          <Ionicons name="close-circle" size={18} color={colors.textMuted} />
+        </Pressable>
+      ) : null}
     </View>
   );
 }
@@ -58,16 +75,23 @@ function createStyles(colors: AppColors) {
       borderBottomWidth: StyleSheet.hairlineWidth,
       borderBottomColor: colors.border,
     },
+
     label: {
       width: 84,
       fontSize: 14,
       fontWeight: "600",
       color: colors.textSecondary,
     },
+
     input: {
       flex: 1,
       fontSize: 14,
       color: colors.textPrimary,
+    },
+
+    clearButton: {
+      alignItems: "center",
+      justifyContent: "center",
     },
   });
 }

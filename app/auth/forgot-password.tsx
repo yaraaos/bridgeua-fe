@@ -5,9 +5,9 @@ import { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 import AppButton from "../../src/components/ui/AppButton/AppButton";
-import AppInput from "../../src/components/ui/AppInput/AppInput";
 import AppLoader from "../../src/components/ui/AppLoader/AppLoader";
 import AppScreen from "../../src/components/ui/AppScreen/AppScreen";
+import ClearableInput from "../../src/components/ui/ClearableInput";
 import { useForgotPassword } from "../../src/features/auth/hooks/useForgotPassword";
 import {
   ForgotPasswordFormErrors,
@@ -25,6 +25,15 @@ export default function ForgotPasswordScreen() {
 
   const [errors, setErrors] = useState<ForgotPasswordFormErrors>({});
 
+  const clearEmail = () => {
+    setEmail("");
+    setErrors((current) => ({
+      ...current,
+      email: undefined,
+    }));
+    setApiError(null);
+  };
+
   const handleSubmit = async () => {
     const values = { email };
 
@@ -40,7 +49,10 @@ export default function ForgotPasswordScreen() {
     const response = await submitForgotPassword(values);
 
     if (response) {
-      console.log('[DEV] Reset password code:', (response as any).resetPasswordCode);
+      console.log(
+        "[DEV] Reset password code:",
+        (response as any).resetPasswordCode,
+      );
       router.push("/auth/reset-password");
     }
   };
@@ -57,9 +69,10 @@ export default function ForgotPasswordScreen() {
 
       <View style={styles.form}>
         <View>
-          <AppInput
+          <ClearableInput
             placeholder="Email address"
             value={email}
+            onClear={clearEmail}
             onChangeText={(value) => {
               setEmail(value.toLowerCase().trim());
               setErrors((current) => ({

@@ -21,10 +21,10 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useNotificationsStore } from "@/src/store/notifications.store";
 import { AccountTypeSwitch } from "../../src/components/auth";
 import AppButton from "../../src/components/ui/AppButton/AppButton";
-import AppInput from "../../src/components/ui/AppInput/AppInput";
 import AppLoader from "../../src/components/ui/AppLoader/AppLoader";
 import AppPasswordInput from "../../src/components/ui/AppPasswordInput/AppPasswordInput";
 import AppSelect from "../../src/components/ui/AppSelect/AppSelect";
+import ClearableInput from "../../src/components/ui/ClearableInput";
 import { useRegisterBusiness } from "../../src/features/auth/hooks/useRegisterBusiness";
 import {
   SignUpBusinessFormErrors,
@@ -39,9 +39,15 @@ import {
 const US_STATES = Object.keys(US_STATE_BOUNDS);
 
 const CUISINE_OPTIONS = [
-  "American", "Chinese", "Italian", "Japanese",
-  "Mediterranean", "Mexican", "Ukrainian", "Vegan",
-].map(c => ({ label: c, value: c }));
+  "American",
+  "Chinese",
+  "Italian",
+  "Japanese",
+  "Mediterranean",
+  "Mexican",
+  "Ukrainian",
+  "Vegan",
+].map((c) => ({ label: c, value: c }));
 
 const FALLBACK_CATEGORIES = [
   "Beauty",
@@ -102,6 +108,42 @@ export default function SignUpBusinessScreen() {
   const setNotificationsAccountType = useNotificationsStore(
     (s) => s.setActiveAccountType,
   );
+
+  const clearBusinessName = () => {
+    setBusinessName("");
+    clearFieldError("businessName");
+  };
+
+  const clearOwnerName = () => {
+    setOwnerName("");
+    clearFieldError("ownerName");
+  };
+
+  const clearAddress = () => {
+    setAddress("");
+    clearFieldError("address");
+  };
+
+  const clearZipCode = () => {
+    setZipCode("");
+    clearFieldError("zipCode");
+  };
+
+  const clearCity = () => {
+    setCity("");
+    clearFieldError("city");
+  };
+
+  const clearState = () => {
+    setState("");
+    setStateQuery("");
+    clearFieldError("state");
+  };
+
+  const clearEmail = () => {
+    setEmail("");
+    clearFieldError("email");
+  };
 
   const handleSubmit = async () => {
     if (isLoading) return;
@@ -212,9 +254,10 @@ export default function SignUpBusinessScreen() {
 
             <View style={styles.form}>
               <View>
-                <AppInput
+                <ClearableInput
                   placeholder="Business name"
                   value={businessName}
+                  onClear={clearBusinessName}
                   onChangeText={(value) => {
                     setBusinessName(value);
                     clearFieldError("businessName");
@@ -223,6 +266,7 @@ export default function SignUpBusinessScreen() {
                   disabled={isLoading}
                   error={Boolean(errors.businessName)}
                 />
+
                 <View style={styles.businessNameHintRow}>
                   {errors.businessName ? (
                     <Text style={styles.errorText}>{errors.businessName}</Text>
@@ -231,6 +275,7 @@ export default function SignUpBusinessScreen() {
                       Cannot be changed later
                     </Text>
                   )}
+
                   <Text
                     style={[
                       styles.charCounter,
@@ -243,6 +288,7 @@ export default function SignUpBusinessScreen() {
                     {businessName.length}/{BUSINESS_NAME_HARD_LIMIT}
                   </Text>
                 </View>
+
                 {!errors.businessName &&
                 isBusinessNameNearLimit(businessName) &&
                 businessName.length < BUSINESS_NAME_HARD_LIMIT ? (
@@ -255,9 +301,10 @@ export default function SignUpBusinessScreen() {
               </View>
 
               <View>
-                <AppInput
+                <ClearableInput
                   placeholder="Your full name"
                   value={ownerName}
+                  onClear={clearOwnerName}
                   onChangeText={(value) => {
                     setOwnerName(value);
                     clearFieldError("ownerName");
@@ -265,6 +312,7 @@ export default function SignUpBusinessScreen() {
                   disabled={isLoading}
                   error={Boolean(errors.ownerName)}
                 />
+
                 {errors.ownerName ? (
                   <Text style={styles.errorText}>{errors.ownerName}</Text>
                 ) : null}
@@ -278,28 +326,44 @@ export default function SignUpBusinessScreen() {
                   error={Boolean(errors.category)}
                   onPress={() => setCategoryModalVisible(true)}
                 />
+
                 {errors.category ? (
                   <Text style={styles.errorText}>{errors.category}</Text>
                 ) : (
                   <Text style={styles.helperText}>Cannot be changed later</Text>
                 )}
-                {selectedCategory === "Food" && !selectedCuisine && errors.cuisine && (
+
+                {selectedCategory === "Food" &&
+                !selectedCuisine &&
+                errors.cuisine ? (
                   <Text style={styles.errorText}>{errors.cuisine}</Text>
-                )}
+                ) : null}
+
                 {selectedCategory === "Food" && !!selectedCuisine && (
                   <Pressable onPress={() => setCuisineModalVisible(true)}>
                     <Text style={styles.helperText}>
-                      <Text style={{ color: colors.white, fontWeight: "700" }}>{selectedCuisine}</Text>
-                      <Text style={{ color: colors.primaryGreen, fontWeight: "700" }}> · tap to change</Text>
+                      <Text style={{ color: colors.white, fontWeight: "700" }}>
+                        {selectedCuisine}
+                      </Text>
+                      <Text
+                        style={{
+                          color: colors.primaryGreen,
+                          fontWeight: "700",
+                        }}
+                      >
+                        {" "}
+                        · tap to change
+                      </Text>
                     </Text>
                   </Pressable>
                 )}
               </View>
 
               <View>
-                <AppInput
+                <ClearableInput
                   placeholder="Address"
                   value={address}
+                  onClear={clearAddress}
                   onChangeText={(value) => {
                     setAddress(value);
                     clearFieldError("address");
@@ -307,6 +371,7 @@ export default function SignUpBusinessScreen() {
                   disabled={isLoading}
                   error={Boolean(errors.address)}
                 />
+
                 {errors.address ? (
                   <Text style={styles.errorText}>{errors.address}</Text>
                 ) : null}
@@ -314,9 +379,10 @@ export default function SignUpBusinessScreen() {
 
               <View style={styles.addressRow}>
                 <View style={styles.addressZip}>
-                  <AppInput
+                  <ClearableInput
                     placeholder="ZIP Code"
                     value={zipCode}
+                    onClear={clearZipCode}
                     onChangeText={(value) => {
                       setZipCode(value);
                       clearFieldError("zipCode");
@@ -325,15 +391,17 @@ export default function SignUpBusinessScreen() {
                     disabled={isLoading}
                     error={Boolean(errors.zipCode)}
                   />
+
                   {errors.zipCode ? (
                     <Text style={styles.errorText}>{errors.zipCode}</Text>
                   ) : null}
                 </View>
 
                 <View style={styles.addressCity}>
-                  <AppInput
+                  <ClearableInput
                     placeholder="City"
                     value={city}
+                    onClear={clearCity}
                     onChangeText={(value) => {
                       setCity(value);
                       clearFieldError("city");
@@ -341,6 +409,7 @@ export default function SignUpBusinessScreen() {
                     disabled={isLoading}
                     error={Boolean(errors.city)}
                   />
+
                   {errors.city ? (
                     <Text style={styles.errorText}>{errors.city}</Text>
                   ) : null}
@@ -348,9 +417,10 @@ export default function SignUpBusinessScreen() {
               </View>
 
               <View style={{ position: "relative", zIndex: 100 }}>
-                <AppInput
+                <ClearableInput
                   placeholder="State / Region"
                   value={stateQuery}
+                  onClear={clearState}
                   onChangeText={(value) => {
                     const trimmed = value.replace(/\s+$/, "");
                     setStateQuery(trimmed);
@@ -364,14 +434,19 @@ export default function SignUpBusinessScreen() {
                   }}
                   error={!!errors.state}
                 />
+
                 {stateSuggestions.length > 0 && (
                   <View style={styles.suggestionsContainer}>
                     <ScrollView
                       keyboardShouldPersistTaps="handled"
                       showsVerticalScrollIndicator={false}
                       style={{ maxHeight: 180 }}
-                      onScroll={(e) => setStateScrollOffset(e.nativeEvent.contentOffset.y)}
-                      onLayout={(e) => setStateScrollViewHeight(e.nativeEvent.layout.height)}
+                      onScroll={(e) =>
+                        setStateScrollOffset(e.nativeEvent.contentOffset.y)
+                      }
+                      onLayout={(e) =>
+                        setStateScrollViewHeight(e.nativeEvent.layout.height)
+                      }
                       onContentSizeChange={(_, h) => setStateContentHeight(h)}
                       scrollEventThrottle={16}
                     >
@@ -385,61 +460,86 @@ export default function SignUpBusinessScreen() {
                             clearFieldError("state");
                           }}
                         >
-                          <Text style={styles.suggestionText}>{suggestion}</Text>
+                          <Text style={styles.suggestionText}>
+                            {suggestion}
+                          </Text>
                         </Pressable>
                       ))}
                     </ScrollView>
-                    {stateContentHeight > stateScrollViewHeight && (() => {
-                      const trackHeight = stateScrollViewHeight - 12;
-                      const thumbHeight = Math.max(20, (stateScrollViewHeight / stateContentHeight) * trackHeight);
-                      const maxThumbTop = trackHeight - thumbHeight;
-                      const thumbTop = Math.min(
-                        maxThumbTop,
-                        Math.max(0, (stateScrollOffset / (stateContentHeight - stateScrollViewHeight)) * maxThumbTop),
-                      );
-                      return (
-                        <View style={styles.scrollTrack}>
-                          <View style={[styles.scrollThumb, { height: thumbHeight, top: thumbTop }]} />
-                        </View>
-                      );
-                    })()}
+
+                    {stateContentHeight > stateScrollViewHeight &&
+                      (() => {
+                        const trackHeight = stateScrollViewHeight - 12;
+                        const thumbHeight = Math.max(
+                          20,
+                          (stateScrollViewHeight / stateContentHeight) *
+                            trackHeight,
+                        );
+                        const maxThumbTop = trackHeight - thumbHeight;
+                        const thumbTop = Math.min(
+                          maxThumbTop,
+                          Math.max(
+                            0,
+                            (stateScrollOffset /
+                              (stateContentHeight - stateScrollViewHeight)) *
+                              maxThumbTop,
+                          ),
+                        );
+
+                        return (
+                          <View style={styles.scrollTrack}>
+                            <View
+                              style={[
+                                styles.scrollThumb,
+                                { height: thumbHeight, top: thumbTop },
+                              ]}
+                            />
+                          </View>
+                        );
+                      })()}
                   </View>
                 )}
+
                 {!!errors.state && (
                   <Text style={styles.errorText}>{errors.state}</Text>
                 )}
               </View>
 
               <View>
-                <AppInput
+                <ClearableInput
                   placeholder="Latitude"
                   value={latitude}
                   onChangeText={setLatitude}
+                  onClear={() => setLatitude("")}
                   keyboardType="decimal-pad"
                   disabled={isLoading}
                 />
+
                 <Text style={styles.helperText}>
                   Optional — helps place your business on the map
                 </Text>
               </View>
 
               <View>
-                <AppInput
+                <ClearableInput
                   placeholder="Longitude"
                   value={longitude}
                   onChangeText={setLongitude}
+                  onClear={() => setLongitude("")}
                   keyboardType="decimal-pad"
                   disabled={isLoading}
                 />
+
                 <Text style={styles.helperText}>
                   Optional — helps place your business on the map
                 </Text>
               </View>
 
               <View>
-                <AppInput
+                <ClearableInput
                   placeholder="Email address"
                   value={email}
+                  onClear={clearEmail}
                   onChangeText={(value) => {
                     setEmail(value.toLowerCase().trim());
                     clearFieldError("email");
@@ -449,6 +549,7 @@ export default function SignUpBusinessScreen() {
                   disabled={isLoading}
                   error={Boolean(errors.email)}
                 />
+
                 {errors.email ? (
                   <Text style={styles.errorText}>{errors.email}</Text>
                 ) : null}
@@ -465,6 +566,7 @@ export default function SignUpBusinessScreen() {
                   disabled={isLoading}
                   error={Boolean(errors.password)}
                 />
+
                 {errors.password ? (
                   <Text style={styles.errorText}>{errors.password}</Text>
                 ) : null}
@@ -481,6 +583,7 @@ export default function SignUpBusinessScreen() {
                   disabled={isLoading}
                   error={Boolean(errors.confirmPassword)}
                 />
+
                 {errors.confirmPassword ? (
                   <Text style={styles.errorText}>{errors.confirmPassword}</Text>
                 ) : null}
@@ -549,6 +652,7 @@ export default function SignUpBusinessScreen() {
             >
               <View style={styles.modalSheet}>
                 <Text style={styles.modalTitle}>Select Category</Text>
+
                 {categoryOptions.map((option) => (
                   <Pressable
                     key={option.value}
@@ -571,6 +675,7 @@ export default function SignUpBusinessScreen() {
                     >
                       {option.label}
                     </Text>
+
                     {selectedCategory === option.value && (
                       <Feather
                         name="check"
@@ -596,6 +701,7 @@ export default function SignUpBusinessScreen() {
             >
               <View style={styles.modalSheet}>
                 <Text style={styles.modalTitle}>Select Cuisine</Text>
+
                 {CUISINE_OPTIONS.map((option) => (
                   <Pressable
                     key={option.value}
@@ -608,7 +714,8 @@ export default function SignUpBusinessScreen() {
                     <Text
                       style={[
                         styles.modalOptionText,
-                        selectedCuisine === option.value && styles.modalOptionTextActive,
+                        selectedCuisine === option.value &&
+                          styles.modalOptionTextActive,
                       ]}
                     >
                       {option.label}
@@ -768,6 +875,7 @@ function createStyles(colors: AppColors) {
       shadowRadius: 16,
       shadowOffset: { width: 0, height: 8 },
     },
+
     scrollTrack: {
       position: "absolute",
       right: 4,
@@ -777,6 +885,7 @@ function createStyles(colors: AppColors) {
       borderRadius: 2,
       backgroundColor: "rgba(255,255,255,0.15)",
     },
+
     scrollThumb: {
       position: "absolute",
       width: 3,
@@ -788,7 +897,7 @@ function createStyles(colors: AppColors) {
       paddingHorizontal: 14,
       paddingVertical: 12,
       borderBottomWidth: 1,
-      borderBottomColor: 'rgba(255,255,255,0.08)',
+      borderBottomColor: "rgba(255,255,255,0.08)",
     },
 
     suggestionText: {

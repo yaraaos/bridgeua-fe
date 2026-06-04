@@ -9,10 +9,10 @@ import { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 import AppButton from "../../src/components/ui/AppButton/AppButton";
-import AppInput from "../../src/components/ui/AppInput/AppInput";
 import AppLoader from "../../src/components/ui/AppLoader/AppLoader";
 import AppPasswordInput from "../../src/components/ui/AppPasswordInput/AppPasswordInput";
 import AppScreen from "../../src/components/ui/AppScreen/AppScreen";
+import ClearableInput from "../../src/components/ui/ClearableInput";
 import { useSignIn } from "../../src/features/auth/hooks/useSignIn";
 import {
   SignInFormErrors,
@@ -38,6 +38,12 @@ export default function SignInScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState<SignInFormErrors>({});
+
+  const clearEmail = () => {
+    setEmail("");
+    setErrors((current) => ({ ...current, email: undefined }));
+    setApiError(null);
+  };
 
   const handleSubmit = async () => {
     if (isLoading) return;
@@ -83,9 +89,10 @@ export default function SignInScreen() {
 
       <View style={styles.form}>
         <View>
-          <AppInput
+          <ClearableInput
             placeholder="Email address"
             value={email}
+            onClear={clearEmail}
             onChangeText={(value) => {
               setEmail(value.toLowerCase().trim());
               setErrors((current) => ({ ...current, email: undefined }));
