@@ -11,10 +11,10 @@ import { useNotificationsStore } from "@/src/store/notifications.store";
 import { useProfileStore } from "@/src/store/profile.store";
 import { AccountTypeSwitch } from "../../src/components/auth";
 import AppButton from "../../src/components/ui/AppButton/AppButton";
-import AppInput from "../../src/components/ui/AppInput/AppInput";
 import AppLoader from "../../src/components/ui/AppLoader/AppLoader";
 import AppPasswordInput from "../../src/components/ui/AppPasswordInput/AppPasswordInput";
 import AppScreen from "../../src/components/ui/AppScreen/AppScreen";
+import ClearableInput from "../../src/components/ui/ClearableInput";
 import { useRegisterPersonal } from "../../src/features/auth/hooks/useRegisterPersonal";
 import {
   SignUpPersonalFormErrors,
@@ -53,10 +53,12 @@ export default function SignUpPersonalScreen() {
     useState<UsernameAvailabilityStatus>("idle");
 
   const debouncedUsername = useDebounce(username.trim(), 1000);
+
   const clearFieldError = (field: keyof SignUpPersonalFormErrors) => {
     setErrors((current) => ({ ...current, [field]: undefined }));
     setApiError(null);
   };
+
   useEffect(() => {
     if (!debouncedUsername || errors.username) {
       setUsernameAvailabilityStatus("idle");
@@ -107,6 +109,27 @@ export default function SignUpPersonalScreen() {
       ...current,
       username: validateSignUpPersonalUsername(normalizedUsername),
     }));
+  };
+
+  const clearFirstName = () => {
+    setFirstName("");
+    clearFieldError("firstName");
+  };
+
+  const clearLastName = () => {
+    setLastName("");
+    clearFieldError("lastName");
+  };
+
+  const clearUsername = () => {
+    setUsername("");
+    setUsernameAvailabilityStatus("idle");
+    clearFieldError("username");
+  };
+
+  const clearEmail = () => {
+    setEmail("");
+    clearFieldError("email");
   };
 
   const handleSubmit = async () => {
@@ -199,9 +222,10 @@ export default function SignUpPersonalScreen() {
 
         <View style={styles.form}>
           <View>
-            <AppInput
+            <ClearableInput
               placeholder="First name"
               value={firstName}
+              onClear={clearFirstName}
               onChangeText={(value) => {
                 setFirstName(value);
                 clearFieldError("firstName");
@@ -215,9 +239,10 @@ export default function SignUpPersonalScreen() {
           </View>
 
           <View>
-            <AppInput
+            <ClearableInput
               placeholder="Last name"
               value={lastName}
+              onClear={clearLastName}
               onChangeText={(value) => {
                 setLastName(value);
                 clearFieldError("lastName");
@@ -231,9 +256,10 @@ export default function SignUpPersonalScreen() {
           </View>
 
           <View>
-            <AppInput
+            <ClearableInput
               placeholder="Username"
               value={username}
+              onClear={clearUsername}
               onChangeText={handleUsernameChange}
               autoCapitalize="none"
               disabled={isLoading}
@@ -265,9 +291,10 @@ export default function SignUpPersonalScreen() {
           </View>
 
           <View>
-            <AppInput
+            <ClearableInput
               placeholder="Email address"
               value={email}
+              onClear={clearEmail}
               onChangeText={(value) => {
                 setEmail(value.toLowerCase().trim());
                 clearFieldError("email");

@@ -11,11 +11,10 @@ import {
   View,
 } from "react-native";
 
-import AppButton from "@/src/components/ui/AppButton/AppButton";
-
 import AppAvatar from "@/src/components/ui/AppAvatar/AppAvatar";
-import AppInput from "@/src/components/ui/AppInput/AppInput";
+import AppButton from "@/src/components/ui/AppButton/AppButton";
 import AppText from "@/src/components/ui/AppText/AppText";
+import ClearableInput from "@/src/components/ui/ClearableInput";
 import { AppColors } from "@/src/constants/colors";
 import { radius } from "@/src/constants/radius";
 import { spacing } from "@/src/constants/spacing";
@@ -129,6 +128,7 @@ export default function EditOverviewTab({
   const setOverviewDraft = useEditBusinessStore((s) => s.setOverviewDraft);
   const updateOverviewHour = useEditBusinessStore((s) => s.updateOverviewHour);
   const hydratedBusinessIdRef = useRef<string | null>(null);
+
   useEffect(() => {
     if (!business) {
       return;
@@ -320,7 +320,6 @@ export default function EditOverviewTab({
           keyboardDismissMode="interactive"
           automaticallyAdjustKeyboardInsets
         >
-          {/* Business Profile Photo */}
           <View style={styles.avatarSection}>
             <View style={styles.avatarContainer}>
               <AppAvatar
@@ -341,7 +340,6 @@ export default function EditOverviewTab({
             </View>
           </View>
 
-          {/* Business Information */}
           <View style={styles.section}>
             <AppText style={styles.sectionTitle}>Business Information</AppText>
 
@@ -385,9 +383,10 @@ export default function EditOverviewTab({
                 {...registerField("address")}
               >
                 <AppText style={styles.fieldLabel}>Address</AppText>
-                <AppInput
+                <ClearableInput
                   value={draft.address}
                   onChangeText={onField("address")}
+                  onClear={() => onField("address")("")}
                   placeholder="Street address"
                   error={errors.address}
                 />
@@ -397,14 +396,16 @@ export default function EditOverviewTab({
                   </AppText>
                 )}
               </View>
+
               <View
                 style={[styles.fieldGroup, styles.postalField]}
                 {...registerField("postalCode")}
               >
                 <AppText style={styles.fieldLabel}>Postal Code</AppText>
-                <AppInput
+                <ClearableInput
                   value={draft.postalCode}
                   onChangeText={onField("postalCode")}
+                  onClear={() => onField("postalCode")("")}
                   placeholder="10001"
                   keyboardType="numeric"
                   error={errors.postalCode}
@@ -421,9 +422,10 @@ export default function EditOverviewTab({
                 {...registerField("city")}
               >
                 <AppText style={styles.fieldLabel}>City</AppText>
-                <AppInput
+                <ClearableInput
                   value={draft.city}
                   onChangeText={onField("city")}
+                  onClear={() => onField("city")("")}
                   placeholder="City"
                   error={errors.city}
                 />
@@ -433,6 +435,7 @@ export default function EditOverviewTab({
                   </AppText>
                 )}
               </View>
+
               <View
                 style={[
                   styles.fieldGroup,
@@ -441,11 +444,17 @@ export default function EditOverviewTab({
                 ]}
               >
                 <AppText style={styles.fieldLabel}>State / Region</AppText>
-                <AppInput
+                <ClearableInput
                   value={stateQuery}
                   onChangeText={(value) => {
                     const trimmed = value.replace(/\s+$/, "");
                     setStateQuery(trimmed);
+                    onStateChange("");
+                    setErrors((prev) => ({ ...prev, state: false }));
+                    clearError();
+                  }}
+                  onClear={() => {
+                    setStateQuery("");
                     onStateChange("");
                     setErrors((prev) => ({ ...prev, state: false }));
                     clearError();
@@ -459,8 +468,12 @@ export default function EditOverviewTab({
                       keyboardShouldPersistTaps="handled"
                       showsVerticalScrollIndicator={false}
                       style={{ maxHeight: 180 }}
-                      onScroll={(e) => setScrollOffset(e.nativeEvent.contentOffset.y)}
-                      onLayout={(e) => setScrollViewHeight(e.nativeEvent.layout.height)}
+                      onScroll={(e) =>
+                        setScrollOffset(e.nativeEvent.contentOffset.y)
+                      }
+                      onLayout={(e) =>
+                        setScrollViewHeight(e.nativeEvent.layout.height)
+                      }
                       onContentSizeChange={(_, h) => setContentHeight(h)}
                       scrollEventThrottle={16}
                     >
@@ -481,25 +494,34 @@ export default function EditOverviewTab({
                         </Pressable>
                       ))}
                     </ScrollView>
-                    {contentHeight > scrollViewHeight && (() => {
-                      const trackHeight = scrollViewHeight - 12;
-                      const thumbHeight = Math.max(20, (scrollViewHeight / contentHeight) * trackHeight);
-                      const maxThumbTop = trackHeight - thumbHeight;
-                      const thumbTop = Math.min(
-                        maxThumbTop,
-                        Math.max(0, (scrollOffset / (contentHeight - scrollViewHeight)) * maxThumbTop),
-                      );
-                      return (
-                        <View style={styles.scrollTrack}>
-                          <View
-                            style={[
-                              styles.scrollThumb,
-                              { height: thumbHeight, top: thumbTop },
-                            ]}
-                          />
-                        </View>
-                      );
-                    })()}
+                    {contentHeight > scrollViewHeight &&
+                      (() => {
+                        const trackHeight = scrollViewHeight - 12;
+                        const thumbHeight = Math.max(
+                          20,
+                          (scrollViewHeight / contentHeight) * trackHeight,
+                        );
+                        const maxThumbTop = trackHeight - thumbHeight;
+                        const thumbTop = Math.min(
+                          maxThumbTop,
+                          Math.max(
+                            0,
+                            (scrollOffset /
+                              (contentHeight - scrollViewHeight)) *
+                              maxThumbTop,
+                          ),
+                        );
+                        return (
+                          <View style={styles.scrollTrack}>
+                            <View
+                              style={[
+                                styles.scrollThumb,
+                                { height: thumbHeight, top: thumbTop },
+                              ]}
+                            />
+                          </View>
+                        );
+                      })()}
                   </View>
                 )}
                 {errors.state && (
@@ -513,18 +535,21 @@ export default function EditOverviewTab({
             <View style={styles.halfRow}>
               <View style={[styles.fieldGroup, styles.halfField]}>
                 <AppText style={styles.fieldLabel}>Latitude</AppText>
-                <AppInput
+                <ClearableInput
                   value={draft.latitude ?? ""}
                   onChangeText={onField("latitude")}
+                  onClear={() => onField("latitude")("")}
                   placeholder="e.g. 34.0549"
                   keyboardType="decimal-pad"
                 />
               </View>
+
               <View style={[styles.fieldGroup, styles.halfField]}>
                 <AppText style={styles.fieldLabel}>Longitude</AppText>
-                <AppInput
+                <ClearableInput
                   value={draft.longitude ?? ""}
                   onChangeText={onField("longitude")}
+                  onClear={() => onField("longitude")("")}
                   placeholder="e.g. -118.2426"
                   keyboardType="decimal-pad"
                 />
@@ -533,16 +558,16 @@ export default function EditOverviewTab({
 
             <View style={styles.fieldGroup}>
               <AppText style={styles.fieldLabel}>Phone Number</AppText>
-              <AppInput
+              <ClearableInput
                 value={draft.phone}
                 onChangeText={onField("phone")}
+                onClear={() => onField("phone")("")}
                 placeholder="+1 (555) 000-0000"
                 keyboardType="phone-pad"
               />
             </View>
           </View>
 
-          {/* Social Links */}
           <View style={styles.section}>
             <AppText style={styles.sectionTitle}>Social Links</AppText>
             <AppText style={styles.sectionNote}>
@@ -571,7 +596,6 @@ export default function EditOverviewTab({
             </View>
           </View>
 
-          {/* Business Hours — always visible */}
           <View style={styles.section}>
             <AppText style={styles.sectionTitle}>Business Hours</AppText>
             <View style={styles.card}>
@@ -605,11 +629,13 @@ export default function EditOverviewTab({
             </AppText>
           </View>
         )}
+
         {saveError != null && !showSuccess && (
           <View style={styles.bannerError}>
             <AppText style={styles.bannerErrorText}>{saveError}</AppText>
           </View>
         )}
+
         {showError && !showSuccess && (
           <AppText style={styles.validationError}>{errorMessage}</AppText>
         )}
@@ -639,8 +665,6 @@ function createStyles(colors: AppColors) {
       paddingBottom: spacing.xl,
       gap: spacing.xl,
     },
-
-    // Avatar
     avatarSection: {
       alignItems: "center",
       paddingTop: spacing.sm,
@@ -662,8 +686,6 @@ function createStyles(colors: AppColors) {
       borderWidth: 2,
       borderColor: colors.background,
     },
-
-    // Sections
     section: {
       gap: spacing.md,
     },
@@ -677,8 +699,6 @@ function createStyles(colors: AppColors) {
       color: colors.textMuted,
       marginTop: -spacing.xs,
     },
-
-    // Fields
     fieldGroup: {
       gap: spacing.xs,
     },
@@ -693,8 +713,6 @@ function createStyles(colors: AppColors) {
       color: colors.error,
       marginTop: 2,
     },
-
-    // Read-only field (mimics disabled AppInput)
     readOnlyField: {
       height: 50,
       backgroundColor: colors.background,
@@ -716,8 +734,6 @@ function createStyles(colors: AppColors) {
       fontSize: 11,
       color: colors.textMuted,
     },
-
-    // Address + postal row
     addressRow: {
       flexDirection: "row",
       gap: spacing.md,
@@ -729,8 +745,6 @@ function createStyles(colors: AppColors) {
     postalField: {
       flex: 1,
     },
-
-    // City + state row
     halfRow: {
       flexDirection: "row",
       gap: spacing.md,
@@ -738,8 +752,6 @@ function createStyles(colors: AppColors) {
     halfField: {
       flex: 1,
     },
-
-    // Card
     card: {
       backgroundColor: colors.surface,
       borderRadius: radius.md,
@@ -750,8 +762,6 @@ function createStyles(colors: AppColors) {
     lastRow: {
       borderBottomWidth: 0,
     },
-
-    // Footer
     footer: {
       paddingHorizontal: spacing.lg,
       paddingTop: spacing.sm,
@@ -805,7 +815,6 @@ function createStyles(colors: AppColors) {
       textAlign: "center",
       marginBottom: spacing.sm,
     },
-
     suggestionsContainer: {
       position: "absolute",
       top: 72,

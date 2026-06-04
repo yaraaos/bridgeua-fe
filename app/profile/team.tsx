@@ -5,6 +5,7 @@ import AppEmptyState from "@/src/components/ui/AppEmptyState";
 import AppLoader from "@/src/components/ui/AppLoader/AppLoader";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
 import AppText from "@/src/components/ui/AppText/AppText";
+import ClearableInput from "@/src/components/ui/ClearableInput";
 import { AppColors } from "@/src/constants/colors";
 import { useMyBusinessProfile } from "@/src/features/businesses/hooks/useBusiness";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
@@ -27,8 +28,7 @@ import {
   Pressable,
   RefreshControl,
   StyleSheet,
-  TextInput,
-  View,
+  View
 } from "react-native";
 
 export default function TeamScreen() {
@@ -389,9 +389,10 @@ export default function TeamScreen() {
               Add team member
             </AppText>
 
-            <TextInput
+            <ClearableInput
               value={firstName}
               onChangeText={setFirstName}
+              onClear={() => setFirstName("")}
               placeholder="First name"
               placeholderTextColor={colors.textMuted}
               style={[
@@ -404,9 +405,10 @@ export default function TeamScreen() {
               ]}
             />
 
-            <TextInput
+            <ClearableInput
               value={lastName}
               onChangeText={setLastName}
+              onClear={() => setLastName("")}
               placeholder="Last name"
               placeholderTextColor={colors.textMuted}
               style={[
@@ -605,9 +607,10 @@ export default function TeamScreen() {
               Edit team member
             </AppText>
 
-            <TextInput
+            <ClearableInput
               value={editFirstName}
               onChangeText={setEditFirstName}
+              onClear={() => setEditFirstName("")}
               placeholder="First name"
               placeholderTextColor={colors.textMuted}
               style={[
@@ -620,9 +623,10 @@ export default function TeamScreen() {
               ]}
             />
 
-            <TextInput
+            <ClearableInput
               value={editLastName}
               onChangeText={setEditLastName}
+              onClear={() => setEditLastName("")}
               placeholder="Last name"
               placeholderTextColor={colors.textMuted}
               style={[
