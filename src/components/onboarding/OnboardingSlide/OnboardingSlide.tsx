@@ -1,9 +1,9 @@
 import AppText from "@/src/components/ui/AppText/AppText";
+import type { OnboardingSlideItem } from "@/src/constants/onboarding";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { ImageBackground, View } from "react-native";
-import type { OnboardingSlideItem } from "@/src/mocks/onboarding.mock";
 import OnboardingDots from "../OnboardingDots";
 import { createStyles } from "./OnboardingSlide.styles";
 
