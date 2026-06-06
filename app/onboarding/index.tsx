@@ -1,6 +1,6 @@
 import { AppColors } from "@/src/constants/colors";
+import { ONBOARDING_SLIDES } from "@/src/constants/onboarding";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
-import { ONBOARDING_SLIDES } from "@/src/mocks/onboarding.mock";
 import { setOnboardingSeen } from "@/src/services/storage/onboarding";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";

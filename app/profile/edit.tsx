@@ -15,7 +15,6 @@ import { spacing } from "@/src/constants/spacing";
 import { validateSignUpPersonalUsername } from "@/src/features/auth/validation/signUpPersonal.validation";
 import { useEditProfile } from "@/src/features/profile/hooks/useEditProfile";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
-import { personalProfileMock } from "@/src/mocks/profile.mock";
 import { useProfileStore } from "@/src/store/profile.store";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation, usePreventRemove } from "@react-navigation/native";
@@ -30,8 +29,7 @@ export default function EditProfileScreen() {
 
   const navigation = useNavigation();
 
-  const storeProfile = useProfileStore((state) => state.profile);
-  const profile = storeProfile ?? personalProfileMock;
+  const profile = useProfileStore((state) => state.profile);
 
   const initialNames = useMemo(() => {
     const parts = profile.displayName.trim().split(" ");
@@ -180,7 +178,11 @@ export default function EditProfileScreen() {
             style={{ alignSelf: "flex-start", marginLeft: -4, marginTop: -4 }}
             hitSlop={12}
           >
-            <Ionicons name="chevron-back" size={28} color={colors.textPrimary} />
+            <Ionicons
+              name="chevron-back"
+              size={28}
+              color={colors.textPrimary}
+            />
           </Pressable>
         }
       />
@@ -234,7 +236,9 @@ export default function EditProfileScreen() {
           <ProfileField label="Username" errorText={usernameError}>
             <ClearableInput
               value={username}
-              onChangeText={(value) => setUsername(value.toLowerCase().replace(/\s/g, ""))}
+              onChangeText={(value) =>
+                setUsername(value.toLowerCase().replace(/\s/g, ""))
+              }
               onClear={() => setUsername("")}
               placeholder="Enter username"
               autoCapitalize="none"
