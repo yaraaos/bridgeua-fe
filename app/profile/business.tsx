@@ -24,6 +24,8 @@ import AppText from "@/src/components/ui/AppText/AppText";
 import { AppColors } from "@/src/constants/colors";
 import { spacing } from "@/src/constants/spacing";
 import { useBusinessAnalytics } from "@/src/features/businesses/hooks/useAnalytics";
+import AppEmptyState from "@/src/components/ui/AppEmptyState";
+import NetworkErrorBanner from "@/src/components/ui/NetworkErrorBanner";
 import { useMyBusinessProfile } from "@/src/features/businesses/hooks/useBusiness";
 import { useReviews } from "@/src/features/reviews/hooks/useReviews";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
@@ -159,8 +161,18 @@ export default function BusinessProfileScreen() {
   if (error) {
     return (
       <AppScreen style={styles.container} withTopInset={false}>
+        {error.isNetworkError && <NetworkErrorBanner />}
         <View style={styles.centerState}>
-          <AppText style={styles.errorText}>{error}</AppText>
+          <AppEmptyState
+            title={error.isNetworkError ? "No internet connection" : "Something went wrong"}
+            description={
+              error.isNetworkError
+                ? "Check your connection and try again."
+                : "Couldn't load business profile."
+            }
+            actionLabel="Try again"
+            onPressAction={refetch}
+          />
         </View>
       </AppScreen>
     );

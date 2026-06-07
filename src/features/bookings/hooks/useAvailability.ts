@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 
+import { ApiError, parseApiError } from "@/src/services/api/types";
 import { getBookingAvailability } from "../services/booking.service";
 
 import type {
@@ -10,7 +11,7 @@ import type {
 export const useAvailability = (params: BookingAvailabilityParams | null) => {
   const [slots, setSlots] = useState<BookingTimeSlot[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<ApiError | null>(null);
 
   const businessId = params?.businessId;
   const serviceId = params?.serviceId;
@@ -42,10 +43,7 @@ export const useAvailability = (params: BookingAvailabilityParams | null) => {
         }
       } catch (e) {
         if (isMounted) {
-          const message =
-            e instanceof Error ? e.message : "Failed to load availability.";
-
-          setError(message);
+          setError(parseApiError(e));
           setSlots([]);
         }
       } finally {

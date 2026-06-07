@@ -176,7 +176,11 @@ export default function ChooseDateScreen() {
             )}
 
             {!!availabilityError && (
-              <AppText style={styles.emptyText}>{availabilityError}</AppText>
+              <AppText style={styles.emptyText}>
+                {availabilityError.isNetworkError
+                  ? "No internet connection. Check your connection."
+                  : availabilityError.message}
+              </AppText>
             )}
 
             <View style={styles.timeGrid}>

@@ -136,8 +136,14 @@ export default function BookingConfirmScreen() {
 
       {!!error && (
         <View style={styles.errorBox}>
-          <AppText style={styles.errorTitle}>Booking failed</AppText>
-          <AppText style={styles.errorText}>{error}</AppText>
+          <AppText style={styles.errorTitle}>
+            {error.isNetworkError ? "No internet connection" : "Booking failed"}
+          </AppText>
+          <AppText style={styles.errorText}>
+            {error.isNetworkError
+              ? "Check your connection and try again."
+              : error.message}
+          </AppText>
           <AppButton
             title="Retry"
             variant="secondary"

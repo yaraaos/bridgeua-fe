@@ -17,15 +17,19 @@ export function useBannerPromotion() {
         return;
       }
 
-      const data = await getBannerPromotion();
+      try {
+        const data = await getBannerPromotion();
 
-      if (!isMounted || !data) {
-        return;
+        if (!isMounted || !data) {
+          return;
+        }
+
+        setPromotion(data);
+        setIsVisible(true);
+        hasShownBannerPromotionThisSession = true;
+      } catch {
+        // banner is non-critical; skip silently
       }
-
-      setPromotion(data);
-      setIsVisible(true);
-      hasShownBannerPromotionThisSession = true;
     }
 
     loadPromotion();

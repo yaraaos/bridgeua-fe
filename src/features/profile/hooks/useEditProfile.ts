@@ -1,5 +1,6 @@
 import { apiClient } from "@/src/services/api/client";
 import { ENDPOINTS } from "@/src/services/api/endpoints";
+import { ApiError, parseApiError } from "@/src/services/api/types";
 import { useProfileStore } from "@/src/store/profile.store";
 import { useReviewsStore } from "@/src/store/reviews.store";
 import { useState } from "react";
@@ -13,6 +14,10 @@ type EditProfilePayload = {
   avatarUrl?: string;
 };
 
+type SaveResult =
+  | { ok: true; avatarUrl: string | undefined }
+  | { ok: false; error: ApiError };
+
 export function useEditProfile() {
   const [isSaving, setIsSaving] = useState(false);
   const updateProfile = useProfileStore((state) => state.updateProfile);
@@ -21,11 +26,10 @@ export function useEditProfile() {
     (state) => state.syncReviewAuthorUsername,
   );
 
-  const saveProfile = async (payload: EditProfilePayload) => {
+  const saveProfile = async (payload: EditProfilePayload): Promise<SaveResult> => {
     try {
       setIsSaving(true);
 
-      // Если аватар изменился и это локальный URI (с телефона) — загружаем отдельно
       let finalAvatarUrl = payload.avatarUrl;
       if (payload.avatarUrl && payload.avatarUrl !== profile.avatarUrl && payload.avatarUrl.startsWith('file')) {
         const formData = new FormData();
@@ -42,7 +46,6 @@ export function useEditProfile() {
         finalAvatarUrl = avatarRes.data.avatarUrl;
       }
 
-      // PATCH основных данных профиля
       await apiClient.patch(ENDPOINTS.USERS_ME, {
         firstName: payload.firstName,
         lastName: payload.lastName,
@@ -70,9 +73,8 @@ export function useEditProfile() {
       });
 
       return { ok: true, avatarUrl: finalAvatarUrl };
-    } catch (error) {
-      console.error("Edit profile failed", error);
-      return { ok: false, avatarUrl: undefined };
+    } catch (e) {
+      return { ok: false, error: parseApiError(e) };
     } finally {
       setIsSaving(false);
     }
