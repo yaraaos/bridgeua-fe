@@ -13,6 +13,22 @@ type RequestOptions = Omit<RequestInit, "body"> & {
 
 let isRefreshing = false;
 let refreshPromise: Promise<string | null> | null = null;
+let isForcingLogout = false;
+
+async function handleSessionExpired(): Promise<void> {
+  if (isForcingLogout) return;
+  isForcingLogout = true;
+
+  try {
+    const { useAuthStore } = await import("@/src/store/auth.store");
+    await useAuthStore.getState().forceSignOut();
+
+    const { router } = await import("expo-router");
+    router.replace("/auth/sign-in");
+  } finally {
+    isForcingLogout = false;
+  }
+}
 
 async function tryRefreshToken(): Promise<string | null> {
   if (isRefreshing && refreshPromise) return refreshPromise;
@@ -103,7 +119,7 @@ async function request<T>(
     if (newAccessToken) {
       return request<T>(path, options, true);
     }
-    // Refresh failed — throw so auth store can handle logout
+    await handleSessionExpired();
     throw new Error("Session expired. Please log in again.");
   }
 
