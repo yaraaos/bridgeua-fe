@@ -2,6 +2,7 @@ import type {
   Business,
   BusinessDetails,
 } from "@/src/features/businesses/types/business.types";
+import { ApiError, parseApiError } from "@/src/services/api/types";
 import { useAuthStore } from "@/src/store/auth.store";
 import { useCallback, useEffect, useState } from "react";
 import {
@@ -17,13 +18,15 @@ export const useBusinesses = (
 ) => {
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<ApiError | null>(null);
+  const [refetchKey, setRefetchKey] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
 
-    const loadBusinesses = async () => {
+    const load = async () => {
       try {
+        setError(null);
         const data = await getBusinesses(params);
         if (!cancelled) {
           setBusinesses(data);
@@ -31,29 +34,33 @@ export const useBusinesses = (
         }
       } catch (e) {
         if (!cancelled) {
-          setError(
-            e instanceof Error ? e.message : "Failed to load businesses",
-          );
+          setError(parseApiError(e));
           setIsInitialLoad(false);
         }
       }
     };
 
-    void loadBusinesses();
+    void load();
 
     return () => {
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [JSON.stringify(params), refetchTrigger]);
+  }, [JSON.stringify(params), refetchTrigger, refetchKey]);
 
-  return { businesses, isLoading: isInitialLoad, error };
+  const refetch = useCallback(() => {
+    setIsInitialLoad(true);
+    setError(null);
+    setRefetchKey((k) => k + 1);
+  }, []);
+
+  return { businesses, isLoading: isInitialLoad, error, refetch };
 };
 
 export const useBusinessDetails = (id?: string) => {
   const [business, setBusiness] = useState<BusinessDetails | null>(null);
   const [isLoading, setIsLoading] = useState(Boolean(id));
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<ApiError | null>(null);
 
   const loadBusiness = useCallback(async () => {
     if (!id) {
@@ -69,7 +76,7 @@ export const useBusinessDetails = (id?: string) => {
       const data = await getBusinessDetailsById(id);
       setBusiness(data);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Failed to load business");
+      setError(parseApiError(e));
     } finally {
       setIsLoading(false);
     }
@@ -85,7 +92,7 @@ export const useBusinessDetails = (id?: string) => {
 export const useMyBusinessProfile = () => {
   const [business, setBusiness] = useState<BusinessDetails | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<ApiError | null>(null);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const isGuest = useAuthStore((state) => state.isGuest);
 
@@ -101,9 +108,7 @@ export const useMyBusinessProfile = () => {
       const data = await getMyBusinessProfile();
       setBusiness(data);
     } catch (e) {
-      setError(
-        e instanceof Error ? e.message : "Failed to load business profile",
-      );
+      setError(parseApiError(e));
     } finally {
       setIsLoading(false);
     }

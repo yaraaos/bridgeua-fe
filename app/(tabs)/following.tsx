@@ -1061,7 +1061,8 @@ export default function FollowingScreen() {
                                       : p.imageUrl,
                                   })) as Promotion[],
                                 );
-                              });
+                              })
+                              .catch(() => {});
                           })
                           .catch(() => {});
                       }

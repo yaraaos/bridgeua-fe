@@ -4,6 +4,7 @@ import CategoryScroller from "@/src/components/home/CategoryScroller/CategoryScr
 import HomePromotionBanner from "@/src/components/home/HomePromotionBanner";
 import HomePromotionModal from "@/src/components/home/HomePromotionModal/HomePromotionModal";
 import AppEmptyState from "@/src/components/ui/AppEmptyState";
+import NetworkErrorBanner from "@/src/components/ui/NetworkErrorBanner";
 import AppLoader from "@/src/components/ui/AppLoader/AppLoader";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
 import { LocationOption } from "@/src/constants/locations";
@@ -91,7 +92,7 @@ export default function HomeScreen() {
 
   const businessVersion = useFilterStore((s) => s.businessVersion);
 
-  const { businesses, isLoading } = useBusinesses(
+  const { businesses, isLoading, error: businessesError, refetch: refetchBusinesses } = useBusinesses(
     Object.keys(serverParams).length > 0 ? serverParams : undefined,
     businessVersion,
   );
@@ -408,6 +409,35 @@ export default function HomeScreen() {
         <View style={styles.contentArea}>
           {categoryBar}
           <AppLoader />
+        </View>
+      </AppScreen>
+    );
+  }
+
+  if (businessesError) {
+    return (
+      <AppScreen withTopInset={false} style={styles.container}>
+        <View style={styles.headerWrap}>
+          {header}
+        </View>
+
+        <View style={styles.contentArea}>
+          {categoryBar}
+          {businessesError.isNetworkError && (
+            <NetworkErrorBanner />
+          )}
+          <View style={styles.emptyStateWrap}>
+            <AppEmptyState
+              title={businessesError.isNetworkError ? "No internet connection" : "Something went wrong"}
+              description={
+                businessesError.isNetworkError
+                  ? "Check your connection and try again."
+                  : "We couldn't load businesses. Please try again."
+              }
+              actionLabel="Try again"
+              onPressAction={refetchBusinesses}
+            />
+          </View>
         </View>
       </AppScreen>
     );

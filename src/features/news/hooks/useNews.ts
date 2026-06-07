@@ -22,6 +22,8 @@ export function useNewsItem(id?: string) {
         if (isMounted) {
           setNewsItem(data);
         }
+      } catch {
+        // non-critical; leave newsItem as null
       } finally {
         if (isMounted) {
           setIsLoading(false);

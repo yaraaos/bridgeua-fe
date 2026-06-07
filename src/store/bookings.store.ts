@@ -53,9 +53,14 @@ export const useBookingsStore = create<BookingsState>()(
       fetchBookings: async () => {
         const { apiClient } = await import("@/src/services/api/client");
 
-        const res = await apiClient.get<{ success: boolean; data: any[] }>(
-          "/api/bookings/me",
-        );
+        let res: { data: any };
+        try {
+          res = await apiClient.get<{ success: boolean; data: any[] }>(
+            "/api/bookings/me",
+          );
+        } catch {
+          return;
+        }
 
         const existing = get().bookings;
 

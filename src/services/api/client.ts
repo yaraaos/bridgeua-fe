@@ -5,6 +5,7 @@ import {
   saveAuthTokens,
 } from "../auth/tokens";
 import { API_BASE_URL } from "./config";
+import { ApiError } from "./types";
 import type { ApiErrorResponse, ApiResponse } from "./types";
 
 type RequestOptions = Omit<RequestInit, "body"> & {
@@ -99,19 +100,29 @@ async function request<T>(
     headers["Authorization"] = `Bearer ${token}`;
   }
 
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    ...options,
-    headers: {
-      ...headers,
-      ...(options.headers as Record<string, string>),
-    },
-    body:
-      options.body instanceof FormData
-        ? options.body
-        : options.body != null
-          ? JSON.stringify(options.body)
-          : undefined,
-  });
+  let response: Response;
+  try {
+    response = await fetch(`${API_BASE_URL}${path}`, {
+      ...options,
+      headers: {
+        ...headers,
+        ...(options.headers as Record<string, string>),
+      },
+      body:
+        options.body instanceof FormData
+          ? options.body
+          : options.body != null
+            ? JSON.stringify(options.body)
+            : undefined,
+    });
+  } catch {
+    throw new ApiError(
+      "Network request failed. Please check your connection.",
+      0,
+      undefined,
+      true,
+    );
+  }
 
   // Auto-refresh on 401, but not for auth endpoints and not on retry
   if (response.status === 401 && !isRetry && !path.includes("/api/auth/")) {
@@ -120,15 +131,29 @@ async function request<T>(
       return request<T>(path, options, true);
     }
     await handleSessionExpired();
-    throw new Error("Session expired. Please log in again.");
+    throw new ApiError("Session expired. Please log in again.", 401);
   }
 
   const json = await response.json();
 
   if (!response.ok) {
     const err = json as ApiErrorResponse;
-    throw new Error(
+    if (response.status === 422) {
+      throw new ApiError(
+        err.message ?? "Validation failed",
+        422,
+        err.errors,
+      );
+    }
+    if (response.status >= 500) {
+      throw new ApiError(
+        "Something went wrong. Please try again.",
+        response.status,
+      );
+    }
+    throw new ApiError(
       err.message ?? `Request failed with status ${response.status}`,
+      response.status,
     );
   }
 
