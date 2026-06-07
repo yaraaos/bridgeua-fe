@@ -120,6 +120,7 @@ export default function SignInScreen() {
             }}
             error={Boolean(errors.password)}
             disabled={isLoading}
+            textContentType="password"
           />
 
           {errors.password ? (

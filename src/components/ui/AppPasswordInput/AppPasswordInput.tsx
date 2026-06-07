@@ -11,7 +11,7 @@ type Props = TextInputProps & {
   disabled?: boolean;
 };
 
-export default function AppPasswordInput(props: Props) {
+export default function AppPasswordInput({ textContentType, ...props }: Props) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
   const [isVisible, setIsVisible] = useState(false);
@@ -21,6 +21,7 @@ export default function AppPasswordInput(props: Props) {
       <AppInput
         {...props}
         secureTextEntry={!isVisible}
+        textContentType={isVisible ? "none" : (textContentType ?? "newPassword")}
         style={[props.style, styles.inputWithIcon]}
       />
 
