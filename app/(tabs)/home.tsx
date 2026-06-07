@@ -105,7 +105,11 @@ export default function HomeScreen() {
     if (!isHydrated || activeAccount?.kind !== "business") return currentUser;
 
     const fallbackOwnedId = activeAccount.ownedBusinessId;
-    const base = currentUser ?? ({ id: activeAccount.id, email: "" } as AuthUser);
+    const matchedUser =
+      currentUser && String(currentUser.id) === String(activeAccount.id)
+        ? currentUser
+        : null;
+    const base = matchedUser ?? ({ id: activeAccount.id, email: "" } as AuthUser);
 
     return {
       ...base,
