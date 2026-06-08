@@ -1,4 +1,4 @@
-import type { BusinessDetails } from "@/src/features/businesses/types/business.types";
+import type { BusinessAmenity, BusinessDetails } from "@/src/features/businesses/types/business.types";
 import type {
   EditBusinessAboutDraft,
   EditBusinessGalleryDraft,
@@ -6,6 +6,17 @@ import type {
   EditBusinessServicesDraft,
   EditBusinessTab,
 } from "@/src/features/businesses/types/editBusiness.types";
+
+const AMENITY_OPTIONS = [
+  { id: "wifi", label: "Wi-Fi", icon: "wifi" },
+  { id: "parking", label: "Parking", icon: "parking" },
+  { id: "ac", label: "Air Conditioning", icon: "ac" },
+  { id: "pet", label: "Pet Friendly", icon: "pet" },
+  { id: "accessibility", label: "Wheelchair Accessible", icon: "accessibility" },
+  { id: "coffee", label: "Coffee & Drinks", icon: "coffee" },
+  { id: "tv", label: "TV", icon: "tv" },
+  { id: "outdoor", label: "Outdoor Seating", icon: "outdoor" },
+] as const;
 
 type DirtyMap = Record<EditBusinessTab, boolean>;
 
@@ -45,7 +56,7 @@ export function buildBusinessPreview({
     nextBusiness.zipCode = overviewDraft.postalCode || nextBusiness.zipCode;
     nextBusiness.city = overviewDraft.city || nextBusiness.city;
     nextBusiness.state = overviewDraft.state || nextBusiness.state;
-    nextBusiness.phone = overviewDraft.phone || nextBusiness.phone;
+    nextBusiness.phone = overviewDraft.phone;
     nextBusiness.avatarUrl = overviewDraft.avatarUrl ?? nextBusiness.avatarUrl;
     nextBusiness.location = [overviewDraft.city, overviewDraft.state]
       .filter(Boolean)
@@ -59,31 +70,50 @@ export function buildBusinessPreview({
     };
 
     // Update about.contacts so BusinessOverviewCard reflects draft changes
+    const updatedContacts = nextBusiness.about.contacts.map((contact) => {
+      if (contact.type === 'address' && overviewDraft.address) {
+        const fullAddress = [
+          overviewDraft.address,
+          overviewDraft.city,
+          overviewDraft.state,
+          overviewDraft.postalCode,
+        ].filter(Boolean).join(', ');
+        return {
+          ...contact,
+          value: fullAddress,
+          actionUrl: `https://maps.google.com/?q=${encodeURIComponent(fullAddress)}`,
+        };
+      }
+      if (contact.type === 'phone' && overviewDraft.phone) {
+        return {
+          ...contact,
+          value: overviewDraft.phone,
+          actionUrl: `tel:${overviewDraft.phone}`,
+        };
+      }
+      return contact;
+    });
+
+    const hasPhoneContact = updatedContacts.some(
+      (contact) => contact.type === "phone",
+    );
+
     nextBusiness.about = {
       ...nextBusiness.about,
-      contacts: nextBusiness.about.contacts.map((contact) => {
-        if (contact.type === 'address' && overviewDraft.address) {
-          const fullAddress = [
-            overviewDraft.address,
-            overviewDraft.city,
-            overviewDraft.state,
-            overviewDraft.postalCode,
-          ].filter(Boolean).join(', ');
-          return {
-            ...contact,
-            value: fullAddress,
-            actionUrl: `https://maps.google.com/?q=${encodeURIComponent(fullAddress)}`,
-          };
-        }
-        if (contact.type === 'phone' && overviewDraft.phone) {
-          return {
-            ...contact,
-            value: overviewDraft.phone,
-            actionUrl: `tel:${overviewDraft.phone}`,
-          };
-        }
-        return contact;
-      }),
+      contacts: overviewDraft.phone
+        ? hasPhoneContact
+          ? updatedContacts
+          : [
+              ...updatedContacts,
+              {
+                id: "contact-phone",
+                type: "phone" as const,
+                label: "Phone",
+                value: overviewDraft.phone,
+                actionUrl: `tel:${overviewDraft.phone}`,
+              },
+            ]
+        : updatedContacts.filter((contact) => contact.type !== "phone"),
     };
 
     // Update opening hours from draft
@@ -139,11 +169,14 @@ export function buildBusinessPreview({
       ...nextBusiness.about,
       description: aboutDraft.description,
       languages: aboutDraft.languages,
-      amenities: aboutDraft.amenities.map((amenity) => ({
-        id: amenity,
-        label: amenity,
-        icon: "coffee",
-      })),
+      amenities: aboutDraft.amenities.map((amenityId) => {
+        const option = AMENITY_OPTIONS.find((item) => item.id === amenityId);
+        return {
+          id: amenityId,
+          label: option?.label ?? amenityId,
+          icon: (option?.icon ?? "coffee") as BusinessAmenity["icon"],
+        };
+      }),
     };
   }
 
