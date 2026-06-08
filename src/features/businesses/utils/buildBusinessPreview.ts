@@ -7,16 +7,16 @@ import type {
   EditBusinessTab,
 } from "@/src/features/businesses/types/editBusiness.types";
 
-const AMENITY_LABELS: Record<string, string> = {
-  wifi: "Wi-Fi",
-  parking: "Parking",
-  ac: "Air Conditioning",
-  pet: "Pet Friendly",
-  accessibility: "Wheelchair Accessible",
-  coffee: "Coffee & Drinks",
-  tv: "TV",
-  outdoor: "Outdoor Seating",
-};
+const AMENITY_OPTIONS = [
+  { id: "wifi", label: "Wi-Fi", icon: "wifi" },
+  { id: "parking", label: "Parking", icon: "parking" },
+  { id: "ac", label: "Air Conditioning", icon: "ac" },
+  { id: "pet", label: "Pet Friendly", icon: "pet" },
+  { id: "accessibility", label: "Wheelchair Accessible", icon: "accessibility" },
+  { id: "coffee", label: "Coffee & Drinks", icon: "coffee" },
+  { id: "tv", label: "TV", icon: "tv" },
+  { id: "outdoor", label: "Outdoor Seating", icon: "outdoor" },
+] as const;
 
 type DirtyMap = Record<EditBusinessTab, boolean>;
 
@@ -161,11 +161,14 @@ export function buildBusinessPreview({
       ...nextBusiness.about,
       description: aboutDraft.description,
       languages: aboutDraft.languages,
-      amenities: aboutDraft.amenities.map((id) => ({
-        id,
-        label: AMENITY_LABELS[id] ?? id,
-        icon: id as BusinessAmenity["icon"],
-      })),
+      amenities: aboutDraft.amenities.map((amenityId) => {
+        const option = AMENITY_OPTIONS.find((item) => item.id === amenityId);
+        return {
+          id: amenityId,
+          label: option?.label ?? amenityId,
+          icon: (option?.icon ?? "coffee") as BusinessAmenity["icon"],
+        };
+      }),
     };
   }
 
