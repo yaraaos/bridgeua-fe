@@ -15,6 +15,7 @@ type Props = {
   time: string;
   price: string;
   status: BookingStatus;
+  isPast?: boolean;
   onPress: () => void;
   onPressRebook?: () => void;
 };
@@ -27,6 +28,7 @@ export default function BookingPreviewCard({
   time,
   price,
   status,
+  isPast,
   onPress,
   onPressRebook,
 }: Props) {
@@ -59,8 +61,8 @@ export default function BookingPreviewCard({
             </AppText>
 
             <AppLabel
-              label={status === "confirmed" || status === "pending" ? "Confirmed" : status.charAt(0).toUpperCase() + status.slice(1)}
-              variant={status === "pending" ? "confirmed" : status as any}
+              label={isPast ? "Past" : status === "confirmed" || status === "pending" ? "Confirmed" : status.charAt(0).toUpperCase() + status.slice(1)}
+              variant={isPast ? "past" : status === "pending" ? "confirmed" : status as any}
             />
           </View>
         </View>
