@@ -263,7 +263,7 @@ export default function SignUpBusinessScreen() {
                     clearFieldError("businessName");
                   }}
                   maxLength={BUSINESS_NAME_HARD_LIMIT}
-                  editable={isLoading}
+                  disabled={isLoading}
                   error={Boolean(errors.businessName)}
                 />
 
@@ -309,7 +309,7 @@ export default function SignUpBusinessScreen() {
                     setOwnerName(value);
                     clearFieldError("ownerName");
                   }}
-                  editable={isLoading}
+                  disabled={isLoading}
                   error={Boolean(errors.ownerName)}
                 />
 
@@ -368,7 +368,7 @@ export default function SignUpBusinessScreen() {
                     setAddress(value);
                     clearFieldError("address");
                   }}
-                  editable={isLoading}
+                  disabled={isLoading}
                   error={Boolean(errors.address)}
                 />
 
@@ -388,7 +388,7 @@ export default function SignUpBusinessScreen() {
                       clearFieldError("zipCode");
                     }}
                     keyboardType="numeric"
-                    editable={isLoading}
+                    disabled={isLoading}
                     error={Boolean(errors.zipCode)}
                   />
 
@@ -406,7 +406,7 @@ export default function SignUpBusinessScreen() {
                       setCity(value);
                       clearFieldError("city");
                     }}
-                    editable={isLoading}
+                    disabled={isLoading}
                     error={Boolean(errors.city)}
                   />
 
@@ -512,7 +512,7 @@ export default function SignUpBusinessScreen() {
                   onChangeText={setLatitude}
                   onClear={() => setLatitude("")}
                   keyboardType="decimal-pad"
-                  editable={isLoading}
+                  disabled={isLoading}
                 />
 
                 <Text style={styles.helperText}>
@@ -527,7 +527,7 @@ export default function SignUpBusinessScreen() {
                   onChangeText={setLongitude}
                   onClear={() => setLongitude("")}
                   keyboardType="decimal-pad"
-                  editable={isLoading}
+                  disabled={isLoading}
                 />
 
                 <Text style={styles.helperText}>
@@ -546,7 +546,7 @@ export default function SignUpBusinessScreen() {
                   }}
                   keyboardType="email-address"
                   autoCapitalize="none"
-                  editable={isLoading}
+                  disabled={isLoading}
                   error={Boolean(errors.email)}
                 />
 

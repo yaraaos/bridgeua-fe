@@ -10,22 +10,28 @@ import {
 } from "react-native";
 import { createStyles } from "./ClearableInput.styles";
 
-type Props = TextInputProps & {
+type ClearableInputProps = TextInputProps & {
   value: string;
   onClear: () => void;
   rightSlot?: React.ReactNode;
   error?: boolean;
+  disabled?: boolean;
 };
 
 export default function ClearableInput({
   value,
   onClear,
   rightSlot,
+  error,
+  disabled = false,
+  editable,
   style,
   ...props
-}: Props) {
+}: ClearableInputProps) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+
+  const isEditable = editable ?? !disabled;
 
   const handleClear = () => {
     Keyboard.dismiss();
@@ -37,15 +43,17 @@ export default function ClearableInput({
       <AppInput
         {...props}
         value={value}
+        editable={isEditable}
         style={[styles.input, style]}
       />
 
       <View style={styles.rightContent}>
         {rightSlot}
 
-        {value.trim().length > 0 ? (
+        {value ? (
           <Pressable
             onPress={handleClear}
+            disabled={!isEditable}
             hitSlop={10}
             style={styles.clearButton}
           >

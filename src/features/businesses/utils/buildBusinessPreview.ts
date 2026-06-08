@@ -56,7 +56,7 @@ export function buildBusinessPreview({
     nextBusiness.zipCode = overviewDraft.postalCode || nextBusiness.zipCode;
     nextBusiness.city = overviewDraft.city || nextBusiness.city;
     nextBusiness.state = overviewDraft.state || nextBusiness.state;
-    nextBusiness.phone = overviewDraft.phone || nextBusiness.phone;
+    nextBusiness.phone = overviewDraft.phone;
     nextBusiness.avatarUrl = overviewDraft.avatarUrl ?? nextBusiness.avatarUrl;
     nextBusiness.location = [overviewDraft.city, overviewDraft.state]
       .filter(Boolean)
