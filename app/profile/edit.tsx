@@ -159,13 +159,6 @@ export default function EditProfileScreen() {
     }
   };
 
-  console.log({
-    DateField,
-    PhoneField,
-    ProfileField,
-    ClearableInput,
-  });
-
   return (
     <AppScreen withTopInset={false} style={styles.container}>
       <ScreenHeader
