@@ -34,8 +34,8 @@ export default function BookingPreviewCard({
   const styles = createStyles(colors);
 
   return (
-    <View>
-      <Pressable style={styles.card} onPress={onPress}>
+    <View style={[styles.wrapper, onPressRebook ? styles.wrapperWithRebook : null]}>
+      <Pressable style={[styles.card, onPressRebook ? styles.cardWithRebook : null]} onPress={onPress}>
         <View style={styles.iconBox}>
           <Ionicons
             name="calendar-outline"

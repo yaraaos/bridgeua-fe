@@ -4,6 +4,17 @@ import { StyleSheet } from "react-native";
 
 export function createStyles(colors: AppColors) {
   return StyleSheet.create({
+    wrapper: {
+      borderRadius: 24,
+      overflow: 'hidden',
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+
+    wrapperWithRebook: {
+      borderRadius: 24,
+    },
+
     card: {
       flexDirection: "row",
       alignItems: "center",
@@ -13,6 +24,13 @@ export function createStyles(colors: AppColors) {
       backgroundColor: colors.surface,
       borderWidth: 1,
       borderColor: colors.border,
+    },
+
+    cardWithRebook: {
+      borderRadius: 0,
+      borderWidth: 0,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
     },
 
     iconBox: {
@@ -57,15 +75,12 @@ export function createStyles(colors: AppColors) {
     },
 
     rebookButton: {
-      alignSelf: "flex-start",
-      marginTop: spacing.sm,
-      flexDirection: "row",
-      alignItems: "center",
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
       gap: spacing.xs,
-      paddingHorizontal: spacing.md,
-      paddingVertical: spacing.sm,
-      borderRadius: 999,
-      backgroundColor: colors.primaryGreenSoft,
+      paddingVertical: spacing.md,
+      backgroundColor: colors.surface,
     },
 
     rebookText: {
