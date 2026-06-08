@@ -1,4 +1,4 @@
-import type { BusinessDetails } from "@/src/features/businesses/types/business.types";
+import type { BusinessAmenity, BusinessDetails } from "@/src/features/businesses/types/business.types";
 import type {
   EditBusinessAboutDraft,
   EditBusinessGalleryDraft,
@@ -6,6 +6,17 @@ import type {
   EditBusinessServicesDraft,
   EditBusinessTab,
 } from "@/src/features/businesses/types/editBusiness.types";
+
+const AMENITY_LABELS: Record<string, string> = {
+  wifi: "Wi-Fi",
+  parking: "Parking",
+  ac: "Air Conditioning",
+  pet: "Pet Friendly",
+  accessibility: "Wheelchair Accessible",
+  coffee: "Coffee & Drinks",
+  tv: "TV",
+  outdoor: "Outdoor Seating",
+};
 
 type DirtyMap = Record<EditBusinessTab, boolean>;
 
@@ -59,31 +70,42 @@ export function buildBusinessPreview({
     };
 
     // Update about.contacts so BusinessOverviewCard reflects draft changes
+    const hasPhoneContact = nextBusiness.about.contacts.some((c) => c.type === 'phone');
+    const updatedContacts = nextBusiness.about.contacts.map((contact) => {
+      if (contact.type === 'address' && overviewDraft.address) {
+        const fullAddress = [
+          overviewDraft.address,
+          overviewDraft.city,
+          overviewDraft.state,
+          overviewDraft.postalCode,
+        ].filter(Boolean).join(', ');
+        return {
+          ...contact,
+          value: fullAddress,
+          actionUrl: `https://maps.google.com/?q=${encodeURIComponent(fullAddress)}`,
+        };
+      }
+      if (contact.type === 'phone' && overviewDraft.phone) {
+        return {
+          ...contact,
+          value: overviewDraft.phone,
+          actionUrl: `tel:${overviewDraft.phone}`,
+        };
+      }
+      return contact;
+    });
+    if (!hasPhoneContact && overviewDraft.phone) {
+      updatedContacts.push({
+        id: 'phone',
+        type: 'phone',
+        label: 'Phone',
+        value: overviewDraft.phone,
+        actionUrl: `tel:${overviewDraft.phone}`,
+      });
+    }
     nextBusiness.about = {
       ...nextBusiness.about,
-      contacts: nextBusiness.about.contacts.map((contact) => {
-        if (contact.type === 'address' && overviewDraft.address) {
-          const fullAddress = [
-            overviewDraft.address,
-            overviewDraft.city,
-            overviewDraft.state,
-            overviewDraft.postalCode,
-          ].filter(Boolean).join(', ');
-          return {
-            ...contact,
-            value: fullAddress,
-            actionUrl: `https://maps.google.com/?q=${encodeURIComponent(fullAddress)}`,
-          };
-        }
-        if (contact.type === 'phone' && overviewDraft.phone) {
-          return {
-            ...contact,
-            value: overviewDraft.phone,
-            actionUrl: `tel:${overviewDraft.phone}`,
-          };
-        }
-        return contact;
-      }),
+      contacts: updatedContacts,
     };
 
     // Update opening hours from draft
@@ -139,10 +161,10 @@ export function buildBusinessPreview({
       ...nextBusiness.about,
       description: aboutDraft.description,
       languages: aboutDraft.languages,
-      amenities: aboutDraft.amenities.map((amenity) => ({
-        id: amenity,
-        label: amenity,
-        icon: "coffee",
+      amenities: aboutDraft.amenities.map((id) => ({
+        id,
+        label: AMENITY_LABELS[id] ?? id,
+        icon: id as BusinessAmenity["icon"],
       })),
     };
   }

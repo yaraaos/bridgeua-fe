@@ -94,7 +94,7 @@ export default function EditBusinessScreen() {
     setAboutDraft({
       description: business.about?.description ?? "",
       languages: business.about?.languages ?? [],
-      amenities: business.about?.amenities?.map((a) => a.label) ?? [],
+      amenities: business.about?.amenities?.map((a) => a.id) ?? [],
     });
   }, [business, setOverviewDraft, setGalleryDraft, setAboutDraft]);
 

@@ -101,7 +101,7 @@ export default function SignInScreen() {
             autoCapitalize="none"
             keyboardType="email-address"
             error={Boolean(errors.email)}
-            disabled={isLoading}
+            editable={isLoading}
           />
 
           {errors.email ? (
