@@ -1,7 +1,7 @@
 //src/components/bookings/SpecialistCard/SpecialistCard.tsx
 
 import React from "react";
-import { Image, Pressable, Text, View } from "react-native";
+import { ActivityIndicator, Image, Pressable, Text, View } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { createStyles } from "./SpecialistCard.styles";
@@ -14,6 +14,8 @@ export type SpecialistCardProps = {
   isSelected?: boolean;
   badgeText?: string;
   onPress?: () => void;
+  isLoadingSlot?: boolean;
+  earliestSlot?: string | null;
 };
 
 export default function SpecialistCard({
@@ -24,6 +26,8 @@ export default function SpecialistCard({
   isSelected = false,
   badgeText,
   onPress,
+  isLoadingSlot,
+  earliestSlot,
 }: SpecialistCardProps) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
@@ -61,6 +65,14 @@ export default function SpecialistCard({
               {description}
             </Text>
           )}
+
+          {isLoadingSlot ? (
+            <ActivityIndicator size="small" color={styles.slotUnavailable.color} style={styles.slotLoader} />
+          ) : isLoadingSlot === false || earliestSlot !== undefined ? (
+            <Text style={earliestSlot ? styles.slotAvailable : styles.slotUnavailable}>
+              {earliestSlot ?? "No availability"}
+            </Text>
+          ) : null}
         </View>
       </View>
 

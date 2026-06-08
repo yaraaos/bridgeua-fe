@@ -92,6 +92,20 @@ export function createStyles(colors: AppColors) {
       lineHeight: 17,
       color: colors.textSecondary,
     },
+    slotAvailable: {
+      fontSize: 12,
+      color: colors.primaryGreen,
+      marginTop: 2,
+    },
+    slotUnavailable: {
+      fontSize: 12,
+      color: colors.textMuted,
+      marginTop: 2,
+    },
+    slotLoader: {
+      alignSelf: "flex-start",
+      marginTop: 4,
+    },
     checkCircle: {
       width: 22,
       height: 22,
