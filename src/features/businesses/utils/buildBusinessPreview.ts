@@ -70,7 +70,6 @@ export function buildBusinessPreview({
     };
 
     // Update about.contacts so BusinessOverviewCard reflects draft changes
-    const hasPhoneContact = nextBusiness.about.contacts.some((c) => c.type === 'phone');
     const updatedContacts = nextBusiness.about.contacts.map((contact) => {
       if (contact.type === 'address' && overviewDraft.address) {
         const fullAddress = [
@@ -94,18 +93,27 @@ export function buildBusinessPreview({
       }
       return contact;
     });
-    if (!hasPhoneContact && overviewDraft.phone) {
-      updatedContacts.push({
-        id: 'phone',
-        type: 'phone',
-        label: 'Phone',
-        value: overviewDraft.phone,
-        actionUrl: `tel:${overviewDraft.phone}`,
-      });
-    }
+
+    const hasPhoneContact = updatedContacts.some(
+      (contact) => contact.type === "phone",
+    );
+
     nextBusiness.about = {
       ...nextBusiness.about,
-      contacts: updatedContacts,
+      contacts: overviewDraft.phone
+        ? hasPhoneContact
+          ? updatedContacts
+          : [
+              ...updatedContacts,
+              {
+                id: "contact-phone",
+                type: "phone" as const,
+                label: "Phone",
+                value: overviewDraft.phone,
+                actionUrl: `tel:${overviewDraft.phone}`,
+              },
+            ]
+        : updatedContacts.filter((contact) => contact.type !== "phone"),
     };
 
     // Update opening hours from draft
