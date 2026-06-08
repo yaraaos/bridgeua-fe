@@ -1,4 +1,5 @@
 import { apiClient } from "@/src/services/api/client";
+import { ApiError } from "@/src/services/api/types";
 import { ENDPOINTS } from "@/src/services/api/endpoints";
 import type {
     Booking,
@@ -41,6 +42,30 @@ export const getBookingAvailability = async (
   );
 
   return res.data;
+};
+
+export const getEarliestAvailableSlot = async (params: {
+  businessId: string;
+  serviceId: string;
+  specialistId: string;
+}): Promise<{ date: string; time: string } | null> => {
+  const DAYS_TO_CHECK = 14;
+
+  for (let i = 0; i < DAYS_TO_CHECK; i++) {
+    const d = new Date();
+    d.setDate(d.getDate() + i);
+    const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+
+    try {
+      const slots = await getBookingAvailability({ ...params, date: dateStr });
+      const first = slots.find((s) => s.isAvailable);
+      if (first) return { date: dateStr, time: first.time };
+    } catch (e) {
+      if (e instanceof ApiError && e.isNetworkError) break;
+    }
+  }
+
+  return null;
 };
 
 export const createBooking = async (
