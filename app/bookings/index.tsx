@@ -108,6 +108,7 @@ function BookingListCard({
       time={booking.time}
       price={booking.price}
       status={booking.status}
+      isPast={showRebook}
       onPress={() =>
         router.push({
           pathname: "/bookings/[bookingId]",

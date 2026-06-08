@@ -181,6 +181,7 @@ export default function BusinessBookingsScreen() {
                       : "Price on request"
                   }
                   status={booking.status}
+                  isPast={activeFilter === "past"}
                   onPress={() =>
                     router.push({
                       pathname: "/bookings/[bookingId]",
