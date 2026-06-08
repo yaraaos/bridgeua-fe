@@ -51,13 +51,16 @@ export default function PersonalProfileScreen() {
   const profile = useProfileStore((state) => state.profile);
   const bookings = useBookingsStore((state) => state.bookings);
 
-  const upcomingBookings = useMemo(
-    () =>
-      bookings.filter((booking) =>
-        ACTIVE_BOOKING_STATUSES.includes(booking.status),
-      ),
-    [bookings],
-  );
+  const upcomingBookings = useMemo(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return bookings.filter((booking) => {
+      if (!ACTIVE_BOOKING_STATUSES.includes(booking.status)) return false;
+      const bookingDate = new Date(booking.date);
+      bookingDate.setHours(0, 0, 0, 0);
+      return bookingDate >= today;
+    });
+  }, [bookings]);
 
   const [myReviews, setMyReviews] = useState<PersonalProfileReview[]>([]);
   const scrollViewRef = useRef<ScrollView | null>(null);

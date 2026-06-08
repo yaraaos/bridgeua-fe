@@ -14,6 +14,7 @@ type Props = TextInputProps & {
   value: string;
   onClear: () => void;
   rightSlot?: React.ReactNode;
+  error?: boolean;
 };
 
 export default function ClearableInput({
