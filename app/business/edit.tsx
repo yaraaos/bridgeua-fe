@@ -67,6 +67,8 @@ export default function EditBusinessScreen() {
       city: business.city ?? "",
       state: business.state ?? "",
       phone: business.phone ?? "",
+      latitude: business.latitude != null ? String(business.latitude) : "",
+      longitude: business.longitude != null ? String(business.longitude) : "",
       socialLinks: {
         website: business.socialLinks?.website ?? "",
         instagram: business.socialLinks?.instagram ?? "",
@@ -92,7 +94,7 @@ export default function EditBusinessScreen() {
     setAboutDraft({
       description: business.about?.description ?? "",
       languages: business.about?.languages ?? [],
-      amenities: business.about?.amenities?.map((a) => a.label) ?? [],
+      amenities: business.about?.amenities?.map((a) => a.id) ?? [],
     });
   }, [business, setOverviewDraft, setGalleryDraft, setAboutDraft]);
 

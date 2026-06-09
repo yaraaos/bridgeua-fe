@@ -25,6 +25,7 @@ type Props = {
   onReviewsListLayout?: (y: number) => void;
   onExpandReview?: (reviewOffsetY: number) => void;
   isPreview?: boolean;
+  isLoadingReviews?: boolean;
 };
 
 function getReviewRelevanceScore(review: BusinessDetailsReview) {
@@ -53,6 +54,7 @@ export default function BusinessReviewsList({
   onReviewsListLayout,
   onExpandReview,
   isPreview,
+  isLoadingReviews,
 }: Props) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
@@ -204,7 +206,7 @@ export default function BusinessReviewsList({
           <Text style={styles.reviewCount}>{reviewCount} total</Text>
         </View>
       ) : null}
-      {displayedReviews.length === 0 ? (
+      {displayedReviews.length === 0 && !isLoadingReviews ? (
         <View style={styles.emptyStateWrap}>
           <AppEmptyState
             title="No reviews yet"

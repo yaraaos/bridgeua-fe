@@ -13,7 +13,8 @@ const distanceMap: Record<DistanceOption, number | null> = {
   "5": 5,
   "10": 10,
   "25": 25,
-  custom: null,
+  "50": 50,
+  "100": 100,
 };
 
 type UseDiscoveryFeedParams = {
@@ -23,7 +24,6 @@ type UseDiscoveryFeedParams = {
   cuisines: string[];
   rating: RatingOption;
   distance: DistanceOption;
-  customDistance: string;
   businessIdsWithPromo?: string[];
 };
 
@@ -34,18 +34,15 @@ export function useDiscoveryFeed({
                                    cuisines,
                                    rating,
                                    distance,
-                                   customDistance,
                                    businessIdsWithPromo,
                                  }: UseDiscoveryFeedParams) {
   const promoIdSet =
     category === PROMO_CATEGORY_LABEL && businessIdsWithPromo
       ? new Set(businessIdsWithPromo.map(String))
       : null;
-  const selectedDistanceKm =
-    distance === "custom" ? Number(customDistance || 0) : distanceMap[distance];
+  const selectedDistanceKm = distanceMap[distance];
 
-  const selectedRatingValue =
-    rating && rating !== "custom" ? Number(rating) : null;
+  const selectedRatingValue = rating ? Number(rating) : null;
 
   const sortBusinesses = (a: Business, b: Business) => {
     if (sort === "distance") {
@@ -81,14 +78,15 @@ export function useDiscoveryFeed({
             : true
           : category === "Food"
             ? cuisines.length > 0
-              ? cuisines.includes(businessCategory)
-              : [
+              ? cuisines.includes((business as any).cuisine ?? "") || businessCategory === "Food"
+              : businessCategory === "Food" || [
                 "American",
                 "Chinese",
                 "Italian",
                 "Japanese",
                 "Mediterranean",
                 "Mexican",
+                "Ukrainian",
                 "Vegan",
               ].includes(businessCategory)
             : businessCategory === category);

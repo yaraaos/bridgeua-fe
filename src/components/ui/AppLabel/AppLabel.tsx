@@ -13,7 +13,8 @@ export type AppLabelVariant =
   | "confirmed"
   | "pending"
   | "cancelled"
-  | "completed";
+  | "completed"
+  | "past";
 
 type Props = {
   label: string;
@@ -88,5 +89,8 @@ function createStyles(colors: AppColors) {
 
     completed: { backgroundColor: colors.surface },
     completed_text: { color: colors.textSecondary },
+
+    past: { backgroundColor: colors.accentOrangeSoft },
+    past_text: { color: colors.accentOrange },
   });
 }

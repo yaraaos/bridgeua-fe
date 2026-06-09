@@ -84,7 +84,9 @@ const ReviewCommentComposer = forwardRef<ReviewCommentComposerRef, Props>(
           <TextInput
             ref={inputRef}
             value={text}
+            multiline
             maxLength={MAX_COMMENT_LENGTH}
+            scrollEnabled
             onKeyPress={({ nativeEvent }) => {
               if (
                 text.length >= MAX_COMMENT_LENGTH &&
@@ -156,31 +158,45 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
   },
   inputPill: {
-    minHeight: 54,
+    minHeight: 44,
+    maxHeight: 150,
     paddingLeft: 18,
-    paddingRight: 8,
+    paddingRight: 6,
+    paddingTop: 4,
+    paddingBottom: 4,
     borderWidth: 1,
-    borderRadius: 999,
+    borderRadius: 24,
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "flex-end",
     gap: 8,
   },
+
   input: {
     flex: 1,
-    minHeight: 42,
+    minHeight: 36,
+    maxHeight: 120,
     fontSize: 16,
+    paddingTop: 7,
+    paddingBottom: 7,
+    textAlignVertical: "top",
   },
+
   counter: {
     minWidth: 54,
+    height: 34,
+    lineHeight: 34,
     textAlign: "right",
     fontSize: 11,
     fontWeight: "700",
+    marginBottom: 2,
   },
+
   sendButton: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
+    width: 34,
+    height: 34,
+    borderRadius: 17,
     alignItems: "center",
     justifyContent: "center",
+    marginBottom: 1,
   },
 });

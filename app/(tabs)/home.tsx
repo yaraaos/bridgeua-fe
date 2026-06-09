@@ -4,6 +4,7 @@ import CategoryScroller from "@/src/components/home/CategoryScroller/CategoryScr
 import HomePromotionBanner from "@/src/components/home/HomePromotionBanner";
 import HomePromotionModal from "@/src/components/home/HomePromotionModal/HomePromotionModal";
 import AppEmptyState from "@/src/components/ui/AppEmptyState";
+import NetworkErrorBanner from "@/src/components/ui/NetworkErrorBanner";
 import AppLoader from "@/src/components/ui/AppLoader/AppLoader";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
 import { LocationOption } from "@/src/constants/locations";
@@ -77,20 +78,21 @@ export default function HomeScreen() {
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
 
-  const { category, sort, cuisines, rating, distance, customDistance } =
+  const { category, sort, cuisines, rating, distance } =
     useFilterStore((state) => state.discoveryFilters);
 
   const serverParams = useMemo(() => {
-    const params: Record<string, string | number> = {};
+    const params: Record<string, string | number | string[]> = {};
     if (sort && sort !== "relevance" && sort !== "distance") params.sort = sort;
-    if (rating && rating !== "custom") params.minRating = Number(rating);
+    if (rating) params.minRating = Number(rating);
     if (locationState) params.state = locationState;
+    if (cuisines?.length) params.cuisines = cuisines;
     return params;
-  }, [sort, rating, locationState]);
+  }, [sort, rating, locationState, cuisines]);
 
   const businessVersion = useFilterStore((s) => s.businessVersion);
 
-  const { businesses, isLoading } = useBusinesses(
+  const { businesses, isLoading, error: businessesError, refetch: refetchBusinesses } = useBusinesses(
     Object.keys(serverParams).length > 0 ? serverParams : undefined,
     businessVersion,
   );
@@ -104,7 +106,11 @@ export default function HomeScreen() {
     if (!isHydrated || activeAccount?.kind !== "business") return currentUser;
 
     const fallbackOwnedId = activeAccount.ownedBusinessId;
-    const base = currentUser ?? ({ id: activeAccount.id, email: "" } as AuthUser);
+    const matchedUser =
+      currentUser && String(currentUser.id) === String(activeAccount.id)
+        ? currentUser
+        : null;
+    const base = matchedUser ?? ({ id: activeAccount.id, email: "" } as AuthUser);
 
     return {
       ...base,
@@ -166,7 +172,6 @@ export default function HomeScreen() {
     cuisines,
     rating: "",
     distance,
-    customDistance,
     businessIdsWithPromo,
   });
 
@@ -329,8 +334,7 @@ export default function HomeScreen() {
     (sort !== "relevance" ? 1 : 0) +
     cuisines.length +
     (rating ? 1 : 0) +
-    (distance ? 1 : 0) +
-    (distance === "custom" && customDistance ? 1 : 0);
+    (distance ? 1 : 0);
 
   const header = (
     <ScreenHeader
@@ -405,6 +409,35 @@ export default function HomeScreen() {
         <View style={styles.contentArea}>
           {categoryBar}
           <AppLoader />
+        </View>
+      </AppScreen>
+    );
+  }
+
+  if (businessesError) {
+    return (
+      <AppScreen withTopInset={false} style={styles.container}>
+        <View style={styles.headerWrap}>
+          {header}
+        </View>
+
+        <View style={styles.contentArea}>
+          {categoryBar}
+          {businessesError.isNetworkError && (
+            <NetworkErrorBanner />
+          )}
+          <View style={styles.emptyStateWrap}>
+            <AppEmptyState
+              title={businessesError.isNetworkError ? "No internet connection" : "Something went wrong"}
+              description={
+                businessesError.isNetworkError
+                  ? "Check your connection and try again."
+                  : "We couldn't load businesses. Please try again."
+              }
+              actionLabel="Try again"
+              onPressAction={refetchBusinesses}
+            />
+          </View>
         </View>
       </AppScreen>
     );

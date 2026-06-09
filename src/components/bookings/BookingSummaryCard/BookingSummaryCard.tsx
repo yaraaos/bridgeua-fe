@@ -16,6 +16,10 @@ type Props = {
   customerName: string;
   phoneNumber: string;
   status?: BookingStatus;
+  originalPrice?: string;
+  discountPercentage?: number;
+  discountAmount?: string;
+  finalPrice?: string;
 };
 
 export default function BookingSummaryCard({
@@ -28,6 +32,10 @@ export default function BookingSummaryCard({
   customerName,
   phoneNumber,
   status,
+  originalPrice,
+  discountPercentage,
+  discountAmount,
+  finalPrice,
 }: Props) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
@@ -46,7 +54,15 @@ export default function BookingSummaryCard({
         <SummaryRow label="Specialist" value={specialistName} />
         <SummaryRow label="Date" value={date} />
         <SummaryRow label="Time" value={time} />
-        <SummaryRow label="Price" value={price} />
+        {originalPrice && discountAmount && finalPrice ? (
+          <>
+            <SummaryRow label="Original price" value={originalPrice} />
+            <SummaryRow label={`Discount (${discountPercentage}%)`} value={`-${discountAmount}`} />
+            <SummaryRow label="Final price" value={finalPrice} />
+          </>
+        ) : (
+          <SummaryRow label="Price" value={price} />
+        )}
         <SummaryRow label="Name" value={customerName} />
         <SummaryRow label="Phone" value={phoneNumber} isLast />
       </View>

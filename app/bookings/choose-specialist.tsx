@@ -6,66 +6,117 @@ import AppText from "@/src/components/ui/AppText/AppText";
 import type { AppColors } from "@/src/constants/colors";
 import { spacing } from "@/src/constants/spacing";
 import { useBusinessDetails } from "@/src/features/businesses/hooks/useBusiness";
+import { getEarliestAvailableSlot } from "@/src/features/bookings/services/booking.service";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { apiClient } from "@/src/services/api/client";
 import { API_BASE_URL } from "@/src/services/api/config";
 import type { TeamMember } from "@/src/types/team";
 import { router, useLocalSearchParams } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
+
+function formatEarliestSlot(date: string, time: string): string {
+  const today = new Date();
+  const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+  const tomorrow = new Date(today);
+  tomorrow.setDate(today.getDate() + 1);
+  const tomorrowStr = `${tomorrow.getFullYear()}-${String(tomorrow.getMonth() + 1).padStart(2, "0")}-${String(tomorrow.getDate()).padStart(2, "0")}`;
+  const timeLabel = time.slice(0, 5);
+  if (date === todayStr) return `Today at ${timeLabel}`;
+  if (date === tomorrowStr) return `Tomorrow at ${timeLabel}`;
+  const [year, month, day] = date.split("-");
+  return `${day}.${month}.${year.slice(2)} at ${timeLabel}`;
+}
 
 export default function ChooseSpecialistScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
 
-  const { businessId, serviceId, serviceName, price, promotionId, promoCode } =
-    useLocalSearchParams<{
-      businessId?: string;
-      serviceId?: string;
-      serviceName?: string;
-      price?: string;
-      promotionId?: string;
-      promoCode?: string;
-    }>();
+  const {
+    businessId,
+    serviceId,
+    serviceName,
+    price,
+    promotionId,
+    promoCode,
+    discountLabel,
+  } = useLocalSearchParams<{
+    businessId?: string;
+    serviceId?: string;
+    serviceName?: string;
+    price?: string;
+    promotionId?: string;
+    promoCode?: string;
+    discountLabel?: string;
+  }>();
 
-  const { business } = useBusinessDetails(businessId);
+  useBusinessDetails(businessId);
 
   const [specialists, setSpecialists] = useState<TeamMember[]>([]);
   const [isLoadingSpecialists, setIsLoadingSpecialists] = useState(true);
-
   const [selectedSpecialistId, setSelectedSpecialistId] = useState<
     string | null
   >(null);
+  const [specialistSlots, setSpecialistSlots] = useState<
+    Record<string, string | null | undefined>
+  >({});
 
   useEffect(() => {
     if (!businessId || !serviceId) {
       setIsLoadingSpecialists(false);
       return;
     }
+
     setIsLoadingSpecialists(true);
+
     void apiClient
       .get<TeamMember[]>(
         `/api/businesses/${businessId}/team?serviceId=${serviceId}`,
       )
       .then((res) => {
-        const normalized = res.data.map((m) => ({
-          ...m,
-          photoUrl: m.photoUrl
-            ? m.photoUrl.startsWith("http")
-              ? m.photoUrl
-              : `${API_BASE_URL}${m.photoUrl}`
+        const normalized = res.data.map((member) => ({
+          ...member,
+          photoUrl: member.photoUrl
+            ? member.photoUrl.startsWith("http")
+              ? member.photoUrl
+              : `${API_BASE_URL}${member.photoUrl}`
             : undefined,
         }));
+
         setSpecialists(normalized);
         setIsLoadingSpecialists(false);
+
+        normalized.forEach((member) => {
+          void getEarliestAvailableSlot({
+            businessId,
+            serviceId,
+            specialistId: String(member.id),
+          }).then((result) => {
+            const label = result
+              ? formatEarliestSlot(result.date, result.time)
+              : null;
+            setSpecialistSlots((prev) => ({
+              ...prev,
+              [String(member.id)]: label,
+            }));
+          });
+        });
       })
       .catch(() => {
+        setSpecialists([]);
         setIsLoadingSpecialists(false);
       });
   }, [businessId, serviceId]);
 
+  const selectedSpecialist = useMemo(() => {
+    return specialists.find(
+      (specialist) => String(specialist.id) === selectedSpecialistId,
+    );
+  }, [selectedSpecialistId, specialists]);
+
   const handleNext = () => {
     if (!businessId || !serviceId || !selectedSpecialistId) return;
+    if (!selectedSpecialist) return;
 
     router.push({
       pathname: "/bookings/choose-date",
@@ -74,14 +125,12 @@ export default function ChooseSpecialistScreen() {
         serviceId,
         serviceName,
         price,
-        specialistId: selectedSpecialistId,
-        specialistName: selectedSpecialistId === "any"
-          ? "Any specialist"
-          : specialists.find((s) => String(s.id) === selectedSpecialistId)
-              ? `${specialists.find((s) => String(s.id) === selectedSpecialistId)!.firstName} ${specialists.find((s) => String(s.id) === selectedSpecialistId)!.lastName}`
-              : "Selected specialist",
+        specialistId: String(selectedSpecialist.id),
+        specialistName:
+          `${selectedSpecialist.firstName} ${selectedSpecialist.lastName}`.trim(),
         promotionId,
         promoCode,
+        discountLabel,
       },
     });
   };
@@ -94,7 +143,7 @@ export default function ChooseSpecialistScreen() {
         <View style={styles.header}>
           <AppText style={styles.title}>Choose specialist</AppText>
           <AppText style={styles.subtitle}>
-            Pick a specialist or let the business assign anyone available.
+            Pick the specialist you want to book with.
           </AppText>
         </View>
 
@@ -103,39 +152,44 @@ export default function ChooseSpecialistScreen() {
           contentContainerStyle={styles.list}
           showsVerticalScrollIndicator={false}
         >
-          <SpecialistCard
-            name="Any specialist"
-            role="First available professional"
-            description="Recommended if you want the earliest available time."
-            badgeText="Fastest"
-            onPress={() => setSelectedSpecialistId("any")}
-            isSelected={selectedSpecialistId === "any"}
-          />
-
           {isLoadingSpecialists ? (
-            <View
-              style={{ flex: 1, alignItems: "center", justifyContent: "center", paddingVertical: spacing.xl }}
-            >
+            <View style={styles.loaderWrap}>
               <AppLoader />
             </View>
+          ) : specialists.length === 0 ? (
+            <View style={styles.emptyWrap}>
+              <AppText style={styles.emptyTitle}>
+                No specialists available
+              </AppText>
+              <AppText style={styles.emptyText}>
+                This service does not have available specialists yet. Please
+                choose another service or contact the business.
+              </AppText>
+            </View>
           ) : (
-            specialists.map((member) => (
-              <SpecialistCard
-                key={String(member.id)}
-                name={`${member.firstName} ${member.lastName}`}
-                role="Specialist"
-                avatarUrl={member.photoUrl}
-                onPress={() => setSelectedSpecialistId(String(member.id))}
-                isSelected={selectedSpecialistId === String(member.id)}
-              />
-            ))
+            specialists.map((member) => {
+              const slotInfo = specialistSlots[String(member.id)];
+              return (
+                <SpecialistCard
+                  key={String(member.id)}
+                  name={`${member.firstName} ${member.lastName}`.trim()}
+                  role="Specialist"
+                  avatarUrl={member.photoUrl}
+                  onPress={() => setSelectedSpecialistId(String(member.id))}
+                  isSelected={selectedSpecialistId === String(member.id)}
+                  isLoadingSlot={slotInfo === undefined}
+                  earliestSlot={typeof slotInfo === "string" ? slotInfo : null}
+                />
+              );
+            })
           )}
         </ScrollView>
       </View>
+
       <View style={styles.footer}>
         <AppButton
           title="Next"
-          disabled={!selectedSpecialistId}
+          disabled={!selectedSpecialistId || !selectedSpecialist}
           onPress={handleNext}
         />
       </View>
@@ -158,6 +212,28 @@ function createStyles(colors: AppColors) {
     list: {
       gap: spacing.cardGap,
       paddingBottom: spacing.md,
+    },
+    loaderWrap: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+      paddingVertical: spacing.xl,
+    },
+    emptyWrap: {
+      paddingVertical: spacing.xl,
+      gap: spacing.xs,
+    },
+    emptyTitle: {
+      fontSize: 16,
+      fontWeight: "800",
+      color: colors.textPrimary,
+      textAlign: "center",
+    },
+    emptyText: {
+      fontSize: 14,
+      lineHeight: 20,
+      color: colors.textSecondary,
+      textAlign: "center",
     },
     footer: {
       paddingTop: spacing.sm,

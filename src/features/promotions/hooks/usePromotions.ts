@@ -20,6 +20,8 @@ export function usePromotions() {
         if (isMounted) {
           setPromotions(data);
         }
+      } catch {
+        // promotions are non-critical; show nothing on error
       } finally {
         if (isMounted) {
           setIsLoading(false);
@@ -57,6 +59,8 @@ export function usePromotion(id?: string) {
         if (isMounted) {
           setPromotion(data);
         }
+      } catch {
+        // non-critical; caller can check promotion === null
       } finally {
         if (isMounted) {
           setIsLoading(false);
@@ -94,6 +98,8 @@ export function useBusinessPromotions(businessId?: string) {
         if (isMounted) {
           setPromotions(data);
         }
+      } catch {
+        // non-critical; show empty list on error
       } finally {
         if (isMounted) {
           setIsLoading(false);

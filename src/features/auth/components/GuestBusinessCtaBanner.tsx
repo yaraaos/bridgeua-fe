@@ -12,13 +12,7 @@ export default function GuestBusinessCtaBanner() {
   const styles = createStyles(colors);
 
   const handlePress = () => {
-    router.push({
-      pathname: "/auth/sign-in",
-      params: {
-        source: "guest_business_cta",
-        action: "promotion",
-      },
-    });
+    router.replace("/auth/sign-in");
   };
 
   return (

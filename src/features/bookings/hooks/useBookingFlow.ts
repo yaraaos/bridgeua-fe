@@ -17,6 +17,7 @@ export const useBookingFlow = () => {
     phoneNumber?: string;
     promotionId?: string;
     promoCode?: string;
+    discountLabel?: string;
   }>();
 
   const canCreateBooking = useMemo(() => {

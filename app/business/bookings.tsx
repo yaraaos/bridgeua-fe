@@ -2,6 +2,7 @@ import { BookingPreviewCard } from "@/src/components/bookings";
 import ScreenHeader from "@/src/components/common/ScreenHeader/ScreenHeader";
 import AppEmptyState from "@/src/components/ui/AppEmptyState";
 import AppLoader from "@/src/components/ui/AppLoader/AppLoader";
+import NetworkErrorBanner from "@/src/components/ui/NetworkErrorBanner";
 import AppTabsPills, {
   AppTabPillItem,
 } from "@/src/components/ui/AppTabsPills/AppTabsPills";
@@ -11,6 +12,7 @@ import type { BookingStatus } from "@/src/features/bookings/types/booking.types"
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { apiClient } from "@/src/services/api/client";
 import { ENDPOINTS } from "@/src/services/api/endpoints";
+import { type ApiError, parseApiError } from "@/src/services/api/types";
 import { useAuthStore } from "@/src/store/auth.store";
 import { router } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
@@ -76,6 +78,7 @@ export default function BusinessBookingsScreen() {
   const [bookings, setBookings] = useState<BusinessBooking[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [fetchError, setFetchError] = useState<ApiError | null>(null);
 
   const loadBookings = useCallback(async () => {
     if (!businessId) {
@@ -83,11 +86,13 @@ export default function BusinessBookingsScreen() {
       return;
     }
     try {
+      setFetchError(null);
       const res = await apiClient.get<BusinessBooking[]>(
         ENDPOINTS.BUSINESS_BOOKINGS(businessId),
       );
       setBookings(res.data ?? []);
-    } catch {
+    } catch (e) {
+      setFetchError(parseApiError(e));
       setBookings([]);
     } finally {
       setIsLoading(false);
@@ -120,9 +125,24 @@ export default function BusinessBookingsScreen() {
         onBack={() => router.back()}
       />
 
+      {fetchError && <NetworkErrorBanner message={fetchError.isNetworkError ? "No internet connection" : "Failed to load bookings"} />}
+
       {isLoading ? (
         <View style={styles.loaderWrap}>
           <AppLoader />
+        </View>
+      ) : fetchError ? (
+        <View style={styles.loaderWrap}>
+          <AppEmptyState
+            title={fetchError.isNetworkError ? "No internet connection" : "Something went wrong"}
+            description={
+              fetchError.isNetworkError
+                ? "Check your connection and try again."
+                : "Couldn't load bookings. Please try again."
+            }
+            actionLabel="Try again"
+            onPressAction={() => { void loadBookings(); }}
+          />
         </View>
       ) : (
         <ScrollView
@@ -161,6 +181,7 @@ export default function BusinessBookingsScreen() {
                       : "Price on request"
                   }
                   status={booking.status}
+                  isPast={activeFilter === "past"}
                   onPress={() =>
                     router.push({
                       pathname: "/bookings/[bookingId]",

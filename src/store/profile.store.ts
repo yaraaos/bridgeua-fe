@@ -3,10 +3,21 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
 import type { UserSettings } from "@/src/features/settings/types/settings.types";
-import { personalProfileMock } from "@/src/mocks/profile.mock";
 import { apiClient } from "@/src/services/api/client";
 import { ENDPOINTS } from "@/src/services/api/endpoints";
 import type { PersonalProfile } from "@/src/types/profile";
+
+const EMPTY_PROFILE: PersonalProfile = {
+  id: "",
+  email: "",
+  displayName: "",
+  username: "",
+  avatarUrl: "",
+  firstName: "",
+  lastName: "",
+  phoneNumber: "",
+  dateOfBirth: "",
+};
 
 type ProfileState = {
   profile: PersonalProfile;
@@ -21,7 +32,7 @@ type ProfileState = {
 export const useProfileStore = create<ProfileState>()(
   persist(
     (set) => ({
-      profile: personalProfileMock,
+      profile: EMPTY_PROFILE,
       settings: null,
 
       setProfile: (profile) => set({ profile }),
@@ -37,7 +48,7 @@ export const useProfileStore = create<ProfileState>()(
 
       clearProfile: () =>
         set({
-          profile: personalProfileMock,
+          profile: EMPTY_PROFILE,
           settings: null,
         }),
 
@@ -72,10 +83,10 @@ export const useProfileStore = create<ProfileState>()(
               displayName,
               username: p.username ?? "",
               avatarUrl: p.avatarUrl ?? "",
-              firstName: p.firstName,
-              lastName: p.lastName,
-              phoneNumber: p.phoneNumber,
-              dateOfBirth: p.dateOfBirth,
+              firstName: p.firstName ?? "",
+              lastName: p.lastName ?? "",
+              phoneNumber: p.phoneNumber ?? "",
+              dateOfBirth: p.dateOfBirth ?? "",
             },
             settings: u.settings ?? null,
           });

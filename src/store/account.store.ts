@@ -1,4 +1,6 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { API_BASE_URL } from "@/src/services/api/config";
+import { STORAGE_KEYS } from "@/src/services/storage/keys";
 import {
   getAllStoredAccounts,
   removeAccountTokens,
@@ -137,12 +139,10 @@ export const useAccountStore = create<AccountState>((set, get) => ({
 
     const valid = summaries.filter(Boolean) as AccountSummary[];
 
-    const { user } = await import('@/src/store/auth.store').then((m) => ({
-      user: m.useAuthStore.getState().user,
-    }));
+    const persistedActiveId = await AsyncStorage.getItem(STORAGE_KEYS.ACTIVE_ACCOUNT_ID);
 
     const activeId =
-      (user?.id ? valid.find((a) => a.id === String(user.id))?.id : null) ??
+      (persistedActiveId ? valid.find((a) => a.id === persistedActiveId)?.id : null) ??
       valid[valid.length - 1]?.id ??
       null;
 
@@ -195,6 +195,7 @@ export const useAccountStore = create<AccountState>((set, get) => ({
     }
 
     await saveAuthTokens(account.accessToken, account.refreshToken);
+    await AsyncStorage.setItem(STORAGE_KEYS.ACTIVE_ACCOUNT_ID, id);
 
     set({
       activeAccountId: id,

@@ -17,13 +17,17 @@ export function useBannerPromotions() {
       let isMounted = true;
 
       async function loadPromotions() {
-        const data = await getBannerPromotions();
+        try {
+          const data = await getBannerPromotions();
 
-        if (!isMounted) {
-          return;
+          if (!isMounted) {
+            return;
+          }
+
+          setPromotions(data);
+        } catch {
+          // banner is non-critical; skip silently
         }
-
-        setPromotions(data);
       }
 
       void loadPromotions();

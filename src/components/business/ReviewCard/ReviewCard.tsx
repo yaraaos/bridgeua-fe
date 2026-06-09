@@ -99,6 +99,7 @@ export default function ReviewCard({
     businessReview?.authorUsername === profile.username;
 
   const [isExpanded, setIsExpanded] = useState(false);
+  const [textLineCount, setTextLineCount] = useState(0);
   const [isLiked, setIsLiked] = useState(review.likedByMe ?? false);
   const [likesCount, setLikesCount] = useState(review.likesCount ?? 0);
 
@@ -110,8 +111,7 @@ export default function ReviewCard({
 
   const hasReviewText = !!review.text?.trim();
 
-  const shouldShowReadMore =
-    !isVariantPreview && hasReviewText && review.text.length > 120;
+  const shouldShowReadMore = !isVariantPreview && hasReviewText && textLineCount > 3;
 
   const showPhotos = !isVariantPreview && !!review.photos?.length;
 
@@ -230,6 +230,19 @@ export default function ReviewCard({
         ]}
         onPress={handlePressCard}
       >
+        <View style={{ height: 0, overflow: 'hidden' }}>
+          <Text
+            style={styles.text}
+            onTextLayout={(e) => {
+              if (textLineCount === 0) {
+                setTextLineCount(e.nativeEvent.lines.length);
+              }
+            }}
+          >
+            {profileReview?.text ?? businessReview?.text}
+          </Text>
+        </View>
+
         {isProfile && profileReview ? (
           <>
             <View style={styles.reviewContent}>

@@ -35,6 +35,7 @@ type AuthState = {
   switchToAccount: (accountId: string) => Promise<void>;
   enterGuestMode: () => Promise<void>;
   clearUser: () => Promise<void>;
+  forceSignOut: () => Promise<void>;
   hydrate: () => Promise<void>;
 };
 
@@ -126,6 +127,13 @@ export const useAuthStore = create<AuthState>((set) => ({
       isGuest: true,
       isLoading: false,
     });
+  },
+
+  forceSignOut: async () => {
+    await clearAuthTokens();
+    await clearGuestSession();
+    clearAccountScopedState();
+    set({ user: null, isAuthenticated: false, isGuest: false, isLoading: false });
   },
 
   clearUser: async () => {

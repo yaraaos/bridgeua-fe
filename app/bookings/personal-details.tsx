@@ -1,15 +1,15 @@
-import React, { useMemo, useState } from "react";
-import { StyleSheet, View } from "react-native";
-import { router, useLocalSearchParams } from "expo-router";
 import { BookingStepper } from "@/src/components/bookings";
 import AppButton from "@/src/components/ui/AppButton/AppButton";
-import AppInput from "@/src/components/ui/AppInput/AppInput";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
 import AppText from "@/src/components/ui/AppText/AppText";
+import ClearableInput from "@/src/components/ui/ClearableInput";
 import type { AppColors } from "@/src/constants/colors";
 import { spacing } from "@/src/constants/spacing";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { useProfileStore } from "@/src/store/profile.store";
+import { router, useLocalSearchParams } from "expo-router";
+import React, { useMemo, useState } from "react";
+import { StyleSheet, View } from "react-native";
 
 export default function BookingPersonalDetailsScreen() {
   const { colors } = useAppTheme();
@@ -81,9 +81,10 @@ export default function BookingPersonalDetailsScreen() {
       <View style={styles.form}>
         <View style={styles.field}>
           <AppText style={styles.label}>Name</AppText>
-          <AppInput
+          <ClearableInput
             value={firstName}
             onChangeText={setFirstName}
+            onClear={() => setFirstName("")}
             placeholder="Enter your name"
             autoCapitalize="words"
           />
@@ -91,9 +92,10 @@ export default function BookingPersonalDetailsScreen() {
 
         <View style={styles.field}>
           <AppText style={styles.label}>Surname</AppText>
-          <AppInput
+          <ClearableInput
             value={lastName}
             onChangeText={setLastName}
+            onClear={() => setLastName("")}
             placeholder="Enter your surname"
             autoCapitalize="words"
           />
@@ -101,9 +103,10 @@ export default function BookingPersonalDetailsScreen() {
 
         <View style={styles.field}>
           <AppText style={styles.label}>Phone number</AppText>
-          <AppInput
+          <ClearableInput
             value={phoneNumber}
             onChangeText={setPhoneNumber}
+            onClear={() => setPhoneNumber("")}
             placeholder="Enter your phone number"
             keyboardType="phone-pad"
             textContentType="telephoneNumber"

@@ -33,6 +33,8 @@ import { buildBusinessPreview } from "@/src/features/businesses/utils/buildBusin
 import { useReviews } from "@/src/features/reviews/hooks/useReviews";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { useAuthStore } from "@/src/store/auth.store";
+import AppEmptyState from "@/src/components/ui/AppEmptyState";
+import NetworkErrorBanner from "@/src/components/ui/NetworkErrorBanner";
 import { useEditBusinessStore } from "@/src/store/editBusiness.store";
 import { useProfileStore } from "@/src/store/profile.store";
 import { router, useLocalSearchParams } from "expo-router";
@@ -103,7 +105,7 @@ export default function BusinessDetailsScreen() {
   const reviewsSectionYRef = useRef(0);
   const reviewsListYRef = useRef(0);
 
-  const { business, isLoading, refetch } = useBusinessDetails(id);
+  const { business, isLoading, error: businessError, refetch } = useBusinessDetails(id);
   const dirty = useEditBusinessStore((state) => state.dirty);
   const overviewDraft = useEditBusinessStore((state) => state.overviewDraft);
   const galleryDraft = useEditBusinessStore((state) => state.galleryDraft);
@@ -113,6 +115,9 @@ export default function BusinessDetailsScreen() {
     reviews,
     reviewCount,
     summary: reviewsSummary,
+    isLoading: isReviewsLoading,
+    error: reviewsError,
+    refresh: refreshReviews,
   } = useReviews({
     businessId: id,
   });
@@ -181,6 +186,24 @@ export default function BusinessDetailsScreen() {
     return (
       <AppScreen style={styles.center}>
         <ActivityIndicator />
+      </AppScreen>
+    );
+  }
+
+  if (businessError) {
+    return (
+      <AppScreen style={styles.center}>
+        {businessError.isNetworkError && <NetworkErrorBanner />}
+        <AppEmptyState
+          title={businessError.isNetworkError ? "No internet connection" : "Something went wrong"}
+          description={
+            businessError.isNetworkError
+              ? "Check your connection and try again."
+              : "Couldn't load business details."
+          }
+          actionLabel="Try again"
+          onPressAction={refetch}
+        />
       </AppScreen>
     );
   }
@@ -407,6 +430,22 @@ export default function BusinessDetailsScreen() {
                 }
               />
 
+              {reviewsError ? (
+                <View style={styles.center}>
+                  {reviewsError.isNetworkError && <NetworkErrorBanner />}
+                  <AppEmptyState
+                    title={reviewsError.isNetworkError ? "No internet connection" : "Something went wrong"}
+                    description={
+                      reviewsError.isNetworkError
+                        ? "Check your connection and try again."
+                        : "Couldn't load reviews."
+                    }
+                    actionLabel="Try again"
+                    onPressAction={refreshReviews}
+                  />
+                </View>
+              ) : null}
+
               <View
                 onLayout={(event) => {
                   reviewsSectionYRef.current = event.nativeEvent.layout.y;
@@ -419,6 +458,7 @@ export default function BusinessDetailsScreen() {
                   focusedReviewId={focusedReviewId}
                   onClearFocusedReview={() => setFocusedReviewId(null)}
                   isPreview={isEditPreview}
+                  isLoadingReviews={isReviewsLoading}
                   onReviewsListLayout={(y) => {
                     reviewsListYRef.current = y;
                   }}

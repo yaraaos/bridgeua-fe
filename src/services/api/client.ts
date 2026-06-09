@@ -5,6 +5,7 @@ import {
   saveAuthTokens,
 } from "../auth/tokens";
 import { API_BASE_URL } from "./config";
+import { ApiError } from "./types";
 import type { ApiErrorResponse, ApiResponse } from "./types";
 
 type RequestOptions = Omit<RequestInit, "body"> & {
@@ -13,6 +14,22 @@ type RequestOptions = Omit<RequestInit, "body"> & {
 
 let isRefreshing = false;
 let refreshPromise: Promise<string | null> | null = null;
+let isForcingLogout = false;
+
+async function handleSessionExpired(): Promise<void> {
+  if (isForcingLogout) return;
+  isForcingLogout = true;
+
+  try {
+    const { useAuthStore } = await import("@/src/store/auth.store");
+    await useAuthStore.getState().forceSignOut();
+
+    const { router } = await import("expo-router");
+    router.replace("/auth/sign-in");
+  } finally {
+    isForcingLogout = false;
+  }
+}
 
 async function tryRefreshToken(): Promise<string | null> {
   if (isRefreshing && refreshPromise) return refreshPromise;
@@ -83,19 +100,29 @@ async function request<T>(
     headers["Authorization"] = `Bearer ${token}`;
   }
 
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    ...options,
-    headers: {
-      ...headers,
-      ...(options.headers as Record<string, string>),
-    },
-    body:
-      options.body instanceof FormData
-        ? options.body
-        : options.body != null
-          ? JSON.stringify(options.body)
-          : undefined,
-  });
+  let response: Response;
+  try {
+    response = await fetch(`${API_BASE_URL}${path}`, {
+      ...options,
+      headers: {
+        ...headers,
+        ...(options.headers as Record<string, string>),
+      },
+      body:
+        options.body instanceof FormData
+          ? options.body
+          : options.body != null
+            ? JSON.stringify(options.body)
+            : undefined,
+    });
+  } catch {
+    throw new ApiError(
+      "Network request failed. Please check your connection.",
+      0,
+      undefined,
+      true,
+    );
+  }
 
   // Auto-refresh on 401, but not for auth endpoints and not on retry
   if (response.status === 401 && !isRetry && !path.includes("/api/auth/")) {
@@ -103,16 +130,30 @@ async function request<T>(
     if (newAccessToken) {
       return request<T>(path, options, true);
     }
-    // Refresh failed — throw so auth store can handle logout
-    throw new Error("Session expired. Please log in again.");
+    await handleSessionExpired();
+    throw new ApiError("Session expired. Please log in again.", 401);
   }
 
   const json = await response.json();
 
   if (!response.ok) {
     const err = json as ApiErrorResponse;
-    throw new Error(
+    if (response.status === 422) {
+      throw new ApiError(
+        err.message ?? "Validation failed",
+        422,
+        err.errors,
+      );
+    }
+    if (response.status >= 500) {
+      throw new ApiError(
+        "Something went wrong. Please try again.",
+        response.status,
+      );
+    }
+    throw new ApiError(
       err.message ?? `Request failed with status ${response.status}`,
+      response.status,
     );
   }
 

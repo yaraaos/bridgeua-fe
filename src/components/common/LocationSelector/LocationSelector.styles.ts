@@ -24,20 +24,20 @@ export function createStyles(colors: AppColors) {
     },
     modalLayer: {
       flex: 1,
-      backgroundColor: "transparent",
+      backgroundColor: 'rgba(0,0,0,0.15)',
     },
     dropdown: {
       position: "absolute",
       width: 260,
-      backgroundColor: colors.surface,
+      backgroundColor: colors.primaryGreenDark,
       borderRadius: 16,
       borderWidth: 1,
-      borderColor: colors.border,
+      borderColor: colors.primaryGreen,
       overflow: "hidden",
       shadowColor: "#000",
-      shadowOpacity: 0.08,
-      shadowRadius: 10,
-      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.25,
+      shadowRadius: 16,
+      shadowOffset: { width: 0, height: 8 },
       elevation: 20,
     },
     option: {
@@ -45,7 +45,7 @@ export function createStyles(colors: AppColors) {
       paddingHorizontal: 14,
       paddingVertical: 10,
       borderBottomWidth: 1,
-      borderBottomColor: colors.border,
+      borderBottomColor: 'rgba(255,255,255,0.08)',
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "space-between",
@@ -54,7 +54,7 @@ export function createStyles(colors: AppColors) {
       borderBottomWidth: 0,
     },
     optionSelected: {
-      backgroundColor: colors.primaryGreenSoft,
+      backgroundColor: 'rgba(255,255,255,0.12)',
     },
     optionContent: {
       flexDirection: "row",
@@ -64,11 +64,11 @@ export function createStyles(colors: AppColors) {
     },
     optionText: {
       fontSize: 14,
-      color: colors.textPrimary,
+      color: colors.white,
     },
     optionTextSelected: {
-      color: colors.primaryGreenDark,
-      fontWeight: "600",
+      color: colors.white,
+      fontWeight: "700",
     },
   });
 }

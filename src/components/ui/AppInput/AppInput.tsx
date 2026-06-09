@@ -18,7 +18,9 @@ export default function AppInput({ error, disabled, style, ...props }: Props) {
       <TextInput
         editable={!disabled}
         placeholderTextColor={colors.textMuted}
+        selectionColor={colors.primaryGreen}
         {...props}
+        allowFontScaling={false}
         returnKeyType={props.returnKeyType ?? "done"}
         submitBehavior={props.submitBehavior ?? "blurAndSubmit"}
         style={[

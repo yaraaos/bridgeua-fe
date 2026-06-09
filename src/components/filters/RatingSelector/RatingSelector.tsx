@@ -40,21 +40,6 @@ export default function RatingSelector({ value, onChange }: Props) {
           );
         })}
 
-        <Pressable style={styles.optionRow}>
-          <View
-            style={[
-              styles.radioOuter,
-              value === "custom" && styles.radioOuterActive,
-            ]}
-          >
-            {value === "custom" ? <View style={styles.radioInner} /> : null}
-          </View>
-
-          <View style={styles.customRangeWrap}>
-            <Text style={styles.optionText}>Custom range</Text>
-            <Text style={styles.dropdownText}>⌄</Text>
-          </View>
-        </Pressable>
       </View>
     </View>
   );

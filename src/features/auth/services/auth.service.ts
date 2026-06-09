@@ -41,20 +41,11 @@ export async function checkUsernameAvailability(
   username: string,
   signal?: AbortSignal,
 ): Promise<UsernameAvailabilityResponse> {
-  await new Promise((resolve, reject) => {
-    const timeoutId = setTimeout(resolve, 500);
-
-    signal?.addEventListener("abort", () => {
-      clearTimeout(timeoutId);
-      reject({ name: "AbortError" });
-    });
-  });
-
-  const takenUsernames = ["admin", "test", "yara", "bridgeua"];
-
-  return {
-    available: !takenUsernames.includes(username.toLowerCase()),
-  };
+  const res = await apiClient.get<UsernameAvailabilityResponse>(
+    `${ENDPOINTS.AUTH_CHECK_USERNAME}?username=${encodeURIComponent(username)}`,
+    { signal },
+  );
+  return res.data;
 }
 
 export async function registerBusiness(

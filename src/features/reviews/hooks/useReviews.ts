@@ -1,5 +1,6 @@
 import { useFocusEffect } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
+import { ApiError, parseApiError } from "@/src/services/api/types";
 import { getReviews } from "../services/review.service";
 import type { Review, ReviewsSummary } from "../types/review.types";
 
@@ -17,6 +18,7 @@ export const useReviews = ({ businessId, rating, limit = 1000 }: Params) => {
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(false);
+  const [error, setError] = useState<ApiError | null>(null);
 
   const loadReviews = useCallback(
     async (nextPage = 1) => {
@@ -34,6 +36,7 @@ export const useReviews = ({ businessId, rating, limit = 1000 }: Params) => {
       try {
         if (isFirstPage) {
           setIsLoading(true);
+          setError(null);
         } else {
           setIsLoadingMore(true);
         }
@@ -52,6 +55,10 @@ export const useReviews = ({ businessId, rating, limit = 1000 }: Params) => {
         setReviewCount(response.total);
         setPage(response.page);
         setHasMore(response.page < response.totalPages);
+      } catch (e) {
+        if (isFirstPage) {
+          setError(parseApiError(e));
+        }
       } finally {
         setIsLoading(false);
         setIsLoadingMore(false);
@@ -77,6 +84,7 @@ export const useReviews = ({ businessId, rating, limit = 1000 }: Params) => {
     isLoading,
     isLoadingMore,
     hasMore,
+    error,
     refresh: () => loadReviews(1),
     loadMore: () => {
       if (!hasMore || isLoadingMore) return;

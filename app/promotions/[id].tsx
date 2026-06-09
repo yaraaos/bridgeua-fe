@@ -94,52 +94,6 @@ export default function PromotionDetailScreen() {
 
         <Image source={{ uri: promotion.imageUrl }} style={styles.heroImage} />
 
-        {!!promotion.business && (
-          <View style={styles.businessCard}>
-            <Image
-              source={{
-                uri:
-                  "image" in promotion.business
-                    ? promotion.business.image
-                    : promotion.imageUrl,
-              }}
-              style={styles.businessImage}
-            />
-
-            <View style={styles.businessInfo}>
-              <AppText style={styles.businessName} numberOfLines={1}>
-                {promotion.business.name}
-              </AppText>
-
-              <View style={styles.metaRow}>
-                <Ionicons name="star" size={14} color={colors.accentOrange} />
-                <AppText style={styles.metaText}>
-                  {(
-                    (promotion.business as any)?.averageRating ??
-                    (promotion.business as any)?.rating ??
-                    0
-                  ).toFixed(1)}
-                </AppText>
-                <AppText style={styles.dot}>•</AppText>
-                <AppText style={styles.metaText} numberOfLines={1}>
-                  {promotion.business.category}
-                </AppText>
-              </View>
-
-              <View style={styles.metaRow}>
-                <Ionicons
-                  name="location-outline"
-                  size={14}
-                  color={colors.textMuted}
-                />
-                <AppText style={styles.metaText} numberOfLines={1}>
-                  {promotion.business.location}
-                </AppText>
-              </View>
-            </View>
-          </View>
-        )}
-
         {(!!offerDetails.length || !!formattedValidUntil) && (
           <View style={styles.sectionCard}>
             <AppText style={styles.sectionTitle}>Offer details</AppText>
@@ -205,6 +159,7 @@ export default function PromotionDetailScreen() {
                   businessId: promotion.businessId,
                   promotionId: promotion.id,
                   promoCode: promotion.promoCode,
+                  discountLabel: promotion.discountLabel ?? "",
                 },
               })
             }
@@ -277,44 +232,10 @@ function createStyles(colors: AppColors) {
       height: 210,
       borderRadius: 18,
     },
-    businessCard: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 12,
-      padding: 12,
-      borderRadius: 18,
-      backgroundColor: colors.surface,
-      borderWidth: 1,
-      borderColor: colors.border,
-    },
-    businessImage: {
-      width: 58,
-      height: 58,
-      borderRadius: 14,
-    },
-    businessInfo: {
-      flex: 1,
-      gap: 4,
-    },
-    businessName: {
-      fontSize: 17,
-      fontWeight: "800",
-      color: colors.textPrimary,
-    },
     metaRow: {
       flexDirection: "row",
       alignItems: "center",
       gap: 4,
-    },
-    metaText: {
-      fontSize: 12,
-      fontWeight: "600",
-      color: colors.textSecondary,
-      flexShrink: 1,
-    },
-    dot: {
-      fontSize: 12,
-      color: colors.textMuted,
     },
     sectionCard: {
       padding: 14,

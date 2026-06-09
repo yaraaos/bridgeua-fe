@@ -2,13 +2,20 @@ import * as SecureStore from "expo-secure-store";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
-import type { Booking, BookingStatus } from "@/src/features/bookings/types/booking.types";
+import type {
+  Booking,
+  BookingStatus,
+} from "@/src/features/bookings/types/booking.types";
 
 export type StoredBooking = Booking & {
   businessName: string;
   serviceName: string;
   specialistName: string;
   price: string;
+  originalPrice?: string;
+  discountPercentage?: number;
+  discountAmount?: string;
+  finalPrice?: string;
 };
 
 type BookingsState = {
@@ -21,7 +28,7 @@ type BookingsState = {
 
 export const useBookingsStore = create<BookingsState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       bookings: [],
 
       addBooking: (booking) =>
@@ -31,8 +38,10 @@ export const useBookingsStore = create<BookingsState>()(
 
       updateBookingStatus: (id, status) =>
         set((state) => ({
-          bookings: state.bookings.map((b) =>
-            String(b.id) === String(id) ? { ...b, status } : b,
+          bookings: state.bookings.map((booking) =>
+            String(booking.id) === String(id)
+              ? { ...booking, status }
+              : booking,
           ),
         })),
 
@@ -43,21 +52,55 @@ export const useBookingsStore = create<BookingsState>()(
 
       fetchBookings: async () => {
         const { apiClient } = await import("@/src/services/api/client");
-        const res = await apiClient.get<{ success: boolean; data: any[] }>("/api/bookings/me");
-        const bookings = ((res as any).data ?? []).map((b: any) => ({
-          id: String(b.id),
-          businessId: String(b.businessId),
-          serviceId: String(b.serviceId),
-          specialistId: b.professionalId ? String(b.professionalId) : "any",
-          date: b.date,
-          time: b.startTime,
-          status: b.status,
-          businessName: b.business?.name ?? "Business",
-          serviceName: b.service?.name ?? "Service",
-          specialistName: b.professional ? `${b.professional.firstName} ${b.professional.lastName}` : "Any specialist",
-          price: b.service?.price ? `$${b.service.price}` : "Price on request",
-          customer: { firstName: "", lastName: "", phoneNumber: "" },
-        }));
+
+        let res: { data: any };
+        try {
+          res = await apiClient.get<{ success: boolean; data: any[] }>(
+            "/api/bookings/me",
+          );
+        } catch {
+          return;
+        }
+
+        const existing = get().bookings;
+
+        const bookings = ((res as any).data ?? []).map((booking: any) => {
+          const existingBooking = existing.find(
+            (item: StoredBooking) => String(item.id) === String(booking.id),
+          );
+
+          const specialistId = booking.professionalId
+            ? String(booking.professionalId)
+            : "";
+
+          return {
+            id: String(booking.id),
+            businessId: String(booking.businessId),
+            serviceId: String(booking.serviceId),
+            specialistId,
+            date: booking.date,
+            time: booking.startTime,
+            status: booking.status,
+            businessName: booking.business?.name ?? "Business",
+            serviceName: booking.service?.name ?? "Service",
+            specialistName: booking.professional
+              ? `${booking.professional.firstName} ${booking.professional.lastName}`.trim()
+              : "Selected specialist",
+            price: booking.service?.price
+              ? `$${booking.service.price}`
+              : "Price on request",
+            customer: existingBooking?.customer ?? {
+              firstName: "",
+              lastName: "",
+              phoneNumber: "",
+            },
+            originalPrice: existingBooking?.originalPrice,
+            discountPercentage: existingBooking?.discountPercentage,
+            discountAmount: existingBooking?.discountAmount,
+            finalPrice: existingBooking?.finalPrice,
+          };
+        });
+
         set({ bookings });
       },
     }),

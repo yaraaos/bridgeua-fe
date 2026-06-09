@@ -11,6 +11,7 @@ export const useCategories = () => {
   useEffect(() => {
     getCategories()
       .then(setCategories)
+      .catch(() => {})
       .finally(() => setIsLoading(false));
   }, []);
 
