@@ -3,6 +3,7 @@ export const ENDPOINTS = {
   AUTH_REGISTER: "/api/auth/register",
   AUTH_REGISTER_PERSONAL: "/api/auth/register/personal",
   AUTH_REGISTER_BUSINESS: "/api/auth/register/business",
+  AUTH_CHECK_USERNAME: "/api/auth/check-username",
   AUTH_CONFIRM_CODE: "/api/auth/confirm-code",
   AUTH_RESEND_CODE: "/api/auth/resend-code",
   AUTH_LOGIN: "/api/auth/login",
