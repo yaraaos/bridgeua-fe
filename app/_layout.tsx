@@ -1,29 +1,39 @@
-//app/_layout.tsx
+// app/_layout.tsx
 
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { getNavigationTheme } from "@/src/theme/navigationTheme";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { useState } from "react";
+import * as SystemUI from "expo-system-ui";
+import { useEffect, useState } from "react";
 import { LogBox } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
-LogBox.ignoreLogs([
-  "already reviewed",
-  "You have already reviewed",
-]);
+LogBox.ignoreLogs(["already reviewed", "You have already reviewed"]);
 
 function RootLayoutInner() {
   const { colors, isDark } = useAppTheme();
   const navTheme = getNavigationTheme(colors, isDark);
   const [queryClient] = useState(() => new QueryClient());
 
+  useEffect(() => {
+    void SystemUI.setBackgroundColorAsync(colors.background);
+  }, [colors.background]);
+
   return (
     <QueryClientProvider client={queryClient}>
-      <StatusBar style={isDark ? "light" : "dark"} />
+      <StatusBar
+        style={isDark ? "light" : "dark"}
+        backgroundColor={colors.background}
+        translucent
+      />
+
       <Stack
-        screenOptions={{ headerShown: false }}
+        screenOptions={{
+          headerShown: false,
+          contentStyle: { backgroundColor: colors.background },
+        }}
         // @ts-ignore — theme prop is valid for NavigationContainer used internally
         theme={navTheme}
       >
