@@ -2,12 +2,14 @@ import AppButton from "@/src/components/ui/AppButton/AppButton";
 import AppLoader from "@/src/components/ui/AppLoader/AppLoader";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
 import AppText from "@/src/components/ui/AppText/AppText";
+import ScreenHeader from "@/src/components/common/ScreenHeader/ScreenHeader";
 import { fetchAdminUsers, deleteAdminUser } from "@/src/features/admin/services/admin.service";
 import type { AdminUser } from "@/src/features/admin/types/admin.types";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { useAppStore } from "@/src/store/app.store";
 import { spacing } from "@/src/constants/spacing";
-import { router } from "expo-router";
-import { useCallback, useEffect, useState } from "react";
+import { router, useFocusEffect } from "expo-router";
+import { useCallback, useRef, useState } from "react";
 import {
   Alert,
   FlatList,
@@ -26,12 +28,14 @@ const ACCOUNT_TYPE_OPTIONS = [
 export default function AdminUsersScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+  const incrementBusinessesVersion = useAppStore((s) => s.incrementBusinessesVersion);
 
   const [users, setUsers] = useState<AdminUser[]>([]);
-  const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [inputValue, setInputValue] = useState("");
   const [search, setSearch] = useState("");
+  const searchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [accountType, setAccountType] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -43,9 +47,11 @@ export default function AdminUsersScreen() {
         if (p === 1) {
           setUsers(data.users);
         } else {
-          setUsers((prev) => [...prev, ...data.users]);
+          setUsers((prev) => {
+            const seen = new Set(prev.map((u) => u.id));
+            return [...prev, ...data.users.filter((u) => !seen.has(u.id))];
+          });
         }
-        setTotal(data.total);
         setPage(data.page);
         setTotalPages(data.totalPages);
       } catch {
@@ -57,9 +63,11 @@ export default function AdminUsersScreen() {
     [search, accountType],
   );
 
-  useEffect(() => {
-    load(1);
-  }, [load]);
+  useFocusEffect(
+    useCallback(() => {
+      load(1);
+    }, [load]),
+  );
 
   const handleDelete = (user: AdminUser) => {
     Alert.alert(
@@ -75,8 +83,9 @@ export default function AdminUsersScreen() {
               await deleteAdminUser(user.id);
               setUsers((prev) => prev.filter((u) => u.id !== user.id));
               setTotal((t) => t - 1);
-            } catch {
-              Alert.alert("Error", "Failed to delete user");
+              incrementBusinessesVersion();
+            } catch (e: any) {
+              Alert.alert("Error", e?.message ?? "Failed to delete user");
             }
           },
         },
@@ -96,23 +105,36 @@ export default function AdminUsersScreen() {
   };
 
   return (
-    <AppScreen style={styles.screen}>
-      <View style={styles.header}>
-        <AppText style={styles.title}>Users ({total})</AppText>
-        <AppButton
-          title="+ Add"
-          onPress={() => router.push({ pathname: "/admin/create" } as any)}
-        />
-      </View>
+    <AppScreen withTopInset={false} style={styles.screen}>
+      <ScreenHeader
+        title="Users"
+        titleSubtitle="Manage accounts"
+        onBack={() => router.back()}
+        bottomSlot={
+          <AppButton
+            title="Add new user"
+            size="sm"
+            onPress={() => router.push({ pathname: "/admin/create" } as any)}
+            style={styles.addButton}
+          />
+        }
+      />
 
       <TextInput
         style={styles.search}
         placeholder="Search by name, email or username..."
         placeholderTextColor={colors.textMuted}
-        value={search}
-        onChangeText={(v) => { setSearch(v); }}
+        value={inputValue}
+        onChangeText={(v) => {
+          setInputValue(v);
+          if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
+          searchTimerRef.current = setTimeout(() => setSearch(v), 350);
+        }}
         returnKeyType="search"
-        onSubmitEditing={() => load(1)}
+        onSubmitEditing={() => {
+          if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
+          setSearch(inputValue);
+        }}
       />
 
       <View style={styles.filters}>
@@ -131,16 +153,18 @@ export default function AdminUsersScreen() {
         ))}
       </View>
 
-      {isLoading && page === 1 ? (
+      {isLoading && users.length === 0 ? (
         <AppLoader />
       ) : (
         <FlatList
           data={users}
           keyExtractor={(u) => String(u.id)}
           contentContainerStyle={styles.list}
-          onEndReached={() => { if (page < totalPages) load(page + 1); }}
+          onEndReached={() => { if (page < totalPages && !isLoading) load(page + 1); }}
           onEndReachedThreshold={0.3}
-          ListFooterComponent={isLoading && page > 1 ? <AppLoader /> : null}
+          keyboardDismissMode="on-drag"
+          keyboardShouldPersistTaps="handled"
+          ListFooterComponent={isLoading && users.length > 0 ? <AppLoader /> : null}
           renderItem={({ item }) => (
             <View style={styles.row}>
               <TouchableOpacity
@@ -170,17 +194,11 @@ export default function AdminUsersScreen() {
 
 const createStyles = (colors: any) =>
   StyleSheet.create({
-    screen: { flex: 1, paddingTop: spacing.xl },
-    header: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-      paddingHorizontal: spacing.lg,
-      marginBottom: spacing.md,
-    },
-    title: { fontSize: 20, fontWeight: "700", color: colors.textPrimary },
+    screen: { flex: 1, padding: 0 },
+    addButton: { flex: 1 },
     search: {
       marginHorizontal: spacing.lg,
+      marginTop: spacing.md,
       marginBottom: spacing.sm,
       borderWidth: 1,
       borderColor: colors.border,

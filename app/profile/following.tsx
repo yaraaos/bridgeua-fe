@@ -5,6 +5,7 @@ import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
 import { spacing } from "@/src/constants/spacing";
 import { useBusinesses } from "@/src/features/businesses";
 import { useFilterStore } from "@/src/store/filter.store";
+import { useAppStore } from "@/src/store/app.store";
 import { useFollowingStore } from "@/src/store/following.store";
 import type { Business } from "@/src/types/business";
 import { router } from "expo-router";
@@ -66,7 +67,8 @@ export default function ProfileFollowingScreen() {
   const [search, setSearch] = useState("");
   const [refreshing, setRefreshing] = useState(false);
 
-  const { businesses } = useBusinesses();
+  const businessesVersion = useAppStore((s) => s.businessesVersion);
+  const { businesses } = useBusinesses(undefined, businessesVersion);
 
   const followedBusinessIds = useFollowingStore(
     (state) => state.followedBusinessIds,

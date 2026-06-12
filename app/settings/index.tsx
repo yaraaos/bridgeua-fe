@@ -3,17 +3,16 @@ import { AppColors } from "@/src/constants/colors";
 import { radius } from "@/src/constants/radius";
 import { spacing } from "@/src/constants/spacing";
 import { useSettings } from "@/src/features/settings/hooks/useSettings";
-import { useMyBusinessProfile } from "@/src/features/businesses/hooks/useBusiness";
-import { deleteBusiness } from "@/src/features/businesses/services/business.service";
+
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { useAppStore } from "@/src/store/app.store";
 import { useAuthStore } from "@/src/store/auth.store";
 import { useAccountStore } from "@/src/store/account.store";
 import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useRef } from "react";
 import {
-  Alert,
+  Animated,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -100,46 +99,18 @@ export default function SettingsScreen() {
   const isAdmin = useAuthStore((state) => state.user?.isAdmin);
   const { settings, updateSetting } = useSettings();
 
-  const [isDeletingBusiness, setIsDeletingBusiness] = useState(false);
-  const { business } = useMyBusinessProfile();
-  const handleDeleteBusiness = () => {
-    if (!business?.id || isDeletingBusiness) return;
+  const themeOverlayColor = useRef(colors.background);
+  const themeOverlayOpacity = useRef(new Animated.Value(0)).current;
 
-    Alert.alert(
-      "Delete business?",
-      "This will permanently delete your business profile. This action cannot be undone.",
-      [
-        {
-          text: "Cancel",
-          style: "cancel",
-        },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              setIsDeletingBusiness(true);
-              await deleteBusiness(business.id);
-              const currentUser = useAuthStore.getState().user;
-              if (currentUser?.id) {
-                await useAccountStore.getState().removeAccount(String(currentUser.id));
-              }
-              await clearUser();
-              router.replace("/auth/sign-in");
-            } catch (error) {
-              Alert.alert(
-                "Could not delete business",
-                error instanceof Error
-                  ? error.message
-                  : "Please try again later.",
-              );
-            } finally {
-              setIsDeletingBusiness(false);
-            }
-          },
-        },
-      ],
-    );
+  const handleThemeChange = (val: boolean) => {
+    themeOverlayColor.current = colors.background;
+    themeOverlayOpacity.setValue(1);
+    setThemeMode(val ? "dark" : "light");
+    Animated.timing(themeOverlayOpacity, {
+      toValue: 0,
+      duration: 220,
+      useNativeDriver: true,
+    }).start();
   };
 
   return (
@@ -227,7 +198,7 @@ export default function SettingsScreen() {
             rightElement={
               <Switch
                 value={isDark}
-                onValueChange={(val) => setThemeMode(val ? "dark" : "light")}
+                onValueChange={handleThemeChange}
                 trackColor={{
                   false: colors.textMuted,
                   true: colors.primaryGreen,
@@ -341,6 +312,14 @@ export default function SettingsScreen() {
 
         <Text style={styles.version}>Version 2.4.7</Text>
       </ScrollView>
+
+      <Animated.View
+        pointerEvents="none"
+        style={[
+          StyleSheet.absoluteFillObject,
+          { backgroundColor: themeOverlayColor.current, opacity: themeOverlayOpacity },
+        ]}
+      />
     </View>
   );
 }
@@ -444,28 +423,6 @@ function createStyles(colors: AppColors) {
       fontSize: 15,
       fontWeight: "600",
       color: colors.accentOrange,
-    },
-
-    deleteBusinessBtn: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "center",
-      gap: spacing.sm,
-      marginHorizontal: spacing.lg,
-      marginBottom: spacing.md,
-      paddingVertical: 14,
-      borderRadius: radius.lg,
-      borderWidth: 1,
-      borderColor: colors.error,
-      backgroundColor: colors.surface,
-    },
-    deleteBusinessText: {
-      fontSize: 15,
-      fontWeight: "600",
-      color: colors.error,
-    },
-    disabledBtn: {
-      opacity: 0.6,
     },
 
     version: {

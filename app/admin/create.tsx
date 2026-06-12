@@ -2,6 +2,7 @@ import AppButton from "@/src/components/ui/AppButton/AppButton";
 import AppInput from "@/src/components/ui/AppInput/AppInput";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
 import AppText from "@/src/components/ui/AppText/AppText";
+import ScreenHeader from "@/src/components/common/ScreenHeader/ScreenHeader";
 import { createAdminUser } from "@/src/features/admin/services/admin.service";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { spacing } from "@/src/constants/spacing";
@@ -78,15 +79,12 @@ export default function AdminCreateUserScreen() {
   };
 
   return (
-    <AppScreen>
+    <AppScreen withTopInset={false} style={{ padding: 0 }}>
+      <ScreenHeader
+        title="New user"
+        onBack={() => router.back()}
+      />
       <ScrollView contentContainerStyle={styles.container}>
-        <View style={styles.topRow}>
-          <TouchableOpacity onPress={() => router.back()}>
-            <AppText style={styles.back}>← Back</AppText>
-          </TouchableOpacity>
-          <AppText style={styles.title}>New user</AppText>
-        </View>
-
         <View style={styles.typeRow}>
           {(["personal", "business"] as AccountType[]).map((t) => (
             <TouchableOpacity
@@ -181,14 +179,6 @@ export default function AdminCreateUserScreen() {
 const createStyles = (colors: any) =>
   StyleSheet.create({
     container: { padding: spacing.lg, paddingBottom: spacing.xxl },
-    topRow: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: spacing.md,
-      marginBottom: spacing.xl,
-    },
-    back: { fontSize: 15, color: colors.primaryGreen },
-    title: { fontSize: 18, fontWeight: "700", color: colors.textPrimary },
     typeRow: {
       flexDirection: "row",
       gap: spacing.sm,

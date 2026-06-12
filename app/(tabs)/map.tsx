@@ -24,6 +24,7 @@ import { useAccountStore, useActiveAccount } from "@/src/store/account.store";
 import { useAuthStore } from "@/src/store/auth.store";
 import { useDiscoveryLocationStore } from "@/src/store/discovery-location";
 import { useFilterStore } from "@/src/store/filter.store";
+import { useAppStore } from "@/src/store/app.store";
 import { useFollowingStore } from "@/src/store/following.store";
 import { Business } from "@/src/types/business";
 import { router, useFocusEffect } from "expo-router";
@@ -149,10 +150,11 @@ export default function MapScreen() {
     (state) => state.followedBusinessIds,
   );
   const businessVersion = useFilterStore((s) => s.businessVersion);
+  const businessesVersion = useAppStore((s) => s.businessesVersion);
 
   const { businesses, isLoading } = useBusinesses(
     locationState ? { state: locationState } : undefined,
-    businessVersion,
+    businessVersion + businessesVersion,
   );
 
   const currentUser = useAuthStore((state) => state.user);

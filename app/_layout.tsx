@@ -23,7 +23,12 @@ function RootLayoutInner() {
     <QueryClientProvider client={queryClient}>
       <StatusBar style={isDark ? "light" : "dark"} />
       <Stack
-        screenOptions={{ headerShown: false }}
+        screenOptions={{
+          headerShown: false,
+          contentStyle: { backgroundColor: colors.background },
+          animation: "fade",
+          animationDuration: 200,
+        }}
         // @ts-ignore — theme prop is valid for NavigationContainer used internally
         theme={navTheme}
       >
