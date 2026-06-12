@@ -55,6 +55,10 @@ export const ENDPOINTS = {
   BOOKING_STATUS: (id: string) => `/api/bookings/${id}/status`,
   BUSINESS_BOOKINGS: (businessId: string) => `/api/businesses/${businessId}/bookings`,
 
+  // Admin
+  ADMIN_USERS: "/api/admin/users",
+  ADMIN_USER_BY_ID: (id: string | number) => `/api/admin/users/${id}`,
+
   // Settings & Account
   SETTINGS: '/api/settings',
   ACCOUNT_EMAIL: '/api/account/email',

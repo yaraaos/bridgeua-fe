@@ -13,6 +13,7 @@ export type AuthUser = {
   name?: string;
   accountType?: "personal" | "business";
   isEmailConfirmed?: boolean;
+  isAdmin?: boolean;
   ownedBusinessIds?: string[];
   activeBusinessId?: string | null;
   businessName?: string | null;
