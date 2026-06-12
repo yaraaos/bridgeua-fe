@@ -97,6 +97,7 @@ export default function SettingsScreen() {
   const setThemeMode = useAppStore((s) => s.setThemeMode);
   const clearUser = useAuthStore((state) => state.clearUser);
   const accountType = useAuthStore((state) => state.user?.accountType);
+  const isAdmin = useAuthStore((state) => state.user?.isAdmin);
   const { settings, updateSetting } = useSettings();
 
   const [isDeletingBusiness, setIsDeletingBusiness] = useState(false);
@@ -155,6 +156,18 @@ export default function SettingsScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
+        {/* Admin */}
+        {isAdmin && (
+          <SettingsSection label="Admin">
+            <SettingsRow
+              icon="users"
+              title="Users"
+              subtitle="Manage personal and business accounts"
+              onPress={() => router.push({ pathname: "/admin" } as any)}
+            />
+          </SettingsSection>
+        )}
+
         {/* Account */}
         <SettingsSection label="Account">
           <SettingsRow
