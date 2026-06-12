@@ -29,6 +29,7 @@ function RootLayoutInner() {
       >
         <Stack.Screen name="index" />
         <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="admin" />
         <Stack.Screen
           name="auth"
           options={{
