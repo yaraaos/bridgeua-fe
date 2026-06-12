@@ -27,6 +27,7 @@ import { useAuthStore } from "@/src/store/auth.store";
 import type { AuthUser } from "@/src/features/auth/types/auth.types";
 import { useDiscoveryLocationStore } from "@/src/store/discovery-location";
 import { useFilterStore } from "@/src/store/filter.store";
+import { useAppStore } from "@/src/store/app.store";
 import { Feather } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router, useFocusEffect } from "expo-router";
@@ -91,10 +92,11 @@ export default function HomeScreen() {
   }, [sort, rating, locationState, cuisines]);
 
   const businessVersion = useFilterStore((s) => s.businessVersion);
+  const businessesVersion = useAppStore((s) => s.businessesVersion);
 
   const { businesses, isLoading, error: businessesError, refetch: refetchBusinesses } = useBusinesses(
     Object.keys(serverParams).length > 0 ? serverParams : undefined,
-    businessVersion,
+    businessVersion + businessesVersion,
   );
 
   const isGuest = useAuthStore((state) => state.isGuest);

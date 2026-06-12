@@ -10,6 +10,11 @@ export function createStyles(colors: AppColors) {
       alignItems: "center",
       justifyContent: "center",
     },
+    baseSm: {
+      height: 34,
+      borderRadius: radius.sm,
+      paddingHorizontal: 14,
+    },
     primary: {
       backgroundColor: colors.primaryGreen,
     },
@@ -25,6 +30,9 @@ export function createStyles(colors: AppColors) {
     text: {
       fontSize: 16,
       fontWeight: "600",
+    },
+    textSm: {
+      fontSize: 13,
     },
     primaryText: {
       color: colors.white,

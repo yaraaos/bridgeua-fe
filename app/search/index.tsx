@@ -5,6 +5,7 @@ import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
 import { AppColors } from "@/src/constants/colors";
 import { useBusinesses } from "@/src/features/businesses";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { useAppStore } from "@/src/store/app.store";
 import { Feather } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
@@ -20,7 +21,8 @@ export default function SearchScreen() {
   const [query, setQuery] = useState("");
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
 
-  const { businesses } = useBusinesses();
+  const businessesVersion = useAppStore((s) => s.businessesVersion);
+  const { businesses } = useBusinesses(undefined, businessesVersion);
 
   useEffect(() => {
     const loadRecentSearches = async () => {

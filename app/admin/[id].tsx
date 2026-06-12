@@ -3,6 +3,7 @@ import AppInput from "@/src/components/ui/AppInput/AppInput";
 import AppLoader from "@/src/components/ui/AppLoader/AppLoader";
 import AppScreen from "@/src/components/ui/AppScreen/AppScreen";
 import AppText from "@/src/components/ui/AppText/AppText";
+import ScreenHeader from "@/src/components/common/ScreenHeader/ScreenHeader";
 import {
   fetchAdminUser,
   updateAdminUser,
@@ -17,7 +18,6 @@ import {
   ScrollView,
   StyleSheet,
   Switch,
-  TouchableOpacity,
   View,
 } from "react-native";
 
@@ -100,19 +100,21 @@ export default function AdminUserDetailScreen() {
     }
   };
 
-  if (isLoading) return <AppLoader />;
+  if (isLoading) return <AppScreen><AppLoader /></AppScreen>;
   if (!user) return null;
 
-  return (
-    <AppScreen>
-      <ScrollView contentContainerStyle={styles.container}>
-        <View style={styles.topRow}>
-          <TouchableOpacity onPress={() => router.back()}>
-            <AppText style={styles.back}>← Back</AppText>
-          </TouchableOpacity>
-          <AppText style={styles.badge}>{user.accountType}</AppText>
-        </View>
+  const displayTitle = user.accountType === "business"
+    ? (user.businesses?.[0]?.name ?? user.email)
+    : [user.profile?.firstName, user.profile?.lastName].filter(Boolean).join(" ") || user.email;
 
+  return (
+    <AppScreen withTopInset={false} style={{ padding: 0 }}>
+      <ScreenHeader
+        title={displayTitle}
+        titleSubtitle={user.email}
+        onBack={() => router.back()}
+      />
+      <ScrollView contentContainerStyle={styles.container}>
         <AppText style={styles.sectionTitle}>Account</AppText>
 
         <AppText style={styles.label}>Email</AppText>
@@ -198,22 +200,6 @@ export default function AdminUserDetailScreen() {
 const createStyles = (colors: any) =>
   StyleSheet.create({
     container: { padding: spacing.lg, paddingBottom: spacing.xxl },
-    topRow: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-      marginBottom: spacing.xl,
-    },
-    back: { fontSize: 15, color: colors.primaryGreen },
-    badge: {
-      fontSize: 12,
-      color: colors.textSecondary,
-      backgroundColor: colors.border,
-      paddingHorizontal: spacing.sm,
-      paddingVertical: 2,
-      borderRadius: 4,
-      textTransform: "capitalize",
-    },
     sectionTitle: {
       fontSize: 16,
       fontWeight: "700",
