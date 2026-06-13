@@ -29,6 +29,7 @@ import { useFilterStore } from "@/src/store/filter.store";
 import { useFollowingLocationStore } from "@/src/store/following-location.store";
 import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Alert,
   FlatList,
@@ -84,6 +85,7 @@ const createNewsFromDraft = (
 export default function FollowingScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+  const { t } = useTranslation();
 
   const { business: myBusiness } = useMyBusinessProfile();
   const businessId = String(myBusiness?.id ?? "");
@@ -109,8 +111,8 @@ export default function FollowingScreen() {
     useFilterStore((state) => state.followingFilters);
 
   const [locationOptions, setLocationOptions] = useState<LocationOption[]>([
-    { label: "All locations", value: "all", type: "manual", state: undefined },
-    { label: "See nearby", value: "nearby", type: "nearby" },
+    { label: t("following.allLocations"), value: "all", type: "manual", state: undefined },
+    { label: t("following.seeNearby"), value: "nearby", type: "nearby" },
   ]);
 
   useEffect(() => {
@@ -122,11 +124,12 @@ export default function FollowingScreen() {
         state: s,
       }));
       setLocationOptions([
-        { label: "All locations", value: "all", type: "manual", state: undefined },
-        { label: "See nearby", value: "nearby", type: "nearby" },
+        { label: t("following.allLocations"), value: "all", type: "manual", state: undefined },
+        { label: t("following.seeNearby"), value: "nearby", type: "nearby" },
         ...stateOptions,
       ]);
     }).catch(() => {});
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const [visibleBusinessIds, setVisibleBusinessIds] = useState<string[]>([]);
@@ -244,16 +247,16 @@ export default function FollowingScreen() {
   const closeEditor = (force = false) => {
     if (!force && draftPromotion && hasPromotionDraftContent(draftPromotion)) {
       Alert.alert(
-        "Unsaved changes",
-        "You have unsaved changes. What would you like to do?",
+        t("following.unsavedTitle"),
+        t("following.unsavedMessage"),
         [
-          { text: "Keep editing", style: "cancel" },
+          { text: t("following.keepEditing"), style: "cancel" },
           {
-            text: "Save draft",
+            text: t("following.saveDraft"),
             onPress: () => void handleSaveDraft(),
           },
           {
-            text: "Discard",
+            text: t("following.discard"),
             style: "destructive",
             onPress: () => closeEditor(true),
           },
@@ -268,16 +271,16 @@ export default function FollowingScreen() {
   const closeNewsEditor = (force = false) => {
     if (!force && draftNews && hasNewsDraftContent(draftNews)) {
       Alert.alert(
-        "Unsaved changes",
-        "You have unsaved changes. What would you like to do?",
+        t("following.unsavedTitle"),
+        t("following.unsavedMessage"),
         [
-          { text: "Keep editing", style: "cancel" },
+          { text: t("following.keepEditing"), style: "cancel" },
           {
-            text: "Save draft",
+            text: t("following.saveDraft"),
             onPress: () => void handleSaveNewsDraft(),
           },
           {
-            text: "Discard",
+            text: t("following.discard"),
             style: "destructive",
             onPress: () => closeNewsEditor(true),
           },
@@ -369,12 +372,12 @@ export default function FollowingScreen() {
       redemptionType: promotion.redemptionType,
       redemptionInstructions: promotion.redemptionInstructions,
       offerDetails:
-        typeof promotion.offerDetails === "string"
-          ? JSON.parse(promotion.offerDetails)
+        typeof (promotion.offerDetails as unknown) === "string"
+          ? JSON.parse(promotion.offerDetails as unknown as string)
           : (promotion.offerDetails ?? []),
       terms:
-        typeof promotion.terms === "string"
-          ? JSON.parse(promotion.terms)
+        typeof (promotion.terms as unknown) === "string"
+          ? JSON.parse(promotion.terms as unknown as string)
           : (promotion.terms ?? []),
       ctaType: promotion.ctaType,
       ctaLabel: promotion.ctaLabel,
@@ -448,7 +451,7 @@ export default function FollowingScreen() {
       );
       closeEditor(true);
     } catch {
-      Alert.alert("Error", "Failed to save promotion. Please try again.");
+      Alert.alert(t("following.errorTitle"), t("following.errorSavePromotion"));
     }
   };
 
@@ -497,7 +500,7 @@ export default function FollowingScreen() {
       );
       closeEditor(true);
     } catch {
-      Alert.alert("Error", "Failed to publish promotion. Please try again.");
+      Alert.alert(t("following.errorTitle"), t("following.errorPublishPromotion"));
     } finally {
       setIsPublishing(false);
     }
@@ -522,7 +525,7 @@ export default function FollowingScreen() {
       );
       closeEditor(true);
     } catch {
-      Alert.alert("Error", "Failed to delete promotion. Please try again.");
+      Alert.alert(t("following.errorTitle"), t("following.errorDeletePromotion"));
     }
   };
 
@@ -536,7 +539,7 @@ export default function FollowingScreen() {
         if (value === undefined || value === null || value === "") return;
         if (Array.isArray(value)) {
           formData.append(key, JSON.stringify(value));
-        } else if (typeof value === "string" && value.startsWith("file://")) {
+        } else if (value.startsWith("file://")) {
           formData.append("image", {
             uri: value,
             name: "news.jpg",
@@ -565,7 +568,7 @@ export default function FollowingScreen() {
       );
       closeNewsEditor(true);
     } catch {
-      Alert.alert("Error", "Failed to save news. Please try again.");
+      Alert.alert(t("following.errorTitle"), t("following.errorSaveNews"));
     }
   };
 
@@ -579,7 +582,7 @@ export default function FollowingScreen() {
         if (value === undefined || value === null || value === "") return;
         if (Array.isArray(value)) {
           formData.append(key, JSON.stringify(value));
-        } else if (typeof value === "string" && value.startsWith("file://")) {
+        } else if (value.startsWith("file://")) {
           formData.append("image", {
             uri: value,
             name: "news.jpg",
@@ -611,7 +614,7 @@ export default function FollowingScreen() {
       );
       closeNewsEditor(true);
     } catch {
-      Alert.alert("Error", "Failed to publish news. Please try again.");
+      Alert.alert(t("following.errorTitle"), t("following.errorPublishNews"));
     } finally {
       setIsPublishingNews(false);
     }
@@ -634,7 +637,7 @@ export default function FollowingScreen() {
       setOwnerNews((prev) => prev.filter((item) => item.id !== idToDelete));
       closeNewsEditor(true);
     } catch {
-      Alert.alert("Error", "Failed to delete news. Please try again.");
+      Alert.alert(t("following.errorTitle"), t("following.errorDeleteNews"));
     }
   };
 
@@ -647,14 +650,14 @@ export default function FollowingScreen() {
         promotionId: promotion.id,
         status: promotion.status,
         isFeatured: promotion.isFeatured === true,
-        title: promotion.title || "Untitled promotion",
+        title: promotion.title || t("following.untitledPromotion"),
         description:
           promotion.subtitle ||
           promotion.description ||
           (promotion.offerDetails as any)?.[0] ||
-          "No description added yet.",
+          t("following.noDescription"),
         createdAt: new Date().toISOString(),
-        businessName: myBusiness?.name ?? "Your Business",
+        businessName: myBusiness?.name ?? t("following.yourBusiness"),
         businessCategory: myBusiness?.category ?? "",
         businessLocation: myBusiness?.location ?? "",
         businessImage:
@@ -670,7 +673,7 @@ export default function FollowingScreen() {
         recommendedByCount: 0,
       };
     });
-  }, [ownerPromotions, myBusiness]);
+  }, [ownerPromotions, myBusiness, t]);
 
   const ownerNewsFeedItems = useMemo<FollowingFeedCardItem[]>(() => {
     return ownerNews.map((newsItem) => ({
@@ -679,13 +682,13 @@ export default function FollowingScreen() {
       type: "news",
       newsId: newsItem.id,
       status: newsItem.status,
-      title: newsItem.title || "Untitled news",
+      title: newsItem.title || t("following.untitledNews"),
       description:
         newsItem.subtitle ??
         newsItem.description ??
-        "No description added yet.",
+        t("following.noDescription"),
       createdAt: newsItem.publishedAt || new Date().toISOString(),
-      businessName: myBusiness?.name ?? "Your Business",
+      businessName: myBusiness?.name ?? t("following.yourBusiness"),
       businessCategory: myBusiness?.category ?? "",
       businessLocation: myBusiness?.location ?? "",
       businessImage:
@@ -700,7 +703,7 @@ export default function FollowingScreen() {
       recommendedByPreview: [],
       recommendedByCount: 0,
     }));
-  }, [ownerNews, myBusiness]);
+  }, [ownerNews, myBusiness, t]);
 
   const listData = useMemo<FeedListItem[]>(() => {
     const feedItems: FeedListItem[] = items.map((item) => ({
@@ -762,20 +765,20 @@ export default function FollowingScreen() {
 
   const handleRequestNearby = () => {
     Alert.alert(
-      "Use your location?",
-      "Allow location access to see followed businesses near you.",
+      t("following.useLocationTitle"),
+      t("following.useLocationDesc"),
       [
         {
-          text: "Not now",
+          text: t("following.notNow"),
           style: "cancel",
           onPress: () => setPermissionStatus("denied"),
         },
         {
-          text: "Allow",
+          text: t("following.allow"),
           onPress: () => {
             setPermissionStatus("granted");
             setNearbyLocation({
-              label: "Near you",
+              label: t("following.nearYou"),
               value: "nearby",
               latitude: 34.0549,
               longitude: -118.2426,
@@ -876,16 +879,16 @@ export default function FollowingScreen() {
     return (
       <AppScreen withTopInset={false} style={styles.container}>
         <ScreenHeader
-          title="News & Promos"
-          titleSubtitle="Updates from followed businesses"
+          title={t("following.title")}
+          titleSubtitle={t("following.subtitleFollower")}
           gradientColors={DISCOVERY_GRADIENT}
         />
 
         <View style={styles.switchWrap}>
           <AccountTypeSwitch
             options={[
-              { label: "Promotions", value: "promotion" },
-              { label: "News", value: "news" },
+              { label: t("following.tabPromotions"), value: "promotion" },
+              { label: t("following.tabNews"), value: "news" },
             ]}
             value={activeTab}
             onChange={setActiveTab}
@@ -893,9 +896,9 @@ export default function FollowingScreen() {
         </View>
 
         <AppEmptyState
-          title="Register to see promotions and news"
-          description="Register and follow businesses to see promotions and news from places you trust."
-          actionLabel="Register to BridgeUA"
+          title={t("following.guestEmptyTitle")}
+          description={t("following.guestEmptyDesc")}
+          actionLabel={t("following.guestButton")}
           onPressAction={handleRegisterPress}
         />
       </AppScreen>
@@ -904,22 +907,22 @@ export default function FollowingScreen() {
 
   const newsAndPromosHeader = isBusinessAccount ? (
     <ScreenHeader
-      title="News & Promos"
-      titleSubtitle="Add and view your news and promotions"
+      title={t("following.title")}
+      titleSubtitle={t("following.subtitleOwner")}
       gradientColors={DISCOVERY_GRADIENT}
     />
   ) : (
     <ScreenHeader
-      title="News & Promos"
-      titleSubtitle="Updates from followed businesses"
-      subtitleLabel="Location"
+      title={t("following.title")}
+      titleSubtitle={t("following.subtitleFollower")}
+      subtitleLabel={t("following.locationLabel")}
       subtitleValue={selectedLocationLabel}
       showSubtitleChevron
       locationOptions={locationOptions}
       onSelectLocationOption={handleSelectLocationOption}
       onRequestNearby={handleRequestNearby}
       showSearch
-      searchPlaceholder="Search here..."
+      searchPlaceholder={t("following.searchPlaceholder")}
       searchValue={searchQuery}
       onSearchChangeText={setSearchQuery}
       actions={["map", "filter"]}
@@ -938,8 +941,8 @@ export default function FollowingScreen() {
         <View style={styles.switchWrap}>
           <AccountTypeSwitch
             options={[
-              { label: "Promotions", value: "promotion" },
-              { label: "News", value: "news" },
+              { label: t("following.tabPromotions"), value: "promotion" },
+              { label: t("following.tabNews"), value: "news" },
             ]}
             value={activeTab}
             onChange={setActiveTab}
@@ -960,8 +963,8 @@ export default function FollowingScreen() {
       <View style={styles.switchWrap}>
         <AccountTypeSwitch
           options={[
-            { label: "Promotions", value: "promotion" },
-            { label: "News", value: "news" },
+            { label: t("following.tabPromotions"), value: "promotion" },
+            { label: t("following.tabNews"), value: "news" },
           ]}
           value={activeTab}
           onChange={setActiveTab}
@@ -970,22 +973,20 @@ export default function FollowingScreen() {
 
       {!hasFollowedBusinesses && !shouldShowOwnerTools ? (
         <AppEmptyState
-          title="You are not following anyone yet"
-          description="Follow businesses to see their promotions and news here."
+          title={t("following.emptyNoFollowTitle")}
+          description={t("following.emptyNoFollowDesc")}
         />
       ) : isEmpty && !shouldShowOwnerTools ? (
         <AppEmptyState
-          title={`No ${
-            activeTab === "promotion" ? "promotions" : "news"
-          } found`}
+          title={t("following.emptyNoItemsTitle", { type: activeTab === "promotion" ? t("following.tabPromotions").toLowerCase() : t("following.tabNews").toLowerCase() })}
           description={
             activeFilterCount > 0
-              ? "Try adjusting or clearing your filters."
+              ? t("following.emptyNoItemsDesc")
               : activeTab === "promotion"
-                ? "There are no promotions at this time. Check the News!"
-                : "There is no news at this time. Check the Promotions!"
+                ? t("following.emptyNoPromotions")
+                : t("following.emptyNoNews")
           }
-          actionLabel={activeFilterCount > 0 ? "Clear filters" : undefined}
+          actionLabel={activeFilterCount > 0 ? t("following.clearFilters") : undefined}
           onPressAction={
             activeFilterCount > 0
               ? () => useFilterStore.getState().reset("following")
@@ -1005,7 +1006,7 @@ export default function FollowingScreen() {
             if (item.type === "add-promo") {
               return (
                 <AppAddCard
-                  label="Create promotion"
+                  label={t("following.createPromotion")}
                   onPress={handleOpenCreate}
                 />
               );
@@ -1014,7 +1015,7 @@ export default function FollowingScreen() {
             if (item.type === "add-news") {
               return (
                 <AppAddCard
-                  label="Create news"
+                  label={t("following.createNews")}
                   onPress={handleOpenCreateNews}
                 />
               );
@@ -1072,12 +1073,12 @@ export default function FollowingScreen() {
                   item.isOwnerPromotion
                     ? () => {
                         Alert.alert(
-                          "Delete promotion",
-                          "This cannot be undone.",
+                          t("following.deletePromotionTitle"),
+                          t("following.deleteCannotUndo"),
                           [
-                            { text: "Cancel", style: "cancel" },
+                            { text: t("following.cancel"), style: "cancel" },
                             {
-                              text: "Delete",
+                              text: t("following.delete"),
                               style: "destructive",
                               onPress: () => {
                                 void (async () => {
@@ -1093,8 +1094,8 @@ export default function FollowingScreen() {
                                     );
                                   } catch {
                                     Alert.alert(
-                                      "Error",
-                                      "Failed to delete promotion. Please try again.",
+                                      t("following.errorTitle"),
+                                      t("following.errorDeletePromotion"),
                                     );
                                   }
                                 })();
@@ -1105,10 +1106,10 @@ export default function FollowingScreen() {
                       }
                     : item.isOwnerNews
                       ? () => {
-                          Alert.alert("Delete news", "This cannot be undone.", [
-                            { text: "Cancel", style: "cancel" },
+                          Alert.alert(t("following.deleteNewsTitle"), t("following.deleteCannotUndo"), [
+                            { text: t("following.cancel"), style: "cancel" },
                             {
-                              text: "Delete",
+                              text: t("following.delete"),
                               style: "destructive",
                               onPress: () => {
                                 void (async () => {
@@ -1124,8 +1125,8 @@ export default function FollowingScreen() {
                                     );
                                   } catch {
                                     Alert.alert(
-                                      "Error",
-                                      "Failed to delete news. Please try again.",
+                                      t("following.errorTitle"),
+                                      t("following.errorDeleteNews"),
                                     );
                                   }
                                 })();

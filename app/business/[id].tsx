@@ -39,6 +39,7 @@ import { useEditBusinessStore } from "@/src/store/editBusiness.store";
 import { useProfileStore } from "@/src/store/profile.store";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
   Alert,
@@ -76,6 +77,7 @@ function getTopReviews(reviews: BusinessDetailsReview[]) {
 export default function BusinessDetailsScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+  const { t } = useTranslation();
   const { isAuthModalVisible, closeAuthModal, confirmAuthModal, requireAuth } =
     useRequireAuth();
 
@@ -195,13 +197,13 @@ export default function BusinessDetailsScreen() {
       <AppScreen style={styles.center}>
         {businessError.isNetworkError && <NetworkErrorBanner />}
         <AppEmptyState
-          title={businessError.isNetworkError ? "No internet connection" : "Something went wrong"}
+          title={businessError.isNetworkError ? t("home.errorNoInternet") : t("home.errorSomethingWrong")}
           description={
             businessError.isNetworkError
-              ? "Check your connection and try again."
-              : "Couldn't load business details."
+              ? t("home.errorNoInternetDesc")
+              : t("business.errorLoadDetails")
           }
-          actionLabel="Try again"
+          actionLabel={t("home.errorTryAgain")}
           onPressAction={refetch}
         />
       </AppScreen>
@@ -211,7 +213,7 @@ export default function BusinessDetailsScreen() {
   if (!business) {
     return (
       <AppScreen style={styles.center}>
-        <Text>Business not found</Text>
+        <Text>{t("business.notFound")}</Text>
       </AppScreen>
     );
   }
@@ -280,7 +282,7 @@ export default function BusinessDetailsScreen() {
         imageUrl={viewBusiness.avatarUrl ?? viewBusiness.images[0]?.url}
         rating={reviewsSummary?.rating ?? viewBusiness.rating}
         reviewCount={reviewsSummary?.reviewCount ?? reviewCount}
-        category={viewBusiness.category}
+        category={t(`categories.${viewBusiness.category.toLowerCase().replace(/\s*&\s*/g, "-").replace(/\s+/g, "-")}`, { defaultValue: viewBusiness.category })}
         location={viewBusiness.location}
         isOpen={viewBusiness.isOpen}
         closesAt={viewBusiness.closesAt}
@@ -308,9 +310,9 @@ export default function BusinessDetailsScreen() {
 
       {isEditPreview ? (
         <View style={styles.previewBanner}>
-          <Text style={styles.previewBannerTitle}>Preview mode</Text>
+          <Text style={styles.previewBannerTitle}>{t("business.previewMode")}</Text>
           <Text style={styles.previewBannerSubtitle}>
-            Unsaved changes are visible only to you
+            {t("business.previewSubtitle")}
           </Text>
         </View>
       ) : null}
@@ -337,7 +339,7 @@ export default function BusinessDetailsScreen() {
 
                 openImageViewer(imageIndex >= 0 ? imageIndex : 0, {
                   overlayIndex: heroPhotos.length - 1,
-                  overlayText: "View all",
+                  overlayText: t("business.viewAll"),
                   businessId: viewBusiness.id,
                 });
               }}
@@ -434,13 +436,13 @@ export default function BusinessDetailsScreen() {
                 <View style={styles.center}>
                   {reviewsError.isNetworkError && <NetworkErrorBanner />}
                   <AppEmptyState
-                    title={reviewsError.isNetworkError ? "No internet connection" : "Something went wrong"}
+                    title={reviewsError.isNetworkError ? t("home.errorNoInternet") : t("home.errorSomethingWrong")}
                     description={
                       reviewsError.isNetworkError
-                        ? "Check your connection and try again."
-                        : "Couldn't load reviews."
+                        ? t("home.errorNoInternetDesc")
+                        : t("business.errorLoadReviews")
                     }
-                    actionLabel="Try again"
+                    actionLabel={t("home.errorTryAgain")}
                     onPressAction={refreshReviews}
                   />
                 </View>
@@ -478,9 +480,9 @@ export default function BusinessDetailsScreen() {
                       : (rating) => {
                           if (isBusinessOwner) {
                             Alert.alert(
-                              "Not available",
-                              "Business profiles cannot leave reviews.",
-                              [{ text: "OK" }],
+                              t("business.alertNotAvailableTitle"),
+                              t("business.alertNotAvailableDesc"),
+                              [{ text: t("common.ok") }],
                             );
                             return;
                           }

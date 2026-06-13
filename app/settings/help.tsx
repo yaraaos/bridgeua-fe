@@ -6,6 +6,7 @@ import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Linking,
   Pressable,
@@ -14,36 +15,6 @@ import {
   Text,
   View,
 } from "react-native";
-
-// ─── Data ─────────────────────────────────────────────────────────────────────
-
-const FAQ_ITEMS = [
-  {
-    question: "How do I book an appointment?",
-    answer:
-      "Find a business, tap Book, choose a service, pick a specialist and time slot, then confirm.",
-  },
-  {
-    question: "How do I cancel a booking?",
-    answer:
-      "Go to your bookings, open the booking, and tap Cancel. Cancellations are free up to 24 hours before the appointment.",
-  },
-  {
-    question: "How do I write a review?",
-    answer:
-      "Visit the business page and scroll to the Reviews section. Tap Write a Review and share your experience.",
-  },
-  {
-    question: "How do I verify my business?",
-    answer:
-      "Go to your business profile and tap Request Verification. Our team will review your submission within 3 business days.",
-  },
-  {
-    question: "Why can't I see my business on the map?",
-    answer:
-      "Make sure your business address is saved and that Show Business in Discovery is enabled in Settings.",
-  },
-];
 
 // ─── SettingsRow ──────────────────────────────────────────────────────────────
 
@@ -81,23 +52,25 @@ export default function HelpScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
   const router = useRouter();
+  const { t } = useTranslation();
+
+  const faqItems = t("help.faq", { returnObjects: true }) as { question: string; answer: string }[];
 
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
   return (
     <View style={styles.safeArea}>
-      <ScreenHeader title="Help Center" onBack={() => router.back()} />
+      <ScreenHeader title={t("help.title")} onBack={() => router.back()} />
 
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* FAQ */}
         <View style={styles.section}>
-          <Text style={styles.sectionLabel}>FAQ</Text>
+          <Text style={styles.sectionLabel}>{t("help.sections.faq")}</Text>
           <View style={styles.sectionCard}>
-            {FAQ_ITEMS.map((item, index) => (
+            {faqItems.map((item, index) => (
               <View key={index}>
                 {index > 0 && <View style={styles.divider} />}
                 <Pressable
@@ -126,19 +99,18 @@ export default function HelpScreen() {
           </View>
         </View>
 
-        {/* Contact */}
         <View style={styles.section}>
-          <Text style={styles.sectionLabel}>Contact</Text>
+          <Text style={styles.sectionLabel}>{t("help.sections.contact")}</Text>
           <View style={styles.sectionCard}>
             <SettingsRow
               icon="mail"
-              title="Email Support"
+              title={t("help.contact.emailSupport")}
               onPress={() => Linking.openURL("mailto:support@bridgeua.com?subject=Support%20Request")}
             />
             <View style={styles.divider} />
             <SettingsRow
               icon="alert-circle"
-              title="Report a Bug"
+              title={t("help.contact.reportBug")}
               onPress={() =>
                 Linking.openURL(
                   "mailto:support@bridgeua.com?subject=Bug%20Report",
@@ -148,7 +120,7 @@ export default function HelpScreen() {
             <View style={styles.divider} />
             <SettingsRow
               icon="message-circle"
-              title="Contact Us"
+              title={t("help.contact.contactUs")}
               onPress={() =>
                 Linking.openURL(
                   "mailto:support@bridgeua.com?subject=General%20Enquiry",

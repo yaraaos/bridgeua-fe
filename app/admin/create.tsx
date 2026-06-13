@@ -8,6 +8,7 @@ import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { spacing } from "@/src/constants/spacing";
 import { router } from "expo-router";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Alert,
   ScrollView,
@@ -21,6 +22,7 @@ type AccountType = "personal" | "business";
 export default function AdminCreateUserScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+  const { t } = useTranslation();
 
   const [accountType, setAccountType] = useState<AccountType>("personal");
   const [isLoading, setIsLoading] = useState(false);
@@ -45,11 +47,11 @@ export default function AdminCreateUserScreen() {
 
   const handleCreate = async () => {
     if (!email.trim() || !password.trim()) {
-      Alert.alert("Validation", "Email and password are required");
+      Alert.alert(t("admin.createUser.validationTitle"), t("admin.createUser.validationEmailPassword"));
       return;
     }
     if (accountType === "business" && !businessName.trim()) {
-      Alert.alert("Validation", "Business name is required");
+      Alert.alert(t("admin.createUser.validationTitle"), t("admin.createUser.validationBusinessName"));
       return;
     }
 
@@ -68,11 +70,11 @@ export default function AdminCreateUserScreen() {
             ? { businessName, ownerName, address, city, state, zipCode, cuisine }
             : undefined,
       });
-      Alert.alert("Created", "User created successfully", [
+      Alert.alert(t("admin.createUser.createSuccess"), t("admin.createUser.createSuccessMessage"), [
         { text: "OK", onPress: () => router.back() },
       ]);
     } catch (err: any) {
-      Alert.alert("Error", err?.message ?? "Failed to create user");
+      Alert.alert(t("common.error"), err?.message ?? t("admin.createUser.errorCreate"));
     } finally {
       setIsLoading(false);
     }
@@ -81,64 +83,64 @@ export default function AdminCreateUserScreen() {
   return (
     <AppScreen withTopInset={false} style={{ padding: 0 }}>
       <ScreenHeader
-        title="New user"
+        title={t("admin.createUser.title")}
         onBack={() => router.back()}
       />
       <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.typeRow}>
-          {(["personal", "business"] as AccountType[]).map((t) => (
+          {(["personal", "business"] as AccountType[]).map((type) => (
             <TouchableOpacity
-              key={t}
-              style={[styles.typeChip, accountType === t && styles.typeChipActive]}
-              onPress={() => setAccountType(t)}
+              key={type}
+              style={[styles.typeChip, accountType === type && styles.typeChipActive]}
+              onPress={() => setAccountType(type)}
             >
               <AppText
-                style={[styles.typeChipText, accountType === t && styles.typeChipTextActive]}
+                style={[styles.typeChipText, accountType === type && styles.typeChipTextActive]}
               >
-                {t.charAt(0).toUpperCase() + t.slice(1)}
+                {type === "personal" ? t("admin.users.filterPersonal") : t("admin.users.filterBusiness")}
               </AppText>
             </TouchableOpacity>
           ))}
         </View>
 
-        <AppText style={styles.sectionTitle}>Account</AppText>
+        <AppText style={styles.sectionTitle}>{t("admin.createUser.sectionAccount")}</AppText>
 
-        <AppText style={styles.label}>Email *</AppText>
+        <AppText style={styles.label}>{t("admin.createUser.labelEmail")}</AppText>
         <AppInput
           value={email}
           onChangeText={setEmail}
-          placeholder="email@example.com"
+          placeholder={t("admin.createUser.placeholderEmail")}
           keyboardType="email-address"
           autoCapitalize="none"
         />
 
-        <AppText style={styles.label}>Password *</AppText>
+        <AppText style={styles.label}>{t("admin.createUser.labelPassword")}</AppText>
         <AppInput
           value={password}
           onChangeText={setPassword}
-          placeholder="Password"
+          placeholder={t("admin.createUser.placeholderPassword")}
           secureTextEntry
         />
 
         {accountType === "personal" && (
           <>
-            <AppText style={styles.sectionTitle}>Profile</AppText>
-            <AppText style={styles.label}>First name</AppText>
-            <AppInput value={firstName} onChangeText={setFirstName} placeholder="First name" />
-            <AppText style={styles.label}>Last name</AppText>
-            <AppInput value={lastName} onChangeText={setLastName} placeholder="Last name" />
-            <AppText style={styles.label}>Username</AppText>
+            <AppText style={styles.sectionTitle}>{t("admin.createUser.sectionProfile")}</AppText>
+            <AppText style={styles.label}>{t("admin.createUser.labelFirstName")}</AppText>
+            <AppInput value={firstName} onChangeText={setFirstName} placeholder={t("admin.createUser.placeholderFirstName")} />
+            <AppText style={styles.label}>{t("admin.createUser.labelLastName")}</AppText>
+            <AppInput value={lastName} onChangeText={setLastName} placeholder={t("admin.createUser.placeholderLastName")} />
+            <AppText style={styles.label}>{t("admin.createUser.labelUsername")}</AppText>
             <AppInput
               value={username}
               onChangeText={setUsername}
-              placeholder="Username"
+              placeholder={t("admin.createUser.placeholderUsername")}
               autoCapitalize="none"
             />
-            <AppText style={styles.label}>Phone</AppText>
+            <AppText style={styles.label}>{t("admin.createUser.labelPhone")}</AppText>
             <AppInput
               value={phoneNumber}
               onChangeText={setPhoneNumber}
-              placeholder="Phone number"
+              placeholder={t("admin.createUser.placeholderPhone")}
               keyboardType="phone-pad"
             />
           </>
@@ -146,27 +148,27 @@ export default function AdminCreateUserScreen() {
 
         {accountType === "business" && (
           <>
-            <AppText style={styles.sectionTitle}>Business</AppText>
-            <AppText style={styles.label}>Business name *</AppText>
-            <AppInput value={businessName} onChangeText={setBusinessName} placeholder="Business name" />
-            <AppText style={styles.label}>Owner name</AppText>
-            <AppInput value={ownerName} onChangeText={setOwnerName} placeholder="Owner full name" />
-            <AppText style={styles.label}>Address</AppText>
-            <AppInput value={address} onChangeText={setAddress} placeholder="Address" />
-            <AppText style={styles.label}>City</AppText>
-            <AppInput value={city} onChangeText={setCity} placeholder="City" />
-            <AppText style={styles.label}>State</AppText>
-            <AppInput value={state} onChangeText={setState} placeholder="State" />
-            <AppText style={styles.label}>ZIP</AppText>
-            <AppInput value={zipCode} onChangeText={setZipCode} placeholder="ZIP code" />
-            <AppText style={styles.label}>Cuisine</AppText>
-            <AppInput value={cuisine} onChangeText={setCuisine} placeholder="Cuisine" />
+            <AppText style={styles.sectionTitle}>{t("admin.createUser.sectionBusiness")}</AppText>
+            <AppText style={styles.label}>{t("admin.createUser.labelBusinessName")}</AppText>
+            <AppInput value={businessName} onChangeText={setBusinessName} placeholder={t("admin.createUser.placeholderBusinessName")} />
+            <AppText style={styles.label}>{t("admin.createUser.labelOwnerName")}</AppText>
+            <AppInput value={ownerName} onChangeText={setOwnerName} placeholder={t("admin.createUser.placeholderOwnerName")} />
+            <AppText style={styles.label}>{t("admin.createUser.labelAddress")}</AppText>
+            <AppInput value={address} onChangeText={setAddress} placeholder={t("admin.createUser.placeholderAddress")} />
+            <AppText style={styles.label}>{t("admin.createUser.labelCity")}</AppText>
+            <AppInput value={city} onChangeText={setCity} placeholder={t("admin.createUser.placeholderCity")} />
+            <AppText style={styles.label}>{t("admin.createUser.labelState")}</AppText>
+            <AppInput value={state} onChangeText={setState} placeholder={t("admin.createUser.placeholderState")} />
+            <AppText style={styles.label}>{t("admin.createUser.labelZip")}</AppText>
+            <AppInput value={zipCode} onChangeText={setZipCode} placeholder={t("admin.createUser.placeholderZip")} />
+            <AppText style={styles.label}>{t("admin.createUser.labelCuisine")}</AppText>
+            <AppInput value={cuisine} onChangeText={setCuisine} placeholder={t("admin.createUser.placeholderCuisine")} />
           </>
         )}
 
         <View style={styles.createBtn}>
           <AppButton
-            title={isLoading ? "Creating..." : "Create user"}
+            title={isLoading ? t("admin.createUser.creatingButton") : t("admin.createUser.createButton")}
             onPress={handleCreate}
             disabled={isLoading}
           />

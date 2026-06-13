@@ -1,6 +1,7 @@
 import type { BusinessSocialLink } from "@/src/features/businesses/types/business.types";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { Ionicons } from "@expo/vector-icons";
+import { useTranslation } from "react-i18next";
 import { Linking, Pressable, Text, View } from "react-native";
 import { createStyles } from "./BusinessSocialLinksSection.styles";
 
@@ -23,11 +24,13 @@ const socialIcons: Record<
 export default function BusinessSocialLinksSection({ socialLinks }: Props) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+  const { t } = useTranslation();
+
   if (!socialLinks?.length) return null;
 
   return (
     <View style={styles.card}>
-      <Text style={styles.title}>Social links</Text>
+      <Text style={styles.title}>{t("business.socialLinks")}</Text>
 
       <View style={styles.chipGrid}>
         {socialLinks.map((social) => (

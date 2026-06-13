@@ -7,6 +7,7 @@ import { ENDPOINTS } from "@/src/services/api/endpoints";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
   Alert,
@@ -21,6 +22,7 @@ export default function ConfirmEmailScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
   const router = useRouter();
+  const { t } = useTranslation();
   const { email: newEmail } = useLocalSearchParams<{ email: string }>();
 
   const [code, setCode] = useState("");
@@ -32,11 +34,11 @@ export default function ConfirmEmailScreen() {
     setLoading(true);
     try {
       await apiClient.patch(ENDPOINTS.ACCOUNT_CONFIRM_EMAIL, { code });
-      Alert.alert("Email updated successfully", undefined, [
-        { text: "OK", onPress: () => router.replace("/settings") },
+      Alert.alert(t("confirmEmail.successTitle"), undefined, [
+        { text: t("common.ok"), onPress: () => router.replace("/settings") },
       ]);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Invalid code. Please try again.");
+      setError(err instanceof Error ? err.message : t("confirmEmail.errorFallback"));
     } finally {
       setLoading(false);
     }
@@ -44,17 +46,17 @@ export default function ConfirmEmailScreen() {
 
   return (
     <View style={styles.safeArea}>
-      <ScreenHeader title="Confirm Email" onBack={() => router.back()} />
+      <ScreenHeader title={t("confirmEmail.title")} onBack={() => router.back()} />
 
       <View style={styles.content}>
         <Text style={styles.instructions}>
-          We sent a confirmation code to{" "}
+          {t("confirmEmail.instructions")}{" "}
           <Text style={styles.email}>{newEmail}</Text>
         </Text>
 
         <TextInput
           style={styles.input}
-          placeholder="4-digit code"
+          placeholder={t("confirmEmail.codePlaceholder")}
           placeholderTextColor={colors.textMuted}
           keyboardType="numeric"
           maxLength={6}
@@ -78,7 +80,7 @@ export default function ConfirmEmailScreen() {
           {loading ? (
             <ActivityIndicator size="small" color={colors.white} />
           ) : (
-            <Text style={styles.submitBtnText}>Confirm</Text>
+            <Text style={styles.submitBtnText}>{t("confirmEmail.confirmButton")}</Text>
           )}
         </Pressable>
       </View>

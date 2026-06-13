@@ -1,0 +1,972 @@
+{
+  "tabs": {
+    "home": "Home",
+    "promos": "Promos",
+    "map": "Map",
+    "alerts": "Alerts",
+    "profile": "Profile"
+  },
+  "auth": {
+    "signIn": {
+      "title": "Welcome!",
+      "emailPlaceholder": "Email address",
+      "passwordPlaceholder": "Password",
+      "forgotPassword": "Forgot password?",
+      "loginButton": "Login",
+      "skipForNow": "Skip for now",
+      "notMember": "Not a member?",
+      "registerFree": "Register for free"
+    },
+    "signUp": {
+      "title": "Create your account",
+      "subtitle": "Choose the type of account you want to create",
+      "personal": "Personal",
+      "business": "Business",
+      "firstNamePlaceholder": "First name",
+      "lastNamePlaceholder": "Last name",
+      "usernamePlaceholder": "Username",
+      "emailPlaceholder": "Email address",
+      "passwordPlaceholder": "Password",
+      "confirmPasswordPlaceholder": "Confirm password",
+      "agreePrefix": "I've read and agree with the ",
+      "termsLink": "Terms and Conditions",
+      "agreeMid": " and the ",
+      "privacyLink": "Privacy Policy",
+      "continueButton": "Continue",
+      "alreadyHaveAccount": "Already have an account?",
+      "signInLink": "Sign in",
+      "checkingUsername": "Checking username...",
+      "usernameAvailable": "Username is available",
+      "usernameTaken": "This username is already taken",
+      "usernameCheckError": "Could not check username availability",
+      "usernameWaiting": "Please wait while we check this username"
+    },
+    "signUpBusiness": {
+      "businessNamePlaceholder": "Business name",
+      "ownerNamePlaceholder": "Your full name",
+      "categoryPlaceholder": "Select category",
+      "addressPlaceholder": "Address",
+      "zipCodePlaceholder": "ZIP Code",
+      "cityPlaceholder": "City",
+      "statePlaceholder": "State / Region",
+      "latitudePlaceholder": "Latitude",
+      "longitudePlaceholder": "Longitude",
+      "cannotChangeLater": "Cannot be changed later",
+      "optionalMap": "Optional — helps place your business on the map",
+      "recommendedLength": "Recommended length is {{limit}} characters — longer names may not display well in cards and headers.",
+      "selectCategoryTitle": "Select Category",
+      "selectCuisineTitle": "Select Cuisine",
+      "tapToChange": " · tap to change"
+    },
+    "confirmCode": {
+      "title": "Enter confirmation code",
+      "subtitle": "A 4-digit code was sent to {{email}}",
+      "enterCode": "Enter the 4-digit code",
+      "resendCodeIn": "Resend code in {{seconds}}s",
+      "resending": "Resending...",
+      "resendCode": "Resend code",
+      "continueButton": "Continue",
+      "yourEmailFallback": "your email"
+    },
+    "forgotPassword": {
+      "title": "Forgot Password",
+      "subtitle": "Enter your email and we will send reset instructions.",
+      "emailPlaceholder": "Email address",
+      "sendResetLink": "Send reset link",
+      "backToLogin": "Back to login"
+    },
+    "resetPassword": {
+      "title": "Reset Password",
+      "subtitle": "Create a new password for your account.",
+      "newPasswordPlaceholder": "New password",
+      "confirmPasswordPlaceholder": "Confirm password",
+      "resetButton": "Reset password",
+      "backToLogin": "Back to login",
+      "successTitle": "Password changed",
+      "successSubtitle": "Your password has been updated successfully"
+    },
+    "success": {
+      "defaultTitle": "Account confirmed",
+      "defaultSubtitle": "Your account has been verified successfully. You can now start using BridgeUA",
+      "defaultCta": "Continue"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Manage your preferences and account",
+    "logout": "Log Out",
+    "version": "Version {{version}}",
+    "sections": {
+      "admin": "Admin",
+      "account": "Account",
+      "preferences": "Preferences",
+      "business": "Business",
+      "support": "Support"
+    },
+    "rows": {
+      "users": { "title": "Users", "subtitle": "Manage personal and business accounts" },
+      "profile": { "title": "Profile", "subtitle": "View and edit your profile" },
+      "security": { "title": "Account & Security", "subtitle": "Manage your account and password" },
+      "payment": { "title": "Payment Methods", "subtitle": "Manage your saved payment methods" },
+      "notifications": { "title": "Notifications", "subtitle": "Manage your notification preferences" },
+      "language": { "title": "Language", "subtitle": "Choose your preferred language" },
+      "darkMode": { "title": "Dark Mode", "subtitle": "Adjust your appearance" },
+      "autoConfirm": { "title": "Auto-confirm Bookings", "subtitle": "Automatically confirm new booking requests" },
+      "discovery": { "title": "Show in Discovery", "subtitle": "Display your business on the map and search" },
+      "priceLevel": { "title": "Show Price Level", "subtitle": "Display price level on your business profile" },
+      "help": { "title": "Help Center", "subtitle": "Find answers to common questions" },
+      "contact": { "title": "Contact Us", "subtitle": "Get in touch with our support team" },
+      "privacy": { "title": "Privacy Policy", "subtitle": "Read how we protect your data" },
+      "terms": { "title": "Terms of Service", "subtitle": "Read our terms and conditions" }
+    }
+  },
+  "about": {
+    "title": "About",
+    "version": "Version {{version}}",
+    "tagline": "Connecting Ukrainian communities with local businesses.",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service",
+    "copyright": "© {{year}} BridgeUA. All rights reserved."
+  },
+  "confirmEmail": {
+    "title": "Confirm Email",
+    "instructions": "We sent a confirmation code to",
+    "codePlaceholder": "4-digit code",
+    "confirmButton": "Confirm",
+    "successTitle": "Email updated successfully",
+    "errorFallback": "Invalid code. Please try again."
+  },
+  "settingsAccount": {
+    "changeEmail": {
+      "title": "Change Email",
+      "subtitle": "Update your email address",
+      "currentPasswordPlaceholder": "Current password",
+      "newEmailPlaceholder": "New email address",
+      "updateButton": "Update Email",
+      "errorAlert": "Could not update email"
+    },
+    "changePassword": {
+      "title": "Change Password",
+      "subtitle": "Update your password",
+      "currentPasswordPlaceholder": "Current password",
+      "newPasswordPlaceholder": "New password",
+      "confirmPasswordPlaceholder": "Confirm new password",
+      "updateButton": "Update Password",
+      "lengthError": "Password must be at least 8 characters.",
+      "mismatchError": "Passwords do not match.",
+      "successAlert": "Password updated successfully",
+      "errorAlert": "Could not update password"
+    },
+    "businessName": {
+      "title": "Change Business Name",
+      "subtitle": "Request a name change for your business"
+    },
+    "businessCategory": {
+      "title": "Change Business Category",
+      "subtitle": "Request a category change for your business"
+    },
+    "deleteAccount": {
+      "button": "Delete Account",
+      "alertTitle": "Delete account?",
+      "alertMessage": "This will permanently delete your account and all your data. This cannot be undone.",
+      "cancel": "Cancel",
+      "confirm": "Delete",
+      "errorAlert": "Could not delete account"
+    }
+  },
+  "language": {
+    "title": "Language"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "subtitle": "Stay updated with BridgeUA",
+    "markAllAsRead": "Mark all as read",
+    "guest": {
+      "title": "Register to get notifications",
+      "description": "Create an account to receive updates, promotions, follows, and activity notifications.",
+      "action": "Register to BridgeUA"
+    },
+    "sections": {
+      "bookings": "Bookings",
+      "activity": "Activity",
+      "reviewsEngagement": "Reviews & Engagement",
+      "teamOperations": "Team & Operations",
+      "general": "General"
+    },
+    "rows": {
+      "newBookingRequest": { "title": "New Booking Request", "subtitle": "When a customer requests a booking" },
+      "bookingConfirmed": { "title": "Booking Confirmed", "subtitle": "When a booking is confirmed" },
+      "bookingCancelled": { "title": "Booking Cancelled", "subtitle": "When a booking is cancelled" },
+      "newReview": { "title": "New Review", "subtitle": "When a customer leaves a review" },
+      "systemUpdates": { "title": "System Updates", "subtitle": "Important updates from BridgeUA" },
+      "teamActivity": { "title": "Team Activity", "subtitle": "Updates from your team members" },
+      "lowAvailability": { "title": "Low Availability", "subtitle": "When your availability is running low" },
+      "newFollower": { "title": "New Follower", "subtitle": "When someone follows you" },
+      "reviewUpvote": { "title": "Review Upvote", "subtitle": "When your review gets upvoted" },
+      "recommendation": { "title": "Recommendation", "subtitle": "When someone recommends a business to you" },
+      "promotions": { "title": "Promotions", "subtitle": "Deals and offers from businesses you follow" }
+    },
+    "empty": {
+      "all": { "title": "No notifications yet", "description": "Updates about your activity will appear here." },
+      "unread": { "title": "No unread notifications", "description": "You are all caught up." },
+      "activity": { "title": "No activity yet", "description": "Reviews, recommendations, and followers will appear here." },
+      "promos": { "title": "No promotions yet", "description": "Business offers and promo updates will appear here." },
+      "updates": { "title": "No updates yet", "description": "System and business updates will appear here." }
+    },
+    "filters": {
+      "all": "All",
+      "unread": "Unread",
+      "activity": "Activity",
+      "promos": "Promos",
+      "updates": "Updates"
+    },
+    "groups": {
+      "new": "New",
+      "earlier": "Earlier"
+    }
+  },
+  "account": {
+    "title": "Account & Security",
+    "subtitle": "Manage your credentials",
+    "sections": {
+      "credentials": "Credentials",
+      "businessDetails": "Business Details",
+      "dangerZone": "Danger Zone"
+    },
+    "placeholders": {
+      "currentPassword": "Current password",
+      "newEmail": "New email address",
+      "newPassword": "New password",
+      "confirmPassword": "Confirm new password"
+    },
+    "buttons": {
+      "updateEmail": "Update Email",
+      "updatePassword": "Update Password",
+      "deleteAccount": "Delete Account"
+    },
+    "alerts": {
+      "emailUpdated": "Email updated successfully",
+      "emailError": "Could not update email",
+      "passwordUpdated": "Password updated successfully",
+      "passwordError": "Could not update password",
+      "deleteConfirmTitle": "Delete Account",
+      "deleteConfirmMessage": "This cannot be undone. All your data will be permanently removed.",
+      "deleteCancel": "Cancel",
+      "deleteConfirm": "Delete",
+      "deleteError": "Could not delete account"
+    }
+  },
+  "help": {
+    "title": "Help Center",
+    "sections": {
+      "faq": "FAQ",
+      "contact": "Contact"
+    },
+    "faq": [
+      {
+        "question": "How do I book an appointment?",
+        "answer": "Find a business, tap Book, choose a service, pick a specialist and time slot, then confirm."
+      },
+      {
+        "question": "How do I cancel a booking?",
+        "answer": "Go to your bookings, open the booking, and tap Cancel. Cancellations are free up to 24 hours before the appointment."
+      },
+      {
+        "question": "How do I write a review?",
+        "answer": "Visit the business page and scroll to the Reviews section. Tap Write a Review and share your experience."
+      },
+      {
+        "question": "How do I verify my business?",
+        "answer": "Go to your business profile and tap Request Verification. Our team will review your submission within 3 business days."
+      },
+      {
+        "question": "Why can't I see my business on the map?",
+        "answer": "Make sure your business address is saved and that Show Business in Discovery is enabled in Settings."
+      }
+    ],
+    "contact": {
+      "emailSupport": "Email Support",
+      "reportBug": "Report a Bug",
+      "contactUs": "Contact Us"
+    }
+  },
+  "contact": {
+    "title": "Contact Us",
+    "email": "Email",
+    "phone": "Phone",
+    "instagram": "Instagram",
+    "facebook": "Facebook",
+    "telegram": "Telegram"
+  },
+  "payment": {
+    "title": "Payment Methods",
+    "comingSoon": "Payment methods coming soon",
+    "workingOnIt": "We're working on it. Check back soon."
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "lastUpdated": "Last updated: January 2025",
+    "sections": [
+      {
+        "heading": "Data We Collect",
+        "body": "We collect information you provide directly, such as your name, email address, and profile details. We also collect usage data such as pages visited, features used, and device information. Location data may be collected when you use map or search features, with your permission."
+      },
+      {
+        "heading": "How We Use Your Data",
+        "body": "Your data is used to provide and improve the BridgeUA service, including personalised recommendations and booking management. We may use your contact details to send service-related notifications and, with your consent, promotional messages. Aggregated and anonymised data may be used for analytics and product development."
+      },
+      {
+        "heading": "Data Sharing",
+        "body": "We do not sell your personal data to third parties. We may share data with service providers who assist us in operating the platform, subject to confidentiality obligations. We may also disclose data when required by law or to protect the rights and safety of our users."
+      },
+      {
+        "heading": "Your Rights",
+        "body": "You have the right to access, correct, or delete the personal data we hold about you. You may withdraw consent for optional data processing at any time through your account settings. To exercise any of these rights, please contact us at support@bridgeua.com."
+      },
+      {
+        "heading": "Contact",
+        "body": "If you have questions about this Privacy Policy or how we handle your data, please reach out to our team at support@bridgeua.com. We aim to respond to all privacy-related enquiries within 5 business days. This policy may be updated periodically; continued use of the app constitutes acceptance of any changes."
+      }
+    ]
+  },
+  "terms": {
+    "title": "Terms of Service",
+    "lastUpdated": "Last updated: January 2025",
+    "sections": [
+      {
+        "heading": "Acceptance of Terms",
+        "body": "By accessing or using BridgeUA, you agree to be bound by these Terms of Service and our Privacy Policy. If you do not agree to these terms, please do not use the app. We reserve the right to update these terms at any time, with continued use constituting acceptance."
+      },
+      {
+        "heading": "Use of the App",
+        "body": "You agree to use BridgeUA only for lawful purposes and in accordance with these terms. You must not attempt to gain unauthorised access to any part of the platform or interfere with its normal operation. We reserve the right to suspend or terminate accounts that violate these terms."
+      },
+      {
+        "heading": "User Content",
+        "body": "You retain ownership of any content you submit, including reviews and profile information, but grant BridgeUA a licence to display and use that content within the platform. You are responsible for ensuring your content does not infringe third-party rights or contain unlawful material. We may remove content that violates our community guidelines."
+      },
+      {
+        "heading": "Bookings & Payments",
+        "body": "BridgeUA facilitates bookings between users and businesses but is not a party to those transactions. Payment processing is handled by third-party providers; their terms and conditions apply. Cancellation and refund policies are set by individual businesses and displayed at the time of booking."
+      },
+      {
+        "heading": "Termination",
+        "body": "Either party may terminate use of the platform at any time. We may suspend or delete your account if you breach these terms or engage in conduct harmful to the platform or its users. Upon termination, your right to use BridgeUA ceases immediately."
+      },
+      {
+        "heading": "Contact",
+        "body": "For questions or concerns about these Terms of Service, please contact us at support@bridgeua.com. We aim to respond to all enquiries within 5 business days. For urgent matters, please indicate the urgency in the subject line of your message."
+      }
+    ]
+  },
+  "profile": {
+    "business": {
+      "errorLoadFailed": "Couldn't load business profile.",
+      "locationNotAdded": "Location not added yet",
+      "editProfile": "Edit profile",
+      "switchAccount": "Switch account",
+      "viewPublicPage": "View public page",
+      "analytics": "Analytics",
+      "upcomingBookings": "Upcoming bookings",
+      "viewAll": "View all",
+      "viewAllBookings": "View all bookings",
+      "noUpcomingBookings": "No upcoming bookings yet",
+      "myTeam": "My Team",
+      "noTeamMembers": "No team members yet",
+      "reviews": "Reviews",
+      "noReviews": "No reviews yet.",
+      "reply": "Reply",
+      "reviewsCount": "{{count}} reviews",
+      "vsLastMonth": "vs last month",
+      "clientFallback": "Client",
+      "serviceFallback": "Service",
+      "statusConfirmed": "Confirmed",
+      "notificationsTitle": "You have 3 new notifications",
+      "notificationsSubtitle": "@kyril left a review, new booking from..."
+    },
+    "editProfile": {
+      "title": "Edit Profile",
+      "subtitle": "Update your personal profile",
+      "tapToChangePhoto": "Tap to change photo",
+      "labelFirstName": "First name",
+      "placeholderFirstName": "Enter first name",
+      "labelLastName": "Last name",
+      "placeholderLastName": "Enter last name",
+      "labelUsername": "Username",
+      "placeholderUsername": "Enter username",
+      "labelEmail": "Email",
+      "helperEmail": "This email is linked to your account and cannot be changed here.",
+      "labelPhone": "Phone number",
+      "helperPhone": "Your phone number is private and will not be visible to other users.",
+      "errorPhone": "Enter a valid phone number.",
+      "labelDateOfBirth": "Date of birth",
+      "helperDateOfBirth": "Your date of birth is private and is only used to suggest birthday promotions.",
+      "placeholderDateOfBirth": "Select date of birth",
+      "saveButton": "Save changes",
+      "savingButton": "Saving...",
+      "discardTitle": "Discard changes?",
+      "discardMessage": "You have unsaved changes. Are you sure you want to leave?",
+      "discardKeepEditing": "Keep editing",
+      "discardConfirm": "Discard",
+      "permissionTitle": "Permission needed",
+      "permissionMessage": "Please allow photo access to change your profile picture.",
+      "errorTitle": "Error",
+      "errorMessage": "Failed to save profile. Please try again."
+    },
+    "personal": {
+      "editProfile": "Edit profile",
+      "switchAccount": "Switch account",
+      "statFollowing": "Following",
+      "statReviews": "Reviews",
+      "statBookings": "Bookings",
+      "upcomingAppointments": "Upcoming appointments",
+      "noUpcomingAppointments": "No upcoming appointments",
+      "noUpcomingAppointmentsDesc": "Appointments booked through BridgeUA will appear here.",
+      "youFollow": "You follow",
+      "yourReviews": "Your reviews",
+      "seeAll": "See all",
+      "emptyFollowing": "No followed businesses yet",
+      "emptyFollowingDesc": "Businesses you follow will appear here.",
+      "emptyReviews": "No reviews yet",
+      "emptyReviewsDesc": "Your reviews will appear here after you share your experience.",
+      "readMore": "Read more",
+      "showLess": "Show less"
+    },
+    "guest": {
+      "headerTitle": "Join BridgeUA",
+      "headerSubtitle": "Create your profile and connect with trusted businesses",
+      "cardTitle": "Register to BridgeUA",
+      "cardDescription": "Create an account to follow businesses, see personalized updates, receive promotions, and share your recommendations with the community.",
+      "benefits": {
+        "follow": "Follow trusted businesses",
+        "promotions": "Receive promotions and news",
+        "reviews": "Leave recommendations and reviews",
+        "notifications": "Get activity notifications"
+      },
+      "registerButton": "Register to BridgeUA"
+    },
+    "following": {
+      "title": "Following",
+      "subtitle": "Businesses you follow",
+      "searchPlaceholder": "Find followed businesses",
+      "empty": {
+        "title": "No followed businesses found",
+        "descriptionFiltered": "Try adjusting or clearing your filters.",
+        "descriptionEmpty": "Follow businesses to see them here.",
+        "clearFilters": "Clear filters"
+      }
+    },
+    "reviews": {
+      "title": "My Reviews",
+      "subtitle": "Reviews you have written",
+      "emptyTitle": "No reviews yet",
+      "emptyDesc": "Reviews you write will appear here.",
+      "discardTitle": "Discard changes?",
+      "discardMessage": "You have unsaved changes in this review.",
+      "discardKeepEditing": "Keep editing",
+      "discardConfirm": "Discard",
+      "notFoundTitle": "Review not found",
+      "notFoundMessage": "This review could not be updated.",
+      "deleteTitle": "Delete review?",
+      "deleteMessage": "This will remove your review from this business.",
+      "editTitle": "Edit review",
+      "updatePlaceholder": "Update your review...",
+      "save": "Save",
+      "saving": "Saving..."
+    }
+  },
+  "common": {
+    "back": "Back",
+    "save": "Save changes",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "error": "Error",
+    "loading": "Loading...",
+    "search": "Search",
+    "filter": "Filter",
+    "english": "English",
+    "ukrainian": "Українська",
+    "ok": "OK"
+  },
+  "bookings": {
+    "title": "Bookings",
+    "subtitle": "Track your appointments and rebook specialists you liked.",
+    "tabActive": "Active",
+    "tabPast": "Past",
+    "tabCancelled": "Cancelled",
+    "emptyActive": "No active bookings",
+    "emptyActiveDesc": "Appointments booked through BridgeUA will appear here.",
+    "emptyPast": "No past bookings yet",
+    "emptyPastDesc": "After an appointment is completed, it will appear here so you can find the specialist again and rebook.",
+    "emptyCancelled": "No cancelled bookings",
+    "emptyCancelledDesc": "Cancelled appointments will appear here.",
+    "appointmentDetails": "Appointment details",
+    "appointmentSubtitle": "Review the details of your upcoming booking.",
+    "cancelTitle": "Cancel booking",
+    "cancelMessage": "Are you sure you want to cancel this appointment?",
+    "cancelConfirm": "Yes, cancel",
+    "cancelSuccess": "Cancelled",
+    "cancelSuccessMessage": "Your booking has been cancelled.",
+    "cancelError": "Could not cancel the booking. Please try again.",
+    "cancelButton": "Cancel booking",
+    "cancellingButton": "Cancelling...",
+    "confirmButton": "Confirm booking",
+    "confirmingButton": "Confirming...",
+    "retryButton": "Retry",
+    "bookingFailed": "Booking failed",
+    "nextButton": "Next",
+    "continueButton": "Continue",
+    "priceOnRequest": "Price on request",
+    "durationVaries": "Duration varies",
+    "fallbackSpecialist": "Selected specialist",
+    "fallbackService": "Selected service",
+    "fallbackBusiness": "Selected business",
+    "fallbackDateNotSelected": "Date not selected",
+    "fallbackTimeNotSelected": "Time not selected",
+    "fallbackCustomer": "Customer",
+    "fallbackPhoneNotAdded": "Phone not added",
+    "specialistRole": "Specialist",
+    "noSlotsTitle": "No available slots",
+    "noSlotsTryDate": "Try a different date",
+    "noSlotsChooseSpecialist": "Choose different specialist",
+    "noSlotsContactBusiness": "Contact business",
+    "personalDetailsNamePlaceholder": "Enter your name",
+    "personalDetailsSurnamePlaceholder": "Enter your surname",
+    "personalDetailsPhonePlaceholder": "Enter your phone number",
+    "noInternetSlots": "No internet connection. Check your connection.",
+    "chooseServiceTitle": "Choose service",
+    "chooseServiceSubtitle": "Select one service for your appointment.",
+    "chooseServiceLoading": "Loading services...",
+    "chooseServiceEmpty": "This business has not added bookable services yet.",
+    "chooseSpecialistTitle": "Choose specialist",
+    "chooseSpecialistSubtitle": "Pick the specialist you want to book with.",
+    "chooseSpecialistEmpty": "No specialists available",
+    "chooseSpecialistEmptyDesc": "This service does not have available specialists yet. Please choose another service or contact the business.",
+    "chooseDateTitle": "Choose date & time",
+    "chooseDateAvailableTimes": "Available times",
+    "chooseDateLoadingTimes": "Loading available times...",
+    "chooseDateNoSlots": "No available times for this date. Please choose another date.",
+    "specialistToday": "Today at {{time}}",
+    "specialistTomorrow": "Tomorrow at {{time}}",
+    "personalDetailsTitle": "Personal details",
+    "chooseDateSubtitle": "Select an available date and appointment time.",
+    "chooseDateSectionDate": "Date",
+    "personalDetailsSubtitle": "We'll use these details for your booking. You can edit them for this appointment.",
+    "personalDetailsLabelName": "Name",
+    "personalDetailsLabelSurname": "Surname",
+    "personalDetailsLabelPhone": "Phone number",
+    "confirmTitle": "Confirm booking",
+    "confirmSubtitle": "Review your appointment details before sending the booking request.",
+    "missingDetailsTitle": "Missing booking details",
+    "missingDetailsDesc": "Please go back and complete all booking steps.",
+    "selectSpecialistTitle": "Select a specialist",
+    "selectSpecialistDesc": "Please go back and choose a real specialist before confirming this booking."
+  },
+  "teamMember": {
+    "subtitle": "Team member",
+    "tabServices": "Services",
+    "tabBookings": "Bookings",
+    "emptyServices": "No services assigned",
+    "emptyServicesDesc": "This team member has no services assigned yet.",
+    "emptyBookings": "No bookings yet",
+    "emptyBookingsDesc": "Bookings for this team member will appear here.",
+    "notFound": "Team member not found.",
+    "minutes": "min",
+    "priceFrom": "from"
+  },
+  "filter": {
+    "tabSort": "Sort",
+    "tabCategories": "Categories",
+    "tabRatings": "Ratings",
+    "tabDistance": "Distance",
+    "sectionSortBy": "SORT BY",
+    "sectionFoodCuisines": "FOOD CUISINES",
+    "sectionCategories": "CATEGORIES",
+    "applyButton": "Apply"
+  },
+  "locationSelector": {
+    "label": "Location",
+    "selectPlaceholder": "Select location"
+  },
+  "categories": {
+    "promo": "Promo",
+    "beauty": "Beauty",
+    "food": "Food",
+    "auto": "Auto",
+    "home-repair": "Home & Repair",
+    "education": "Education",
+    "health-medical": "Health & Medical"
+  },
+  "map": {
+    "title": "Map",
+    "subtitle": "Discover on the map",
+    "searchPlaceholder": "Find on map",
+    "getDirections": "Get directions"
+  },
+  "home": {
+    "title": "Discover",
+    "subtitle": "Community trusted places",
+    "allCategories": "All Categories",
+    "searchPlaceholder": "Find services, food or places",
+    "recentSearches": "Recent searches",
+    "clearAll": "Clear all",
+    "locationSeeNearby": "See nearby",
+    "locationAllLocations": "All locations",
+    "locationNearYou": "Near you",
+    "locationPermissionTitle": "Use your location?",
+    "locationPermissionMessage": "Allow location access to find businesses near you.",
+    "locationPermissionNotNow": "Not now",
+    "locationPermissionAllow": "Allow",
+    "errorNoInternet": "No internet connection",
+    "errorSomethingWrong": "Something went wrong",
+    "errorNoInternetDesc": "Check your connection and try again.",
+    "errorLoadFailedDesc": "We couldn't load businesses. Please try again.",
+    "errorTryAgain": "Try again",
+    "emptySearchTitle": "No businesses found for \"{{query}}\"",
+    "emptyTitle": "No businesses found",
+    "emptySearchDesc": "Try another business name.",
+    "emptyDesc": "Try adjusting or clearing some filters to discover more places.",
+    "clearSearch": "Clear search",
+    "clearFilters": "Clear filters"
+  },
+  "admin": {
+    "users": {
+      "title": "Users",
+      "subtitle": "Manage accounts",
+      "addNew": "Add new user",
+      "searchPlaceholder": "Search by name, email or username...",
+      "filterAll": "All",
+      "filterPersonal": "Personal",
+      "filterBusiness": "Business",
+      "deleteTitle": "Delete user",
+      "deleteConfirm": "Delete {{email}}? This cannot be undone.",
+      "deleteButton": "Delete",
+      "deleteSuccess": "User deleted",
+      "errorLoad": "Failed to load users",
+      "errorDelete": "Failed to delete user",
+      "isAdminLabel": "admin",
+      "isUnconfirmedLabel": "unconfirmed"
+    },
+    "userDetail": {
+      "sectionAccount": "Account",
+      "sectionProfile": "Profile",
+      "sectionBusiness": "Business",
+      "labelEmail": "Email",
+      "labelPassword": "New password (leave blank to keep)",
+      "labelAdmin": "Admin",
+      "labelFirstName": "First name",
+      "labelLastName": "Last name",
+      "labelUsername": "Username",
+      "labelPhone": "Phone",
+      "labelBusinessName": "Business name",
+      "labelOwnerName": "Owner name",
+      "labelAddress": "Address",
+      "labelCity": "City",
+      "labelState": "State",
+      "labelZip": "ZIP",
+      "labelCuisine": "Cuisine",
+      "placeholderEmail": "Email",
+      "placeholderPassword": "New password",
+      "placeholderFirstName": "First name",
+      "placeholderLastName": "Last name",
+      "placeholderUsername": "Username",
+      "placeholderPhone": "Phone number",
+      "placeholderBusinessName": "Business name",
+      "placeholderOwnerName": "Owner full name",
+      "placeholderAddress": "Address",
+      "placeholderCity": "City",
+      "placeholderState": "State",
+      "placeholderZip": "ZIP code",
+      "placeholderCuisine": "Cuisine",
+      "saveButton": "Save changes",
+      "savingButton": "Saving...",
+      "saveSuccess": "Saved",
+      "saveSuccessMessage": "User updated successfully",
+      "errorLoad": "Failed to load user",
+      "errorSave": "Failed to save"
+    },
+    "createUser": {
+      "title": "New user",
+      "sectionAccount": "Account",
+      "sectionProfile": "Profile",
+      "sectionBusiness": "Business",
+      "labelEmail": "Email *",
+      "labelPassword": "Password *",
+      "labelFirstName": "First name",
+      "labelLastName": "Last name",
+      "labelUsername": "Username",
+      "labelPhone": "Phone",
+      "labelBusinessName": "Business name *",
+      "labelOwnerName": "Owner name",
+      "labelAddress": "Address",
+      "labelCity": "City",
+      "labelState": "State",
+      "labelZip": "ZIP",
+      "labelCuisine": "Cuisine",
+      "placeholderEmail": "email@example.com",
+      "placeholderPassword": "Password",
+      "placeholderFirstName": "First name",
+      "placeholderLastName": "Last name",
+      "placeholderUsername": "Username",
+      "placeholderPhone": "Phone number",
+      "placeholderBusinessName": "Business name",
+      "placeholderOwnerName": "Owner full name",
+      "placeholderAddress": "Address",
+      "placeholderCity": "City",
+      "placeholderState": "State",
+      "placeholderZip": "ZIP code",
+      "placeholderCuisine": "Cuisine",
+      "createButton": "Create user",
+      "creatingButton": "Creating...",
+      "createSuccess": "Created",
+      "createSuccessMessage": "User created successfully",
+      "validationTitle": "Validation",
+      "validationEmailPassword": "Email and password are required",
+      "validationBusinessName": "Business name is required",
+      "errorCreate": "Failed to create user"
+    }
+  },
+  "accountSwitcher": {
+    "title": "Switch account",
+    "personal": "Personal account",
+    "business": "Business account",
+    "notifications_one": "{{count}} new notification",
+    "notifications_other": "{{count}} new notifications",
+    "addAccount": "Add account"
+  },
+  "business": {
+    "statusOpen": "Open",
+    "statusClosed": "Closed",
+    "closesAt": "Closes at {{time}}",
+    "opensAt": "Opens at {{time}}",
+    "previewMode": "Preview mode",
+    "previewSubtitle": "Unsaved changes are visible only to you",
+    "notFound": "Business not found",
+    "errorLoadDetails": "Couldn't load business details.",
+    "errorLoadReviews": "Couldn't load reviews.",
+    "viewAll": "View all",
+    "alertNotAvailableTitle": "Not available",
+    "alertNotAvailableDesc": "Business profiles cannot leave reviews.",
+    "tabOverview": "Overview",
+    "tabServices": "Services",
+    "tabReviews": "Reviews",
+    "tabPhotos": "Photos",
+    "tabAbout": "About",
+    "topReviews": "Top reviews",
+    "yourBusiness": "Your business",
+    "recommendedBy": "Recommended by",
+    "recommends": "Recommends",
+    "hours": "Hours",
+    "amenities": "Amenities",
+    "languagesSpoken": "Languages spoken",
+    "socialLinks": "Social links",
+    "recommendedByNames": "Recommended by {{names}}"
+  },
+  "edit": {
+    "title": "Edit Business",
+    "tabOverview": "Overview",
+    "tabGallery": "Gallery",
+    "tabServices": "Services",
+    "tabAbout": "About",
+    "preview": "Preview",
+    "unsavedTitle": "Unsaved changes",
+    "unsavedMessage": "You have unsaved changes. Are you sure you want to leave?",
+    "unsavedStay": "Stay",
+    "unsavedLeave": "Leave"
+  },
+  "businessBookings": {
+    "title": "Bookings",
+    "subtitle": "Manage upcoming and past bookings for your business.",
+    "tabUpcoming": "Upcoming",
+    "tabPast": "Past",
+    "tabCancelled": "Cancelled",
+    "errorBanner": "Failed to load bookings",
+    "errorDesc": "Couldn't load bookings. Please try again.",
+    "fallbackClient": "Client",
+    "fallbackService": "Service",
+    "fallbackSpecialist": "Any specialist",
+    "fallbackPrice": "Price on request",
+    "emptyUpcomingTitle": "No upcoming bookings",
+    "emptyUpcomingDesc": "New customer bookings will appear here once clients book your services.",
+    "emptyPastTitle": "No past bookings yet",
+    "emptyPastDesc": "Completed bookings will appear here.",
+    "emptyCancelledTitle": "No cancelled bookings",
+    "emptyCancelledDesc": "Cancelled customer bookings will appear here."
+  },
+  "writeReview": {
+    "title": "Write a Review",
+    "notFound": "Business not found",
+    "permissionTitle": "Permission needed",
+    "permissionDesc": "Please allow photo access to add review photos.",
+    "alreadyReviewedTitle": "Already reviewed",
+    "alreadyReviewedDesc": "You've already reviewed this business.",
+    "submitErrorTitle": "Could not submit review",
+    "successTitle": "Review submitted",
+    "successDesc": "Thank you!",
+    "done": "Done",
+    "labelRating": "Your rating",
+    "labelReview": "Your review",
+    "reviewPlaceholder": "Share about your experience",
+    "labelPhotos": "Add photos",
+    "labelLiked": "What did you like?",
+    "optional": "(optional)",
+    "addPhoto": "Add photo",
+    "submitButton": "Submit Review",
+    "submittingButton": "Submitting...",
+    "ratingExcellent": "Excellent",
+    "ratingGreat": "Great",
+    "ratingGood": "Good",
+    "ratingBetter": "Could be better",
+    "ratingPoor": "Poor",
+    "ratingTap": "Tap to rate",
+    "tagGreatService": "Great service",
+    "tagClean": "Clean & comfortable",
+    "tagProfessional": "Professional staff",
+    "tagValue": "Good value",
+    "tagEasyBooking": "Easy booking",
+    "tagRelaxing": "Relaxing atmosphere"
+  },
+  "recommendedBy": {
+    "title": "Recommended by",
+    "subtitle": "Businesses that trust and recommend this place",
+    "emptyTitle": "No recommendations yet",
+    "emptyDesc": "Businesses that recommend this place will appear here."
+  },
+  "recommends": {
+    "title": "Recommends",
+    "subtitle": "Businesses this place recommends",
+    "emptyTitle": "No recommendations yet",
+    "emptyDesc": "Businesses recommended by this place will appear here."
+  },
+  "following": {
+    "title": "News & Promos",
+    "subtitleOwner": "Add and view your news and promotions",
+    "subtitleFollower": "Updates from followed businesses",
+    "locationLabel": "Location",
+    "allLocations": "All locations",
+    "seeNearby": "See nearby",
+    "nearYou": "Near you",
+    "searchPlaceholder": "Search here...",
+    "tabPromotions": "Promotions",
+    "tabNews": "News",
+    "useLocationTitle": "Use your location?",
+    "useLocationDesc": "Allow location access to see followed businesses near you.",
+    "notNow": "Not now",
+    "allow": "Allow",
+    "guestEmptyTitle": "Register to see promotions and news",
+    "guestEmptyDesc": "Register and follow businesses to see promotions and news from places you trust.",
+    "guestButton": "Register to BridgeUA",
+    "emptyNoFollowTitle": "You are not following anyone yet",
+    "emptyNoFollowDesc": "Follow businesses to see their promotions and news here.",
+    "emptyNoItemsTitle": "No {{type}} found",
+    "emptyNoItemsDesc": "Try adjusting or clearing your filters.",
+    "emptyNoPromotions": "There are no promotions at this time. Check the News!",
+    "emptyNoNews": "There is no news at this time. Check the Promotions!",
+    "clearFilters": "Clear filters",
+    "createPromotion": "Create promotion",
+    "createNews": "Create news",
+    "unsavedTitle": "Unsaved changes",
+    "unsavedMessage": "You have unsaved changes. What would you like to do?",
+    "keepEditing": "Keep editing",
+    "saveDraft": "Save draft",
+    "discard": "Discard",
+    "deletePromotionTitle": "Delete promotion",
+    "deleteNewsTitle": "Delete news",
+    "deleteCannotUndo": "This cannot be undone.",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "errorTitle": "Error",
+    "errorSavePromotion": "Failed to save promotion. Please try again.",
+    "errorPublishPromotion": "Failed to publish promotion. Please try again.",
+    "errorDeletePromotion": "Failed to delete promotion. Please try again.",
+    "errorSaveNews": "Failed to save news. Please try again.",
+    "errorPublishNews": "Failed to publish news. Please try again.",
+    "errorDeleteNews": "Failed to delete news. Please try again.",
+    "untitledPromotion": "Untitled promotion",
+    "untitledNews": "Untitled news",
+    "noDescription": "No description added yet.",
+    "yourBusiness": "Your Business"
+  },
+  "dashboard": {
+    "bookings": "Bookings",
+    "newClients": "New clients",
+    "followers": "Followers"
+  },
+  "quickActions": {
+    "title": "Quick actions",
+    "edit": "Edit",
+    "editTitle": "Edit quick actions",
+    "cancel": "Cancel",
+    "save": "Save",
+    "addPromo": "Add promo",
+    "addNews": "Add news",
+    "editBusiness": "Edit business",
+    "editServices": "Edit services",
+    "editGallery": "Edit gallery",
+    "viewBookings": "View bookings",
+    "viewReviews": "View reviews",
+    "shareBusiness": "Share business",
+    "publicProfile": "Public profile",
+    "myTeam": "My Team",
+    "recommends": "Recommends",
+    "recommendedBy": "Recomm-ed by"
+  },
+  "reviewFilters": {
+    "mostRelevant": "Most relevant",
+    "newest": "Newest",
+    "highest": "Highest rating",
+    "lowest": "Lowest rating"
+  },
+  "businessServices": {
+    "emptyTitle": "No services yet",
+    "emptyDesc": "This business has not added services yet."
+  },
+  "businessBooking": {
+    "title": "Book an appointment",
+    "selectServices": "Select services",
+    "selectServicesSubtitle": "Choose one or more services"
+  },
+  "businessReviews": {
+    "writeTitle": "Write a review",
+    "writeHint": "Share your experience and help the community.",
+    "reviewPhotos": "Review photos",
+    "allReviews": "All reviews",
+    "totalCount": "{{count}} total",
+    "emptyTitle": "No reviews yet",
+    "emptyDesc": "Be the first to share your experience."
+  },
+  "reviewCard": {
+    "edited": "Edited",
+    "editAction": "Edit review",
+    "deleteAction": "Delete review",
+    "showLess": "Show less",
+    "readMore": "Read more",
+    "more": "More"
+  },
+  "follow": {
+    "following": "Following",
+    "follow": "Follow"
+  },
+  "recommend": {
+    "confirmTitle": "Recommend {{businessName}}?",
+    "confirmBody": "Your recommendation will be publicly visible and shown on this business's profile. Other users will see that you endorse this place.",
+    "confirm": "Recommend",
+    "fallbackName": "this business"
+  },
+  "promotion": {
+    "badge": "Promo",
+    "viewBusiness": "View {{businessName}}"
+  },
+  "filterOptions": {
+    "activeFilters": "ACTIVE FILTERS",
+    "filterByRating": "FILTER BY RATING",
+    "filterByDistance": "FILTER BY DISTANCE",
+    "sortRelevance": "Relevance (Default)",
+    "sortDistance": "Distance",
+    "sortRating": "Rating",
+    "sortPriceLow": "Cost: Low to High",
+    "sortPriceHigh": "Cost: High to Low",
+    "ratingAny": "Any rating",
+    "distanceNearby": "Nearby"
+  }
+}

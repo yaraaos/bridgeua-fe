@@ -13,6 +13,7 @@ import { API_BASE_URL } from "@/src/services/api/config";
 import type { TeamMember } from "@/src/types/team";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { ScrollView, StyleSheet, View } from "react-native";
 
 function formatEarliestSlot(date: string, time: string): string {
@@ -31,6 +32,7 @@ function formatEarliestSlot(date: string, time: string): string {
 export default function ChooseSpecialistScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+  const { t } = useTranslation();
 
   const {
     businessId,
@@ -141,9 +143,9 @@ export default function ChooseSpecialistScreen() {
         <BookingStepper currentStep={2} />
 
         <View style={styles.header}>
-          <AppText style={styles.title}>Choose specialist</AppText>
+          <AppText style={styles.title}>{t("bookings.chooseSpecialistTitle")}</AppText>
           <AppText style={styles.subtitle}>
-            Pick the specialist you want to book with.
+            {t("bookings.chooseSpecialistSubtitle")}
           </AppText>
         </View>
 
@@ -159,11 +161,10 @@ export default function ChooseSpecialistScreen() {
           ) : specialists.length === 0 ? (
             <View style={styles.emptyWrap}>
               <AppText style={styles.emptyTitle}>
-                No specialists available
+                {t("bookings.chooseSpecialistEmpty")}
               </AppText>
               <AppText style={styles.emptyText}>
-                This service does not have available specialists yet. Please
-                choose another service or contact the business.
+                {t("bookings.chooseSpecialistEmptyDesc")}
               </AppText>
             </View>
           ) : (
@@ -173,7 +174,7 @@ export default function ChooseSpecialistScreen() {
                 <SpecialistCard
                   key={String(member.id)}
                   name={`${member.firstName} ${member.lastName}`.trim()}
-                  role="Specialist"
+                  role={t("bookings.specialistRole")}
                   avatarUrl={member.photoUrl}
                   onPress={() => setSelectedSpecialistId(String(member.id))}
                   isSelected={selectedSpecialistId === String(member.id)}
@@ -188,7 +189,7 @@ export default function ChooseSpecialistScreen() {
 
       <View style={styles.footer}>
         <AppButton
-          title="Next"
+          title={t("bookings.nextButton")}
           disabled={!selectedSpecialistId || !selectedSpecialist}
           onPress={handleNext}
         />

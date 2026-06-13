@@ -29,6 +29,7 @@ import { useFollowingStore } from "@/src/store/following.store";
 import { Business } from "@/src/types/business";
 import { router, useFocusEffect } from "expo-router";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Alert, StyleSheet, View } from "react-native";
 import MapView, { MapMarkerProps, Marker, Region } from "react-native-maps";
 
@@ -100,10 +101,11 @@ function BusinessMarker({
 }
 
 export default function MapScreen() {
+  const { t } = useTranslation();
   const mapRef = useRef<MapView | null>(null);
 
   const [locationOptions, setLocationOptions] = useState<LocationOption[]>([
-    { label: "See nearby", value: "nearby", type: "nearby" },
+    { label: t("home.locationSeeNearby"), value: "nearby", type: "nearby" },
   ]);
 
   useEffect(() => {
@@ -115,12 +117,12 @@ export default function MapScreen() {
         state: s,
       }));
       setLocationOptions([
-        { label: "All locations", value: "all", type: "manual", state: undefined },
-        { label: "See nearby", value: "nearby", type: "nearby" },
+        { label: t("home.locationAllLocations"), value: "all", type: "manual", state: undefined },
+        { label: t("home.locationSeeNearby"), value: "nearby", type: "nearby" },
         ...stateOptions,
       ]);
     }).catch(() => {});
-  }, []);
+  }, [t]);
 
   const {
     label: selectedLocationLabel,
@@ -232,7 +234,7 @@ export default function MapScreen() {
     return result;
   }, [filteredBusinesses]);
 
-  const selectedHomeCategory = category || "All Categories";
+  const selectedHomeCategory = category;
 
   const prioritizedMappableBusinesses = useMemo(
     () =>
@@ -322,20 +324,20 @@ export default function MapScreen() {
 
   const handleRequestNearby = useCallback(() => {
     Alert.alert(
-      "Use your location?",
-      "Allow location access to find businesses near you.",
+      t("home.locationPermissionTitle"),
+      t("home.locationPermissionMessage"),
       [
         {
-          text: "Not now",
+          text: t("home.locationPermissionNotNow"),
           style: "cancel",
           onPress: () => setPermissionStatus("denied"),
         },
         {
-          text: "Allow",
+          text: t("home.locationPermissionAllow"),
           onPress: () => {
             setPermissionStatus("granted");
             setNearbyLocation({
-              label: "Near you",
+              label: t("home.locationNearYou"),
               value: "nearby",
               latitude: 34.0549,
               longitude: -118.2426,
@@ -344,7 +346,7 @@ export default function MapScreen() {
         },
       ],
     );
-  }, [setPermissionStatus, setNearbyLocation]);
+  }, [setPermissionStatus, setNearbyLocation, t]);
 
   useFocusEffect(
     useCallback(() => {
@@ -366,19 +368,17 @@ export default function MapScreen() {
   const canUsePromoFilter = !isBusinessAccount && !isGuest;
 
   const { categories } = useCategories();
-  const categoryNames = [
-    "All Categories",
-    ...(canUsePromoFilter ? [PROMO_CATEGORY_LABEL] : []),
-    ...categories.map((c) => c.name),
+  const categoryItems = [
+    { label: t("home.allCategories"), value: "" },
+    ...(canUsePromoFilter ? [{ label: t("categories.promo"), value: PROMO_CATEGORY_LABEL }] : []),
+    ...categories.map((c) => ({ label: t(`categories.${c.slug}`, { defaultValue: c.name }), value: c.name })),
   ];
 
-  const selectedCategory = category || "All Categories";
+  const selectedCategory = category;
 
-  const handleSelectCategory = (selectedCategoryLabel: string) => {
+  const handleSelectCategory = (value: string) => {
     setSelectedBusinessId(null);
-    const mappedCategory =
-      selectedCategoryLabel === "All Categories" ? "" : selectedCategoryLabel;
-    useFilterStore.getState().setCategory("discovery", mappedCategory);
+    useFilterStore.getState().setCategory("discovery", value);
   };
 
   const handleMarkerPress = (business: Business) => {
@@ -404,15 +404,15 @@ export default function MapScreen() {
 
   const header = (
     <ScreenHeader
-      title="Map"
-      titleSubtitle="Discover on the map"
+      title={t("map.title")}
+      titleSubtitle={t("map.subtitle")}
       subtitleValue={selectedLocationLabel}
       showSubtitleChevron
       locationOptions={locationOptions}
       onSelectLocationOption={handleSelectLocationOption}
       onRequestNearby={handleRequestNearby}
       showSearch
-      searchPlaceholder="Find on map"
+      searchPlaceholder={t("map.searchPlaceholder")}
       actions={["filter"]}
       onPressFilter={handleFilterPress}
       activeFilterCount={activeFilterCount}
@@ -461,7 +461,7 @@ export default function MapScreen() {
 
         <View style={styles.categoryWrap} pointerEvents="box-none">
           <CategoryScroller
-            categories={categoryNames}
+            categories={categoryItems}
             selectedCategory={selectedCategory}
             onSelectCategory={handleSelectCategory}
             overlay

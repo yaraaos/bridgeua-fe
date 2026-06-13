@@ -4,6 +4,7 @@ import { Feather, Ionicons } from "@expo/vector-icons";
 import { useQueryClient } from "@tanstack/react-query";
 import { router, useFocusEffect } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Image,
   Pressable,
@@ -50,15 +51,16 @@ type UpcomingBooking = {
   status: "confirmed" | "pending";
 };
 
-function formatDelta(current: number, lastMonth: number): string {
-  const diff = current - lastMonth;
-  const sign = diff >= 0 ? "+" : "";
-  return `${sign}${diff} vs last month`;
-}
-
 export default function BusinessProfileScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+  const { t } = useTranslation();
+
+  function formatDelta(current: number, lastMonth: number): string {
+    const diff = current - lastMonth;
+    const sign = diff >= 0 ? "+" : "";
+    return `${sign}${diff} ${t("profile.business.vsLastMonth")}`;
+  }
   const account = useActiveAccount();
   const user = useAuthStore((s) => s.user);
   const { business, isLoading, error, refetch } = useMyBusinessProfile();
@@ -81,11 +83,11 @@ export default function BusinessProfileScreen() {
             id: String(b.id),
             customerName: b.user?.profile
               ? [b.user.profile.firstName, b.user.profile.lastName].filter(Boolean).join(" ") || b.user.email
-              : b.user?.email ?? "Client",
+              : b.user?.email ?? t("profile.business.clientFallback"),
             customerAvatar: b.user?.profile?.avatarUrl ?? undefined,
             date: b.date,
             startTime: b.startTime?.slice(0, 5) ?? "",
-            service: b.service?.name ?? "Service",
+            service: b.service?.name ?? t("profile.business.serviceFallback"),
             status: b.status as "confirmed" | "pending",
           }));
         setUpcomingBookings(upcoming);
@@ -94,7 +96,7 @@ export default function BusinessProfileScreen() {
         console.log("[Bookings] API error:", err?.message);
         setUpcomingBookings([]);
       });
-  }, [business?.id]);
+  }, [business?.id, t, user?.activeBusinessId]);
   const { members: teamMembers, setMembers } = useTeamStore();
   const { analytics } = useBusinessAnalytics();
   const queryClient = useQueryClient();
@@ -164,13 +166,13 @@ export default function BusinessProfileScreen() {
         {error.isNetworkError && <NetworkErrorBanner />}
         <View style={styles.centerState}>
           <AppEmptyState
-            title={error.isNetworkError ? "No internet connection" : "Something went wrong"}
+            title={error.isNetworkError ? t("home.errorNoInternet") : t("home.errorSomethingWrong")}
             description={
               error.isNetworkError
-                ? "Check your connection and try again."
-                : "Couldn't load business profile."
+                ? t("home.errorNoInternetDesc")
+                : t("profile.business.errorLoadFailed")
             }
-            actionLabel="Try again"
+            actionLabel={t("home.errorTryAgain")}
             onPressAction={refetch}
           />
         </View>
@@ -305,12 +307,12 @@ export default function BusinessProfileScreen() {
                     {businessRating.toFixed(1)}
                   </AppText>
                   <AppText style={styles.heroRatingCount}>
-                    ({businessReviewCount} reviews)
+                    ({t("profile.business.reviewsCount", { count: businessReviewCount })})
                   </AppText>
                 </View>
 
                 <AppText style={styles.heroSubInfo} numberOfLines={1}>
-                  {businessLocation || "Location not added yet"}
+                  {businessLocation || t("profile.business.locationNotAdded")}
                 </AppText>
               </View>
 
@@ -336,7 +338,7 @@ export default function BusinessProfileScreen() {
                   size={16}
                   color={colors.textMuted}
                 />
-                <AppText style={styles.editButtonText}>Edit profile</AppText>
+                <AppText style={styles.editButtonText}>{t("profile.business.editProfile")}</AppText>
               </Pressable>
 
               <Pressable
@@ -349,7 +351,7 @@ export default function BusinessProfileScreen() {
                   color={colors.textMuted}
                 />
                 <AppText style={styles.switchButtonText}>
-                  Switch account
+                  {t("profile.business.switchAccount")}
                 </AppText>
               </Pressable>
             </View>
@@ -366,7 +368,7 @@ export default function BusinessProfileScreen() {
               >
                 <Feather name="eye" size={14} color={colors.textPrimary} />
                 <AppText style={styles.viewPublicButtonText}>
-                  View public page
+                  {t("profile.business.viewPublicPage")}
                 </AppText>
               </Pressable>
             </View>
@@ -380,7 +382,7 @@ export default function BusinessProfileScreen() {
       >
         <View style={styles.card}>
           <View style={styles.cardHeader}>
-            <AppText style={styles.cardTitle}>Analytics</AppText>
+            <AppText style={styles.cardTitle}>{t("profile.business.analytics")}</AppText>
           </View>
 
           <BusinessDashboardStats
@@ -422,10 +424,10 @@ export default function BusinessProfileScreen() {
 
           <View style={styles.notificationsText}>
             <AppText style={styles.notificationsTitle}>
-              You have 3 new notifications
+              {t("profile.business.notificationsTitle")}
             </AppText>
             <AppText style={styles.notificationsSubtitle} numberOfLines={1}>
-              @kyril left a review, new booking from...
+              {t("profile.business.notificationsSubtitle")}
             </AppText>
           </View>
 
@@ -438,16 +440,16 @@ export default function BusinessProfileScreen() {
 
         <View style={styles.card}>
           <View style={styles.cardHeader}>
-            <AppText style={styles.cardTitle}>Upcoming bookings</AppText>
+            <AppText style={styles.cardTitle}>{t("profile.business.upcomingBookings")}</AppText>
             <Pressable onPress={() => router.push("/business/bookings")}>
-              <AppText style={styles.cardLink}>View all</AppText>
+              <AppText style={styles.cardLink}>{t("profile.business.viewAll")}</AppText>
             </Pressable>
           </View>
 
           <View style={styles.bookingsList}>
             {upcomingBookings.length === 0 ? (
               <AppText style={{ color: colors.textMuted, fontSize: 14 }}>
-                No upcoming bookings yet
+                {t("profile.business.noUpcomingBookings")}
               </AppText>
             ) : null}
             {upcomingBookings.map((booking) => (
@@ -470,7 +472,7 @@ export default function BusinessProfileScreen() {
                 </View>
 
                 <AppLabel
-                  label="Confirmed"
+                  label={t("profile.business.statusConfirmed")}
                   variant="confirmed"
                 />
               </View>
@@ -482,7 +484,7 @@ export default function BusinessProfileScreen() {
             onPress={() => router.push("/business/bookings")}
           >
             <AppText style={styles.cardFooterLinkText}>
-              View all bookings
+              {t("profile.business.viewAllBookings")}
             </AppText>
             <Ionicons
               name="chevron-forward"
@@ -494,9 +496,9 @@ export default function BusinessProfileScreen() {
 
         <View style={styles.card}>
           <View style={styles.cardHeader}>
-            <AppText style={styles.cardTitle}>My Team</AppText>
+            <AppText style={styles.cardTitle}>{t("profile.business.myTeam")}</AppText>
             <Pressable onPress={() => router.push("/profile/team")}>
-              <AppText style={styles.cardLink}>View all</AppText>
+              <AppText style={styles.cardLink}>{t("profile.business.viewAll")}</AppText>
             </Pressable>
           </View>
 
@@ -513,7 +515,7 @@ export default function BusinessProfileScreen() {
                   fontStyle: "italic",
                 }}
               >
-                No team members yet
+                {t("profile.business.noTeamMembers")}
               </AppText>
             ) : (
               teamMembers.map((member) => (
@@ -551,7 +553,7 @@ export default function BusinessProfileScreen() {
 
         <View style={styles.card}>
           <View style={styles.cardHeader}>
-            <AppText style={styles.cardTitle}>Reviews</AppText>
+            <AppText style={styles.cardTitle}>{t("profile.business.reviews")}</AppText>
             <Pressable
               onPress={() =>
                 router.push({
@@ -560,7 +562,7 @@ export default function BusinessProfileScreen() {
                 })
               }
             >
-              <AppText style={styles.cardLink}>View all</AppText>
+              <AppText style={styles.cardLink}>{t("profile.business.viewAll")}</AppText>
             </Pressable>
           </View>
 
@@ -610,7 +612,7 @@ export default function BusinessProfileScreen() {
                       })
                     }
                   >
-                    <AppText style={styles.reviewReplyText}>Reply</AppText>
+                    <AppText style={styles.reviewReplyText}>{t("profile.business.reply")}</AppText>
                   </Pressable>
 
                   {false && <Pressable
@@ -632,7 +634,7 @@ export default function BusinessProfileScreen() {
                 fontStyle: "italic",
               }}
             >
-              No reviews yet.
+              {t("profile.business.noReviews")}
             </AppText>
           )}
         </View>

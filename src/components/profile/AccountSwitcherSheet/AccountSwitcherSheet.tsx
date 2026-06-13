@@ -12,6 +12,7 @@ import {
 } from "@/src/store/account.store";
 import { useAuthStore } from "@/src/store/auth.store";
 import { useNotificationsStore } from "@/src/store/notifications.store";
+import { useTranslation } from "react-i18next";
 
 import { createStyles } from "./AccountSwitcherSheet.styles";
 
@@ -26,6 +27,7 @@ export default function AccountSwitcherSheet({
 }: Props) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+  const { t } = useTranslation();
 
   const [isSwitching, setIsSwitching] = useState(false);
 
@@ -71,7 +73,7 @@ export default function AccountSwitcherSheet({
       </View>
 
       <View style={styles.header}>
-        <AppText style={styles.headerTitle}>Switch account</AppText>
+        <AppText style={styles.headerTitle}>{t("accountSwitcher.title")}</AppText>
 
         <Pressable onPress={onClose} style={styles.closeButton} hitSlop={10}>
           <Feather name="x" size={18} color={colors.textMuted} />
@@ -119,14 +121,13 @@ export default function AccountSwitcherSheet({
 
                 <AppText style={styles.rowSubtype}>
                   {account.kind === "personal"
-                    ? "Personal account"
-                    : "Business account"}
+                    ? t("accountSwitcher.personal")
+                    : t("accountSwitcher.business")}
                 </AppText>
 
                 {account.notificationsCount > 0 ? (
                   <AppText style={styles.notificationCount}>
-                    {account.notificationsCount} new notification
-                    {account.notificationsCount === 1 ? "" : "s"}
+                    {t("accountSwitcher.notifications", { count: account.notificationsCount })}
                   </AppText>
                 ) : null}
               </View>
@@ -169,7 +170,7 @@ export default function AccountSwitcherSheet({
             <Ionicons name="add" size={22} color={colors.primaryGreen} />
           </View>
 
-          <AppText style={styles.addText}>Add account</AppText>
+          <AppText style={styles.addText}>{t("accountSwitcher.addAccount")}</AppText>
         </Pressable>
       </ScrollView>
     </View>

@@ -3,6 +3,7 @@ import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { Feather } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { checkUsernameAvailability } from "@/src/features/auth/services/auth.service";
@@ -32,6 +33,7 @@ type UsernameAvailabilityStatus =
 export default function SignUpPersonalScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+  const { t } = useTranslation();
   const setProfile = useProfileStore((state) => state.setProfile);
   const setNotificationsAccountType = useNotificationsStore(
     (state) => state.setActiveAccountType,
@@ -154,7 +156,7 @@ export default function SignUpPersonalScreen() {
     if (usernameAvailabilityStatus === "checking") {
       setErrors((current) => ({
         ...current,
-        username: "Please wait while we check this username",
+        username: t("auth.signUp.usernameWaiting"),
       }));
       return;
     }
@@ -162,7 +164,7 @@ export default function SignUpPersonalScreen() {
     if (usernameAvailabilityStatus === "taken") {
       setErrors((current) => ({
         ...current,
-        username: "This username is already taken",
+        username: t("auth.signUp.usernameTaken"),
       }));
       return;
     }
@@ -199,17 +201,15 @@ export default function SignUpPersonalScreen() {
     <AppScreen scroll style={styles.container}>
       <View style={styles.content}>
         <View style={styles.headerBlock}>
-          <Text style={styles.title}>Create your account</Text>
-          <Text style={styles.subtitle}>
-            Choose the type of account you want to create
-          </Text>
+          <Text style={styles.title}>{t("auth.signUp.title")}</Text>
+          <Text style={styles.subtitle}>{t("auth.signUp.subtitle")}</Text>
         </View>
 
         <View style={styles.switchWrap}>
           <AccountTypeSwitch
             options={[
-              { label: "Personal", value: "personal" },
-              { label: "Business", value: "business" },
+              { label: t("auth.signUp.personal"), value: "personal" },
+              { label: t("auth.signUp.business"), value: "business" },
             ]}
             value="personal"
             onChange={(value) => {
@@ -223,7 +223,7 @@ export default function SignUpPersonalScreen() {
         <View style={styles.form}>
           <View>
             <ClearableInput
-              placeholder="First name"
+              placeholder={t("auth.signUp.firstNamePlaceholder")}
               value={firstName}
               onClear={clearFirstName}
               onChangeText={(value) => {
@@ -240,7 +240,7 @@ export default function SignUpPersonalScreen() {
 
           <View>
             <ClearableInput
-              placeholder="Last name"
+              placeholder={t("auth.signUp.lastNamePlaceholder")}
               value={lastName}
               onClear={clearLastName}
               onChangeText={(value) => {
@@ -257,7 +257,7 @@ export default function SignUpPersonalScreen() {
 
           <View>
             <ClearableInput
-              placeholder="Username"
+              placeholder={t("auth.signUp.usernamePlaceholder")}
               value={username}
               onClear={clearUsername}
               onChangeText={handleUsernameChange}
@@ -270,29 +270,25 @@ export default function SignUpPersonalScreen() {
             ) : null}
 
             {!errors.username && usernameAvailabilityStatus === "checking" ? (
-              <Text style={styles.helperText}>Checking username...</Text>
+              <Text style={styles.helperText}>{t("auth.signUp.checkingUsername")}</Text>
             ) : null}
 
             {!errors.username && usernameAvailabilityStatus === "available" ? (
-              <Text style={styles.successText}>Username is available</Text>
+              <Text style={styles.successText}>{t("auth.signUp.usernameAvailable")}</Text>
             ) : null}
 
             {!errors.username && usernameAvailabilityStatus === "taken" ? (
-              <Text style={styles.errorText}>
-                This username is already taken
-              </Text>
+              <Text style={styles.errorText}>{t("auth.signUp.usernameTaken")}</Text>
             ) : null}
 
             {!errors.username && usernameAvailabilityStatus === "error" ? (
-              <Text style={styles.errorText}>
-                Could not check username availability
-              </Text>
+              <Text style={styles.errorText}>{t("auth.signUp.usernameCheckError")}</Text>
             ) : null}
           </View>
 
           <View>
             <ClearableInput
-              placeholder="Email address"
+              placeholder={t("auth.signUp.emailPlaceholder")}
               value={email}
               onClear={clearEmail}
               onChangeText={(value) => {
@@ -311,7 +307,7 @@ export default function SignUpPersonalScreen() {
 
           <View>
             <AppPasswordInput
-              placeholder="Password"
+              placeholder={t("auth.signUp.passwordPlaceholder")}
               value={password}
               onChangeText={(value) => {
                 setPassword(value);
@@ -327,7 +323,7 @@ export default function SignUpPersonalScreen() {
 
           <View>
             <AppPasswordInput
-              placeholder="Confirm password"
+              placeholder={t("auth.signUp.confirmPasswordPlaceholder")}
               value={confirmPassword}
               onChangeText={(value) => {
                 setConfirmPassword(value);
@@ -356,9 +352,10 @@ export default function SignUpPersonalScreen() {
             </View>
 
             <Text style={styles.checkboxText}>
-              I&apos;ve read and agree with the{" "}
-              <Text style={styles.linkText}>Terms and Conditions</Text> and the{" "}
-              <Text style={styles.linkText}>Privacy Policy</Text>.
+              {t("auth.signUp.agreePrefix")}
+              <Text style={styles.linkText}>{t("auth.signUp.termsLink")}</Text>
+              {t("auth.signUp.agreeMid")}
+              <Text style={styles.linkText}>{t("auth.signUp.privacyLink")}</Text>.
             </Text>
           </Pressable>
 
@@ -371,18 +368,18 @@ export default function SignUpPersonalScreen() {
           {isLoading ? (
             <AppLoader />
           ) : (
-            <AppButton title="Continue" onPress={handleSubmit} />
+            <AppButton title={t("auth.signUp.continueButton")} onPress={handleSubmit} />
           )}
         </View>
 
         <View style={styles.footer}>
           <Text style={styles.footerText}>
-            Already have an account?{" "}
+            {t("auth.signUp.alreadyHaveAccount")}{" "}
             <Text
               style={styles.footerLink}
               onPress={() => router.replace("/auth/sign-in")}
             >
-              Sign in
+              {t("auth.signUp.signInLink")}
             </Text>
           </Text>
         </View>

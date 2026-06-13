@@ -13,6 +13,7 @@ import { useFilterStore } from "@/src/store/filter.store";
 import { Feather } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
     Animated,
     Dimensions,
@@ -44,6 +45,7 @@ const COLLAPSE_THRESHOLD = 40;
 export default function FilterModalScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
 
   const [activeTab, setActiveTab] = useState<FilterTab>("sort");
@@ -166,12 +168,12 @@ export default function FilterModalScreen() {
   // ─── Sidebar items ───────────────────────────────────────────────────
   const sidebarItems = useMemo(
     () => [
-      { key: "sort" as FilterTab, label: "Sort" },
-      { key: "categories" as FilterTab, label: "Categories" },
-      { key: "ratings" as FilterTab, label: "Ratings" },
-      { key: "distance" as FilterTab, label: "Distance" },
+      { key: "sort" as FilterTab, label: t("filter.tabSort") },
+      { key: "categories" as FilterTab, label: t("filter.tabCategories") },
+      { key: "ratings" as FilterTab, label: t("filter.tabRatings") },
+      { key: "distance" as FilterTab, label: t("filter.tabDistance") },
     ],
-    [],
+    [t],
   );
 
   // ─── Right panel ───────────────────────────────────────────────────
@@ -179,9 +181,18 @@ export default function FilterModalScreen() {
     if (activeTab === "sort") {
       return (
         <FilterOptionList
-          title="SORT BY"
+          title={t("filter.sectionSortBy")}
           type="radio"
-          options={SORT_OPTIONS}
+          options={SORT_OPTIONS.map((opt) => {
+            const sortLabels: Record<string, string> = {
+              relevance: t("filterOptions.sortRelevance"),
+              distance: t("filterOptions.sortDistance"),
+              rating: t("filterOptions.sortRating"),
+              price_low: t("filterOptions.sortPriceLow"),
+              price_high: t("filterOptions.sortPriceHigh"),
+            };
+            return { ...opt, label: sortLabels[opt.value] ?? opt.label };
+          })}
           selectedValue={sort}
           onSelect={(value) => setSort(scope, value)}
         />
@@ -191,7 +202,7 @@ export default function FilterModalScreen() {
       if (categoryPanel === "food-cuisines") {
         return (
           <FilterOptionList
-            title="FOOD CUISINES"
+            title={t("filter.sectionFoodCuisines")}
             type="checkbox"
             options={CUISINE_OPTIONS.map((option) => option.value)}
             selectedValues={cuisines}
@@ -202,7 +213,7 @@ export default function FilterModalScreen() {
 
       return (
         <FilterOptionList
-          title="CATEGORIES"
+          title={t("filter.sectionCategories")}
           type="radio"
           options={categoryOptions}
           selectedValue={category}
@@ -311,7 +322,7 @@ export default function FilterModalScreen() {
 
               <View style={styles.applyWrap}>
                 <AppButton
-                  title="Apply"
+                  title={t("filter.applyButton")}
                   variant="secondary"
                   onPress={handleClose}
                 />

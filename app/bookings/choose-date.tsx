@@ -10,6 +10,7 @@ import { useAvailability } from "@/src/features/bookings/hooks/useAvailability";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { ScrollView, StyleSheet, View } from "react-native";
 
 type DateOption = {
@@ -50,6 +51,7 @@ const buildDateOptions = (): DateOption[] => {
 export default function ChooseDateScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+  const { t } = useTranslation();
 
   const {
     businessId,
@@ -135,9 +137,9 @@ export default function ChooseDateScreen() {
         <BookingStepper currentStep={3} />
 
         <View style={styles.header}>
-          <AppText style={styles.title}>Choose date and time</AppText>
+          <AppText style={styles.title}>{t("bookings.chooseDateTitle")}</AppText>
           <AppText style={styles.subtitle}>
-            Select an available date and appointment time.
+            {t("bookings.chooseDateSubtitle")}
           </AppText>
         </View>
 
@@ -146,7 +148,7 @@ export default function ChooseDateScreen() {
           contentContainerStyle={styles.scrollContent}
         >
           <View style={styles.section}>
-            <AppText style={styles.sectionTitle}>Date</AppText>
+            <AppText style={styles.sectionTitle}>{t("bookings.chooseDateSectionDate")}</AppText>
 
             <ScrollView
               horizontal
@@ -168,17 +170,17 @@ export default function ChooseDateScreen() {
           </View>
 
           <View style={styles.section}>
-            <AppText style={styles.sectionTitle}>Available times</AppText>
+            <AppText style={styles.sectionTitle}>{t("bookings.chooseDateAvailableTimes")}</AppText>
             {isAvailabilityLoading && (
               <AppText style={styles.emptyText}>
-                Loading available times...
+                {t("bookings.chooseDateLoadingTimes")}
               </AppText>
             )}
 
             {!!availabilityError && (
               <AppText style={styles.emptyText}>
                 {availabilityError.isNetworkError
-                  ? "No internet connection. Check your connection."
+                  ? t("bookings.noInternetSlots")
                   : availabilityError.message}
               </AppText>
             )}
@@ -198,7 +200,7 @@ export default function ChooseDateScreen() {
 
             {!slots.some((slot) => slot.isAvailable) && (
               <AppText style={styles.emptyText}>
-                No available times for this date. Please choose another date.
+                {t("bookings.chooseDateNoSlots")}
               </AppText>
             )}
           </View>
@@ -207,7 +209,7 @@ export default function ChooseDateScreen() {
 
       <View style={styles.footer}>
         <AppButton
-          title="Next"
+          title={t("bookings.nextButton")}
           disabled={!selectedTimeSlot}
           onPress={handleNext}
         />

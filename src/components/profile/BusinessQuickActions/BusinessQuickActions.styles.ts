@@ -6,12 +6,14 @@ import { spacing } from "@/src/constants/spacing";
 export function createStyles(colors: AppColors) {
   return StyleSheet.create({
     card: {
-      padding: spacing.lg,
+      paddingTop: spacing.md,
+      paddingBottom: spacing.lg,
+      paddingHorizontal: spacing.lg,
       borderRadius: 24,
       backgroundColor: colors.surface,
       borderWidth: 1,
       borderColor: colors.border,
-      gap: spacing.md,
+      gap: spacing.sm,
     },
 
     cardHeader: {
@@ -27,11 +29,11 @@ export function createStyles(colors: AppColors) {
     },
 
     editButton: {
-      width: 32,
       height: 32,
       borderRadius: 10,
       alignItems: "center",
       justifyContent: "center",
+      paddingLeft: spacing.sm,
     },
 
     editText: {

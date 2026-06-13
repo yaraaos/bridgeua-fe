@@ -8,6 +8,7 @@ import AppButton from "../../src/components/ui/AppButton/AppButton";
 import AppLoader from "../../src/components/ui/AppLoader/AppLoader";
 import AppPasswordInput from "../../src/components/ui/AppPasswordInput/AppPasswordInput";
 import AppScreen from "../../src/components/ui/AppScreen/AppScreen";
+import { useTranslation } from "react-i18next";
 import { useResetPassword } from "../../src/features/auth/hooks/useResetPassword";
 import {
   ResetPasswordFormErrors,
@@ -17,6 +18,7 @@ import {
 export default function ResetPasswordScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+  const { t } = useTranslation();
 
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -47,9 +49,9 @@ export default function ResetPasswordScreen() {
       router.push({
         pathname: "/auth/success",
         params: {
-          title: "Password changed",
-          subtitle: "Your password has been updated successfully",
-          ctaLabel: "Back to login",
+          title: t("auth.resetPassword.successTitle"),
+          subtitle: t("auth.resetPassword.successSubtitle"),
+          ctaLabel: t("auth.resetPassword.backToLogin"),
           ctaRoute: "/auth/sign-in",
         },
       });
@@ -59,17 +61,15 @@ export default function ResetPasswordScreen() {
   return (
     <AppScreen scroll style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Reset Password</Text>
+        <Text style={styles.title}>{t("auth.resetPassword.title")}</Text>
 
-        <Text style={styles.subtitle}>
-          Create a new password for your account.
-        </Text>
+        <Text style={styles.subtitle}>{t("auth.resetPassword.subtitle")}</Text>
       </View>
 
       <View style={styles.form}>
         <View>
           <AppPasswordInput
-            placeholder="New password"
+            placeholder={t("auth.resetPassword.newPasswordPlaceholder")}
             value={password}
             onChangeText={(value) => {
               setPassword(value);
@@ -87,7 +87,7 @@ export default function ResetPasswordScreen() {
 
         <View>
           <AppPasswordInput
-            placeholder="Confirm password"
+            placeholder={t("auth.resetPassword.confirmPasswordPlaceholder")}
             value={confirmPassword}
             onChangeText={(value) => {
               setConfirmPassword(value);
@@ -116,12 +116,12 @@ export default function ResetPasswordScreen() {
         {isLoading ? (
           <AppLoader />
         ) : (
-          <AppButton title="Reset password" onPress={handleSubmit} />
+          <AppButton title={t("auth.resetPassword.resetButton")} onPress={handleSubmit} />
         )}
       </View>
 
       <Text style={styles.back} onPress={() => router.push("/auth/sign-in")}>
-        Back to login
+        {t("auth.resetPassword.backToLogin")}
       </Text>
     </AppScreen>
   );

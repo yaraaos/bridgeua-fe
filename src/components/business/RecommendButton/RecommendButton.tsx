@@ -6,6 +6,7 @@ import { useAuthStore } from '@/src/store/auth.store';
 import { useRecommendationsStore } from "@/src/store/recommendations.store";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Modal,
   Pressable,
@@ -33,6 +34,7 @@ export default function RecommendButton({
 
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+  const { t } = useTranslation();
 
   const recommendedBusinessIds = useRecommendationsStore(
     (s) => s.recommendedBusinessIds,
@@ -104,24 +106,22 @@ export default function RecommendButton({
         <View style={styles.modalOverlay}>
           <View style={styles.modalCard}>
             <AppText style={styles.modalTitle}>
-              Recommend {businessName ?? 'this business'}?
+              {t("recommend.confirmTitle", { businessName: businessName ?? t("recommend.fallbackName") })}
             </AppText>
             <AppText style={styles.modalBody}>
-              Your recommendation will be publicly visible and shown on this
-              business&apos;s profile. Other users will see that you endorse
-              this place.
+              {t("recommend.confirmBody")}
             </AppText>
             <View style={styles.modalActions}>
               <View style={styles.modalActionButton}>
                 <AppButton
-                  title="Cancel"
+                  title={t("common.cancel")}
                   variant="ghost"
                   onPress={() => setShowConfirmModal(false)}
                 />
               </View>
               <View style={styles.modalActionButton}>
                 <AppButton
-                  title="Recommend"
+                  title={t("recommend.confirm")}
                   variant="primary"
                   onPress={handleConfirmRecommend}
                 />
