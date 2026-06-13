@@ -21,6 +21,7 @@ import type {
 import { Ionicons } from "@expo/vector-icons";
 import { router, useFocusEffect } from "expo-router";
 import React, { useCallback, useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import {
   Image,
@@ -40,6 +41,7 @@ const ACTIVE_BOOKING_STATUSES: BookingStatus[] = [
 export default function PersonalProfileScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+  const { t } = useTranslation();
   const [refreshing, setRefreshing] = useState(false);
   const handleRefresh = async () => {
     setRefreshing(true);
@@ -101,7 +103,7 @@ export default function PersonalProfileScreen() {
   const handleExpandReview = (reviewId: string) => {
     const y = reviewOffsets.current[reviewId];
 
-    if (typeof y !== "number") {
+    if (y === undefined) {
       return;
     }
 
@@ -115,17 +117,17 @@ export default function PersonalProfileScreen() {
     () => [
       {
         id: "following" as const,
-        label: "Following",
+        label: t("profile.personal.statFollowing"),
         value: previewFollowedBusinesses.length,
       },
       {
         id: "reviews" as const,
-        label: "Reviews",
+        label: t("profile.personal.statReviews"),
         value: myReviews.length,
       },
       {
         id: "bookings" as const,
-        label: "Bookings",
+        label: t("profile.personal.statBookings"),
         value: upcomingBookings.length,
       },
     ],
@@ -133,6 +135,7 @@ export default function PersonalProfileScreen() {
       previewFollowedBusinesses.length,
       myReviews.length,
       upcomingBookings.length,
+      t,
     ],
   );
 
@@ -212,7 +215,7 @@ export default function PersonalProfileScreen() {
                   size={16}
                   color={colors.textMuted}
                 />
-                <AppText style={styles.editButtonText}>Edit profile</AppText>
+                <AppText style={styles.editButtonText}>{t("profile.personal.editProfile")}</AppText>
               </Pressable>
 
               <Pressable
@@ -225,7 +228,7 @@ export default function PersonalProfileScreen() {
                   color={colors.textMuted}
                 />
                 <AppText style={styles.switchButtonText}>
-                  Switch account
+                  {t("profile.personal.switchAccount")}
                 </AppText>
               </Pressable>
             </View>
@@ -242,10 +245,10 @@ export default function PersonalProfileScreen() {
       >
         <View style={styles.appointmentsSection}>
           <View style={styles.sectionHeaderRow}>
-            <AppText style={styles.sectionTitle}>Upcoming appointments</AppText>
+            <AppText style={styles.sectionTitle}>{t("profile.personal.upcomingAppointments")}</AppText>
 
             <Pressable onPress={() => router.push("/bookings")}>
-              <AppText style={styles.seeAllText}>See all</AppText>
+              <AppText style={styles.seeAllText}>{t("profile.personal.seeAll")}</AppText>
             </Pressable>
           </View>
 
@@ -261,11 +264,11 @@ export default function PersonalProfileScreen() {
 
               <View style={styles.appointmentTextWrap}>
                 <AppText style={styles.appointmentTitle}>
-                  No upcoming appointments
+                  {t("profile.personal.noUpcomingAppointments")}
                 </AppText>
 
                 <AppText style={styles.appointmentDescription}>
-                  Appointments booked through BridgeUA will appear here.
+                  {t("profile.personal.noUpcomingAppointmentsDesc")}
                 </AppText>
               </View>
             </View>
@@ -294,18 +297,18 @@ export default function PersonalProfileScreen() {
         </View>
 
         <View style={styles.sectionHeaderRow}>
-          <AppText style={styles.sectionTitle}>You follow</AppText>
+          <AppText style={styles.sectionTitle}>{t("profile.personal.youFollow")}</AppText>
 
           <Pressable onPress={() => router.push("/profile/following")}>
-            <AppText style={styles.seeAllText}>See all</AppText>
+            <AppText style={styles.seeAllText}>{t("profile.personal.seeAll")}</AppText>
           </Pressable>
         </View>
 
         {previewFollowedBusinesses.length === 0 ? (
           <View style={styles.emptyStateWrap}>
             <AppEmptyState
-              title="No followed businesses yet"
-              description="Businesses you follow will appear here."
+              title={t("profile.personal.emptyFollowing")}
+              description={t("profile.personal.emptyFollowingDesc")}
             />
           </View>
         ) : (
@@ -322,18 +325,18 @@ export default function PersonalProfileScreen() {
 
         <View style={styles.reviewsSection}>
           <View style={styles.sectionHeaderRow}>
-            <AppText style={styles.sectionTitle}>Your reviews</AppText>
+            <AppText style={styles.sectionTitle}>{t("profile.personal.yourReviews")}</AppText>
 
             <Pressable onPress={() => router.push("/profile/reviews")}>
-              <AppText style={styles.seeAllText}>See all</AppText>
+              <AppText style={styles.seeAllText}>{t("profile.personal.seeAll")}</AppText>
             </Pressable>
           </View>
 
           {myReviews.length === 0 ? (
             <View style={styles.emptyStateWrap}>
               <AppEmptyState
-                title="No reviews yet"
-                description="Your reviews will appear here after you share your experience."
+                title={t("profile.personal.emptyReviews")}
+                description={t("profile.personal.emptyReviewsDesc")}
               />
             </View>
           ) : (
@@ -419,6 +422,7 @@ function ReviewCard({
 }) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+  const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
 
   const shouldShowReadMore = !!review.text?.trim() && review.text.length > 140;
@@ -482,7 +486,7 @@ function ReviewCard({
                 style={{ alignSelf: "flex-end" }}
               >
                 <AppText style={styles.reviewReadMore}>
-                  {isExpanded ? "Show less" : "Read more"}
+                  {isExpanded ? t("profile.personal.showLess") : t("profile.personal.readMore")}
                 </AppText>
               </Pressable>
             ) : null}

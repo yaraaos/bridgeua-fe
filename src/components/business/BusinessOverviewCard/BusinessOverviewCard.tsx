@@ -9,6 +9,7 @@ import type {
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Linking, Text, View } from "react-native";
 import { createStyles } from "./BusinessOverviewCard.styles";
 
@@ -40,6 +41,7 @@ const handlePressContact = async (item: BusinessContactItem) => {
 export default function BusinessOverviewCard({ business }: Props) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+  const { t } = useTranslation();
 
   const [areHoursExpanded, setAreHoursExpanded] = useState(false);
 
@@ -55,7 +57,7 @@ export default function BusinessOverviewCard({ business }: Props) {
         {
           id: "contact-hours",
           type: "hours",
-          label: "Hours",
+          label: t("business.hours"),
           value: "",
         },
       ]
@@ -155,8 +157,12 @@ export default function BusinessOverviewCard({ business }: Props) {
               statusText={
                 isHoursRow
                   ? business.about.isOpen
-                    ? `Open now${business.about.closesAt ? `  ·  Closes at ${business.about.closesAt}` : ''}`
-                    : `Closed${business.about.opensAt ? `  ·  Opens at ${business.about.opensAt}` : ''}`
+                    ? business.about.closesAt
+                      ? `${t("business.statusOpen")}  ·  ${t("business.closesAt", { time: business.about.closesAt })}`
+                      : t("business.statusOpen")
+                    : business.about.opensAt
+                      ? `${t("business.statusClosed")}  ·  ${t("business.opensAt", { time: business.about.opensAt })}`
+                      : t("business.statusClosed")
                   : undefined
               }
               statusColor={

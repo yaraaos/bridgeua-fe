@@ -14,6 +14,7 @@ import type { PersonalProfileReview } from "@/src/types/profile";
 import { MaterialIcons } from "@expo/vector-icons";
 import { router, useFocusEffect } from "expo-router";
 import { useCallback, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Alert,
   FlatList,
@@ -31,6 +32,7 @@ import {
 
 export default function ProfileReviewsScreen() {
   const { colors } = useAppTheme();
+  const { t } = useTranslation();
   const [reviews, setReviews] = useState<PersonalProfileReview[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -56,7 +58,7 @@ export default function ProfileReviewsScreen() {
   const handleExpandReview = (reviewId: string) => {
     const y = reviewOffsets.current[reviewId];
 
-    if (typeof y !== "number") {
+    if (y === undefined) {
       return;
     }
 
@@ -118,15 +120,15 @@ export default function ProfileReviewsScreen() {
   const closeEditModal = () => {
     if (hasUnsavedChanges) {
       Alert.alert(
-        "Discard changes?",
-        "You have unsaved changes in this review.",
+        t("profile.reviews.discardTitle"),
+        t("profile.reviews.discardMessage"),
         [
           {
-            text: "Keep editing",
+            text: t("profile.reviews.discardKeepEditing"),
             style: "cancel",
           },
           {
-            text: "Discard",
+            text: t("profile.reviews.discardConfirm"),
             style: "destructive",
             onPress: resetEditState,
           },
@@ -165,7 +167,7 @@ export default function ProfileReviewsScreen() {
 
     if (!updatedReview) {
       setIsSaving(false);
-      Alert.alert("Review not found", "This review could not be updated.");
+      Alert.alert(t("profile.reviews.notFoundTitle"), t("profile.reviews.notFoundMessage"));
       return;
     }
 
@@ -188,15 +190,15 @@ export default function ProfileReviewsScreen() {
 
   const handleDeleteReview = (review: PersonalProfileReview) => {
     Alert.alert(
-      "Delete review?",
-      "This will remove your review from this business.",
+      t("profile.reviews.deleteTitle"),
+      t("profile.reviews.deleteMessage"),
       [
         {
-          text: "Cancel",
+          text: t("common.cancel"),
           style: "cancel",
         },
         {
-          text: "Delete",
+          text: t("common.delete"),
           style: "destructive",
           onPress: async () => {
             await deleteReview(review.id, review.businessId);
@@ -213,8 +215,8 @@ export default function ProfileReviewsScreen() {
   return (
     <AppScreen withTopInset={false} style={styles.container}>
       <ScreenHeader
-        title="My Reviews"
-        titleSubtitle="Reviews you have written"
+        title={t("profile.reviews.title")}
+        titleSubtitle={t("profile.reviews.subtitle")}
         onBack={() => router.back()}
         gradientColors={DISCOVERY_GRADIENT}
       />
@@ -279,8 +281,8 @@ export default function ProfileReviewsScreen() {
           )}
           ListEmptyComponent={
             <AppEmptyState
-              title="No reviews yet"
-              description="Reviews you write will appear here."
+              title={t("profile.reviews.emptyTitle")}
+              description={t("profile.reviews.emptyDesc")}
             />
           }
         />
@@ -305,7 +307,7 @@ export default function ProfileReviewsScreen() {
         >
           <View style={[styles.modalCard, { backgroundColor: colors.surface }]}>
             <Text style={[styles.modalTitle, { color: colors.textPrimary }]}>
-              Edit review
+              {t("profile.reviews.editTitle")}
             </Text>
 
             <Text
@@ -363,7 +365,7 @@ export default function ProfileReviewsScreen() {
               value={editedText}
               onChangeText={setEditedText}
               multiline
-              placeholder="Update your review..."
+              placeholder={t("profile.reviews.updatePlaceholder")}
               placeholderTextColor={colors.textMuted}
               style={[
                 styles.modalInput,
@@ -391,7 +393,7 @@ export default function ProfileReviewsScreen() {
                     { color: colors.textPrimary },
                   ]}
                 >
-                  Cancel
+                  {t("common.cancel")}
                 </Text>
               </Pressable>
 
@@ -409,7 +411,7 @@ export default function ProfileReviewsScreen() {
                 disabled={!canSaveReview || isSaving}
               >
                 <Text style={styles.modalPrimaryText}>
-                  {isSaving ? "Saving..." : "Save"}
+                  {isSaving ? t("profile.reviews.saving") : t("profile.reviews.save")}
                 </Text>
               </Pressable>
             </View>

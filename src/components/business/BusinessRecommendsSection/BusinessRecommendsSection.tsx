@@ -1,6 +1,7 @@
 import type { BusinessRecommendation } from "@/src/features/businesses/types/business.types";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { Ionicons } from "@expo/vector-icons";
+import { useTranslation } from "react-i18next";
 import { Pressable, Text, View } from "react-native";
 import RecommendedByCard from "../RecommendedByCard";
 import { createStyles } from "./BusinessRecommendsSection.styles";
@@ -20,6 +21,7 @@ export default function BusinessRecommendsSection({
 }: Props) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+  const { t } = useTranslation();
 
   if (recommends.length < 1) {
     return null;
@@ -31,11 +33,11 @@ export default function BusinessRecommendsSection({
   return (
     <View style={styles.container}>
       <View style={styles.headerRow}>
-        <Text style={styles.title}>Recommends</Text>
+        <Text style={styles.title}>{t("business.recommends")}</Text>
 
         {shouldShowSeeAll ? (
           <Pressable style={styles.viewAllButton} onPress={onPressSeeAll}>
-            <Text style={styles.viewAllText}>View all</Text>
+            <Text style={styles.viewAllText}>{t("business.viewAll")}</Text>
             <Ionicons
               name="chevron-forward"
               size={14}

@@ -10,6 +10,7 @@ import { useAppStore } from "@/src/store/app.store";
 import { spacing } from "@/src/constants/spacing";
 import { router, useFocusEffect } from "expo-router";
 import { useCallback, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Alert,
   FlatList,
@@ -19,16 +20,17 @@ import {
   View,
 } from "react-native";
 
-const ACCOUNT_TYPE_OPTIONS = [
-  { label: "All", value: "" },
-  { label: "Personal", value: "personal" },
-  { label: "Business", value: "business" },
-];
-
 export default function AdminUsersScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+  const { t } = useTranslation();
   const incrementBusinessesVersion = useAppStore((s) => s.incrementBusinessesVersion);
+
+  const ACCOUNT_TYPE_OPTIONS = [
+    { label: t("admin.users.filterAll"), value: "" },
+    { label: t("admin.users.filterPersonal"), value: "personal" },
+    { label: t("admin.users.filterBusiness"), value: "business" },
+  ];
 
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [page, setPage] = useState(1);
@@ -55,12 +57,12 @@ export default function AdminUsersScreen() {
         setPage(data.page);
         setTotalPages(data.totalPages);
       } catch {
-        Alert.alert("Error", "Failed to load users");
+        Alert.alert(t("common.error"), t("admin.users.errorLoad"));
       } finally {
         setIsLoading(false);
       }
     },
-    [search, accountType],
+    [search, accountType, t],
   );
 
   useFocusEffect(
@@ -71,21 +73,20 @@ export default function AdminUsersScreen() {
 
   const handleDelete = (user: AdminUser) => {
     Alert.alert(
-      "Delete user",
-      `Delete ${user.email}? This cannot be undone.`,
+      t("admin.users.deleteTitle"),
+      t("admin.users.deleteConfirm", { email: user.email }),
       [
-        { text: "Cancel", style: "cancel" },
+        { text: t("common.cancel"), style: "cancel" },
         {
-          text: "Delete",
+          text: t("admin.users.deleteButton"),
           style: "destructive",
           onPress: async () => {
             try {
               await deleteAdminUser(user.id);
               setUsers((prev) => prev.filter((u) => u.id !== user.id));
-              setTotal((t) => t - 1);
               incrementBusinessesVersion();
             } catch (e: any) {
-              Alert.alert("Error", e?.message ?? "Failed to delete user");
+              Alert.alert(t("common.error"), e?.message ?? t("admin.users.errorDelete"));
             }
           },
         },
@@ -107,12 +108,12 @@ export default function AdminUsersScreen() {
   return (
     <AppScreen withTopInset={false} style={styles.screen}>
       <ScreenHeader
-        title="Users"
-        titleSubtitle="Manage accounts"
+        title={t("admin.users.title")}
+        titleSubtitle={t("admin.users.subtitle")}
         onBack={() => router.back()}
         bottomSlot={
           <AppButton
-            title="Add new user"
+            title={t("admin.users.addNew")}
             size="sm"
             onPress={() => router.push({ pathname: "/admin/create" } as any)}
             style={styles.addButton}
@@ -122,7 +123,7 @@ export default function AdminUsersScreen() {
 
       <TextInput
         style={styles.search}
-        placeholder="Search by name, email or username..."
+        placeholder={t("admin.users.searchPlaceholder")}
         placeholderTextColor={colors.textMuted}
         value={inputValue}
         onChangeText={(v) => {
@@ -174,15 +175,15 @@ export default function AdminUsersScreen() {
                 <AppText style={styles.rowName}>{displayName(item)}</AppText>
                 <AppText style={styles.rowMeta}>
                   {item.email} · {item.accountType}
-                  {item.isAdmin ? " · admin" : ""}
-                  {!item.isEmailConfirmed ? " · unconfirmed" : ""}
+                  {item.isAdmin ? ` · ${t("admin.users.isAdminLabel")}` : ""}
+                  {!item.isEmailConfirmed ? ` · ${t("admin.users.isUnconfirmedLabel")}` : ""}
                 </AppText>
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.deleteBtn}
                 onPress={() => handleDelete(item)}
               >
-                <AppText style={styles.deleteBtnText}>Delete</AppText>
+                <AppText style={styles.deleteBtnText}>{t("admin.users.deleteButton")}</AppText>
               </TouchableOpacity>
             </View>
           )}

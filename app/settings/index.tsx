@@ -11,6 +11,7 @@ import { useAccountStore } from "@/src/store/account.store";
 import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useRef } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Animated,
   Pressable,
@@ -92,6 +93,7 @@ export default function SettingsScreen() {
   const { colors, isDark } = useAppTheme();
   const styles = createStyles(colors);
 
+  const { t, i18n } = useTranslation();
   const router = useRouter();
   const setThemeMode = useAppStore((s) => s.setThemeMode);
   const clearUser = useAuthStore((state) => state.clearUser);
@@ -116,93 +118,82 @@ export default function SettingsScreen() {
   return (
     <View style={styles.safeArea}>
       <ScreenHeader
-        title="Settings"
-        titleSubtitle="Manage your preferences and account"
+        title={t("settings.title")}
+        titleSubtitle={t("settings.subtitle")}
         onBack={() => router.back()}
       />
 
-      {/* Scrollable content */}
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Admin */}
         {isAdmin && (
-          <SettingsSection label="Admin">
+          <SettingsSection label={t("settings.sections.admin")}>
             <SettingsRow
               icon="users"
-              title="Users"
-              subtitle="Manage personal and business accounts"
+              title={t("settings.rows.users.title")}
+              subtitle={t("settings.rows.users.subtitle")}
               onPress={() => router.push({ pathname: "/admin" } as any)}
             />
           </SettingsSection>
         )}
 
-        {/* Account */}
-        <SettingsSection label="Account">
+        <SettingsSection label={t("settings.sections.account")}>
           <SettingsRow
             icon="user"
-            title="Profile"
-            subtitle="View and edit your profile"
+            title={t("settings.rows.profile.title")}
+            subtitle={t("settings.rows.profile.subtitle")}
             onPress={() => router.push(accountType === "business" ? "/business/edit" : "/profile/edit")}
           />
           <View style={styles.divider} />
           <SettingsRow
             icon="lock"
-            title="Account & Security"
-            subtitle="Manage your account and password"
+            title={t("settings.rows.security.title")}
+            subtitle={t("settings.rows.security.subtitle")}
             onPress={() => router.push("/settings/account")}
           />
           <View style={styles.divider} />
           <SettingsRow
             icon="credit-card"
-            title="Payment Methods"
-            subtitle="Manage your saved payment methods"
+            title={t("settings.rows.payment.title")}
+            subtitle={t("settings.rows.payment.subtitle")}
             onPress={() => router.push("/settings/payment-methods")}
           />
           <View style={styles.divider} />
           <SettingsRow
             icon="bell"
-            title="Notifications"
-            subtitle="Manage your notification preferences"
+            title={t("settings.rows.notifications.title")}
+            subtitle={t("settings.rows.notifications.subtitle")}
             onPress={() => router.push("/settings/notifications")}
           />
         </SettingsSection>
 
-        {/* Preferences */}
-        <SettingsSection label="Preferences">
+        <SettingsSection label={t("settings.sections.preferences")}>
           <SettingsRow
             icon="globe"
-            title="Language"
-            subtitle="Choose your preferred language"
+            title={t("settings.rows.language.title")}
+            subtitle={t("settings.rows.language.subtitle")}
             onPress={() => router.push("/settings/language")}
             rightElement={
               <View style={styles.rowRight}>
                 <Text style={styles.rowValue}>
-                  {settings?.language === "uk" ? "Українська" : "English"}
+                  {i18n.language === "uk" ? t("common.ukrainian") : t("common.english")}
                 </Text>
-                <Feather
-                  name="chevron-right"
-                  size={18}
-                  color={colors.textMuted}
-                />
+                <Feather name="chevron-right" size={18} color={colors.textMuted} />
               </View>
             }
           />
           <View style={styles.divider} />
           <SettingsRow
             icon="moon"
-            title="Dark Mode"
-            subtitle="Adjust your appearance"
+            title={t("settings.rows.darkMode.title")}
+            subtitle={t("settings.rows.darkMode.subtitle")}
             rightElement={
               <Switch
                 value={isDark}
                 onValueChange={handleThemeChange}
-                trackColor={{
-                  false: colors.textMuted,
-                  true: colors.primaryGreen,
-                }}
+                trackColor={{ false: colors.textMuted, true: colors.primaryGreen }}
                 thumbColor={colors.white}
                 ios_backgroundColor={colors.textMuted}
               />
@@ -210,13 +201,12 @@ export default function SettingsScreen() {
           />
         </SettingsSection>
 
-        {/* Business */}
         {accountType === "business" && (
-          <SettingsSection label="Business">
+          <SettingsSection label={t("settings.sections.business")}>
             <SettingsRow
               icon="refresh-cw"
-              title="Auto-confirm Bookings"
-              subtitle="Automatically confirm new booking requests"
+              title={t("settings.rows.autoConfirm.title")}
+              subtitle={t("settings.rows.autoConfirm.subtitle")}
               rightElement={
                 <Switch
                   value={settings?.bookingAutoConfirm ?? false}
@@ -230,8 +220,8 @@ export default function SettingsScreen() {
             <View style={styles.divider} />
             <SettingsRow
               icon="map-pin"
-              title="Show in Discovery"
-              subtitle="Display your business on the map and search"
+              title={t("settings.rows.discovery.title")}
+              subtitle={t("settings.rows.discovery.subtitle")}
               rightElement={
                 <Switch
                   value={settings?.profileVisible ?? true}
@@ -245,8 +235,8 @@ export default function SettingsScreen() {
             <View style={styles.divider} />
             <SettingsRow
               icon="tag"
-              title="Show Price Level"
-              subtitle="Display price level on your business profile"
+              title={t("settings.rows.priceLevel.title")}
+              subtitle={t("settings.rows.priceLevel.subtitle")}
               rightElement={
                 <Switch
                   value={settings?.showPriceLevel ?? true}
@@ -260,43 +250,38 @@ export default function SettingsScreen() {
           </SettingsSection>
         )}
 
-        {/* Support */}
-        <SettingsSection label="Support">
+        <SettingsSection label={t("settings.sections.support")}>
           <SettingsRow
             icon="help-circle"
-            title="Help Center"
-            subtitle="Find answers to common questions"
+            title={t("settings.rows.help.title")}
+            subtitle={t("settings.rows.help.subtitle")}
             onPress={() => router.push("/settings/help")}
           />
           <View style={styles.divider} />
           <SettingsRow
             icon="message-circle"
-            title="Contact Us"
-            subtitle="Get in touch with our support team"
+            title={t("settings.rows.contact.title")}
+            subtitle={t("settings.rows.contact.subtitle")}
             onPress={() => router.push("/settings/contact")}
           />
           <View style={styles.divider} />
           <SettingsRow
             icon="shield"
-            title="Privacy Policy"
-            subtitle="Read how we protect your data"
+            title={t("settings.rows.privacy.title")}
+            subtitle={t("settings.rows.privacy.subtitle")}
             onPress={() => router.push("/settings/privacy")}
           />
           <View style={styles.divider} />
           <SettingsRow
             icon="file-text"
-            title="Terms of Service"
-            subtitle="Read our terms and conditions"
+            title={t("settings.rows.terms.title")}
+            subtitle={t("settings.rows.terms.subtitle")}
             onPress={() => router.push("/settings/terms")}
           />
         </SettingsSection>
 
-        {/* Log Out */}
         <Pressable
-          style={({ pressed }) => [
-            styles.logoutBtn,
-            pressed && styles.logoutPressed,
-          ]}
+          style={({ pressed }) => [styles.logoutBtn, pressed && styles.logoutPressed]}
           onPress={async () => {
             const currentUser = useAuthStore.getState().user;
             if (currentUser?.id) {
@@ -307,10 +292,10 @@ export default function SettingsScreen() {
           }}
         >
           <Feather name="log-out" size={18} color={colors.accentOrange} />
-          <Text style={styles.logoutText}>Log Out</Text>
+          <Text style={styles.logoutText}>{t("settings.logout")}</Text>
         </Pressable>
 
-        <Text style={styles.version}>Version 2.4.7</Text>
+        <Text style={styles.version}>{t("settings.version", { version: "2.4.7" })}</Text>
       </ScrollView>
 
       <Animated.View

@@ -3,6 +3,7 @@ import type { BusinessDetailsReview } from "@/src/features/businesses/types/busi
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { FlatList, Pressable, Text, View } from "react-native";
 import { createStyles } from "./BusinessTopReviews.styles";
 
@@ -20,6 +21,7 @@ export default function BusinessTopReviews({
 }: Props) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+  const { t } = useTranslation();
 
   const previewReviews = reviews.slice(0, 6);
 
@@ -30,10 +32,10 @@ export default function BusinessTopReviews({
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Top reviews</Text>
+        <Text style={styles.title}>{t("business.topReviews")}</Text>
 
         <Pressable style={styles.viewAllButton} onPress={onPressViewAll}>
-          <Text style={styles.viewAllText}>View all</Text>
+          <Text style={styles.viewAllText}>{t("business.viewAll")}</Text>
           <Ionicons
             name="chevron-forward"
             size={14}

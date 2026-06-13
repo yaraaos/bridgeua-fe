@@ -3,6 +3,7 @@ import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Image,
   Pressable,
@@ -110,6 +111,7 @@ export default function ScreenHeader({
   bottomSlot,
 }: Props) {
   const { colors, isDark } = useAppTheme();
+  const { t } = useTranslation();
   const styles = createStyles(colors);
   const [titleLines, setTitleLines] = useState(1);
 
@@ -218,7 +220,7 @@ export default function ScreenHeader({
                   styles.businessStatus,
                   { color: isOpen ? colors.primaryGreen : colors.error },
                 ]}>
-                  {isOpen ? "Open" : "Closed"}
+                  {isOpen ? t("business.statusOpen") : t("business.statusClosed")}
                 </Text>
 
                 {isOpen && !!closesAt ? (
@@ -226,7 +228,7 @@ export default function ScreenHeader({
                     <Text style={styles.businessStatusSeparator}>•</Text>
 
                     <Text style={styles.businessStatusMuted}>
-                      Closes at {closesAt}
+                      {t("business.closesAt", { time: closesAt })}
                     </Text>
                   </>
                 ) : null}
@@ -235,7 +237,7 @@ export default function ScreenHeader({
                     <Text style={styles.businessStatusSeparator}>•</Text>
 
                     <Text style={styles.businessStatusMuted}>
-                      Opens at {opensAt}
+                      {t("business.opensAt", { time: opensAt })}
                     </Text>
                   </>
                 ) : null}

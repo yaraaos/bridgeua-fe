@@ -2,6 +2,7 @@ import type { BusinessDetailsService } from "@/src/features/businesses/types/bus
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Pressable, Text, View } from "react-native";
 import { createStyles } from "./BusinessServicesList.styles";
 
@@ -18,13 +19,14 @@ export default function BusinessServicesList({
 }: Props) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+  const { t } = useTranslation();
 
   if (services.length === 0) {
     return (
       <View style={styles.emptyContainer}>
-        <Text style={styles.emptyTitle}>No services yet</Text>
+        <Text style={styles.emptyTitle}>{t("businessServices.emptyTitle")}</Text>
         <Text style={styles.emptyText}>
-          This business has not added services yet.
+          {t("businessServices.emptyDesc")}
         </Text>
       </View>
     );
@@ -60,7 +62,7 @@ export default function BusinessServicesList({
                 )}
 
                 {!!service.priceFrom && (
-                  <Text style={styles.metaText}>From {service.priceFrom}</Text>
+                  <Text style={styles.metaText}>{t("teamMember.priceFrom")} {service.priceFrom}</Text>
                 )}
               </View>
             </View>

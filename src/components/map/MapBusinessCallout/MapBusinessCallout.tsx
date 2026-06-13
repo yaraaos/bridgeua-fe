@@ -14,6 +14,7 @@ import {
   Text,
   View,
 } from "react-native";
+import { useTranslation } from "react-i18next";
 import { createStyles } from "./MapBusinessCallout.styles";
 
 type Props = {
@@ -33,6 +34,7 @@ export default function MapBusinessCallout({
 }: Props) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+  const { t } = useTranslation();
 
   const { latitude, longitude } = business.coordinates;
   const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`;
@@ -126,7 +128,7 @@ export default function MapBusinessCallout({
         >
           <Feather name="navigation" size={16} color={colors.white} />
 
-          <Text style={styles.directionsLabel}>Get directions</Text>
+          <Text style={styles.directionsLabel}>{t("map.getDirections")}</Text>
         </Pressable>
 
         <Pressable

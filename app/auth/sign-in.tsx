@@ -6,6 +6,7 @@ import { useProfileStore } from "@/src/store/profile.store";
 import { useReviewsStore } from "@/src/store/reviews.store";
 import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { StyleSheet, Text, View } from "react-native";
 
 import AppButton from "../../src/components/ui/AppButton/AppButton";
@@ -22,6 +23,7 @@ import {
 export default function SignInScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+  const { t } = useTranslation();
 
   const { mode } = useLocalSearchParams<{ mode?: string }>();
 
@@ -84,13 +86,13 @@ export default function SignInScreen() {
   return (
     <AppScreen scroll style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Welcome!</Text>
+        <Text style={styles.title}>{t("auth.signIn.title")}</Text>
       </View>
 
       <View style={styles.form}>
         <View>
           <ClearableInput
-            placeholder="Email address"
+            placeholder={t("auth.signIn.emailPlaceholder")}
             value={email}
             onClear={clearEmail}
             onChangeText={(value) => {
@@ -111,7 +113,7 @@ export default function SignInScreen() {
 
         <View>
           <AppPasswordInput
-            placeholder="Password"
+            placeholder={t("auth.signIn.passwordPlaceholder")}
             value={password}
             onChangeText={(value) => {
               setPassword(value);
@@ -132,7 +134,7 @@ export default function SignInScreen() {
           style={styles.forgot}
           onPress={() => router.push("/auth/forgot-password")}
         >
-          Forgot password?
+          {t("auth.signIn.forgotPassword")}
         </Text>
 
         {apiError ? <Text style={styles.apiError}>{apiError}</Text> : null}
@@ -140,12 +142,12 @@ export default function SignInScreen() {
         {isLoading ? (
           <AppLoader />
         ) : (
-          <AppButton title="Login" onPress={handleSubmit} />
+          <AppButton title={t("auth.signIn.loginButton")} onPress={handleSubmit} />
         )}
 
         {mode !== "add-account" ? (
           <AppButton
-            title="Skip for now"
+            title={t("auth.signIn.skipForNow")}
             variant="ghost"
             onPress={handleSkipForNow}
           />
@@ -153,12 +155,12 @@ export default function SignInScreen() {
       </View>
 
       <Text style={styles.footer}>
-        Not a member?{" "}
+        {t("auth.signIn.notMember")}{" "}
         <Text
           style={styles.link}
           onPress={() => router.push("/auth/sign-up-personal")}
         >
-          Register for free
+          {t("auth.signIn.registerFree")}
         </Text>
       </Text>
     </AppScreen>

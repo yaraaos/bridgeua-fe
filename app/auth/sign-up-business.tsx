@@ -19,6 +19,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { useNotificationsStore } from "@/src/store/notifications.store";
+import { useTranslation } from "react-i18next";
 import { AccountTypeSwitch } from "../../src/components/auth";
 import AppButton from "../../src/components/ui/AppButton/AppButton";
 import AppLoader from "../../src/components/ui/AppLoader/AppLoader";
@@ -63,6 +64,7 @@ const FALLBACK_CATEGORIES = [
 export default function SignUpBusinessScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+  const { t } = useTranslation();
 
   const { submitRegisterBusiness, isLoading, apiError, setApiError } =
     useRegisterBusiness();
@@ -231,17 +233,15 @@ export default function SignUpBusinessScreen() {
         >
           <View style={styles.content}>
             <View style={styles.headerBlock}>
-              <Text style={styles.title}>Create your account</Text>
-              <Text style={styles.subtitle}>
-                Choose the type of account you want to create
-              </Text>
+              <Text style={styles.title}>{t("auth.signUp.title")}</Text>
+              <Text style={styles.subtitle}>{t("auth.signUp.subtitle")}</Text>
             </View>
 
             <View style={styles.switchWrap}>
               <AccountTypeSwitch
                 options={[
-                  { label: "Personal", value: "personal" },
-                  { label: "Business", value: "business" },
+                  { label: t("auth.signUp.personal"), value: "personal" },
+                  { label: t("auth.signUp.business"), value: "business" },
                 ]}
                 value="business"
                 onChange={(value) => {
@@ -255,7 +255,7 @@ export default function SignUpBusinessScreen() {
             <View style={styles.form}>
               <View>
                 <ClearableInput
-                  placeholder="Business name"
+                  placeholder={t("auth.signUpBusiness.businessNamePlaceholder")}
                   value={businessName}
                   onClear={clearBusinessName}
                   onChangeText={(value) => {
@@ -272,7 +272,7 @@ export default function SignUpBusinessScreen() {
                     <Text style={styles.errorText}>{errors.businessName}</Text>
                   ) : (
                     <Text style={styles.helperText}>
-                      Cannot be changed later
+                      {t("auth.signUpBusiness.cannotChangeLater")}
                     </Text>
                   )}
 
@@ -293,16 +293,14 @@ export default function SignUpBusinessScreen() {
                 isBusinessNameNearLimit(businessName) &&
                 businessName.length < BUSINESS_NAME_HARD_LIMIT ? (
                   <Text style={styles.helperWarningText}>
-                    Recommended length is {BUSINESS_NAME_RECOMMENDED_LIMIT}{" "}
-                    characters — longer names may not display well in cards and
-                    headers.
+                    {t("auth.signUpBusiness.recommendedLength", { limit: BUSINESS_NAME_RECOMMENDED_LIMIT })}
                   </Text>
                 ) : null}
               </View>
 
               <View>
                 <ClearableInput
-                  placeholder="Your full name"
+                  placeholder={t("auth.signUpBusiness.ownerNamePlaceholder")}
                   value={ownerName}
                   onClear={clearOwnerName}
                   onChangeText={(value) => {
@@ -320,7 +318,7 @@ export default function SignUpBusinessScreen() {
 
               <View>
                 <AppSelect
-                  placeholder="Select category"
+                  placeholder={t("auth.signUpBusiness.categoryPlaceholder")}
                   value={selectedCategoryLabel}
                   disabled={isLoading}
                   error={Boolean(errors.category)}
@@ -330,7 +328,7 @@ export default function SignUpBusinessScreen() {
                 {errors.category ? (
                   <Text style={styles.errorText}>{errors.category}</Text>
                 ) : (
-                  <Text style={styles.helperText}>Cannot be changed later</Text>
+                  <Text style={styles.helperText}>{t("auth.signUpBusiness.cannotChangeLater")}</Text>
                 )}
 
                 {selectedCategory === "Food" &&
@@ -351,8 +349,7 @@ export default function SignUpBusinessScreen() {
                           fontWeight: "700",
                         }}
                       >
-                        {" "}
-                        · tap to change
+                        {t("auth.signUpBusiness.tapToChange")}
                       </Text>
                     </Text>
                   </Pressable>
@@ -361,7 +358,7 @@ export default function SignUpBusinessScreen() {
 
               <View>
                 <ClearableInput
-                  placeholder="Address"
+                  placeholder={t("auth.signUpBusiness.addressPlaceholder")}
                   value={address}
                   onClear={clearAddress}
                   onChangeText={(value) => {
@@ -380,7 +377,7 @@ export default function SignUpBusinessScreen() {
               <View style={styles.addressRow}>
                 <View style={styles.addressZip}>
                   <ClearableInput
-                    placeholder="ZIP Code"
+                    placeholder={t("auth.signUpBusiness.zipCodePlaceholder")}
                     value={zipCode}
                     onClear={clearZipCode}
                     onChangeText={(value) => {
@@ -399,7 +396,7 @@ export default function SignUpBusinessScreen() {
 
                 <View style={styles.addressCity}>
                   <ClearableInput
-                    placeholder="City"
+                    placeholder={t("auth.signUpBusiness.cityPlaceholder")}
                     value={city}
                     onClear={clearCity}
                     onChangeText={(value) => {
@@ -418,7 +415,7 @@ export default function SignUpBusinessScreen() {
 
               <View style={{ position: "relative", zIndex: 100 }}>
                 <ClearableInput
-                  placeholder="State / Region"
+                  placeholder={t("auth.signUpBusiness.statePlaceholder")}
                   value={stateQuery}
                   onClear={clearState}
                   onChangeText={(value) => {
@@ -507,7 +504,7 @@ export default function SignUpBusinessScreen() {
 
               <View>
                 <ClearableInput
-                  placeholder="Latitude"
+                  placeholder={t("auth.signUpBusiness.latitudePlaceholder")}
                   value={latitude}
                   onChangeText={setLatitude}
                   onClear={() => setLatitude("")}
@@ -516,13 +513,13 @@ export default function SignUpBusinessScreen() {
                 />
 
                 <Text style={styles.helperText}>
-                  Optional — helps place your business on the map
+                  {t("auth.signUpBusiness.optionalMap")}
                 </Text>
               </View>
 
               <View>
                 <ClearableInput
-                  placeholder="Longitude"
+                  placeholder={t("auth.signUpBusiness.longitudePlaceholder")}
                   value={longitude}
                   onChangeText={setLongitude}
                   onClear={() => setLongitude("")}
@@ -531,13 +528,13 @@ export default function SignUpBusinessScreen() {
                 />
 
                 <Text style={styles.helperText}>
-                  Optional — helps place your business on the map
+                  {t("auth.signUpBusiness.optionalMap")}
                 </Text>
               </View>
 
               <View>
                 <ClearableInput
-                  placeholder="Email address"
+                  placeholder={t("auth.signUp.emailPlaceholder")}
                   value={email}
                   onClear={clearEmail}
                   onChangeText={(value) => {
@@ -557,7 +554,7 @@ export default function SignUpBusinessScreen() {
 
               <View>
                 <AppPasswordInput
-                  placeholder="Password"
+                  placeholder={t("auth.signUp.passwordPlaceholder")}
                   value={password}
                   onChangeText={(value) => {
                     setPassword(value);
@@ -574,7 +571,7 @@ export default function SignUpBusinessScreen() {
 
               <View>
                 <AppPasswordInput
-                  placeholder="Confirm password"
+                  placeholder={t("auth.signUp.confirmPasswordPlaceholder")}
                   value={confirmPassword}
                   onChangeText={(value) => {
                     setConfirmPassword(value);
@@ -606,9 +603,10 @@ export default function SignUpBusinessScreen() {
                 </View>
 
                 <Text style={styles.checkboxText}>
-                  I&apos;ve read and agree with the{" "}
-                  <Text style={styles.linkText}>Terms and Conditions</Text> and
-                  the <Text style={styles.linkText}>Privacy Policy</Text>.
+                  {t("auth.signUp.agreePrefix")}
+                  <Text style={styles.linkText}>{t("auth.signUp.termsLink")}</Text>
+                  {t("auth.signUp.agreeMid")}
+                  <Text style={styles.linkText}>{t("auth.signUp.privacyLink")}</Text>.
                 </Text>
               </Pressable>
 
@@ -623,18 +621,18 @@ export default function SignUpBusinessScreen() {
               {isLoading ? (
                 <AppLoader />
               ) : (
-                <AppButton title="Continue" onPress={handleSubmit} />
+                <AppButton title={t("auth.signUp.continueButton")} onPress={handleSubmit} />
               )}
             </View>
 
             <View style={styles.footer}>
               <Text style={styles.footerText}>
-                Already have an account?{" "}
+                {t("auth.signUp.alreadyHaveAccount")}{" "}
                 <Text
                   style={styles.footerLink}
                   onPress={() => router.replace("/auth/sign-in")}
                 >
-                  Sign in
+                  {t("auth.signUp.signInLink")}
                 </Text>
               </Text>
             </View>
@@ -651,7 +649,7 @@ export default function SignUpBusinessScreen() {
               onPress={() => setCategoryModalVisible(false)}
             >
               <View style={styles.modalSheet}>
-                <Text style={styles.modalTitle}>Select Category</Text>
+                <Text style={styles.modalTitle}>{t("auth.signUpBusiness.selectCategoryTitle")}</Text>
 
                 {categoryOptions.map((option) => (
                   <Pressable
@@ -700,7 +698,7 @@ export default function SignUpBusinessScreen() {
               onPress={() => setCuisineModalVisible(false)}
             >
               <View style={styles.modalSheet}>
-                <Text style={styles.modalTitle}>Select Cuisine</Text>
+                <Text style={styles.modalTitle}>{t("auth.signUpBusiness.selectCuisineTitle")}</Text>
 
                 {CUISINE_OPTIONS.map((option) => (
                   <Pressable

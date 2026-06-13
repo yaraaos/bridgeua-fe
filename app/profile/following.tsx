@@ -10,6 +10,7 @@ import { useFollowingStore } from "@/src/store/following.store";
 import type { Business } from "@/src/types/business";
 import { router } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { FlatList, RefreshControl, StyleSheet, View } from "react-native";
 
 const FOOD_SUBCATEGORIES = [
@@ -64,6 +65,7 @@ const doesBusinessMatchSubcategories = (
 };
 
 export default function ProfileFollowingScreen() {
+  const { t } = useTranslation();
   const [search, setSearch] = useState("");
   const [refreshing, setRefreshing] = useState(false);
 
@@ -191,13 +193,13 @@ export default function ProfileFollowingScreen() {
   return (
     <AppScreen withTopInset={false} style={styles.container}>
       <ScreenHeader
-        title="Following"
-        titleSubtitle="Businesses you follow"
+        title={t("profile.following.title")}
+        titleSubtitle={t("profile.following.subtitle")}
         onBack={() => router.back()}
         showSearch
         searchValue={search}
         onSearchChangeText={setSearch}
-        searchPlaceholder="Find followed businesses"
+        searchPlaceholder={t("profile.following.searchPlaceholder")}
         actions={["filter"]}
         onPressFilter={handleFilterPress}
         activeFilterCount={activeFilterCount}
@@ -228,13 +230,13 @@ export default function ProfileFollowingScreen() {
         )}
         ListEmptyComponent={
           <AppEmptyState
-            title="No followed businesses found"
+            title={t("profile.following.empty.title")}
             description={
               activeFilterCount > 0
-                ? "Try adjusting or clearing your filters."
-                : "Follow businesses to see them here."
+                ? t("profile.following.empty.descriptionFiltered")
+                : t("profile.following.empty.descriptionEmpty")
             }
-            actionLabel={activeFilterCount > 0 ? "Clear filters" : undefined}
+            actionLabel={activeFilterCount > 0 ? t("profile.following.empty.clearFilters") : undefined}
             onPressAction={
               activeFilterCount > 0
                 ? () => useFilterStore.getState().reset("profileFollowing")

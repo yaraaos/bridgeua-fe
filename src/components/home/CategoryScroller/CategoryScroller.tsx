@@ -3,10 +3,15 @@ import { Pressable, ScrollView, Text, View } from "react-native";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { createStyles } from "./CategoryScroller.styles";
 
+type CategoryItem = {
+  label: string;
+  value: string;
+};
+
 type Props = {
-  categories: string[];
+  categories: CategoryItem[];
   selectedCategory: string;
-  onSelectCategory: (category: string) => void;
+  onSelectCategory: (value: string) => void;
   overlay?: boolean;
 };
 
@@ -30,16 +35,16 @@ export default function CategoryScroller({
         ]}
       >
         {categories.map((category) => {
-          const isActive = category === selectedCategory;
+          const isActive = category.value === selectedCategory;
 
           return (
             <Pressable
-              key={category}
-              onPress={() => onSelectCategory(category)}
+              key={category.value}
+              onPress={() => onSelectCategory(category.value)}
               style={[styles.chip, isActive && styles.chipActive]}
             >
               <Text style={[styles.chipText, isActive && styles.chipTextActive]}>
-                {category}
+                {category.label}
               </Text>
             </Pressable>
           );

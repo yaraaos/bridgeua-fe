@@ -7,11 +7,13 @@ import { spacing } from "@/src/constants/spacing";
 import { useBusinessDetails } from "@/src/features/businesses/hooks/useBusiness";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { router, useLocalSearchParams } from "expo-router";
+import { useTranslation } from "react-i18next";
 import { ActivityIndicator, ScrollView, StyleSheet, View } from "react-native";
 
 export default function RecommendedByScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+  const { t } = useTranslation();
 
   const { businessId } = useLocalSearchParams<{ businessId?: string }>();
   const { business, isLoading } = useBusinessDetails(businessId);
@@ -21,8 +23,8 @@ export default function RecommendedByScreen() {
   return (
     <AppScreen withTopInset={false} style={styles.container}>
       <ScreenHeader
-        title="Recommended by"
-        titleSubtitle="Businesses that trust and recommend this place"
+        title={t("recommendedBy.title")}
+        titleSubtitle={t("recommendedBy.subtitle")}
       />
 
       {isLoading ? (
@@ -34,8 +36,8 @@ export default function RecommendedByScreen() {
           {recommendations.length < 1 ? (
             <View style={styles.emptyWrap}>
               <AppEmptyState
-                title="No recommendations yet"
-                description="Businesses that recommend this place will appear here."
+                title={t("recommendedBy.emptyTitle")}
+                description={t("recommendedBy.emptyDesc")}
               />
             </View>
           ) : (

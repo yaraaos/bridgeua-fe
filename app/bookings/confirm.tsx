@@ -12,11 +12,13 @@ import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { useBookingsStore } from "@/src/store/bookings.store";
 import { router } from "expo-router";
 import React, { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { StyleSheet, View } from "react-native";
 
 export default function BookingConfirmScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+  const { t } = useTranslation();
 
   const { params, canCreateBooking } = useBookingFlow();
 
@@ -29,12 +31,12 @@ export default function BookingConfirmScreen() {
       service.serviceId === params.serviceId || service.id === params.serviceId,
   );
 
-  const specialistName = params.specialistName ?? "Selected specialist";
+  const specialistName = params.specialistName ?? t("bookings.fallbackSpecialist");
 
   const serviceName =
-    params.serviceName ?? selectedService?.name ?? "Selected service";
+    params.serviceName ?? selectedService?.name ?? t("bookings.fallbackService");
 
-  const price = params.price ?? "Price on request";
+  const price = params.price ?? t("bookings.priceOnRequest");
 
   const servicePrice = selectedService?.price ?? null;
   const discountPercentage = params.discountLabel
@@ -94,7 +96,7 @@ export default function BookingConfirmScreen() {
       businessId: payload.businessId,
       serviceId: payload.serviceId,
       specialistId: payload.specialistId,
-      businessName: business?.name ?? "Selected business",
+      businessName: business?.name ?? t("bookings.fallbackBusiness"),
       serviceName,
       specialistName,
       price,
@@ -113,21 +115,21 @@ export default function BookingConfirmScreen() {
       <BookingStepper currentStep={5} />
 
       <View style={styles.header}>
-        <AppText style={styles.title}>Confirm booking</AppText>
+        <AppText style={styles.title}>{t("bookings.confirmTitle")}</AppText>
         <AppText style={styles.subtitle}>
-          Review your appointment details before sending the booking request.
+          {t("bookings.confirmSubtitle")}
         </AppText>
       </View>
 
       <BookingSummaryCard
-        businessName={business?.name ?? "Selected business"}
+        businessName={business?.name ?? t("bookings.fallbackBusiness")}
         serviceName={serviceName}
         specialistName={specialistName}
-        date={params.date ?? "Date not selected"}
-        time={params.time ?? "Time not selected"}
+        date={params.date ?? t("bookings.fallbackDateNotSelected")}
+        time={params.time ?? t("bookings.fallbackTimeNotSelected")}
         price={price}
-        customerName={customerName || "Customer"}
-        phoneNumber={params.phoneNumber ?? "Phone not added"}
+        customerName={customerName || t("bookings.fallbackCustomer")}
+        phoneNumber={params.phoneNumber ?? t("bookings.fallbackPhoneNotAdded")}
         originalPrice={originalPriceDisplay}
         discountPercentage={discountPercentage ?? undefined}
         discountAmount={discountAmountDisplay}
@@ -137,15 +139,15 @@ export default function BookingConfirmScreen() {
       {!!error && (
         <View style={styles.errorBox}>
           <AppText style={styles.errorTitle}>
-            {error.isNetworkError ? "No internet connection" : "Booking failed"}
+            {error.isNetworkError ? t("home.errorNoInternet") : t("bookings.bookingFailed")}
           </AppText>
           <AppText style={styles.errorText}>
             {error.isNetworkError
-              ? "Check your connection and try again."
+              ? t("home.errorNoInternetDesc")
               : error.message}
           </AppText>
           <AppButton
-            title="Retry"
+            title={t("bookings.retryButton")}
             variant="secondary"
             disabled={!canCreateBooking || isCreating}
             onPress={handleConfirm}
@@ -155,25 +157,24 @@ export default function BookingConfirmScreen() {
 
       {!canCreateBooking && (
         <View style={styles.errorBox}>
-          <AppText style={styles.errorTitle}>Missing booking details</AppText>
+          <AppText style={styles.errorTitle}>{t("bookings.missingDetailsTitle")}</AppText>
           <AppText style={styles.errorText}>
-            Please go back and complete all booking steps.
+            {t("bookings.missingDetailsDesc")}
           </AppText>
         </View>
       )}
 
       {params.specialistId === "any" && (
         <View style={styles.errorBox}>
-          <AppText style={styles.errorTitle}>Select a specialist</AppText>
+          <AppText style={styles.errorTitle}>{t("bookings.selectSpecialistTitle")}</AppText>
           <AppText style={styles.errorText}>
-            Please go back and choose a real specialist before confirming this
-            booking.
+            {t("bookings.selectSpecialistDesc")}
           </AppText>
         </View>
       )}
 
       <AppButton
-        title={isCreating ? "Confirming..." : "Confirm booking"}
+        title={isCreating ? t("bookings.confirmingButton") : t("bookings.confirmButton")}
         disabled={
           !canCreateBooking || isCreating || params.specialistId === "any"
         }

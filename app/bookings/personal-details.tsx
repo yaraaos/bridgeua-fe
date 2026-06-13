@@ -9,11 +9,13 @@ import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { useProfileStore } from "@/src/store/profile.store";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { StyleSheet, View } from "react-native";
 
 export default function BookingPersonalDetailsScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+  const { t } = useTranslation();
 
   const params = useLocalSearchParams<{
     businessId?: string;
@@ -71,43 +73,42 @@ export default function BookingPersonalDetailsScreen() {
       <BookingStepper currentStep={4} />
 
       <View style={styles.header}>
-        <AppText style={styles.title}>Personal details</AppText>
+        <AppText style={styles.title}>{t("bookings.personalDetailsTitle")}</AppText>
         <AppText style={styles.subtitle}>
-          We’ll use these details for your booking. You can edit them for this
-          appointment.
+          {t("bookings.personalDetailsSubtitle")}
         </AppText>
       </View>
 
       <View style={styles.form}>
         <View style={styles.field}>
-          <AppText style={styles.label}>Name</AppText>
+          <AppText style={styles.label}>{t("bookings.personalDetailsLabelName")}</AppText>
           <ClearableInput
             value={firstName}
             onChangeText={setFirstName}
             onClear={() => setFirstName("")}
-            placeholder="Enter your name"
+            placeholder={t("bookings.personalDetailsNamePlaceholder")}
             autoCapitalize="words"
           />
         </View>
 
         <View style={styles.field}>
-          <AppText style={styles.label}>Surname</AppText>
+          <AppText style={styles.label}>{t("bookings.personalDetailsLabelSurname")}</AppText>
           <ClearableInput
             value={lastName}
             onChangeText={setLastName}
             onClear={() => setLastName("")}
-            placeholder="Enter your surname"
+            placeholder={t("bookings.personalDetailsSurnamePlaceholder")}
             autoCapitalize="words"
           />
         </View>
 
         <View style={styles.field}>
-          <AppText style={styles.label}>Phone number</AppText>
+          <AppText style={styles.label}>{t("bookings.personalDetailsLabelPhone")}</AppText>
           <ClearableInput
             value={phoneNumber}
             onChangeText={setPhoneNumber}
             onClear={() => setPhoneNumber("")}
-            placeholder="Enter your phone number"
+            placeholder={t("bookings.personalDetailsPhonePlaceholder")}
             keyboardType="phone-pad"
             textContentType="telephoneNumber"
           />
@@ -115,7 +116,7 @@ export default function BookingPersonalDetailsScreen() {
       </View>
 
       <AppButton
-        title="Continue"
+        title={t("bookings.continueButton")}
         disabled={!canContinue}
         onPress={handleContinue}
       />

@@ -7,21 +7,16 @@ import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { useAccountStore, useActiveAccount } from "@/src/store/account.store";
 import { useAuthStore } from "@/src/store/auth.store";
 import { router } from "expo-router";
+import { useTranslation } from "react-i18next";
 import { StyleSheet, View } from "react-native";
 
 import BusinessProfileScreen from "../profile/business";
 import PersonalProfileScreen from "../profile/personal";
 
-const GUEST_BENEFITS = [
-  "Follow trusted businesses",
-  "Receive promotions and news",
-  "Leave recommendations and reviews",
-  "Get activity notifications",
-];
-
 export default function ProfileTabScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+  const { t } = useTranslation();
   const isGuest = useAuthStore((state) => state.isGuest);
   const user = useAuthStore((state) => state.user);
   const account = useActiveAccount();
@@ -39,26 +34,31 @@ export default function ProfileTabScreen() {
     });
   };
 
+  const guestBenefits = [
+    t("profile.guest.benefits.follow"),
+    t("profile.guest.benefits.promotions"),
+    t("profile.guest.benefits.reviews"),
+    t("profile.guest.benefits.notifications"),
+  ];
+
   if (isGuest) {
     return (
       <View style={styles.container}>
         <ScreenHeader
-          title="Join BridgeUA"
-          titleSubtitle="Create your profile and connect with trusted businesses"
+          title={t("profile.guest.headerTitle")}
+          titleSubtitle={t("profile.guest.headerSubtitle")}
           headerInnerStyle={styles.headerInner}
         />
 
         <View style={styles.content}>
           <View style={styles.card}>
-            <AppText style={styles.title}>Register to BridgeUA</AppText>
+            <AppText style={styles.title}>{t("profile.guest.cardTitle")}</AppText>
             <AppText style={styles.description}>
-              Create an account to follow businesses, see personalized updates,
-              receive promotions, and share your recommendations with the
-              community.
+              {t("profile.guest.cardDescription")}
             </AppText>
 
             <View style={styles.benefitsList}>
-              {GUEST_BENEFITS.map((benefit) => (
+              {guestBenefits.map((benefit) => (
                 <View key={benefit} style={styles.benefitRow}>
                   <View style={styles.bullet} />
                   <AppText style={styles.benefitText}>{benefit}</AppText>
@@ -67,7 +67,7 @@ export default function ProfileTabScreen() {
             </View>
 
             <AppButton
-              title="Register to BridgeUA"
+              title={t("profile.guest.registerButton")}
               onPress={handleRegisterPress}
             />
           </View>

@@ -11,20 +11,21 @@ import type { StoredBooking } from "@/src/store/bookings.store";
 import { useBookingsStore } from "@/src/store/bookings.store";
 import { router, useFocusEffect } from "expo-router";
 import React, { useCallback, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { ScrollView, StyleSheet, View } from "react-native";
 
 type BookingFilter = "active" | "past" | "cancelled";
 
-const BOOKING_TABS: AppTabPillItem<BookingFilter>[] = [
-  { label: "Active", value: "active" },
-  { label: "Past", value: "past" },
-  { label: "Cancelled", value: "cancelled" },
-];
-
-
 export default function BookingsScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+  const { t } = useTranslation();
+
+  const BOOKING_TABS: AppTabPillItem<BookingFilter>[] = [
+    { label: t("bookings.tabActive"), value: "active" },
+    { label: t("bookings.tabPast"), value: "past" },
+    { label: t("bookings.tabCancelled"), value: "cancelled" },
+  ];
 
   const [activeFilter, setActiveFilter] = useState<BookingFilter>("active");
   const bookings = useBookingsStore((state) => state.bookings);
@@ -49,13 +50,21 @@ export default function BookingsScreen() {
     });
   }, [activeFilter, bookings]);
 
-  const emptyState = getEmptyState(activeFilter);
+  const emptyState = useMemo(() => {
+    if (activeFilter === "past") {
+      return { title: t("bookings.emptyPast"), description: t("bookings.emptyPastDesc") };
+    }
+    if (activeFilter === "cancelled") {
+      return { title: t("bookings.emptyCancelled"), description: t("bookings.emptyCancelledDesc") };
+    }
+    return { title: t("bookings.emptyActive"), description: t("bookings.emptyActiveDesc") };
+  }, [activeFilter, t]);
 
   return (
     <View style={styles.container}>
       <ScreenHeader
-        title="Bookings"
-        titleSubtitle="Track your appointments and rebook specialists you liked."
+        title={t("bookings.title")}
+        titleSubtitle={t("bookings.subtitle")}
         onBack={() => router.back()}
       />
 
@@ -126,28 +135,6 @@ function BookingListCard({
       }
     />
   );
-}
-
-function getEmptyState(filter: BookingFilter) {
-  if (filter === "past") {
-    return {
-      title: "No past bookings yet",
-      description:
-        "After an appointment is completed, it will appear here so you can find the specialist again and rebook.",
-    };
-  }
-
-  if (filter === "cancelled") {
-    return {
-      title: "No cancelled bookings",
-      description: "Cancelled appointments will appear here.",
-    };
-  }
-
-  return {
-    title: "No active bookings",
-    description: "Appointments booked through BridgeUA will appear here.",
-  };
 }
 
 function createStyles(colors: AppColors) {

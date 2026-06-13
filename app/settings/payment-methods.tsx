@@ -4,22 +4,22 @@ import { spacing } from "@/src/constants/spacing";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { useTranslation } from "react-i18next";
 import { StyleSheet, Text, View } from "react-native";
 
 export default function PaymentMethodsScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
   const router = useRouter();
+  const { t } = useTranslation();
 
   return (
     <View style={styles.safeArea}>
-      <ScreenHeader title="Payment Methods" onBack={() => router.back()} />
+      <ScreenHeader title={t("payment.title")} onBack={() => router.back()} />
       <View style={styles.centered}>
         <Feather name="credit-card" size={48} color={colors.textMuted} />
-        <Text style={styles.title}>Payment methods coming soon</Text>
-        <Text style={styles.subtitle}>
-          We're working on it. Check back soon.
-        </Text>
+        <Text style={styles.title}>{t("payment.comingSoon")}</Text>
+        <Text style={styles.subtitle}>{t("payment.workingOnIt")}</Text>
       </View>
     </View>
   );

@@ -4,6 +4,7 @@ import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Pressable, Text, View } from "react-native";
 import { createStyles } from "./BusinessBookingCard.styles";
 
@@ -23,35 +24,36 @@ type BookingAction = {
     | "/bookings/choose-service";
 };
 
-const BOOKING_ACTIONS: BookingAction[] = [
-  /*
-  {
-    title: "Choose a professional",
-    subtitle: "Find your preferred specialist",
-    icon: "person-outline",
-    pathname: "/bookings/choose-specialist",
-  },
-  {
-    title: "Pick date and time",
-    subtitle: "See available appointment slots",
-    icon: "calendar-outline",
-    pathname: "/bookings/choose-date",
-  },
-  */
-  {
-    title: "Select services",
-    subtitle: "Choose one or more services",
-    icon: "cut-outline",
-    pathname: "/bookings/choose-service",
-  },
-];
-
 export default function BusinessBookingCard({ businessId, category, disabled }: Props) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+  const { t } = useTranslation();
 
   const { isAuthModalVisible, closeAuthModal, confirmAuthModal, requireAuth } =
     useRequireAuth();
+
+  const BOOKING_ACTIONS: BookingAction[] = [
+    /*
+    {
+      title: t("businessBooking.chooseProfessional"),
+      subtitle: t("businessBooking.chooseProfessionalSubtitle"),
+      icon: "person-outline",
+      pathname: "/bookings/choose-specialist",
+    },
+    {
+      title: t("businessBooking.pickDate"),
+      subtitle: t("businessBooking.pickDateSubtitle"),
+      icon: "calendar-outline",
+      pathname: "/bookings/choose-date",
+    },
+    */
+    {
+      title: t("businessBooking.selectServices"),
+      subtitle: t("businessBooking.selectServicesSubtitle"),
+      icon: "cut-outline",
+      pathname: "/bookings/choose-service",
+    },
+  ];
 
   const handlePress = (pathname: BookingAction["pathname"]) => {
     requireAuth(
@@ -69,7 +71,7 @@ export default function BusinessBookingCard({ businessId, category, disabled }: 
 
   return (
     <View style={[styles.container, disabled && { opacity: 0.5 }]}>
-      <Text style={styles.title}>Book an appointment</Text>
+      <Text style={styles.title}>{t("businessBooking.title")}</Text>
 
       <View style={styles.actions}>
         {BOOKING_ACTIONS.map((action, index) => (

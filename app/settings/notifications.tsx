@@ -6,6 +6,7 @@ import { useSettings } from "@/src/features/settings/hooks/useSettings";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { useAuthStore } from "@/src/store/auth.store";
 import { useRouter } from "expo-router";
+import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
   ScrollView,
@@ -69,6 +70,7 @@ export default function NotificationsScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
   const router = useRouter();
+  const { t } = useTranslation();
   const accountType = useAuthStore((state) => state.user?.accountType);
   const { settings, isLoading, updateSetting } = useSettings();
 
@@ -86,7 +88,7 @@ export default function NotificationsScreen() {
 
   return (
     <View style={styles.safeArea}>
-      <ScreenHeader title="Notifications" onBack={() => router.back()} />
+      <ScreenHeader title={t("notifications.title")} onBack={() => router.back()} />
 
       {isLoading ? (
         <View style={styles.centered}>
@@ -98,50 +100,50 @@ export default function NotificationsScreen() {
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
-          <SettingsSection label="Bookings">
+          <SettingsSection label={t("notifications.sections.bookings")}>
             <SettingsRow
-              title="New Booking Request"
-              subtitle="When a customer requests a booking"
+              title={t("notifications.rows.newBookingRequest.title")}
+              subtitle={t("notifications.rows.newBookingRequest.subtitle")}
               rightElement={renderSwitch("notifyNewBookingRequest")}
             />
             <View style={styles.divider} />
             <SettingsRow
-              title="Booking Confirmed"
-              subtitle="When a booking is confirmed"
+              title={t("notifications.rows.bookingConfirmed.title")}
+              subtitle={t("notifications.rows.bookingConfirmed.subtitle")}
               rightElement={renderSwitch("notifyBookingConfirmed")}
             />
             <View style={styles.divider} />
             <SettingsRow
-              title="Booking Cancelled"
-              subtitle="When a booking is cancelled"
+              title={t("notifications.rows.bookingCancelled.title")}
+              subtitle={t("notifications.rows.bookingCancelled.subtitle")}
               rightElement={renderSwitch("notifyBookingCancelled")}
             />
           </SettingsSection>
 
-          <SettingsSection label="Reviews & Engagement">
+          <SettingsSection label={t("notifications.sections.reviewsEngagement")}>
             <SettingsRow
-              title="New Review"
-              subtitle="When a customer leaves a review"
+              title={t("notifications.rows.newReview.title")}
+              subtitle={t("notifications.rows.newReview.subtitle")}
               rightElement={renderSwitch("notifyNewReview")}
             />
             <View style={styles.divider} />
             <SettingsRow
-              title="System Updates"
-              subtitle="Important updates from BridgeUA"
+              title={t("notifications.rows.systemUpdates.title")}
+              subtitle={t("notifications.rows.systemUpdates.subtitle")}
               rightElement={renderSwitch("notifySystemUpdates")}
             />
           </SettingsSection>
 
-          <SettingsSection label="Team & Operations">
+          <SettingsSection label={t("notifications.sections.teamOperations")}>
             <SettingsRow
-              title="Team Activity"
-              subtitle="Updates from your team members"
+              title={t("notifications.rows.teamActivity.title")}
+              subtitle={t("notifications.rows.teamActivity.subtitle")}
               rightElement={renderSwitch("notifyTeamActivity")}
             />
             <View style={styles.divider} />
             <SettingsRow
-              title="Low Availability"
-              subtitle="When your availability is running low"
+              title={t("notifications.rows.lowAvailability.title")}
+              subtitle={t("notifications.rows.lowAvailability.subtitle")}
               rightElement={renderSwitch("notifyLowAvailability")}
             />
           </SettingsSection>
@@ -152,50 +154,50 @@ export default function NotificationsScreen() {
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
-          <SettingsSection label="Activity">
+          <SettingsSection label={t("notifications.sections.activity")}>
             <SettingsRow
-              title="New Follower"
-              subtitle="When someone follows you"
+              title={t("notifications.rows.newFollower.title")}
+              subtitle={t("notifications.rows.newFollower.subtitle")}
               rightElement={renderSwitch("notifyNewFollower")}
             />
             <View style={styles.divider} />
             <SettingsRow
-              title="Review Upvote"
-              subtitle="When your review gets upvoted"
+              title={t("notifications.rows.reviewUpvote.title")}
+              subtitle={t("notifications.rows.reviewUpvote.subtitle")}
               rightElement={renderSwitch("notifyReviewUpvote")}
             />
             <View style={styles.divider} />
             <SettingsRow
-              title="Recommendation"
-              subtitle="When someone recommends a business to you"
+              title={t("notifications.rows.recommendation.title")}
+              subtitle={t("notifications.rows.recommendation.subtitle")}
               rightElement={renderSwitch("notifyRecommendation")}
             />
           </SettingsSection>
 
-          <SettingsSection label="Bookings">
+          <SettingsSection label={t("notifications.sections.bookings")}>
             <SettingsRow
-              title="Booking Confirmed"
-              subtitle="When a booking is confirmed"
+              title={t("notifications.rows.bookingConfirmed.title")}
+              subtitle={t("notifications.rows.bookingConfirmed.subtitle")}
               rightElement={renderSwitch("notifyBookingConfirmed")}
             />
             <View style={styles.divider} />
             <SettingsRow
-              title="Booking Cancelled"
-              subtitle="When a booking is cancelled"
+              title={t("notifications.rows.bookingCancelled.title")}
+              subtitle={t("notifications.rows.bookingCancelled.subtitle")}
               rightElement={renderSwitch("notifyBookingCancelled")}
             />
           </SettingsSection>
 
-          <SettingsSection label="General">
+          <SettingsSection label={t("notifications.sections.general")}>
             <SettingsRow
-              title="Promotions"
-              subtitle="Deals and offers from businesses you follow"
+              title={t("notifications.rows.promotions.title")}
+              subtitle={t("notifications.rows.promotions.subtitle")}
               rightElement={renderSwitch("notifyPromotions")}
             />
             <View style={styles.divider} />
             <SettingsRow
-              title="System Updates"
-              subtitle="Important updates from BridgeUA"
+              title={t("notifications.rows.systemUpdates.title")}
+              subtitle={t("notifications.rows.systemUpdates.subtitle")}
               rightElement={renderSwitch("notifySystemUpdates")}
             />
           </SettingsSection>

@@ -11,11 +11,13 @@ import { useBusinessDetails } from "@/src/features/businesses/hooks/useBusiness"
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { ScrollView, StyleSheet, View } from "react-native";
 
 export default function ChooseServiceScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+  const { t } = useTranslation();
 
   const { businessId, serviceId, promotionId, promoCode, discountLabel } =
     useLocalSearchParams<{
@@ -46,7 +48,7 @@ export default function ChooseServiceScreen() {
         businessId,
         serviceId: selectedService?.serviceId ?? selectedServiceId,
         serviceName: selectedService?.name,
-        price: selectedService?.priceFrom ?? (selectedService as any)?.price ?? "Price on request",
+        price: selectedService?.priceFrom ?? (selectedService as any)?.price ?? t("bookings.priceOnRequest"),
         promotionId,
         promoCode,
         discountLabel,
@@ -60,9 +62,9 @@ export default function ChooseServiceScreen() {
         <BookingStepper currentStep={1} />
 
         <View style={styles.header}>
-          <AppText style={styles.title}>Choose service</AppText>
+          <AppText style={styles.title}>{t("bookings.chooseServiceTitle")}</AppText>
           <AppText style={styles.subtitle}>
-            Select one service for your appointment.
+            {t("bookings.chooseServiceSubtitle")}
           </AppText>
         </View>
 
@@ -72,18 +74,18 @@ export default function ChooseServiceScreen() {
           showsVerticalScrollIndicator={false}
         >
           {isLoading ? (
-            <AppText style={styles.emptyText}>Loading services...</AppText>
+            <AppText style={styles.emptyText}>{t("bookings.chooseServiceLoading")}</AppText>
           ) : services.length === 0 ? (
             <AppText style={styles.emptyText}>
-              This business has not added bookable services yet.
+              {t("bookings.chooseServiceEmpty")}
             </AppText>
           ) : (
             services.map((service) => (
               <ServiceSelectionCard
                 key={service.id}
                 title={service.name}
-                duration={service.duration ?? "Duration varies"}
-                price={service.priceFrom ?? "Price on request"}
+                duration={service.duration ?? t("bookings.durationVaries")}
+                price={service.priceFrom ?? t("bookings.priceOnRequest")}
                 isSelected={selectedServiceId === service.id}
                 onPress={() => setSelectedServiceId(service.id)}
               />
@@ -94,7 +96,7 @@ export default function ChooseServiceScreen() {
 
       <View style={styles.footer}>
         <AppButton
-          title="Next"
+          title={t("bookings.nextButton")}
           disabled={!selectedServiceId}
           onPress={handleNext}
         />

@@ -13,6 +13,7 @@ import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
   Alert,
@@ -26,22 +27,23 @@ import {
   View,
 } from "react-native";
 
-const REVIEW_TAGS = [
-  "Great service",
-  "Clean & comfortable",
-  "Professional staff",
-  "Good value",
-  "Easy booking",
-  "Relaxing atmosphere",
-];
-
 const MAX_REVIEW_LENGTH = 1000;
 const MAX_PHOTOS = 8;
 
 export default function WriteReviewScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+  const { t } = useTranslation();
   const isGuest = useAuthStore((state) => state.isGuest);
+
+  const REVIEW_TAGS = [
+    t("writeReview.tagGreatService"),
+    t("writeReview.tagClean"),
+    t("writeReview.tagProfessional"),
+    t("writeReview.tagValue"),
+    t("writeReview.tagEasyBooking"),
+    t("writeReview.tagRelaxing"),
+  ];
 
   const { businessId, rating: initialRating } = useLocalSearchParams<{
     businessId?: string;
@@ -72,13 +74,13 @@ export default function WriteReviewScreen() {
   const counterShake = useState(new Animated.Value(0))[0];
 
   const ratingLabel = useMemo(() => {
-    if (rating === 5) return "Excellent";
-    if (rating === 4) return "Great";
-    if (rating === 3) return "Good";
-    if (rating === 2) return "Could be better";
-    if (rating === 1) return "Poor";
-    return "Tap to rate";
-  }, [rating]);
+    if (rating === 5) return t("writeReview.ratingExcellent");
+    if (rating === 4) return t("writeReview.ratingGreat");
+    if (rating === 3) return t("writeReview.ratingGood");
+    if (rating === 2) return t("writeReview.ratingBetter");
+    if (rating === 1) return t("writeReview.ratingPoor");
+    return t("writeReview.ratingTap");
+  }, [rating, t]);
 
   const canSubmit = rating > 0;
   const { submit, isSubmitting } = useSubmitReview();
@@ -100,8 +102,8 @@ export default function WriteReviewScreen() {
 
     if (!permission.granted) {
       Alert.alert(
-        "Permission needed",
-        "Please allow photo access to add review photos.",
+        t("writeReview.permissionTitle"),
+        t("writeReview.permissionDesc"),
       );
       return;
     }
@@ -167,18 +169,18 @@ export default function WriteReviewScreen() {
 
     if (error) {
       if (error.toLowerCase().includes("already reviewed")) {
-        Alert.alert("Already reviewed", "You've already reviewed this business.");
+        Alert.alert(t("writeReview.alreadyReviewedTitle"), t("writeReview.alreadyReviewedDesc"));
       } else {
-        Alert.alert("Could not submit review", error || "Something went wrong. Please try again.");
+        Alert.alert(t("writeReview.submitErrorTitle"), error || t("home.errorSomethingWrong"));
       }
       return;
     }
 
     if (!submittedReview) return;
 
-    Alert.alert("Review submitted", "Thank you!", [
+    Alert.alert(t("writeReview.successTitle"), t("writeReview.successDesc"), [
       {
-        text: "Done",
+        text: t("writeReview.done"),
         onPress: () => router.back(),
       },
     ]);
@@ -195,7 +197,7 @@ export default function WriteReviewScreen() {
   if (!business) {
     return (
       <AppScreen style={styles.center}>
-        <Text style={styles.errorText}>Business not found</Text>
+        <Text style={styles.errorText}>{t("writeReview.notFound")}</Text>
       </AppScreen>
     );
   }
@@ -207,7 +209,7 @@ export default function WriteReviewScreen() {
           <Ionicons name="close" size={24} color={colors.textPrimary} />
         </Pressable>
 
-        <Text style={styles.headerTitle}>Write a Review</Text>
+        <Text style={styles.headerTitle}>{t("writeReview.title")}</Text>
 
         <View style={styles.headerSpacer} />
       </View>
@@ -243,7 +245,7 @@ export default function WriteReviewScreen() {
         </View>
 
         <View style={styles.card}>
-          <Text style={styles.label}>Your rating</Text>
+          <Text style={styles.label}>{t("writeReview.labelRating")}</Text>
 
           <View style={styles.ratingRow}>
             {Array.from({ length: 5 }).map((_, index) => {
@@ -268,7 +270,7 @@ export default function WriteReviewScreen() {
 
           <Text style={styles.ratingLabel}>{ratingLabel}</Text>
 
-          <Text style={[styles.label, styles.reviewLabel]}>Your review</Text>
+          <Text style={[styles.label, styles.reviewLabel]}>{t("writeReview.labelReview")}</Text>
 
           <View style={styles.textAreaWrap}>
             <TextInput
@@ -294,7 +296,7 @@ export default function WriteReviewScreen() {
               }}
               multiline
               textAlignVertical="top"
-              placeholder="Share about your experience"
+              placeholder={t("writeReview.reviewPlaceholder")}
               placeholderTextColor={colors.textMuted}
               style={styles.textArea}
             />
@@ -311,7 +313,7 @@ export default function WriteReviewScreen() {
           </View>
 
           <Text style={[styles.label, styles.sectionGap]}>
-            Add photos <Text style={styles.optional}>(optional)</Text>
+            {t("writeReview.labelPhotos")} <Text style={styles.optional}>{t("writeReview.optional")}</Text>
           </Text>
 
           <View style={styles.photosRow}>
@@ -335,13 +337,13 @@ export default function WriteReviewScreen() {
                   size={26}
                   color={colors.primaryGreen}
                 />
-                <Text style={styles.addPhotoText}>Add photo</Text>
+                <Text style={styles.addPhotoText}>{t("writeReview.addPhoto")}</Text>
               </Pressable>
             ) : null}
           </View>
 
           <Text style={[styles.label, styles.sectionGap]}>
-            What did you like? <Text style={styles.optional}>(optional)</Text>
+            {t("writeReview.labelLiked")} <Text style={styles.optional}>{t("writeReview.optional")}</Text>
           </Text>
 
           <View style={styles.tagsWrap}>
@@ -376,7 +378,7 @@ export default function WriteReviewScreen() {
           </View>
           <View style={styles.submitWrap}>
             <AppButton
-              title={isSubmitting ? "Submitting..." : "Submit Review"}
+              title={isSubmitting ? t("writeReview.submittingButton") : t("writeReview.submitButton")}
               onPress={handleSubmit}
               disabled={!canSubmit || isSubmitting}
             />

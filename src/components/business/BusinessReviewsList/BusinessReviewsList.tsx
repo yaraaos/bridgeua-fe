@@ -12,6 +12,7 @@ import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Image, Pressable, ScrollView, Text, View } from "react-native";
 import { createStyles } from "./BusinessReviewsList.styles";
 
@@ -58,6 +59,7 @@ export default function BusinessReviewsList({
 }: Props) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+  const { t } = useTranslation();
 
   const [activeFilter, setActiveFilter] =
     useState<ReviewFilterOption>("Most relevant");
@@ -103,7 +105,7 @@ export default function BusinessReviewsList({
   const handleExpandReview = (reviewId: string) => {
     const reviewOffsetY = reviewOffsets.current[reviewId];
 
-    if (typeof reviewOffsetY !== "number") {
+    if (reviewOffsetY === undefined) {
       return;
     }
 
@@ -132,7 +134,7 @@ export default function BusinessReviewsList({
       ]}
     >
       <View style={[styles.writeCard, isPreview && { opacity: 0.4 }]}>
-        <Text style={styles.writeTitle}>Write a review</Text>
+        <Text style={styles.writeTitle}>{t("businessReviews.writeTitle")}</Text>
 
         <View style={styles.writeStars}>
           {Array.from({ length: 5 }).map((_, index) => {
@@ -155,18 +157,18 @@ export default function BusinessReviewsList({
         </View>
 
         <Text style={styles.writeHint}>
-          Share your experience and help the community.
+          {t("businessReviews.writeHint")}
         </Text>
 
         <AppButton
-          title="Write a review"
+          title={t("businessReviews.writeTitle")}
           onPress={() => onPressWriteReview?.()}
         />
       </View>
       {reviewPhotos.length > 0 ? (
         <View style={styles.photosSection}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Review photos</Text>
+            <Text style={styles.sectionTitle}>{t("businessReviews.reviewPhotos")}</Text>
           </View>
 
           <ScrollView
@@ -202,15 +204,15 @@ export default function BusinessReviewsList({
             onReviewsListLayout?.(event.nativeEvent.layout.y);
           }}
         >
-          <Text style={styles.sectionTitle}>All reviews</Text>
-          <Text style={styles.reviewCount}>{reviewCount} total</Text>
+          <Text style={styles.sectionTitle}>{t("businessReviews.allReviews")}</Text>
+          <Text style={styles.reviewCount}>{t("businessReviews.totalCount", { count: reviewCount })}</Text>
         </View>
       ) : null}
       {displayedReviews.length === 0 && !isLoadingReviews ? (
         <View style={styles.emptyStateWrap}>
           <AppEmptyState
-            title="No reviews yet"
-            description="Be the first to share your experience."
+            title={t("businessReviews.emptyTitle")}
+            description={t("businessReviews.emptyDesc")}
           />
         </View>
       ) : (

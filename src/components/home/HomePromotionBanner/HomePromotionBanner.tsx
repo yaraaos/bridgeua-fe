@@ -1,6 +1,7 @@
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import type { HomePromotion } from "@/src/features/promotions/types/promotion.types";
 import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import {
     FlatList,
     ImageBackground,
@@ -30,6 +31,7 @@ export default function HomePromotionBanner({
 }: Props) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+  const { t } = useTranslation();
 
   const listRef = useRef<FlatList<HomePromotion>>(null);
   const activeIndexRef = useRef(1);
@@ -143,7 +145,7 @@ export default function HomePromotionBanner({
                 <View style={styles.overlay} />
 
                 <View style={styles.badge}>
-                  <Text style={styles.badgeText}>Promo</Text>
+                  <Text style={styles.badgeText}>{t("promotion.badge")}</Text>
                 </View>
 
                 <View style={styles.content}>
@@ -151,7 +153,7 @@ export default function HomePromotionBanner({
                     {item.title}
                   </Text>
                   <Text style={styles.ctaText} numberOfLines={1}>
-                    {item.ctaLabel ?? `View ${item.businessName}`}
+                    {item.ctaLabel ?? t("promotion.viewBusiness", { businessName: item.businessName })}
                   </Text>
                 </View>
               </ImageBackground>

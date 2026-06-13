@@ -16,6 +16,7 @@ import { type ApiError, parseApiError } from "@/src/services/api/types";
 import { useAuthStore } from "@/src/store/auth.store";
 import { router } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { RefreshControl, ScrollView, StyleSheet, View } from "react-native";
 
 type BusinessBookingFilter = "upcoming" | "past" | "cancelled";
@@ -48,27 +49,29 @@ type BusinessBooking = {
   };
 };
 
-const BUSINESS_BOOKING_TABS: AppTabPillItem<BusinessBookingFilter>[] = [
-  { label: "Upcoming", value: "upcoming" },
-  { label: "Past", value: "past" },
-  { label: "Cancelled", value: "cancelled" },
-];
 
 const UPCOMING_STATUSES: BookingStatus[] = ["pending", "confirmed", "active"];
 const PAST_STATUSES: BookingStatus[] = ["completed", "past"];
 const CANCELLED_STATUSES: BookingStatus[] = ["cancelled"];
 
-function getClientName(booking: BusinessBooking): string {
+function getClientName(booking: BusinessBooking, fallback: string): string {
   const p = booking.user?.profile;
   if (p?.firstName || p?.lastName) {
     return [p.firstName, p.lastName].filter(Boolean).join(" ");
   }
-  return booking.user?.email ?? "Client";
+  return booking.user?.email ?? fallback;
 }
 
 export default function BusinessBookingsScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+  const { t } = useTranslation();
+
+  const BUSINESS_BOOKING_TABS: AppTabPillItem<BusinessBookingFilter>[] = [
+    { label: t("businessBookings.tabUpcoming"), value: "upcoming" },
+    { label: t("businessBookings.tabPast"), value: "past" },
+    { label: t("businessBookings.tabCancelled"), value: "cancelled" },
+  ];
 
   const user = useAuthStore((s) => s.user);
   const businessId = user?.activeBusinessId ?? null;
@@ -115,17 +118,17 @@ export default function BusinessBookingsScreen() {
     return CANCELLED_STATUSES.includes(booking.status);
   });
 
-  const emptyState = getEmptyState(activeFilter);
+  const emptyState = getEmptyState(activeFilter, t);
 
   return (
     <View style={styles.container}>
       <ScreenHeader
-        title="Bookings"
-        titleSubtitle="Manage upcoming and past bookings for your business."
+        title={t("businessBookings.title")}
+        titleSubtitle={t("businessBookings.subtitle")}
         onBack={() => router.back()}
       />
 
-      {fetchError && <NetworkErrorBanner message={fetchError.isNetworkError ? "No internet connection" : "Failed to load bookings"} />}
+      {fetchError && <NetworkErrorBanner message={fetchError.isNetworkError ? t("home.errorNoInternet") : t("businessBookings.errorBanner")} />}
 
       {isLoading ? (
         <View style={styles.loaderWrap}>
@@ -134,13 +137,13 @@ export default function BusinessBookingsScreen() {
       ) : fetchError ? (
         <View style={styles.loaderWrap}>
           <AppEmptyState
-            title={fetchError.isNetworkError ? "No internet connection" : "Something went wrong"}
+            title={fetchError.isNetworkError ? t("home.errorNoInternet") : t("home.errorSomethingWrong")}
             description={
               fetchError.isNetworkError
-                ? "Check your connection and try again."
-                : "Couldn't load bookings. Please try again."
+                ? t("home.errorNoInternetDesc")
+                : t("businessBookings.errorDesc")
             }
-            actionLabel="Try again"
+            actionLabel={t("home.errorTryAgain")}
             onPressAction={() => { void loadBookings(); }}
           />
         </View>
@@ -170,15 +173,15 @@ export default function BusinessBookingsScreen() {
               {filteredBookings.map((booking) => (
                 <BookingPreviewCard
                   key={String(booking.id)}
-                  businessName={getClientName(booking)}
-                  serviceName={booking.service?.name ?? "Service"}
-                  specialistName={booking.professional?.name ?? "Any specialist"}
+                  businessName={getClientName(booking, t("businessBookings.fallbackClient"))}
+                  serviceName={booking.service?.name ?? t("businessBookings.fallbackService")}
+                  specialistName={booking.professional?.name ?? t("businessBookings.fallbackSpecialist")}
                   date={booking.date}
                   time={booking.startTime?.slice(0, 5) ?? ""}
                   price={
                     booking.service?.price
                       ? `$${booking.service.price}`
-                      : "Price on request"
+                      : t("businessBookings.fallbackPrice")
                   }
                   status={booking.status}
                   isPast={activeFilter === "past"}
@@ -198,22 +201,22 @@ export default function BusinessBookingsScreen() {
   );
 }
 
-function getEmptyState(filter: BusinessBookingFilter) {
+function getEmptyState(filter: BusinessBookingFilter, t: (key: string) => string) {
   if (filter === "past") {
     return {
-      title: "No past bookings yet",
-      description: "Completed bookings will appear here.",
+      title: t("businessBookings.emptyPastTitle"),
+      description: t("businessBookings.emptyPastDesc"),
     };
   }
   if (filter === "cancelled") {
     return {
-      title: "No cancelled bookings",
-      description: "Cancelled customer bookings will appear here.",
+      title: t("businessBookings.emptyCancelledTitle"),
+      description: t("businessBookings.emptyCancelledDesc"),
     };
   }
   return {
-    title: "No upcoming bookings",
-    description: "New customer bookings will appear here once clients book your services.",
+    title: t("businessBookings.emptyUpcomingTitle"),
+    description: t("businessBookings.emptyUpcomingDesc"),
   };
 }
 

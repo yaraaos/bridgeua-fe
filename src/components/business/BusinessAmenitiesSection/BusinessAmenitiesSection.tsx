@@ -1,6 +1,7 @@
 import type { BusinessAmenity } from "@/src/features/businesses/types/business.types";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { Ionicons } from "@expo/vector-icons";
+import { useTranslation } from "react-i18next";
 import { Text, View } from "react-native";
 import { createStyles } from "./BusinessAmenitiesSection.styles";
 
@@ -25,12 +26,13 @@ const amenityIcons: Record<
 export default function BusinessAmenitiesSection({ amenities }: Props) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+  const { t } = useTranslation();
 
   if (!amenities?.length) return null;
 
   return (
     <View style={styles.card}>
-      <Text style={styles.title}>Amenities</Text>
+      <Text style={styles.title}>{t("business.amenities")}</Text>
 
       <View style={styles.grid}>
         {amenities.map((amenity) => (

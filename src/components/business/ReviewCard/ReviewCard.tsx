@@ -13,6 +13,7 @@ import { formatRelativeTime } from "@/src/utils/formatRelativeTime";
 import { MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   GestureResponderEvent,
   Image,
@@ -81,6 +82,7 @@ export default function ReviewCard({
 }: Props) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+  const { t } = useTranslation();
   const { isAuthModalVisible, closeAuthModal, confirmAuthModal, requireAuth } =
     useRequireAuth();
 
@@ -270,7 +272,7 @@ export default function ReviewCard({
                     </View>
 
                     {review.isEdited ? (
-                      <Text style={styles.profileReviewDate}>Edited</Text>
+                      <Text style={styles.profileReviewDate}>{t("reviewCard.edited")}</Text>
                     ) : null}
 
                     <Text style={styles.profileReviewDate}>
@@ -307,7 +309,7 @@ export default function ReviewCard({
                           color={colors.primaryGreen}
                         />
                         <Text style={styles.profileActionsMenuText}>
-                          Edit review
+                          {t("reviewCard.editAction")}
                         </Text>
                       </Pressable>
 
@@ -326,7 +328,7 @@ export default function ReviewCard({
                             { color: colors.error },
                           ]}
                         >
-                          Delete review
+                          {t("reviewCard.deleteAction")}
                         </Text>
                       </Pressable>
                     </View>
@@ -359,7 +361,7 @@ export default function ReviewCard({
                       }}
                     >
                       <Text style={styles.moreText}>
-                        {isExpanded ? "Show less" : "Read more"}
+                        {isExpanded ? t("reviewCard.showLess") : t("reviewCard.readMore")}
                       </Text>
                     </Pressable>
                   ) : null}
@@ -511,7 +513,7 @@ export default function ReviewCard({
                 {!isVariantPreview ? (
                   <>
                     {review.isEdited ? (
-                      <Text style={styles.reviewDate}>Edited</Text>
+                      <Text style={styles.reviewDate}>{t("reviewCard.edited")}</Text>
                     ) : null}
 
                     <Text style={styles.reviewDate}>
@@ -536,7 +538,7 @@ export default function ReviewCard({
                   style={styles.moreButton}
                   onPress={() => onPressMore?.(businessReview.id)}
                 >
-                  <Text style={styles.moreText}>More</Text>
+                  <Text style={styles.moreText}>{t("reviewCard.more")}</Text>
                 </Pressable>
               ) : shouldShowReadMore ? (
                 <Pressable
@@ -554,7 +556,7 @@ export default function ReviewCard({
                   }}
                 >
                   <Text style={styles.moreText}>
-                    {isExpanded ? "Show less" : "Read more"}
+                    {isExpanded ? t("reviewCard.showLess") : t("reviewCard.readMore")}
                   </Text>
                 </Pressable>
               ) : null}

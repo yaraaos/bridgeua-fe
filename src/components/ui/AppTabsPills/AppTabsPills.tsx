@@ -33,7 +33,11 @@ export default function AppTabsPills<T extends string>({
             onPress={() => onChange(tab.value)}
             style={[styles.tab, isActive && styles.tabActive]}
           >
-            <Text style={[styles.label, isActive && styles.labelActive]}>
+            <Text
+              style={[styles.label, isActive && styles.labelActive]}
+              numberOfLines={1}
+              adjustsFontSizeToFit
+            >
               {tab.label}
             </Text>
           </Pressable>

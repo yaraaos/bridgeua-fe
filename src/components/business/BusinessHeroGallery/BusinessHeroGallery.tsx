@@ -1,6 +1,7 @@
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import type { BusinessDetailsImage } from "@/src/features/businesses/types/business.types";
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Image, Pressable, Text, View } from "react-native";
 import { createStyles } from "./BusinessHeroGallery.styles";
 
@@ -17,6 +18,7 @@ export default function BusinessHeroGallery({
 }: Props) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+  const { t } = useTranslation();
 
   const mainImage = images[0];
   const sideImages = images.slice(1, 3);
@@ -48,7 +50,7 @@ export default function BusinessHeroGallery({
 
               {isLastVisibleImage ? (
                 <Pressable style={styles.viewAllOverlay} onPress={onPressViewAll}>
-                  <Text style={styles.viewAllText}>View all</Text>
+                  <Text style={styles.viewAllText}>{t("business.viewAll")}</Text>
                 </Pressable>
               ) : null}
             </Pressable>

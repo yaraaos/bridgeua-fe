@@ -13,6 +13,7 @@ import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { spacing } from "@/src/constants/spacing";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Alert,
   ScrollView,
@@ -25,6 +26,7 @@ export default function AdminUserDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+  const { t } = useTranslation();
 
   const [user, setUser] = useState<AdminUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -73,9 +75,9 @@ export default function AdminUserDetailScreen() {
           }
         }
       })
-      .catch(() => Alert.alert("Error", "Failed to load user"))
+      .catch(() => Alert.alert(t("common.error"), t("admin.userDetail.errorLoad")))
       .finally(() => setIsLoading(false));
-  }, [id]);
+  }, [id, t]);
 
   const handleSave = async () => {
     try {
@@ -92,9 +94,9 @@ export default function AdminUserDetailScreen() {
       const updated = await updateAdminUser(Number(id), payload as any);
       setUser(updated);
       setPassword("");
-      Alert.alert("Saved", "User updated successfully");
+      Alert.alert(t("admin.userDetail.saveSuccess"), t("admin.userDetail.saveSuccessMessage"));
     } catch (err: any) {
-      Alert.alert("Error", err?.message ?? "Failed to save");
+      Alert.alert(t("common.error"), err?.message ?? t("admin.userDetail.errorSave"));
     } finally {
       setIsSaving(false);
     }
@@ -115,27 +117,27 @@ export default function AdminUserDetailScreen() {
         onBack={() => router.back()}
       />
       <ScrollView contentContainerStyle={styles.container}>
-        <AppText style={styles.sectionTitle}>Account</AppText>
+        <AppText style={styles.sectionTitle}>{t("admin.userDetail.sectionAccount")}</AppText>
 
-        <AppText style={styles.label}>Email</AppText>
+        <AppText style={styles.label}>{t("admin.userDetail.labelEmail")}</AppText>
         <AppInput
           value={email}
           onChangeText={setEmail}
-          placeholder="Email"
+          placeholder={t("admin.userDetail.placeholderEmail")}
           keyboardType="email-address"
           autoCapitalize="none"
         />
 
-        <AppText style={styles.label}>New password (leave blank to keep)</AppText>
+        <AppText style={styles.label}>{t("admin.userDetail.labelPassword")}</AppText>
         <AppInput
           value={password}
           onChangeText={setPassword}
-          placeholder="New password"
+          placeholder={t("admin.userDetail.placeholderPassword")}
           secureTextEntry
         />
 
         <View style={styles.switchRow}>
-          <AppText style={styles.label}>Admin</AppText>
+          <AppText style={styles.label}>{t("admin.userDetail.labelAdmin")}</AppText>
           <Switch
             value={isAdmin}
             onValueChange={setIsAdmin}
@@ -145,23 +147,23 @@ export default function AdminUserDetailScreen() {
 
         {user.accountType === "personal" && (
           <>
-            <AppText style={styles.sectionTitle}>Profile</AppText>
-            <AppText style={styles.label}>First name</AppText>
-            <AppInput value={firstName} onChangeText={setFirstName} placeholder="First name" />
-            <AppText style={styles.label}>Last name</AppText>
-            <AppInput value={lastName} onChangeText={setLastName} placeholder="Last name" />
-            <AppText style={styles.label}>Username</AppText>
+            <AppText style={styles.sectionTitle}>{t("admin.userDetail.sectionProfile")}</AppText>
+            <AppText style={styles.label}>{t("admin.userDetail.labelFirstName")}</AppText>
+            <AppInput value={firstName} onChangeText={setFirstName} placeholder={t("admin.userDetail.placeholderFirstName")} />
+            <AppText style={styles.label}>{t("admin.userDetail.labelLastName")}</AppText>
+            <AppInput value={lastName} onChangeText={setLastName} placeholder={t("admin.userDetail.placeholderLastName")} />
+            <AppText style={styles.label}>{t("admin.userDetail.labelUsername")}</AppText>
             <AppInput
               value={username}
               onChangeText={setUsername}
-              placeholder="Username"
+              placeholder={t("admin.userDetail.placeholderUsername")}
               autoCapitalize="none"
             />
-            <AppText style={styles.label}>Phone</AppText>
+            <AppText style={styles.label}>{t("admin.userDetail.labelPhone")}</AppText>
             <AppInput
               value={phoneNumber}
               onChangeText={setPhoneNumber}
-              placeholder="Phone number"
+              placeholder={t("admin.userDetail.placeholderPhone")}
               keyboardType="phone-pad"
             />
           </>
@@ -169,25 +171,25 @@ export default function AdminUserDetailScreen() {
 
         {user.accountType === "business" && (
           <>
-            <AppText style={styles.sectionTitle}>Business</AppText>
-            <AppText style={styles.label}>Business name</AppText>
-            <AppInput value={businessName} onChangeText={setBusinessName} placeholder="Business name" />
-            <AppText style={styles.label}>Address</AppText>
-            <AppInput value={address} onChangeText={setAddress} placeholder="Address" />
-            <AppText style={styles.label}>City</AppText>
-            <AppInput value={city} onChangeText={setCity} placeholder="City" />
-            <AppText style={styles.label}>State</AppText>
-            <AppInput value={state} onChangeText={setState} placeholder="State" />
-            <AppText style={styles.label}>ZIP</AppText>
-            <AppInput value={zipCode} onChangeText={setZipCode} placeholder="ZIP code" />
-            <AppText style={styles.label}>Cuisine</AppText>
-            <AppInput value={cuisine} onChangeText={setCuisine} placeholder="Cuisine" />
+            <AppText style={styles.sectionTitle}>{t("admin.userDetail.sectionBusiness")}</AppText>
+            <AppText style={styles.label}>{t("admin.userDetail.labelBusinessName")}</AppText>
+            <AppInput value={businessName} onChangeText={setBusinessName} placeholder={t("admin.userDetail.placeholderBusinessName")} />
+            <AppText style={styles.label}>{t("admin.userDetail.labelAddress")}</AppText>
+            <AppInput value={address} onChangeText={setAddress} placeholder={t("admin.userDetail.placeholderAddress")} />
+            <AppText style={styles.label}>{t("admin.userDetail.labelCity")}</AppText>
+            <AppInput value={city} onChangeText={setCity} placeholder={t("admin.userDetail.placeholderCity")} />
+            <AppText style={styles.label}>{t("admin.userDetail.labelState")}</AppText>
+            <AppInput value={state} onChangeText={setState} placeholder={t("admin.userDetail.placeholderState")} />
+            <AppText style={styles.label}>{t("admin.userDetail.labelZip")}</AppText>
+            <AppInput value={zipCode} onChangeText={setZipCode} placeholder={t("admin.userDetail.placeholderZip")} />
+            <AppText style={styles.label}>{t("admin.userDetail.labelCuisine")}</AppText>
+            <AppInput value={cuisine} onChangeText={setCuisine} placeholder={t("admin.userDetail.placeholderCuisine")} />
           </>
         )}
 
         <View style={styles.saveBtn}>
           <AppButton
-            title={isSaving ? "Saving..." : "Save changes"}
+            title={isSaving ? t("admin.userDetail.savingButton") : t("admin.userDetail.saveButton")}
             onPress={handleSave}
             disabled={isSaving}
           />

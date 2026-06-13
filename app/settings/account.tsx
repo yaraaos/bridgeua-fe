@@ -10,6 +10,7 @@ import { useAuthStore } from "@/src/store/auth.store";
 import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
   Alert,
@@ -49,6 +50,7 @@ export default function AccountScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
   const router = useRouter();
+  const { t } = useTranslation();
 
   const accountType = useAuthStore((state) => state.user?.accountType);
 
@@ -95,7 +97,7 @@ export default function AccountScreen() {
       });
     } catch (err: unknown) {
       Alert.alert(
-        "Could not update email",
+        t("settingsAccount.changeEmail.errorAlert"),
         err instanceof Error ? err.message : "Please try again later.",
       );
     } finally {
@@ -105,11 +107,11 @@ export default function AccountScreen() {
 
   async function handleUpdatePassword() {
     if (newPassword.length < 8) {
-      setPasswordError("Password must be at least 8 characters.");
+      setPasswordError(t("settingsAccount.changePassword.lengthError"));
       return;
     }
     if (newPassword !== confirmPassword) {
-      setPasswordError("Passwords do not match.");
+      setPasswordError(t("settingsAccount.changePassword.mismatchError"));
       return;
     }
     setPasswordError(null);
@@ -119,12 +121,12 @@ export default function AccountScreen() {
         currentPassword,
         newPassword,
       });
-      Alert.alert("Password updated successfully");
+      Alert.alert(t("settingsAccount.changePassword.successAlert"));
       resetPasswordForm();
       setPasswordOpen(false);
     } catch (err: unknown) {
       Alert.alert(
-        "Could not update password",
+        t("settingsAccount.changePassword.errorAlert"),
         err instanceof Error ? err.message : "Please try again later.",
       );
     } finally {
@@ -134,12 +136,12 @@ export default function AccountScreen() {
 
   function handleDeleteAccount() {
     Alert.alert(
-      "Delete account?",
-      "This will permanently delete your account and all your data. This cannot be undone.",
+      t("settingsAccount.deleteAccount.alertTitle"),
+      t("settingsAccount.deleteAccount.alertMessage"),
       [
-        { text: "Cancel", style: "cancel" },
+        { text: t("settingsAccount.deleteAccount.cancel"), style: "cancel" },
         {
-          text: "Delete",
+          text: t("settingsAccount.deleteAccount.confirm"),
           style: "destructive",
           onPress: async () => {
             try {
@@ -154,7 +156,7 @@ export default function AccountScreen() {
               router.replace("/auth/sign-in");
             } catch (err: unknown) {
               Alert.alert(
-                "Could not delete account",
+                t("settingsAccount.deleteAccount.errorAlert"),
                 err instanceof Error ? err.message : "Please try again later.",
               );
             }
@@ -167,8 +169,8 @@ export default function AccountScreen() {
   return (
     <View style={styles.safeArea}>
       <ScreenHeader
-        title="Account & Security"
-        titleSubtitle="Manage your credentials"
+        title={t("account.title")}
+        titleSubtitle={t("account.subtitle")}
         onBack={() => router.back()}
       />
 
@@ -177,9 +179,7 @@ export default function AccountScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Credentials */}
-        <SettingsSection label="Credentials">
-          {/* Change Email */}
+        <SettingsSection label={t("account.sections.credentials")}>
           <Pressable
             style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}
             onPress={() => {
@@ -191,8 +191,8 @@ export default function AccountScreen() {
               <Feather name="mail" size={18} color={colors.primaryGreen} />
             </View>
             <View style={styles.rowContent}>
-              <Text style={styles.rowTitle}>Change Email</Text>
-              <Text style={styles.rowSubtitle}>Update your email address</Text>
+              <Text style={styles.rowTitle}>{t("settingsAccount.changeEmail.title")}</Text>
+              <Text style={styles.rowSubtitle}>{t("settingsAccount.changeEmail.subtitle")}</Text>
             </View>
             <Feather
               name={emailOpen ? "chevron-up" : "chevron-down"}
@@ -205,7 +205,7 @@ export default function AccountScreen() {
             <View style={styles.formPanel}>
               <ClearableInput
                 style={styles.input}
-                placeholder="Current password"
+                placeholder={t("settingsAccount.changeEmail.currentPasswordPlaceholder")}
                 placeholderTextColor={colors.textMuted}
                 secureTextEntry
                 value={emailCurrentPassword}
@@ -214,7 +214,7 @@ export default function AccountScreen() {
               />
               <ClearableInput
                 style={styles.input}
-                placeholder="New email address"
+                placeholder={t("settingsAccount.changeEmail.newEmailPlaceholder")}
                 placeholderTextColor={colors.textMuted}
                 keyboardType="email-address"
                 autoCapitalize="none"
@@ -235,7 +235,7 @@ export default function AccountScreen() {
                 {emailLoading ? (
                   <ActivityIndicator size="small" color={colors.white} />
                 ) : (
-                  <Text style={styles.submitBtnText}>Update Email</Text>
+                  <Text style={styles.submitBtnText}>{t("settingsAccount.changeEmail.updateButton")}</Text>
                 )}
               </Pressable>
             </View>
@@ -243,7 +243,6 @@ export default function AccountScreen() {
 
           <View style={styles.divider} />
 
-          {/* Change Password */}
           <Pressable
             style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}
             onPress={() => {
@@ -255,8 +254,8 @@ export default function AccountScreen() {
               <Feather name="lock" size={18} color={colors.primaryGreen} />
             </View>
             <View style={styles.rowContent}>
-              <Text style={styles.rowTitle}>Change Password</Text>
-              <Text style={styles.rowSubtitle}>Update your password</Text>
+              <Text style={styles.rowTitle}>{t("settingsAccount.changePassword.title")}</Text>
+              <Text style={styles.rowSubtitle}>{t("settingsAccount.changePassword.subtitle")}</Text>
             </View>
             <Feather
               name={passwordOpen ? "chevron-up" : "chevron-down"}
@@ -269,7 +268,7 @@ export default function AccountScreen() {
             <View style={styles.formPanel}>
               <ClearableInput
                 style={styles.input}
-                placeholder="Current password"
+                placeholder={t("settingsAccount.changePassword.currentPasswordPlaceholder")}
                 placeholderTextColor={colors.textMuted}
                 secureTextEntry
                 value={currentPassword}
@@ -278,7 +277,7 @@ export default function AccountScreen() {
               />
               <ClearableInput
                 style={styles.input}
-                placeholder="New password"
+                placeholder={t("settingsAccount.changePassword.newPasswordPlaceholder")}
                 placeholderTextColor={colors.textMuted}
                 secureTextEntry
                 value={newPassword}
@@ -290,7 +289,7 @@ export default function AccountScreen() {
               />
               <ClearableInput
                 style={styles.input}
-                placeholder="Confirm new password"
+                placeholder={t("settingsAccount.changePassword.confirmPasswordPlaceholder")}
                 placeholderTextColor={colors.textMuted}
                 secureTextEntry
                 value={confirmPassword}
@@ -314,16 +313,15 @@ export default function AccountScreen() {
                 {passwordLoading ? (
                   <ActivityIndicator size="small" color={colors.white} />
                 ) : (
-                  <Text style={styles.submitBtnText}>Update Password</Text>
+                  <Text style={styles.submitBtnText}>{t("settingsAccount.changePassword.updateButton")}</Text>
                 )}
               </Pressable>
             </View>
           )}
         </SettingsSection>
 
-        {/* Business Details */}
         {accountType === "business" && (
-          <SettingsSection label="Business Details">
+          <SettingsSection label={t("account.sections.businessDetails")}>
             <Pressable
               style={({ pressed }) => [
                 styles.row,
@@ -343,9 +341,9 @@ export default function AccountScreen() {
                 />
               </View>
               <View style={styles.rowContent}>
-                <Text style={styles.rowTitle}>Change Business Name</Text>
+                <Text style={styles.rowTitle}>{t("settingsAccount.businessName.title")}</Text>
                 <Text style={styles.rowSubtitle}>
-                  Request a name change for your business
+                  {t("settingsAccount.businessName.subtitle")}
                 </Text>
               </View>
               <Feather
@@ -372,9 +370,9 @@ export default function AccountScreen() {
                 <Feather name="grid" size={18} color={colors.primaryGreen} />
               </View>
               <View style={styles.rowContent}>
-                <Text style={styles.rowTitle}>Change Business Category</Text>
+                <Text style={styles.rowTitle}>{t("settingsAccount.businessCategory.title")}</Text>
                 <Text style={styles.rowSubtitle}>
-                  Request a category change for your business
+                  {t("settingsAccount.businessCategory.subtitle")}
                 </Text>
               </View>
               <Feather
@@ -386,7 +384,6 @@ export default function AccountScreen() {
           </SettingsSection>
         )}
 
-        {/* Danger Zone */}
         <View style={styles.dangerSection}>
           <Pressable
             style={({ pressed }) => [
@@ -396,7 +393,7 @@ export default function AccountScreen() {
             onPress={handleDeleteAccount}
           >
             <Feather name="trash-2" size={18} color={colors.error} />
-            <Text style={styles.deleteBtnText}>Delete Account</Text>
+            <Text style={styles.deleteBtnText}>{t("settingsAccount.deleteAccount.button")}</Text>
           </Pressable>
         </View>
       </ScrollView>

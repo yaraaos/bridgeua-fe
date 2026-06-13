@@ -15,16 +15,18 @@ import { useTeamStore } from "@/src/store/team.store";
 import type { TeamMember } from "@/src/types/team";
 import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import { useCallback, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { FlatList, StyleSheet, View } from "react-native";
-
-const MEMBER_TABS = [
-  { label: "Services", value: "services" },
-  { label: "Bookings", value: "bookings" },
-] satisfies AppTabPillItem<"services" | "bookings">[];
 
 export default function TeamMemberScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+  const { t } = useTranslation();
+
+  const MEMBER_TABS = [
+    { label: t("teamMember.tabServices"), value: "services" },
+    { label: t("teamMember.tabBookings"), value: "bookings" },
+  ] satisfies AppTabPillItem<"services" | "bookings">[];
   const { memberId } = useLocalSearchParams<{ memberId?: string }>();
   const { members, setMembers } = useTeamStore();
   const { business } = useMyBusinessProfile();
@@ -87,7 +89,7 @@ export default function TeamMemberScreen() {
             marginTop: 40,
           }}
         >
-          Team member not found.
+          {t("teamMember.notFound")}
         </AppText>
       </AppScreen>
     );
@@ -103,7 +105,7 @@ export default function TeamMemberScreen() {
     <AppScreen withTopInset={false} style={{ padding: 0 }}>
       <ScreenHeader
         title={`${member.firstName} ${member.lastName}`}
-        titleSubtitle="Team member"
+        titleSubtitle={t("teamMember.subtitle")}
         onBack={() => router.back()}
       />
 
@@ -118,8 +120,8 @@ export default function TeamMemberScreen() {
       {activeTab === "services" ? (
         assignedServices.length === 0 ? (
           <AppEmptyState
-            title="No services assigned"
-            description="This team member has no services assigned yet."
+            title={t("teamMember.emptyServices")}
+            description={t("teamMember.emptyServicesDesc")}
           />
         ) : (
           <FlatList
@@ -131,12 +133,12 @@ export default function TeamMemberScreen() {
                 <AppText style={styles.serviceName}>{item.name}</AppText>
                 <AppText style={styles.serviceMeta}>
                   {item.durationMinutes
-                    ? `${item.durationMinutes} min`
+                    ? `${item.durationMinutes} ${t("teamMember.minutes")}`
                     : (item.duration ?? "")}
                   {item.price != null
                     ? ` · $${item.price}`
                     : item.priceFrom
-                      ? ` · from ${item.priceFrom}`
+                      ? ` · ${t("teamMember.priceFrom")} ${item.priceFrom}`
                       : ""}
                 </AppText>
               </View>
@@ -145,8 +147,8 @@ export default function TeamMemberScreen() {
         )
       ) : (
         <AppEmptyState
-          title="No bookings yet"
-          description="Bookings for this team member will appear here."
+          title={t("teamMember.emptyBookings")}
+          description={t("teamMember.emptyBookingsDesc")}
         />
       )}
     </AppScreen>
