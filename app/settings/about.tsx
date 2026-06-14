@@ -5,8 +5,8 @@ import { spacing } from "@/src/constants/spacing";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import Constants from "expo-constants";
 import { useRouter } from "expo-router";
+import { useTranslation } from "react-i18next";
 import {
-  Linking,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -18,12 +18,13 @@ export default function AboutScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
   const router = useRouter();
+  const { t } = useTranslation();
 
   const version = Constants.expoConfig?.version ?? "1.0.0";
 
   return (
     <View style={styles.safeArea}>
-      <ScreenHeader title="About" onBack={() => router.back()} />
+      <ScreenHeader title={t("about.title")} onBack={() => router.back()} />
 
       <ScrollView
         style={styles.scroll}
@@ -32,10 +33,8 @@ export default function AboutScreen() {
       >
         <View style={styles.hero}>
           <Text style={styles.appName}>BridgeUA</Text>
-          <Text style={styles.version}>Version {version}</Text>
-          <Text style={styles.tagline}>
-            Connecting Ukrainian communities with local businesses.
-          </Text>
+          <Text style={styles.version}>{t("about.version", { version })}</Text>
+          <Text style={styles.tagline}>{t("about.tagline")}</Text>
         </View>
 
         <View style={styles.section}>
@@ -47,7 +46,7 @@ export default function AboutScreen() {
               ]}
               onPress={() => router.push("/settings/privacy")}
             >
-              <Text style={styles.rowTitle}>Privacy Policy</Text>
+              <Text style={styles.rowTitle}>{t("about.privacyPolicy")}</Text>
               <Text style={styles.rowChevron}>›</Text>
             </Pressable>
             <View style={styles.divider} />
@@ -58,14 +57,14 @@ export default function AboutScreen() {
               ]}
               onPress={() => router.push("/settings/terms")}
             >
-              <Text style={styles.rowTitle}>Terms of Service</Text>
+              <Text style={styles.rowTitle}>{t("about.termsOfService")}</Text>
               <Text style={styles.rowChevron}>›</Text>
             </Pressable>
           </View>
         </View>
 
         <Text style={styles.copyright}>
-          © {new Date().getFullYear()} BridgeUA. All rights reserved.
+          {t("about.copyright", { year: new Date().getFullYear() })}
         </Text>
       </ScrollView>
     </View>

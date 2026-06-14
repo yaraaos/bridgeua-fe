@@ -2,6 +2,7 @@ import { Feather, Ionicons } from "@expo/vector-icons";
 import { usePreventRemove } from '@react-navigation/core';
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { Animated, Alert, Pressable, StyleSheet, View } from "react-native";
 
 import EditAboutTab from "@/src/components/editBusiness/EditAboutTab";
@@ -22,17 +23,18 @@ import {
   useEditBusinessStore,
 } from "@/src/store/editBusiness.store";
 
-const TABS: AppTabPillItem<EditBusinessTab>[] = [
-  { label: "Overview", value: "overview" },
-  { label: "Gallery", value: "gallery" },
-  { label: "Services", value: "services" },
-  { label: "About", value: "about" },
-];
-
 export default function EditBusinessScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+  const { t } = useTranslation();
   const { business } = useMyBusinessProfile();
+
+  const TABS: AppTabPillItem<EditBusinessTab>[] = [
+    { label: t("edit.tabOverview"), value: "overview" },
+    { label: t("edit.tabGallery"), value: "gallery" },
+    { label: t("edit.tabServices"), value: "services" },
+    { label: t("edit.tabAbout"), value: "about" },
+  ];
 
   const { tab } = useLocalSearchParams<{ tab?: string }>();
 
@@ -127,14 +129,14 @@ export default function EditBusinessScreen() {
     return () => pulse.stop();
   }, [hasUnsaved, pulseAnim]);
 
-  usePreventRemove(hasUnsaved, ({ data }) => {
+  usePreventRemove(hasUnsaved, () => {
     Alert.alert(
-      'Unsaved changes',
-      'You have unsaved changes. Are you sure you want to leave?',
+      t("edit.unsavedTitle"),
+      t("edit.unsavedMessage"),
       [
-        { text: 'Stay', style: 'cancel' },
+        { text: t("edit.unsavedStay"), style: 'cancel' },
         {
-          text: 'Leave',
+          text: t("edit.unsavedLeave"),
           style: 'destructive',
           onPress: () => {
             resetAll();
@@ -148,12 +150,12 @@ export default function EditBusinessScreen() {
   function handleBack() {
     if (hasUnsaved) {
       Alert.alert(
-        "Unsaved changes",
-        "You have unsaved changes. Are you sure you want to leave?",
+        t("edit.unsavedTitle"),
+        t("edit.unsavedMessage"),
         [
-          { text: "Stay", style: "cancel" },
+          { text: t("edit.unsavedStay"), style: "cancel" },
           {
-            text: "Leave",
+            text: t("edit.unsavedLeave"),
             style: "destructive",
             onPress: () => {
               resetAll();
@@ -183,7 +185,7 @@ export default function EditBusinessScreen() {
           <Ionicons name="chevron-back" size={28} color={colors.textPrimary} />
         </Pressable>
 
-        <AppText pointerEvents="none" style={styles.headerTitle}>Edit Business</AppText>
+        <AppText pointerEvents="none" style={styles.headerTitle}>{t("edit.title")}</AppText>
 
         <Pressable
           onPress={handlePreview}
@@ -192,7 +194,7 @@ export default function EditBusinessScreen() {
         >
           <View style={styles.previewButtonInner}>
             <AppText style={[styles.previewLabel, !hasUnsaved && styles.previewLabelHidden]}>
-              Preview
+              {t("edit.preview")}
             </AppText>
             <Animated.View style={{ transform: [{ scale: pulseAnim }] }}>
               <Feather

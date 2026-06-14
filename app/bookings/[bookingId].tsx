@@ -10,6 +10,7 @@ import { ENDPOINTS } from "@/src/services/api/endpoints";
 import { useBookingsStore } from "@/src/store/bookings.store";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Alert, ScrollView, StyleSheet, View } from "react-native";
 
 type ApiBooking = {
@@ -29,6 +30,7 @@ type ApiBooking = {
 export default function BookingDetailsScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+  const { t } = useTranslation();
 
   const { bookingId } = useLocalSearchParams<{ bookingId?: string }>();
 
@@ -60,12 +62,12 @@ export default function BookingDetailsScreen() {
 
   const handleCancel = () => {
     Alert.alert(
-      "Cancel booking",
-      "Are you sure you want to cancel this appointment?",
+      t("bookings.cancelTitle"),
+      t("bookings.cancelMessage"),
       [
-        { text: "No", style: "cancel" },
+        { text: t("common.cancel"), style: "cancel" },
         {
-          text: "Yes, cancel",
+          text: t("bookings.cancelConfirm"),
           style: "destructive",
           onPress: async () => {
             setIsCancelling(true);
@@ -74,21 +76,19 @@ export default function BookingDetailsScreen() {
                 status: "cancelled",
               });
 
-              // Update local store if booking is there
               if (storedBooking) {
                 updateBookingStatus(String(bookingId), "cancelled");
               }
 
-              // Update local API booking state
               if (apiBooking) {
                 setApiBooking({ ...apiBooking, status: "cancelled" });
               }
 
-              Alert.alert("Cancelled", "Your booking has been cancelled.", [
-                { text: "OK", onPress: () => router.back() },
+              Alert.alert(t("bookings.cancelSuccess"), t("bookings.cancelSuccessMessage"), [
+                { text: t("common.ok"), onPress: () => router.back() },
               ]);
             } catch {
-              Alert.alert("Error", "Could not cancel the booking. Please try again.");
+              Alert.alert(t("common.error"), t("bookings.cancelError"));
             } finally {
               setIsCancelling(false);
             }
@@ -113,8 +113,8 @@ export default function BookingDetailsScreen() {
     return (
       <View style={styles.safeArea}>
         <ScreenHeader
-          title="Appointment details"
-          titleSubtitle="Review the details of your upcoming booking."
+          title={t("bookings.appointmentDetails")}
+          titleSubtitle={t("bookings.appointmentSubtitle")}
           onBack={() => router.back()}
         />
         <ScrollView
@@ -140,7 +140,7 @@ export default function BookingDetailsScreen() {
 
           {canCancel && (
             <AppButton
-              title={isCancelling ? "Cancelling..." : "Cancel booking"}
+              title={isCancelling ? t("bookings.cancellingButton") : t("bookings.cancelButton")}
               variant="secondary"
               disabled={isCancelling}
               onPress={handleCancel}
@@ -161,8 +161,8 @@ export default function BookingDetailsScreen() {
     return (
       <View style={styles.safeArea}>
         <ScreenHeader
-          title="Appointment details"
-          titleSubtitle="Review the details of your upcoming booking."
+          title={t("bookings.appointmentDetails")}
+          titleSubtitle={t("bookings.appointmentSubtitle")}
           onBack={() => router.back()}
         />
         <ScrollView
@@ -171,12 +171,12 @@ export default function BookingDetailsScreen() {
           showsVerticalScrollIndicator={false}
         >
           <BookingSummaryCard
-            businessName={apiBooking.business?.name ?? "Business"}
-            serviceName={apiBooking.service?.name ?? "Service"}
-            specialistName={apiBooking.professional?.name ?? "Any specialist"}
+            businessName={apiBooking.business?.name ?? t("bookings.fallbackBusiness")}
+            serviceName={apiBooking.service?.name ?? t("bookings.fallbackService")}
+            specialistName={apiBooking.professional?.name ?? t("bookings.fallbackSpecialist")}
             date={apiBooking.date}
             time={apiBooking.startTime?.slice(0, 5) ?? ""}
-            price={apiBooking.service?.price ? `$${apiBooking.service.price}` : "Price on request"}
+            price={apiBooking.service?.price ? `$${apiBooking.service.price}` : t("bookings.priceOnRequest")}
             customerName={customerName}
             phoneNumber=""
             status={apiBooking.status as any}
@@ -184,7 +184,7 @@ export default function BookingDetailsScreen() {
 
           {canCancel && (
             <AppButton
-              title={isCancelling ? "Cancelling..." : "Cancel booking"}
+              title={isCancelling ? t("bookings.cancellingButton") : t("bookings.cancelButton")}
               variant="secondary"
               disabled={isCancelling}
               onPress={handleCancel}

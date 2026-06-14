@@ -4,6 +4,7 @@ import { useAuthStore } from "@/src/store/auth.store";
 import { useFollowingStore } from "@/src/store/following.store";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Pressable, StyleProp, Text, ViewStyle } from "react-native";
 import { createStyles } from "./FollowButton.styles";
 
@@ -22,6 +23,7 @@ export default function FollowButton({
 }: FollowButtonProps) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+  const { t } = useTranslation();
 
   const { isAuthModalVisible, closeAuthModal, confirmAuthModal, requireAuth } =
     useRequireAuth();
@@ -85,7 +87,7 @@ export default function FollowButton({
             useFilledStyle ? styles.buttonTextFilled : styles.buttonTextOutline,
           ]}
         >
-          {displayIsFollowing ? "Following" : "Follow"}
+          {displayIsFollowing ? t("follow.following") : t("follow.follow")}
         </Text>
       </Pressable>
 

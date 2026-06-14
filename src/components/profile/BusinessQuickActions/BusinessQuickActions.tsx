@@ -3,6 +3,7 @@ import { apiClient } from "@/src/services/api/client";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useRef, useState } from "react";
 import { Modal, Pressable, View } from "react-native";
+import { useTranslation } from "react-i18next";
 
 import AppButton from "@/src/components/ui/AppButton/AppButton";
 import AppText from "@/src/components/ui/AppText/AppText";
@@ -25,13 +26,28 @@ type Props = {
 };
 
 export default function BusinessQuickActions({
-  businessId,
   onActionPress,
 }: Props) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+  const { t } = useTranslation();
 
   const { business } = useMyBusinessProfile();
+
+  const actionLabels: Record<string, string> = {
+    "add-promo": t("quickActions.addPromo"),
+    "add-news": t("quickActions.addNews"),
+    "edit-business": t("quickActions.editBusiness"),
+    "edit-services": t("quickActions.editServices"),
+    "edit-gallery": t("quickActions.editGallery"),
+    "view-bookings": t("quickActions.viewBookings"),
+    "view-reviews": t("quickActions.viewReviews"),
+    "share-business": t("quickActions.shareBusiness"),
+    "view-public-profile": t("quickActions.publicProfile"),
+    "edit-team": t("quickActions.myTeam"),
+    "view-recommends": t("quickActions.recommends"),
+    "view-recommended-by": t("quickActions.recommendedBy"),
+  };
 
   const [selectedActions, setSelectedActions] = useState<QuickActionId[]>(
     DEFAULT_SELECTED_ACTIONS,
@@ -95,10 +111,10 @@ export default function BusinessQuickActions({
     <>
       <View style={styles.card}>
         <View style={styles.cardHeader}>
-          <AppText style={styles.cardTitle}>Quick actions</AppText>
+          <AppText style={styles.cardTitle}>{t("quickActions.title")}</AppText>
 
           <Pressable style={styles.editButton} onPress={openEdit}>
-            <AppText style={styles.editText}>Edit</AppText>
+            <AppText style={styles.editText}>{t("quickActions.edit")}</AppText>
           </Pressable>
         </View>
 
@@ -122,7 +138,7 @@ export default function BusinessQuickActions({
                 />
               </View>
 
-              <AppText style={styles.actionLabel}>{action.label}</AppText>
+              <AppText style={styles.actionLabel}>{actionLabels[action.id] ?? action.label}</AppText>
             </Pressable>
           ))}
         </View>
@@ -136,7 +152,7 @@ export default function BusinessQuickActions({
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalCard}>
-            <AppText style={styles.modalTitle}>Edit quick actions</AppText>
+            <AppText style={styles.modalTitle}>{t("quickActions.editTitle")}</AppText>
 
             <View style={styles.modalList}>
               {QUICK_ACTIONS.map((action) => {
@@ -156,7 +172,7 @@ export default function BusinessQuickActions({
                       />
 
                       <AppText style={styles.modalItemText}>
-                        {action.label}
+                        {actionLabels[action.id] ?? action.label}
                       </AppText>
                     </View>
 
@@ -175,14 +191,14 @@ export default function BusinessQuickActions({
             <View style={styles.modalActions}>
               <View style={styles.modalButton}>
                 <AppButton
-                  title="Cancel"
+                  title={t("quickActions.cancel")}
                   variant="secondary"
                   onPress={closeEdit}
                 />
               </View>
 
               <View style={styles.modalButton}>
-                <AppButton title="Save" onPress={handleSave} />
+                <AppButton title={t("quickActions.save")} onPress={handleSave} />
               </View>
             </View>
           </View>

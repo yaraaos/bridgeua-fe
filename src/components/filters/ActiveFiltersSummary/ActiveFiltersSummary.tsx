@@ -14,6 +14,7 @@ import type {
   RatingOption,
   SortOption,
 } from "@/src/store/filter.store";
+import { useTranslation } from "react-i18next";
 
 import { createStyles } from "./ActiveFiltersSummary.styles";
 
@@ -55,13 +56,22 @@ export default function ActiveFiltersSummary({
 }: Props) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+  const { t } = useTranslation();
+
+  const sortLabelMap: Record<string, string> = {
+    relevance: t("filterOptions.sortRelevance"),
+    distance: t("filterOptions.sortDistance"),
+    rating: t("filterOptions.sortRating"),
+    price_low: t("filterOptions.sortPriceLow"),
+    price_high: t("filterOptions.sortPriceHigh"),
+  };
 
   const chips: ActiveChip[] = [];
 
   if (sort !== "relevance") {
     chips.push({
       key: `sort-${sort}`,
-      label: getLabel(SORT_OPTIONS, sort),
+      label: sortLabelMap[sort] ?? getLabel(SORT_OPTIONS, sort),
       onRemove: onClearSort,
     });
   }
@@ -104,7 +114,7 @@ export default function ActiveFiltersSummary({
 
   return (
     <View style={styles.root}>
-      <Text style={styles.title}>ACTIVE FILTERS</Text>
+      <Text style={styles.title}>{t("filterOptions.activeFilters")}</Text>
 
       <View style={styles.chipsWrap}>
         {chips.map((chip) => (

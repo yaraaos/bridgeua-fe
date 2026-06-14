@@ -65,7 +65,7 @@ export default function ImageViewerScreen() {
       ? Number.parseInt(params.overlayIndex, 10)
       : null;
 
-  const overlayText = params.overlayText ?? "View all";
+  const overlayText = params.overlayText;
 
   const panResponder = useRef(
     PanResponder.create({

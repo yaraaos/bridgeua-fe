@@ -9,11 +9,13 @@ import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Linking, StyleSheet, View } from "react-native";
 
 export default function NoAvailableSlotsScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+  const { t } = useTranslation();
 
   const {
     businessId,
@@ -109,18 +111,18 @@ export default function NoAvailableSlotsScreen() {
 
         <View style={styles.actions}>
           <AppButton
-            title="Try a different date"
+            title={t("bookings.noSlotsTryDate")}
             onPress={handleTryDifferentDate}
           />
 
           <AppButton
-            title="Choose different specialist"
+            title={t("bookings.noSlotsChooseSpecialist")}
             variant="secondary"
             onPress={handleChooseDifferentSpecialist}
           />
 
           <AppButton
-            title="Contact business"
+            title={t("bookings.noSlotsContactBusiness")}
             variant="ghost"
             onPress={handleContactBusiness}
           />

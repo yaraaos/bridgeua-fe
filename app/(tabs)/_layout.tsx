@@ -4,8 +4,10 @@ import { Feather } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
 import { Platform, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useTranslation } from "react-i18next";
 
 export default function TabsLayout() {
+  const { t } = useTranslation();
   const { colors } = useAppTheme();
   const insets = useSafeAreaInsets();
 
@@ -34,12 +36,13 @@ export default function TabsLayout() {
           borderTopColor: colors.border,
           backgroundColor: colors.surface,
         },
+        sceneStyle: { backgroundColor: colors.background },
       }}
     >
       <Tabs.Screen
         name="home"
         options={{
-          title: "Home",
+          title: t("tabs.home"),
           tabBarIcon: ({ color, size }) => (
             <Feather name="home" size={size} color={color} />
           ),
@@ -48,7 +51,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="following"
         options={{
-          title: "Promos",
+          title: t("tabs.promos"),
           tabBarIcon: ({ color, size }) => (
             <Feather name="heart" size={size} color={color} />
           ),
@@ -57,7 +60,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="map"
         options={{
-          title: "Map",
+          title: t("tabs.map"),
           tabBarIcon: ({ color, size }) => (
             <Feather name="map" size={size} color={color} />
           ),
@@ -72,7 +75,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="notifications"
         options={{
-          title: "Alerts",
+          title: t("tabs.alerts"),
           tabBarIcon: ({ color, size }) => (
             <View>
               <Feather name="bell" size={size} color={color} />
@@ -95,7 +98,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="profile"
         options={{
-          title: "Profile",
+          title: t("tabs.profile"),
           tabBarIcon: ({ color, size }) => (
             <Feather name="user" size={size} color={color} />
           ),

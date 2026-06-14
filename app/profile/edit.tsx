@@ -21,17 +21,13 @@ import { useNavigation, usePreventRemove } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
 import React, { useMemo, useState } from "react";
-import {
-  Alert,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  View
-} from "react-native";
+import { useTranslation } from "react-i18next";
+import { Alert, Pressable, ScrollView, StyleSheet, View } from "react-native";
 
 export default function EditProfileScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+  const { t } = useTranslation();
 
   const navigation = useNavigation();
 
@@ -61,8 +57,8 @@ export default function EditProfileScreen() {
 
     if (!permission.granted) {
       Alert.alert(
-        "Permission needed",
-        "Please allow photo access to change your profile picture.",
+        t("profile.editProfile.permissionTitle"),
+        t("profile.editProfile.permissionMessage"),
       );
       return;
     }
@@ -89,15 +85,15 @@ export default function EditProfileScreen() {
 
   usePreventRemove(hasChanges, ({ data }) => {
     Alert.alert(
-      "Discard changes?",
-      "You have unsaved changes. Are you sure you want to leave?",
+      t("profile.editProfile.discardTitle"),
+      t("profile.editProfile.discardMessage"),
       [
         {
-          text: "Keep editing",
+          text: t("profile.editProfile.discardKeepEditing"),
           style: "cancel",
         },
         {
-          text: "Discard",
+          text: t("profile.editProfile.discardConfirm"),
           style: "destructive",
           onPress: () => navigation.dispatch(data.action),
         },
@@ -112,7 +108,7 @@ export default function EditProfileScreen() {
 
   const phoneError =
     phoneNumber.trim().length > 0 && !isPhoneValid
-      ? "Enter a valid phone number."
+      ? t("profile.editProfile.errorPhone")
       : "";
 
   const canSave =
@@ -131,15 +127,15 @@ export default function EditProfileScreen() {
     }
 
     Alert.alert(
-      "Discard changes?",
-      "You have unsaved changes. Are you sure you want to leave?",
+      t("profile.editProfile.discardTitle"),
+      t("profile.editProfile.discardMessage"),
       [
         {
-          text: "Keep editing",
+          text: t("profile.editProfile.discardKeepEditing"),
           style: "cancel",
         },
         {
-          text: "Discard",
+          text: t("profile.editProfile.discardConfirm"),
           style: "destructive",
           onPress: () => router.back(),
         },
@@ -161,15 +157,15 @@ export default function EditProfileScreen() {
       if (result.avatarUrl !== undefined) setAvatarUrl(result.avatarUrl);
       router.back();
     } else {
-      Alert.alert("Error", "Failed to save profile. Please try again.");
+      Alert.alert(t("profile.editProfile.errorTitle"), t("profile.editProfile.errorMessage"));
     }
   };
 
   return (
     <AppScreen withTopInset={false} style={styles.container}>
       <ScreenHeader
-        title="Edit Profile"
-        titleSubtitle="Update your personal profile"
+        title={t("profile.editProfile.title")}
+        titleSubtitle={t("profile.editProfile.subtitle")}
         gradientColors={DISCOVERY_GRADIENT}
         leftSlot={
           <Pressable
@@ -208,58 +204,58 @@ export default function EditProfileScreen() {
             </View>
           </Pressable>
 
-          <AppText style={styles.avatarHint}>Tap to change photo</AppText>
+          <AppText style={styles.avatarHint}>{t("profile.editProfile.tapToChangePhoto")}</AppText>
         </View>
 
         <View style={styles.form}>
-          <ProfileField label="First name">
+          <ProfileField label={t("profile.editProfile.labelFirstName")}>
             <ClearableInput
               value={firstName}
               onChangeText={setFirstName}
               onClear={() => setFirstName("")}
-              placeholder="Enter first name"
+              placeholder={t("profile.editProfile.placeholderFirstName")}
               maxLength={30}
             />
           </ProfileField>
 
-          <ProfileField label="Last name">
+          <ProfileField label={t("profile.editProfile.labelLastName")}>
             <ClearableInput
               value={lastName}
               onChangeText={setLastName}
               onClear={() => setLastName("")}
-              placeholder="Enter last name"
+              placeholder={t("profile.editProfile.placeholderLastName")}
               maxLength={30}
             />
           </ProfileField>
 
-          <ProfileField label="Username" errorText={usernameError}>
+          <ProfileField label={t("profile.editProfile.labelUsername")} errorText={usernameError}>
             <ClearableInput
               value={username}
               onChangeText={(value) =>
                 setUsername(value.toLowerCase().replace(/\s/g, ""))
               }
               onClear={() => setUsername("")}
-              placeholder="Enter username"
+              placeholder={t("profile.editProfile.placeholderUsername")}
               autoCapitalize="none"
               maxLength={20}
             />
           </ProfileField>
 
           <ProfileField
-            label="Email"
-            helperText="This email is linked to your account and cannot be changed here."
+            label={t("profile.editProfile.labelEmail")}
+            helperText={t("profile.editProfile.helperEmail")}
           >
             <AppInput
               value={profile.email}
               editable={false}
-              placeholder="Email"
+              placeholder={t("profile.editProfile.labelEmail")}
             />
           </ProfileField>
 
           <ProfileField
-            label="Phone number"
+            label={t("profile.editProfile.labelPhone")}
             errorText={phoneError}
-            helperText="Your phone number is private and will not be visible to other users."
+            helperText={t("profile.editProfile.helperPhone")}
           >
             <PhoneField
               value={phoneNumber}
@@ -269,20 +265,20 @@ export default function EditProfileScreen() {
           </ProfileField>
 
           <ProfileField
-            label="Date of birth"
-            helperText="Your date of birth is private and is only used to suggest birthday promotions."
+            label={t("profile.editProfile.labelDateOfBirth")}
+            helperText={t("profile.editProfile.helperDateOfBirth")}
           >
             <DateField
               value={dateOfBirth}
               onChange={setDateOfBirth}
-              placeholder="Select date of birth"
+              placeholder={t("profile.editProfile.placeholderDateOfBirth")}
             />
           </ProfileField>
         </View>
 
         <View style={styles.saveButtonWrap}>
           <AppButton
-            title={isSaving ? "Saving..." : "Save changes"}
+            title={isSaving ? t("profile.editProfile.savingButton") : t("profile.editProfile.saveButton")}
             onPress={handleSave}
             disabled={!canSave}
           />

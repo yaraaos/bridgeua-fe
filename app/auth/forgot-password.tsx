@@ -8,6 +8,7 @@ import AppButton from "../../src/components/ui/AppButton/AppButton";
 import AppLoader from "../../src/components/ui/AppLoader/AppLoader";
 import AppScreen from "../../src/components/ui/AppScreen/AppScreen";
 import ClearableInput from "../../src/components/ui/ClearableInput";
+import { useTranslation } from "react-i18next";
 import { useForgotPassword } from "../../src/features/auth/hooks/useForgotPassword";
 import {
   ForgotPasswordFormErrors,
@@ -17,6 +18,7 @@ import {
 export default function ForgotPasswordScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+  const { t } = useTranslation();
 
   const [email, setEmail] = useState("");
 
@@ -60,17 +62,15 @@ export default function ForgotPasswordScreen() {
   return (
     <AppScreen scroll style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Forgot Password</Text>
+        <Text style={styles.title}>{t("auth.forgotPassword.title")}</Text>
 
-        <Text style={styles.subtitle}>
-          Enter your email and we will send reset instructions.
-        </Text>
+        <Text style={styles.subtitle}>{t("auth.forgotPassword.subtitle")}</Text>
       </View>
 
       <View style={styles.form}>
         <View>
           <ClearableInput
-            placeholder="Email address"
+            placeholder={t("auth.forgotPassword.emailPlaceholder")}
             value={email}
             onClear={clearEmail}
             onChangeText={(value) => {
@@ -98,12 +98,12 @@ export default function ForgotPasswordScreen() {
         {isLoading ? (
           <AppLoader />
         ) : (
-          <AppButton title="Send reset link" onPress={handleSubmit} />
+          <AppButton title={t("auth.forgotPassword.sendResetLink")} onPress={handleSubmit} />
         )}
       </View>
 
       <Text style={styles.back} onPress={() => router.push("/auth/sign-in")}>
-        Back to login
+        {t("auth.forgotPassword.backToLogin")}
       </Text>
     </AppScreen>
   );

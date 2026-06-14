@@ -4,6 +4,7 @@ import AppLabel from "@/src/components/ui/AppLabel/AppLabel";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Image, Pressable, Text, View } from "react-native";
 
 import { useBusinessReviewSummary } from "@/src/features/reviews/hooks/useBusinessReviewSummary";
@@ -28,6 +29,7 @@ export default function BusinessCard({
                                      }: Props) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+  const { t } = useTranslation();
   const accountType = useAuthStore((state) => state.user?.accountType);
   const isBusinessAccount = accountType === "business";
 
@@ -70,7 +72,7 @@ export default function BusinessCard({
             </Text>
 
             {isOwnedBusiness ? (
-              <AppLabel label="Your business" variant="your-business" />
+              <AppLabel label={t("business.yourBusiness")} variant="your-business" />
             ) : null}
           </View>
 
@@ -84,7 +86,7 @@ export default function BusinessCard({
 
           <View style={styles.metaRow}>
             <Text style={styles.metaText} numberOfLines={1}>
-              {business.category}
+              {t(`categories.${business.category.toLowerCase().replace(/\s*&\s*/g, "-").replace(/\s+/g, "-")}`, { defaultValue: business.category })}
             </Text>
 
             <Text style={styles.dot}>•</Text>
@@ -100,11 +102,11 @@ export default function BusinessCard({
                 styles.openStatusText,
                 { color: business.isOpen ? colors.primaryGreen : colors.error },
               ]}>
-                {business.isOpen ? 'Open' : 'Closed'}
+                {business.isOpen ? t("business.statusOpen") : t("business.statusClosed")}
               </Text>
               {(business.isOpen ? business.closesAt : business.opensAt) ? (
                 <Text style={[styles.openStatusText, { color: colors.white }]}>
-                  {` · ${business.isOpen ? `Closes at ${business.closesAt}` : `Opens at ${business.opensAt}`}`}
+                  {` · ${business.isOpen ? t("business.closesAt", { time: business.closesAt }) : t("business.opensAt", { time: business.opensAt })}`}
                 </Text>
               ) : null}
             </View>
@@ -113,7 +115,7 @@ export default function BusinessCard({
           {!!recommendedByPreview.length && (
             <View style={styles.recommendedRow}>
               <Text style={styles.recommendedLabel} numberOfLines={1}>
-                Recommended by {recommendedPreview}
+                {t("business.recommendedByNames", { names: recommendedPreview })}
               </Text>
 
               {recommendedByCount > 0 ? (

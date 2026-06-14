@@ -17,6 +17,7 @@ import { useAuthStore } from "@/src/store/auth.store";
 import { useNotificationsStore } from "@/src/store/notifications.store";
 import { router, useLocalSearchParams, useFocusEffect } from "expo-router";
 import { useEffect, useState, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
   SectionList,
@@ -25,64 +26,34 @@ import {
   View,
 } from "react-native";
 
-const PERSONAL_NOTIFICATION_TABS: {
-  label: string;
-  value: NotificationTab;
-}[] = [
-  { label: "All", value: "all" },
-  { label: "Unread", value: "unread" },
-  { label: "Updates", value: "updates" },
-];
-
-const BUSINESS_NOTIFICATION_TABS: {
-  label: string;
-  value: NotificationTab;
-}[] = [
-  { label: "All", value: "all" },
-  { label: "Unread", value: "unread" },
-  { label: "Activity", value: "activity" },
-  { label: "Promos", value: "promotions" },
-  { label: "Updates", value: "updates" },
-];
-
-const EMPTY_STATE_BY_TAB: Record<
-  NotificationTab,
-  { title: string; description: string }
-> = {
-  all: {
-    title: "No notifications yet",
-    description: "Updates about your activity will appear here.",
-  },
-  unread: {
-    title: "No unread notifications",
-    description: "You are all caught up.",
-  },
-  activity: {
-    title: "No activity yet",
-    description: "Reviews, recommendations, and followers will appear here.",
-  },
-  promotions: {
-    title: "No promotions yet",
-    description: "Business offers and promo updates will appear here.",
-  },
-  updates: {
-    title: "No updates yet",
-    description: "System and business updates will appear here.",
-  },
-};
 
 export default function NotificationsScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+  const { t } = useTranslation();
   const isGuest = useAuthStore((state) => state.isGuest);
   const activeAccount = useActiveAccount();
   const { tab } = useLocalSearchParams<{ tab?: string }>();
+
+  const PERSONAL_NOTIFICATION_TABS: { label: string; value: NotificationTab }[] = [
+    { label: t("notifications.filters.all"), value: "all" },
+    { label: t("notifications.filters.unread"), value: "unread" },
+    { label: t("notifications.filters.updates"), value: "updates" },
+  ];
+
+  const BUSINESS_NOTIFICATION_TABS: { label: string; value: NotificationTab }[] = [
+    { label: t("notifications.filters.all"), value: "all" },
+    { label: t("notifications.filters.unread"), value: "unread" },
+    { label: t("notifications.filters.activity"), value: "activity" },
+    { label: t("notifications.filters.promos"), value: "promotions" },
+    { label: t("notifications.filters.updates"), value: "updates" },
+  ];
 
   useEffect(() => {
     if (activeAccount) {
       useNotificationsStore.getState().setActiveAccountType(activeAccount.kind);
     }
-  }, [activeAccount?.kind]);
+  }, [activeAccount, activeAccount?.kind]);
 
   const [activeTab, setActiveTab] = useState<NotificationTab>("all");
 
@@ -115,11 +86,18 @@ export default function NotificationsScreen() {
         ? [{ title: "", data: notifications }]
         : []
       : [
-          { title: "New", data: newNotifications },
-          { title: "Earlier", data: earlierNotifications },
+          { title: t("notifications.groups.new"), data: newNotifications },
+          { title: t("notifications.groups.earlier"), data: earlierNotifications },
         ].filter((section) => section.data.length > 0);
 
-  const emptyState = EMPTY_STATE_BY_TAB[activeTab];
+  const emptyStateMap: Record<NotificationTab, { title: string; description: string }> = {
+    all: { title: t("notifications.empty.all.title"), description: t("notifications.empty.all.description") },
+    unread: { title: t("notifications.empty.unread.title"), description: t("notifications.empty.unread.description") },
+    activity: { title: t("notifications.empty.activity.title"), description: t("notifications.empty.activity.description") },
+    promotions: { title: t("notifications.empty.promos.title"), description: t("notifications.empty.promos.description") },
+    updates: { title: t("notifications.empty.updates.title"), description: t("notifications.empty.updates.description") },
+  };
+  const emptyState = emptyStateMap[activeTab];
 
   const handleRegisterPress = () => {
     router.replace({
@@ -145,16 +123,16 @@ export default function NotificationsScreen() {
     return (
       <View style={styles.container}>
         <ScreenHeader
-          title="Notifications"
-          titleSubtitle="Stay updated with BridgeUA"
+          title={t("notifications.title")}
+          titleSubtitle={t("notifications.subtitle")}
           headerInnerStyle={styles.guestHeaderInner}
         />
 
         <View style={styles.guestContent}>
           <AppEmptyState
-            title="Register to get notifications"
-            description="Create an account to receive updates, promotions, follows, and activity notifications."
-            actionLabel="Register to BridgeUA"
+            title={t("notifications.guest.title")}
+            description={t("notifications.guest.description")}
+            actionLabel={t("notifications.guest.action")}
             onPressAction={handleRegisterPress}
           />
         </View>
@@ -165,8 +143,8 @@ export default function NotificationsScreen() {
   return (
     <View style={styles.container}>
       <ScreenHeader
-        title="Notifications"
-        titleSubtitle="Stay updated with BridgeUA"
+        title={t("notifications.title")}
+        titleSubtitle={t("notifications.subtitle")}
         headerInnerStyle={styles.headerInner}
         bottomSlot={
           <>
@@ -183,7 +161,7 @@ export default function NotificationsScreen() {
       {activeTab === "unread" && notifications.length > 0 ? (
         <View style={styles.unreadSectionHeader}>
           <Text style={styles.markAllText} onPress={markAll}>
-            Mark all as read
+            {t("notifications.markAllAsRead")}
           </Text>
         </View>
       ) : null}

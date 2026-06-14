@@ -1,6 +1,8 @@
 // app/_layout.tsx
 
+import "@/src/i18n";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
+import { useLanguageSync } from "@/src/hooks/useLanguageSync";
 import { getNavigationTheme } from "@/src/theme/navigationTheme";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Stack } from "expo-router";
@@ -16,6 +18,7 @@ function RootLayoutInner() {
   const { colors, isDark } = useAppTheme();
   const navTheme = getNavigationTheme(colors, isDark);
   const [queryClient] = useState(() => new QueryClient());
+  useLanguageSync();
 
   useEffect(() => {
     void SystemUI.setBackgroundColorAsync(colors.background);
@@ -33,12 +36,15 @@ function RootLayoutInner() {
         screenOptions={{
           headerShown: false,
           contentStyle: { backgroundColor: colors.background },
+          animation: "fade",
+          animationDuration: 200,
         }}
         // @ts-ignore — theme prop is valid for NavigationContainer used internally
         theme={navTheme}
       >
         <Stack.Screen name="index" />
         <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="admin" />
         <Stack.Screen
           name="auth"
           options={{

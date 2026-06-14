@@ -27,10 +27,12 @@ import { useAuthStore } from "@/src/store/auth.store";
 import type { AuthUser } from "@/src/features/auth/types/auth.types";
 import { useDiscoveryLocationStore } from "@/src/store/discovery-location";
 import { useFilterStore } from "@/src/store/filter.store";
+import { useAppStore } from "@/src/store/app.store";
 import { Feather } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router, useFocusEffect } from "expo-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { PROMO_CATEGORY_LABEL } from "@/src/constants/categories";
 import {
   Alert,
@@ -44,6 +46,7 @@ import {
 const RECENT_SEARCHES_KEY = "home-recent-searches";
 
 export default function HomeScreen() {
+  const { t } = useTranslation();
   const {
     label: selectedLocationLabel,
     state: locationState,
@@ -55,7 +58,7 @@ export default function HomeScreen() {
   const scrollY = useRef(new Animated.Value(0)).current;
 
   const [locationOptions, setLocationOptions] = useState<LocationOption[]>([
-    { label: "See nearby", value: "nearby", type: "nearby" },
+    { label: t("home.locationSeeNearby"), value: "nearby", type: "nearby" },
   ]);
 
   useEffect(() => {
@@ -67,12 +70,12 @@ export default function HomeScreen() {
         state: s,
       }));
       setLocationOptions([
-        { label: "All locations", value: "all", type: "manual", state: undefined },
-        { label: "See nearby", value: "nearby", type: "nearby" },
+        { label: t("home.locationAllLocations"), value: "all", type: "manual", state: undefined },
+        { label: t("home.locationSeeNearby"), value: "nearby", type: "nearby" },
         ...stateOptions,
       ]);
     }).catch(() => {});
-  }, []);
+  }, [t]);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
@@ -91,10 +94,11 @@ export default function HomeScreen() {
   }, [sort, rating, locationState, cuisines]);
 
   const businessVersion = useFilterStore((s) => s.businessVersion);
+  const businessesVersion = useAppStore((s) => s.businessesVersion);
 
   const { businesses, isLoading, error: businessesError, refetch: refetchBusinesses } = useBusinesses(
     Object.keys(serverParams).length > 0 ? serverParams : undefined,
-    businessVersion,
+    businessVersion + businessesVersion,
   );
 
   const isGuest = useAuthStore((state) => state.isGuest);
@@ -124,10 +128,10 @@ export default function HomeScreen() {
   const canUsePromoFilter = !isBusinessAccount && !isGuest;
 
   const { categories } = useCategories();
-  const categoryNames = [
-    "All Categories",
-    ...(canUsePromoFilter ? [PROMO_CATEGORY_LABEL] : []),
-    ...categories.map((c) => c.name),
+  const categoryItems = [
+    { label: t("home.allCategories"), value: "" },
+    ...(canUsePromoFilter ? [{ label: t("categories.promo"), value: PROMO_CATEGORY_LABEL }] : []),
+    ...categories.map((c) => ({ label: t(`categories.${c.slug}`, { defaultValue: c.name }), value: c.name })),
   ];
 
   useEffect(() => {
@@ -175,7 +179,7 @@ export default function HomeScreen() {
     businessIdsWithPromo,
   });
 
-  const selectedHomeCategory = category || "All Categories";
+  const selectedHomeCategory = category;
 
   useFocusEffect(
     useCallback(() => {
@@ -288,20 +292,20 @@ export default function HomeScreen() {
 
   const handleRequestNearby = () => {
     Alert.alert(
-      "Use your location?",
-      "Allow location access to find businesses near you.",
+      t("home.locationPermissionTitle"),
+      t("home.locationPermissionMessage"),
       [
         {
-          text: "Not now",
+          text: t("home.locationPermissionNotNow"),
           style: "cancel",
           onPress: () => setPermissionStatus("denied"),
         },
         {
-          text: "Allow",
+          text: t("home.locationPermissionAllow"),
           onPress: () => {
             setPermissionStatus("granted");
             setNearbyLocation({
-              label: "Near you",
+              label: t("home.locationNearYou"),
               value: "nearby",
               latitude: 34.0549,
               longitude: -118.2426,
@@ -323,10 +327,8 @@ export default function HomeScreen() {
     });
   };
 
-  const handleSelectCategory = (selectedCategory: string) => {
-    const mappedCategory =
-      selectedCategory === "All Categories" ? "" : selectedCategory;
-    useFilterStore.getState().setCategory("discovery", mappedCategory);
+  const handleSelectCategory = (value: string) => {
+    useFilterStore.getState().setCategory("discovery", value);
   };
 
   const activeFilterCount =
@@ -338,8 +340,8 @@ export default function HomeScreen() {
 
   const header = (
     <ScreenHeader
-      title="Discover"
-      titleSubtitle="Community trusted places"
+      title={t("home.title")}
+      titleSubtitle={t("home.subtitle")}
       subtitleValue={selectedLocationLabel}
       onSubtitlePress={handleLocationPress}
       showSubtitleChevron
@@ -347,7 +349,7 @@ export default function HomeScreen() {
       onSelectLocationOption={handleSelectLocationOption}
       onRequestNearby={handleRequestNearby}
       showSearch
-      searchPlaceholder="Find services, food or places"
+      searchPlaceholder={t("home.searchPlaceholder")}
       searchValue={searchQuery}
       onSearchChangeText={handleSearchChange}
       onSearchFocus={() => setIsSearchFocused(true)}
@@ -366,10 +368,10 @@ export default function HomeScreen() {
   const recentSearchesDropdown = shouldShowRecentSearches ? (
     <View style={styles.recentDropdown}>
       <View style={styles.recentHeader}>
-        <Text style={styles.recentTitle}>Recent searches</Text>
+        <Text style={styles.recentTitle}>{t("home.recentSearches")}</Text>
 
         <Pressable onPress={clearRecentSearches}>
-          <Text style={styles.clearAll}>Clear all</Text>
+          <Text style={styles.clearAll}>{t("home.clearAll")}</Text>
         </Pressable>
       </View>
 
@@ -392,7 +394,7 @@ export default function HomeScreen() {
 
   const categoryBar = (
     <CategoryScroller
-      categories={categoryNames}
+      categories={categoryItems}
       selectedCategory={selectedHomeCategory}
       onSelectCategory={handleSelectCategory}
     />
@@ -428,13 +430,13 @@ export default function HomeScreen() {
           )}
           <View style={styles.emptyStateWrap}>
             <AppEmptyState
-              title={businessesError.isNetworkError ? "No internet connection" : "Something went wrong"}
+              title={businessesError.isNetworkError ? t("home.errorNoInternet") : t("home.errorSomethingWrong")}
               description={
                 businessesError.isNetworkError
-                  ? "Check your connection and try again."
-                  : "We couldn't load businesses. Please try again."
+                  ? t("home.errorNoInternetDesc")
+                  : t("home.errorLoadFailedDesc")
               }
-              actionLabel="Try again"
+              actionLabel={t("home.errorTryAgain")}
               onPressAction={refetchBusinesses}
             />
           </View>
@@ -486,16 +488,16 @@ export default function HomeScreen() {
                 <AppEmptyState
                   title={
                     searchQuery.trim()
-                      ? `No businesses found for "${searchQuery}"`
-                      : "No businesses found"
+                      ? t("home.emptySearchTitle", { query: searchQuery })
+                      : t("home.emptyTitle")
                   }
                   description={
                     searchQuery.trim()
-                      ? "Try another business name."
-                      : "Try adjusting or clearing some filters to discover more places."
+                      ? t("home.emptySearchDesc")
+                      : t("home.emptyDesc")
                   }
                   actionLabel={
-                    searchQuery.trim() ? "Clear search" : "Clear filters"
+                    searchQuery.trim() ? t("home.clearSearch") : t("home.clearFilters")
                   }
                   onPressAction={() => {
                     if (searchQuery.trim()) {

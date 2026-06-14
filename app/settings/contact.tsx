@@ -5,6 +5,7 @@ import { spacing } from "@/src/constants/spacing";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { useTranslation } from "react-i18next";
 import {
   Linking,
   Pressable,
@@ -16,52 +17,53 @@ import {
 
 type FeatherIconName = React.ComponentProps<typeof Feather>["name"];
 
-const CONTACT_ITEMS: {
-  icon: FeatherIconName;
-  label: string;
-  value: string;
-  url: string;
-}[] = [
-  {
-    icon: "mail",
-    label: "Email",
-    value: "support@bridgeua.com",
-    url: "mailto:support@bridgeua.com",
-  },
-  {
-    icon: "phone",
-    label: "Phone",
-    value: "+380 00 000 0000",
-    url: "tel:+380000000000",
-  },
-  {
-    icon: "instagram",
-    label: "Instagram",
-    value: "@bridgeua",
-    url: "https://instagram.com/bridgeua",
-  },
-  {
-    icon: "facebook",
-    label: "Facebook",
-    value: "BridgeUA",
-    url: "https://facebook.com/bridgeua",
-  },
-  {
-    icon: "send",
-    label: "Telegram",
-    value: "@bridgeua",
-    url: "https://t.me/bridgeua",
-  },
-];
-
 export default function ContactScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
   const router = useRouter();
+  const { t } = useTranslation();
+
+  const contactItems: {
+    icon: FeatherIconName;
+    label: string;
+    value: string;
+    url: string;
+  }[] = [
+    {
+      icon: "mail",
+      label: t("contact.email"),
+      value: "support@bridgeua.com",
+      url: "mailto:support@bridgeua.com",
+    },
+    {
+      icon: "phone",
+      label: t("contact.phone"),
+      value: "+380 00 000 0000",
+      url: "tel:+380000000000",
+    },
+    {
+      icon: "instagram",
+      label: t("contact.instagram"),
+      value: "@bridgeua",
+      url: "https://instagram.com/bridgeua",
+    },
+    {
+      icon: "facebook",
+      label: t("contact.facebook"),
+      value: "BridgeUA",
+      url: "https://facebook.com/bridgeua",
+    },
+    {
+      icon: "send",
+      label: t("contact.telegram"),
+      value: "@bridgeua",
+      url: "https://t.me/bridgeua",
+    },
+  ];
 
   return (
     <View style={styles.safeArea}>
-      <ScreenHeader title="Contact Us" onBack={() => router.back()} />
+      <ScreenHeader title={t("contact.title")} onBack={() => router.back()} />
 
       <ScrollView
         style={styles.scroll}
@@ -69,7 +71,7 @@ export default function ContactScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.sectionCard}>
-          {CONTACT_ITEMS.map((item, index) => (
+          {contactItems.map((item, index) => (
             <View key={item.label}>
               {index > 0 && <View style={styles.divider} />}
               <Pressable

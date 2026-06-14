@@ -14,15 +14,16 @@ import AppOtpInput from "../../src/components/ui/AppOtpInput/AppOtpInput";
 import AppScreen from "../../src/components/ui/AppScreen/AppScreen";
 import { useConfirmCode } from "../../src/features/auth/hooks/useConfirmCode";
 import { useResendCode } from "../../src/features/auth/hooks/useResendCode";
+import { useTranslation } from "react-i18next";
 
 const OTP_LENGTH = 4;
 const RESEND_SECONDS = 60;
 
-function maskEmail(email: string) {
+function maskEmail(email: string, fallback: string) {
   const [name, domain] = email.split("@");
 
   if (!name || !domain) {
-    return "your email";
+    return fallback;
   }
 
   const visible = name.slice(0, 2);
@@ -32,6 +33,7 @@ function maskEmail(email: string) {
 export default function ConfirmCodeScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+  const { t } = useTranslation();
 
   const params = useLocalSearchParams<{ email?: string }>();
   const email = params.email ?? "";
@@ -54,7 +56,7 @@ export default function ConfirmCodeScreen() {
   const [timer, setTimer] = useState(RESEND_SECONDS);
   const [localError, setLocalError] = useState<string | null>(null);
 
-  const maskedContact = useMemo(() => maskEmail(email), [email]);
+  const maskedContact = useMemo(() => maskEmail(email, t("auth.confirmCode.yourEmailFallback")), [email, t]);
   const canResend = timer === 0 && !isResending;
 
   useEffect(() => {
@@ -77,7 +79,7 @@ export default function ConfirmCodeScreen() {
     if (isLoading) return;
 
     if (code.length !== OTP_LENGTH) {
-      setLocalError("Enter the 4-digit code");
+      setLocalError(t("auth.confirmCode.enterCode"));
       return;
     }
 
@@ -130,9 +132,9 @@ export default function ConfirmCodeScreen() {
   return (
     <AppScreen style={styles.container}>
       <View style={styles.center}>
-        <Text style={styles.title}>Enter confirmation code</Text>
+        <Text style={styles.title}>{t("auth.confirmCode.title")}</Text>
         <Text style={styles.subtitle}>
-          A 4-digit code was sent to {maskedContact}
+          {t("auth.confirmCode.subtitle", { email: maskedContact })}
         </Text>
 
         <View style={styles.otpWrap}>
@@ -154,10 +156,10 @@ export default function ConfirmCodeScreen() {
         >
           <Text style={[styles.resendText, !canResend && styles.resendMuted]}>
             {timer > 0
-              ? `Resend code in ${timer}s`
+              ? t("auth.confirmCode.resendCodeIn", { seconds: timer })
               : isResending
-                ? "Resending..."
-                : "Resend code"}
+                ? t("auth.confirmCode.resending")
+                : t("auth.confirmCode.resendCode")}
           </Text>
         </Pressable>
       </View>
@@ -166,7 +168,7 @@ export default function ConfirmCodeScreen() {
         {isLoading ? (
           <AppLoader />
         ) : (
-          <AppButton title="Continue" onPress={handleSubmit} />
+          <AppButton title={t("auth.confirmCode.continueButton")} onPress={handleSubmit} />
         )}
       </View>
     </AppScreen>

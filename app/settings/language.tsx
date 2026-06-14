@@ -4,8 +4,11 @@ import { radius } from "@/src/constants/radius";
 import { spacing } from "@/src/constants/spacing";
 import { useSettings } from "@/src/features/settings/hooks/useSettings";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
+import i18n from "@/src/i18n";
 import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { useTranslation } from "react-i18next";
+import { useState } from "react";
 import {
     ActivityIndicator,
     Pressable,
@@ -20,16 +23,19 @@ const LANGUAGES: { label: string; value: "en" | "uk" }[] = [
 ];
 
 export default function LanguageScreen() {
+  const { t } = useTranslation();
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
   const router = useRouter();
   const { settings, isLoading, updateSetting } = useSettings();
 
-  const selected = settings?.language ?? "en";
+  const [selected, setSelected] = useState<"en" | "uk">(
+    (i18n.language as "en" | "uk") || (settings?.language ?? "en"),
+  );
 
   return (
     <View style={styles.safeArea}>
-      <ScreenHeader title="Language" onBack={() => router.back()} />
+      <ScreenHeader title={t("language.title")} onBack={() => router.back()} />
 
       {isLoading ? (
         <View style={styles.centered}>
@@ -46,7 +52,11 @@ export default function LanguageScreen() {
                     styles.row,
                     pressed && styles.rowPressed,
                   ]}
-                  onPress={() => updateSetting("language", lang.value)}
+                  onPress={() => {
+                    setSelected(lang.value);
+                    updateSetting("language", lang.value);
+                    i18n.changeLanguage(lang.value);
+                  }}
                 >
                   <Text style={styles.rowLabel}>{lang.label}</Text>
                   {selected === lang.value && (

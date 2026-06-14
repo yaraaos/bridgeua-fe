@@ -7,6 +7,7 @@ import {
     TouchableWithoutFeedback,
     View,
 } from "react-native";
+import { useTranslation } from "react-i18next";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { LocationOption } from "@/src/constants/locations";
 import { createStyles } from "./LocationSelector.styles";
@@ -27,10 +28,11 @@ export default function LocationSelector({
   options,
   onSelectManual,
   onRequestNearby,
-  subtitleLabel = "Location",
+  subtitleLabel,
   showChevron = true,
 }: Props) {
   const { colors } = useAppTheme();
+  const { t } = useTranslation();
   const styles = createStyles(colors);
 
   const triggerRef = useRef<View>(null);
@@ -43,8 +45,8 @@ export default function LocationSelector({
   const selectedLabel = useMemo(() => {
     if (label) return label;
     const found = options.find((option) => option.value === value);
-    return found?.label ?? "Select location";
-  }, [label, options, value]);
+    return found?.label ?? t("locationSelector.selectPlaceholder");
+  }, [label, options, value, t]);
 
   const openDropdown = () => {
     triggerRef.current?.measureInWindow((x, y, width, height) => {
@@ -72,7 +74,7 @@ export default function LocationSelector({
 
   return (
     <View style={styles.root} ref={triggerRef}>
-      <Text style={styles.subtitleLabel}>{subtitleLabel}</Text>
+      <Text style={styles.subtitleLabel}>{subtitleLabel ?? t("locationSelector.label")}</Text>
 
       <Pressable style={styles.triggerRow} onPress={openDropdown}>
         <Text style={styles.subtitleValue}>{selectedLabel}</Text>

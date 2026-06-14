@@ -1,5 +1,6 @@
 import { Feather } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
+import { useTranslation } from "react-i18next";
 import { StyleSheet, Text, View } from "react-native";
 
 import AppButton from "../../src/components/ui/AppButton/AppButton";
@@ -10,6 +11,7 @@ import { useAppTheme } from "../../src/hooks/useAppTheme";
 export default function AuthSuccessScreen() {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+  const { t } = useTranslation();
 
   const { title, subtitle, ctaLabel, ctaRoute } = useLocalSearchParams<{
     title?: string;
@@ -24,15 +26,14 @@ export default function AuthSuccessScreen() {
         <View style={styles.iconWrap}>
           <Feather name="check" size={40} color={colors.white} />
         </View>
-        <Text style={styles.title}>{title || "Account confirmed"}</Text>
+        <Text style={styles.title}>{title || t("auth.success.defaultTitle")}</Text>
         <Text style={styles.subtitle}>
-          {subtitle ||
-            "Your account has been verified successfully. You can now start using BridgeUA"}
+          {subtitle || t("auth.success.defaultSubtitle")}
         </Text>
       </View>
 
       <AppButton
-        title={ctaLabel || "Continue"}
+        title={ctaLabel || t("auth.success.defaultCta")}
         onPress={() => router.replace((ctaRoute as any) || "/(tabs)/home")}
       />
     </AppScreen>

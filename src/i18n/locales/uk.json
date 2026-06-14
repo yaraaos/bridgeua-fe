@@ -1,0 +1,972 @@
+{
+  "tabs": {
+    "home": "Головна",
+    "promos": "Акції",
+    "map": "Мапа",
+    "alerts": "Сповіщення",
+    "profile": "Профіль"
+  },
+  "auth": {
+    "signIn": {
+      "title": "Ласкаво просимо!",
+      "emailPlaceholder": "Адреса email",
+      "passwordPlaceholder": "Пароль",
+      "forgotPassword": "Забули пароль?",
+      "loginButton": "Увійти",
+      "skipForNow": "Пропустити",
+      "notMember": "Ще не зареєстровані?",
+      "registerFree": "Зареєструватися безкоштовно"
+    },
+    "signUp": {
+      "title": "Створіть акаунт",
+      "subtitle": "Оберіть тип акаунту, який хочете створити",
+      "personal": "Особистий",
+      "business": "Бізнес",
+      "firstNamePlaceholder": "Ім'я",
+      "lastNamePlaceholder": "Прізвище",
+      "usernamePlaceholder": "Нікнейм",
+      "emailPlaceholder": "Адреса email",
+      "passwordPlaceholder": "Пароль",
+      "confirmPasswordPlaceholder": "Підтвердіть пароль",
+      "agreePrefix": "Я прочитав(ла) і погоджуюся з ",
+      "termsLink": "Умовами використання",
+      "agreeMid": " та ",
+      "privacyLink": "Політикою конфіденційності",
+      "continueButton": "Продовжити",
+      "alreadyHaveAccount": "Вже маєте акаунт?",
+      "signInLink": "Увійти",
+      "checkingUsername": "Перевірка нікнейму...",
+      "usernameAvailable": "Нікнейм доступний",
+      "usernameTaken": "Цей нікнейм вже зайнятий",
+      "usernameCheckError": "Не вдалося перевірити нікнейм",
+      "usernameWaiting": "Зачекайте, поки ми перевіряємо нікнейм"
+    },
+    "signUpBusiness": {
+      "businessNamePlaceholder": "Назва бізнесу",
+      "ownerNamePlaceholder": "Ваше повне ім'я",
+      "categoryPlaceholder": "Оберіть категорію",
+      "addressPlaceholder": "Адреса",
+      "zipCodePlaceholder": "ZIP-код",
+      "cityPlaceholder": "Місто",
+      "statePlaceholder": "Штат / Регіон",
+      "latitudePlaceholder": "Широта",
+      "longitudePlaceholder": "Довгота",
+      "cannotChangeLater": "Не можна змінити пізніше",
+      "optionalMap": "Необов'язково — допомагає відобразити бізнес на карті",
+      "recommendedLength": "Рекомендована довжина — {{limit}} символів; довші назви можуть погано відображатися на картках та в заголовках.",
+      "selectCategoryTitle": "Оберіть категорію",
+      "selectCuisineTitle": "Оберіть кухню",
+      "tapToChange": " · натисніть для зміни"
+    },
+    "confirmCode": {
+      "title": "Введіть код підтвердження",
+      "subtitle": "4-значний код надіслано на {{email}}",
+      "enterCode": "Введіть 4-значний код",
+      "resendCodeIn": "Надіслати повторно через {{seconds}}с",
+      "resending": "Надсилаємо...",
+      "resendCode": "Надіслати повторно",
+      "continueButton": "Продовжити",
+      "yourEmailFallback": "вашу пошту"
+    },
+    "forgotPassword": {
+      "title": "Забули пароль?",
+      "subtitle": "Введіть email, і ми надішлемо інструкції для відновлення.",
+      "emailPlaceholder": "Адреса email",
+      "sendResetLink": "Надіслати посилання",
+      "backToLogin": "Назад до входу"
+    },
+    "resetPassword": {
+      "title": "Відновлення пароля",
+      "subtitle": "Створіть новий пароль для вашого акаунту.",
+      "newPasswordPlaceholder": "Новий пароль",
+      "confirmPasswordPlaceholder": "Підтвердіть пароль",
+      "resetButton": "Відновити пароль",
+      "backToLogin": "Назад до входу",
+      "successTitle": "Пароль змінено",
+      "successSubtitle": "Ваш пароль успішно оновлено"
+    },
+    "success": {
+      "defaultTitle": "Акаунт підтверджено",
+      "defaultSubtitle": "Ваш акаунт успішно верифіковано. Тепер ви можете користуватися BridgeUA",
+      "defaultCta": "Продовжити"
+    }
+  },
+  "settings": {
+    "title": "Налаштування",
+    "subtitle": "Керуйте вашими налаштуваннями та акаунтом",
+    "logout": "Вийти",
+    "version": "Версія {{version}}",
+    "sections": {
+      "admin": "Адмін",
+      "account": "Акаунт",
+      "preferences": "Налаштування",
+      "business": "Бізнес",
+      "support": "Підтримка"
+    },
+    "rows": {
+      "users": { "title": "Користувачі", "subtitle": "Управління особистими та бізнес-акаунтами" },
+      "profile": { "title": "Профіль", "subtitle": "Перегляд та редагування профілю" },
+      "security": { "title": "Акаунт та безпека", "subtitle": "Управління акаунтом та паролем" },
+      "payment": { "title": "Способи оплати", "subtitle": "Управління збереженими способами оплати" },
+      "notifications": { "title": "Сповіщення", "subtitle": "Налаштування сповіщень" },
+      "language": { "title": "Мова", "subtitle": "Оберіть бажану мову" },
+      "darkMode": { "title": "Темна тема", "subtitle": "Налаштуйте зовнішній вигляд" },
+      "autoConfirm": { "title": "Автопідтвердження записів", "subtitle": "Автоматично підтверджувати нові запити на запис" },
+      "discovery": { "title": "Показувати у пошуку", "subtitle": "Відображати бізнес на карті та в пошуку" },
+      "priceLevel": { "title": "Показувати рівень цін", "subtitle": "Відображати рівень цін на сторінці бізнесу" },
+      "help": { "title": "Центр допомоги", "subtitle": "Знайдіть відповіді на часті запитання" },
+      "contact": { "title": "Зв'язатися з нами", "subtitle": "Зверніться до нашої служби підтримки" },
+      "privacy": { "title": "Політика конфіденційності", "subtitle": "Дізнайтесь, як ми захищаємо ваші дані" },
+      "terms": { "title": "Умови використання", "subtitle": "Ознайомтесь з нашими умовами" }
+    }
+  },
+  "about": {
+    "title": "Про застосунок",
+    "version": "Версія {{version}}",
+    "tagline": "Поєднуємо українські спільноти з місцевими підприємствами.",
+    "privacyPolicy": "Політика конфіденційності",
+    "termsOfService": "Умови використання",
+    "copyright": "© {{year}} BridgeUA. Всі права захищені."
+  },
+  "confirmEmail": {
+    "title": "Підтвердження email",
+    "instructions": "Ми надіслали код підтвердження на",
+    "codePlaceholder": "4-значний код",
+    "confirmButton": "Підтвердити",
+    "successTitle": "Email успішно оновлено",
+    "errorFallback": "Невірний код. Спробуйте ще раз."
+  },
+  "settingsAccount": {
+    "changeEmail": {
+      "title": "Змінити email",
+      "subtitle": "Оновіть адресу електронної пошти",
+      "currentPasswordPlaceholder": "Поточний пароль",
+      "newEmailPlaceholder": "Нова адреса email",
+      "updateButton": "Оновити email",
+      "errorAlert": "Не вдалося оновити email"
+    },
+    "changePassword": {
+      "title": "Змінити пароль",
+      "subtitle": "Оновіть свій пароль",
+      "currentPasswordPlaceholder": "Поточний пароль",
+      "newPasswordPlaceholder": "Новий пароль",
+      "confirmPasswordPlaceholder": "Підтвердіть пароль",
+      "updateButton": "Оновити пароль",
+      "lengthError": "Пароль повинен містити щонайменше 8 символів.",
+      "mismatchError": "Паролі не збігаються.",
+      "successAlert": "Пароль успішно оновлено",
+      "errorAlert": "Не вдалося оновити пароль"
+    },
+    "businessName": {
+      "title": "Змінити назву бізнесу",
+      "subtitle": "Запит на зміну назви вашого бізнесу"
+    },
+    "businessCategory": {
+      "title": "Змінити категорію бізнесу",
+      "subtitle": "Запит на зміну категорії вашого бізнесу"
+    },
+    "deleteAccount": {
+      "button": "Видалити акаунт",
+      "alertTitle": "Видалити акаунт?",
+      "alertMessage": "Це назавжди видалить ваш акаунт та всі ваші дані. Цю дію не можна скасувати.",
+      "cancel": "Скасувати",
+      "confirm": "Видалити",
+      "errorAlert": "Не вдалося видалити акаунт"
+    }
+  },
+  "language": {
+    "title": "Мова"
+  },
+  "notifications": {
+    "title": "Сповіщення",
+    "subtitle": "Будьте в курсі подій з BridgeUA",
+    "markAllAsRead": "Позначити всі як прочитані",
+    "guest": {
+      "title": "Зареєструйтеся для отримання сповіщень",
+      "description": "Створіть акаунт, щоб отримувати оновлення, акції, підписки та сповіщення про активність.",
+      "action": "Зареєструватися в BridgeUA"
+    },
+    "sections": {
+      "bookings": "Записи",
+      "activity": "Активність",
+      "reviewsEngagement": "Відгуки та взаємодія",
+      "teamOperations": "Команда та операції",
+      "general": "Загальне"
+    },
+    "rows": {
+      "newBookingRequest": { "title": "Новий запит на запис", "subtitle": "Коли клієнт надсилає запит на запис" },
+      "bookingConfirmed": { "title": "Запис підтверджено", "subtitle": "Коли запис підтверджено" },
+      "bookingCancelled": { "title": "Запис скасовано", "subtitle": "Коли запис скасовано" },
+      "newReview": { "title": "Новий відгук", "subtitle": "Коли клієнт залишає відгук" },
+      "systemUpdates": { "title": "Оновлення системи", "subtitle": "Важливі оновлення від BridgeUA" },
+      "teamActivity": { "title": "Активність команди", "subtitle": "Оновлення від членів вашої команди" },
+      "lowAvailability": { "title": "Мало доступних слотів", "subtitle": "Коли у вас залишається мало доступних слотів" },
+      "newFollower": { "title": "Новий підписник", "subtitle": "Коли хтось підписується на вас" },
+      "reviewUpvote": { "title": "Лайк на відгук", "subtitle": "Коли хтось ставить лайк вашому відгуку" },
+      "recommendation": { "title": "Рекомендація", "subtitle": "Коли хтось рекомендує бізнес вам" },
+      "promotions": { "title": "Акції", "subtitle": "Пропозиції та акції від бізнесів, на які ви підписані" }
+    },
+    "empty": {
+      "all": { "title": "Сповіщень поки немає", "description": "Тут з'являтимуться оновлення про вашу активність." },
+      "unread": { "title": "Непрочитаних немає", "description": "Ви все переглянули." },
+      "activity": { "title": "Активності поки немає", "description": "Тут з'являтимуться відгуки, рекомендації та підписники." },
+      "promos": { "title": "Акцій поки немає", "description": "Тут з'являтимуться пропозиції та акції від бізнесів." },
+      "updates": { "title": "Оновлень поки немає", "description": "Тут з'являтимуться системні та бізнес-оновлення." }
+    },
+    "filters": {
+      "all": "Усі",
+      "unread": "Непрочитані",
+      "activity": "Активність",
+      "promos": "Акції",
+      "updates": "Оновлення"
+    },
+    "groups": {
+      "new": "Нові",
+      "earlier": "Раніше"
+    }
+  },
+  "account": {
+    "title": "Акаунт та безпека",
+    "subtitle": "Управління обліковими даними",
+    "sections": {
+      "credentials": "Облікові дані",
+      "businessDetails": "Дані бізнесу",
+      "dangerZone": "Небезпечна зона"
+    },
+    "placeholders": {
+      "currentPassword": "Поточний пароль",
+      "newEmail": "Нова адреса email",
+      "newPassword": "Новий пароль",
+      "confirmPassword": "Підтвердіть пароль"
+    },
+    "buttons": {
+      "updateEmail": "Оновити email",
+      "updatePassword": "Оновити пароль",
+      "deleteAccount": "Видалити акаунт"
+    },
+    "alerts": {
+      "emailUpdated": "Email успішно оновлено",
+      "emailError": "Не вдалося оновити email",
+      "passwordUpdated": "Пароль успішно оновлено",
+      "passwordError": "Не вдалося оновити пароль",
+      "deleteConfirmTitle": "Видалити акаунт",
+      "deleteConfirmMessage": "Це незворотня дія. Всі ваші дані будуть видалені назавжди.",
+      "deleteCancel": "Скасувати",
+      "deleteConfirm": "Видалити",
+      "deleteError": "Не вдалося видалити акаунт"
+    }
+  },
+  "help": {
+    "title": "Центр допомоги",
+    "sections": {
+      "faq": "Часті питання",
+      "contact": "Контакти"
+    },
+    "faq": [
+      {
+        "question": "Як записатися на прийом?",
+        "answer": "Знайдіть бізнес, натисніть «Записатися», оберіть послугу, спеціаліста та зручний час, потім підтвердіть."
+      },
+      {
+        "question": "Як скасувати запис?",
+        "answer": "Перейдіть до своїх записів, відкрийте потрібний запис і натисніть «Скасувати». Скасування безкоштовне за 24 години до прийому."
+      },
+      {
+        "question": "Як залишити відгук?",
+        "answer": "Відвідайте сторінку бізнесу та прокрутіть до розділу «Відгуки». Натисніть «Написати відгук» і поділіться своїм досвідом."
+      },
+      {
+        "question": "Як верифікувати мій бізнес?",
+        "answer": "Перейдіть до профілю бізнесу та натисніть «Запит на верифікацію». Наша команда розгляне вашу заявку протягом 3 робочих днів."
+      },
+      {
+        "question": "Чому мій бізнес не відображається на карті?",
+        "answer": "Переконайтеся, що адреса збережена та увімкнено «Показувати у пошуку» в налаштуваннях."
+      }
+    ],
+    "contact": {
+      "emailSupport": "Підтримка Email",
+      "reportBug": "Повідомити про помилку",
+      "contactUs": "Зв'язатися з нами"
+    }
+  },
+  "contact": {
+    "title": "Зв'язатися з нами",
+    "email": "Email",
+    "phone": "Телефон",
+    "instagram": "Instagram",
+    "facebook": "Facebook",
+    "telegram": "Telegram"
+  },
+  "payment": {
+    "title": "Способи оплати",
+    "comingSoon": "Способи оплати незабаром",
+    "workingOnIt": "Ми працюємо над цим. Перевірте пізніше."
+  },
+  "privacy": {
+    "title": "Політика конфіденційності",
+    "lastUpdated": "Останнє оновлення: Січень 2025",
+    "sections": [
+      {
+        "heading": "Дані, які ми збираємо",
+        "body": "Ми збираємо інформацію, яку ви надаєте безпосередньо: ім'я, адресу електронної пошти та деталі профілю. Також збираємо дані про використання: відвідані сторінки, функції та інформацію про пристрій. З вашого дозволу може збиратися геолокація під час використання карти чи пошуку."
+      },
+      {
+        "heading": "Як ми використовуємо ваші дані",
+        "body": "Ваші дані використовуються для надання та покращення сервісу BridgeUA, зокрема персоналізованих рекомендацій та управління записами. Контактні дані можуть використовуватися для надсилання сервісних сповіщень і, за вашої згоди, промоматеріалів. Агреговані та анонімізовані дані можуть використовуватися для аналітики."
+      },
+      {
+        "heading": "Передача даних",
+        "body": "Ми не продаємо ваші особисті дані третім особам. Дані можуть передаватися постачальникам послуг, які допомагають нам в роботі платформи, відповідно до зобов'язань про конфіденційність. Ми також можемо розкрити дані на вимогу закону або для захисту прав та безпеки наших користувачів."
+      },
+      {
+        "heading": "Ваші права",
+        "body": "Ви маєте право на доступ, виправлення або видалення особистих даних, які ми зберігаємо. Ви можете відкликати згоду на необов'язкову обробку даних у будь-який час через налаштування акаунту. Щоб скористатися будь-яким із цих прав, зверніться до нас за адресою support@bridgeua.com."
+      },
+      {
+        "heading": "Контакти",
+        "body": "З питань щодо цієї Політики конфіденційності або обробки ваших даних звертайтесь до нас за адресою support@bridgeua.com. Ми прагнемо відповідати на всі запити протягом 5 робочих днів. Ця політика може оновлюватися; продовження використання додатку означає прийняття будь-яких змін."
+      }
+    ]
+  },
+  "terms": {
+    "title": "Умови використання",
+    "lastUpdated": "Останнє оновлення: Січень 2025",
+    "sections": [
+      {
+        "heading": "Прийняття умов",
+        "body": "Користуючись BridgeUA, ви погоджуєтеся дотримуватися цих Умов використання та нашої Політики конфіденційності. Якщо ви не погоджуєтесь, будь ласка, не використовуйте додаток. Ми залишаємо за собою право оновлювати ці умови в будь-який час; продовження використання означає прийняття змін."
+      },
+      {
+        "heading": "Використання додатку",
+        "body": "Ви погоджуєтеся використовувати BridgeUA лише в законних цілях та відповідно до цих умов. Забороняється намагатися отримати несанкціонований доступ до будь-якої частини платформи або заважати її нормальній роботі. Ми залишаємо за собою право призупинити або заблокувати акаунти, що порушують ці умови."
+      },
+      {
+        "heading": "Контент користувачів",
+        "body": "Ви зберігаєте права власності на будь-який контент, який ви завантажуєте, включаючи відгуки та інформацію профілю, але надаєте BridgeUA ліцензію на відображення та використання цього контенту в межах платформи. Ви несете відповідальність за те, щоб ваш контент не порушував права третіх осіб. Ми можемо видаляти контент, що порушує наші правила."
+      },
+      {
+        "heading": "Записи та оплата",
+        "body": "BridgeUA забезпечує записи між користувачами та бізнесами, але не є стороною цих угод. Обробка платежів здійснюється сторонніми постачальниками; до них застосовуються їхні умови. Правила скасування та повернення коштів встановлюються окремими бізнесами і відображаються під час запису."
+      },
+      {
+        "heading": "Припинення використання",
+        "body": "Будь-яка зі сторін може припинити використання платформи в будь-який час. Ми можемо призупинити або видалити ваш акаунт у разі порушення цих умов або поведінки, що завдає шкоди платформі чи її користувачам. Після припинення ваше право на використання BridgeUA негайно втрачає силу."
+      },
+      {
+        "heading": "Контакти",
+        "body": "З питань щодо цих Умов використання звертайтесь до нас за адресою support@bridgeua.com. Ми прагнемо відповідати на всі запити протягом 5 робочих днів. У термінових випадках, будь ласка, вкажіть про це в темі повідомлення."
+      }
+    ]
+  },
+  "profile": {
+    "business": {
+      "errorLoadFailed": "Не вдалося завантажити профіль бізнесу.",
+      "locationNotAdded": "Локацію ще не додано",
+      "editProfile": "Редагувати профіль",
+      "switchAccount": "Змінити акаунт",
+      "viewPublicPage": "Переглянути публічну сторінку",
+      "analytics": "Аналітика",
+      "upcomingBookings": "Майбутні бронювання",
+      "viewAll": "Дивитися всі",
+      "viewAllBookings": "Всі бронювання",
+      "noUpcomingBookings": "Немає майбутніх бронювань",
+      "myTeam": "Моя команда",
+      "noTeamMembers": "Команди ще немає",
+      "reviews": "Відгуки",
+      "noReviews": "Відгуків ще немає.",
+      "reply": "Відповісти",
+      "reviewsCount": "{{count}} відгуків",
+      "vsLastMonth": "vs минулий місяць",
+      "clientFallback": "Клієнт",
+      "serviceFallback": "Послуга",
+      "statusConfirmed": "Підтверджено",
+      "notificationsTitle": "У вас 3 нових сповіщення",
+      "notificationsSubtitle": "@kyril залишив відгук, нове бронювання від..."
+    },
+    "editProfile": {
+      "title": "Редагувати профіль",
+      "subtitle": "Оновіть свій особистий профіль",
+      "tapToChangePhoto": "Натисніть, щоб змінити фото",
+      "labelFirstName": "Ім'я",
+      "placeholderFirstName": "Введіть ім'я",
+      "labelLastName": "Прізвище",
+      "placeholderLastName": "Введіть прізвище",
+      "labelUsername": "Ім'я користувача",
+      "placeholderUsername": "Введіть ім'я користувача",
+      "labelEmail": "Email",
+      "helperEmail": "Цей email прив'язаний до вашого акаунту і не може бути змінений тут.",
+      "labelPhone": "Номер телефону",
+      "helperPhone": "Ваш номер телефону є приватним і не буде видимим іншим користувачам.",
+      "errorPhone": "Введіть дійсний номер телефону.",
+      "labelDateOfBirth": "Дата народження",
+      "helperDateOfBirth": "Ваша дата народження є приватною і використовується лише для пропозицій до дня народження.",
+      "placeholderDateOfBirth": "Оберіть дату народження",
+      "saveButton": "Зберегти зміни",
+      "savingButton": "Збереження...",
+      "discardTitle": "Скасувати зміни?",
+      "discardMessage": "У вас є незбережені зміни. Ви впевнені, що хочете вийти?",
+      "discardKeepEditing": "Продовжити редагування",
+      "discardConfirm": "Скасувати",
+      "permissionTitle": "Потрібен дозвіл",
+      "permissionMessage": "Будь ласка, надайте доступ до фото, щоб змінити фото профілю.",
+      "errorTitle": "Помилка",
+      "errorMessage": "Не вдалося зберегти профіль. Спробуйте ще раз."
+    },
+    "personal": {
+      "editProfile": "Редагувати профіль",
+      "switchAccount": "Змінити акаунт",
+      "statFollowing": "Підписки",
+      "statReviews": "Відгуки",
+      "statBookings": "Бронювання",
+      "upcomingAppointments": "Майбутні записи",
+      "noUpcomingAppointments": "Немає майбутніх записів",
+      "noUpcomingAppointmentsDesc": "Записи, зроблені через BridgeUA, з'являться тут.",
+      "youFollow": "Ви підписані",
+      "yourReviews": "Ваші відгуки",
+      "seeAll": "Дивитися всі",
+      "emptyFollowing": "Немає підписок",
+      "emptyFollowingDesc": "Бізнеси, на які ви підписані, з'являться тут.",
+      "emptyReviews": "Ще немає відгуків",
+      "emptyReviewsDesc": "Ваші відгуки з'являться тут після того, як ви поділитеся досвідом.",
+      "readMore": "Читати більше",
+      "showLess": "Згорнути"
+    },
+    "guest": {
+      "headerTitle": "Приєднатися до BridgeUA",
+      "headerSubtitle": "Створіть профіль та знайдіть перевірені бізнеси",
+      "cardTitle": "Зареєструватися в BridgeUA",
+      "cardDescription": "Створіть акаунт, щоб підписуватися на бізнеси, отримувати персоналізовані оновлення, акції та ділитися рекомендаціями з спільнотою.",
+      "benefits": {
+        "follow": "Підписуватися на перевірені бізнеси",
+        "promotions": "Отримувати акції та новини",
+        "reviews": "Залишати рекомендації та відгуки",
+        "notifications": "Отримувати сповіщення про активність"
+      },
+      "registerButton": "Зареєструватися в BridgeUA"
+    },
+    "following": {
+      "title": "Підписки",
+      "subtitle": "Бізнеси, на які ви підписані",
+      "searchPlaceholder": "Знайти бізнес",
+      "empty": {
+        "title": "Бізнесів не знайдено",
+        "descriptionFiltered": "Спробуйте змінити або скинути фільтри.",
+        "descriptionEmpty": "Підпишіться на бізнеси, щоб бачити їх тут.",
+        "clearFilters": "Скинути фільтри"
+      }
+    },
+    "reviews": {
+      "title": "Мої відгуки",
+      "subtitle": "Відгуки, які ви написали",
+      "emptyTitle": "Ще немає відгуків",
+      "emptyDesc": "Ваші відгуки з'являться тут.",
+      "discardTitle": "Скасувати зміни?",
+      "discardMessage": "У вас є незбережені зміни у цьому відгуку.",
+      "discardKeepEditing": "Продовжити редагування",
+      "discardConfirm": "Скасувати",
+      "notFoundTitle": "Відгук не знайдено",
+      "notFoundMessage": "Цей відгук не вдалося оновити.",
+      "deleteTitle": "Видалити відгук?",
+      "deleteMessage": "Це видалить ваш відгук з цього бізнесу.",
+      "editTitle": "Редагувати відгук",
+      "updatePlaceholder": "Оновіть ваш відгук...",
+      "save": "Зберегти",
+      "saving": "Збереження..."
+    }
+  },
+  "common": {
+    "back": "Назад",
+    "save": "Зберегти зміни",
+    "cancel": "Скасувати",
+    "delete": "Видалити",
+    "error": "Помилка",
+    "loading": "Завантаження...",
+    "search": "Пошук",
+    "filter": "Фільтр",
+    "english": "English",
+    "ukrainian": "Українська",
+    "ok": "OK"
+  },
+  "bookings": {
+    "title": "Бронювання",
+    "subtitle": "Відстежуйте свої записи та перебронюйте спеціалістів.",
+    "tabActive": "Активні",
+    "tabPast": "Минулі",
+    "tabCancelled": "Скасовані",
+    "emptyActive": "Немає активних бронювань",
+    "emptyActiveDesc": "Записи через BridgeUA з'являться тут.",
+    "emptyPast": "Ще немає минулих записів",
+    "emptyPastDesc": "Після завершення запису він з'явиться тут, щоб ви могли знайти спеціаліста знову.",
+    "emptyCancelled": "Немає скасованих записів",
+    "emptyCancelledDesc": "Скасовані записи з'являться тут.",
+    "appointmentDetails": "Деталі запису",
+    "appointmentSubtitle": "Перегляньте деталі вашого запису.",
+    "cancelTitle": "Скасувати запис",
+    "cancelMessage": "Ви впевнені, що хочете скасувати цей запис?",
+    "cancelConfirm": "Так, скасувати",
+    "cancelSuccess": "Скасовано",
+    "cancelSuccessMessage": "Ваш запис скасовано.",
+    "cancelError": "Не вдалося скасувати запис. Спробуйте ще раз.",
+    "cancelButton": "Скасувати запис",
+    "cancellingButton": "Скасування...",
+    "confirmButton": "Підтвердити запис",
+    "confirmingButton": "Підтвердження...",
+    "retryButton": "Спробувати ще раз",
+    "bookingFailed": "Помилка бронювання",
+    "nextButton": "Далі",
+    "continueButton": "Продовжити",
+    "priceOnRequest": "Ціна за запитом",
+    "durationVaries": "Тривалість варіюється",
+    "fallbackSpecialist": "Обраний спеціаліст",
+    "fallbackService": "Обрана послуга",
+    "fallbackBusiness": "Обраний бізнес",
+    "fallbackDateNotSelected": "Дату не обрано",
+    "fallbackTimeNotSelected": "Час не обрано",
+    "fallbackCustomer": "Клієнт",
+    "fallbackPhoneNotAdded": "Телефон не додано",
+    "specialistRole": "Спеціаліст",
+    "noSlotsTitle": "Немає доступних слотів",
+    "noSlotsTryDate": "Спробувати іншу дату",
+    "noSlotsChooseSpecialist": "Обрати іншого спеціаліста",
+    "noSlotsContactBusiness": "Зв'язатися з бізнесом",
+    "personalDetailsNamePlaceholder": "Введіть ваше ім'я",
+    "personalDetailsSurnamePlaceholder": "Введіть ваше прізвище",
+    "personalDetailsPhonePlaceholder": "Введіть номер телефону",
+    "noInternetSlots": "Немає інтернету. Перевірте з'єднання.",
+    "chooseServiceTitle": "Оберіть послугу",
+    "chooseServiceSubtitle": "Оберіть одну послугу для запису.",
+    "chooseServiceLoading": "Завантаження послуг...",
+    "chooseServiceEmpty": "Цей бізнес ще не додав послуги для бронювання.",
+    "chooseSpecialistTitle": "Оберіть спеціаліста",
+    "chooseSpecialistSubtitle": "Оберіть спеціаліста для запису.",
+    "chooseSpecialistEmpty": "Немає доступних спеціалістів",
+    "chooseSpecialistEmptyDesc": "Для цієї послуги ще немає доступних спеціалістів. Будь ласка, оберіть іншу послугу або зверніться до бізнесу.",
+    "chooseDateTitle": "Оберіть дату й час",
+    "chooseDateAvailableTimes": "Доступний час",
+    "chooseDateLoadingTimes": "Завантаження доступного часу...",
+    "chooseDateNoSlots": "Немає доступного часу на цю дату. Будь ласка, оберіть іншу дату.",
+    "specialistToday": "Сьогодні о {{time}}",
+    "specialistTomorrow": "Завтра о {{time}}",
+    "personalDetailsTitle": "Особисті дані",
+    "chooseDateSubtitle": "Оберіть доступну дату та час запису.",
+    "chooseDateSectionDate": "Дата",
+    "personalDetailsSubtitle": "Ми використаємо ці дані для вашого бронювання. Ви можете змінити їх для цього запису.",
+    "personalDetailsLabelName": "Ім'я",
+    "personalDetailsLabelSurname": "Прізвище",
+    "personalDetailsLabelPhone": "Номер телефону",
+    "confirmTitle": "Підтвердити запис",
+    "confirmSubtitle": "Перегляньте деталі запису перед надсиланням запиту.",
+    "missingDetailsTitle": "Відсутні дані про запис",
+    "missingDetailsDesc": "Будь ласка, поверніться назад і заповніть всі кроки.",
+    "selectSpecialistTitle": "Оберіть спеціаліста",
+    "selectSpecialistDesc": "Будь ласка, поверніться назад та оберіть конкретного спеціаліста перед підтвердженням."
+  },
+  "teamMember": {
+    "subtitle": "Член команди",
+    "tabServices": "Послуги",
+    "tabBookings": "Бронювання",
+    "emptyServices": "Немає призначених послуг",
+    "emptyServicesDesc": "Цей член команди ще не має призначених послуг.",
+    "emptyBookings": "Ще немає бронювань",
+    "emptyBookingsDesc": "Бронювання для цього члена команди з'являться тут.",
+    "notFound": "Члена команди не знайдено.",
+    "minutes": "хв",
+    "priceFrom": "від"
+  },
+  "filter": {
+    "tabSort": "Сортування",
+    "tabCategories": "Категорії",
+    "tabRatings": "Рейтинг",
+    "tabDistance": "Відстань",
+    "sectionSortBy": "СОРТУВАТИ ЗА",
+    "sectionFoodCuisines": "КУХНІ СВІТУ",
+    "sectionCategories": "КАТЕГОРІЇ",
+    "applyButton": "Застосувати"
+  },
+  "locationSelector": {
+    "label": "Локація",
+    "selectPlaceholder": "Оберіть локацію"
+  },
+  "categories": {
+    "promo": "Акції",
+    "beauty": "Краса",
+    "food": "Їжа",
+    "auto": "Авто",
+    "home-repair": "Дім та ремонт",
+    "education": "Освіта",
+    "health-medical": "Здоров'я та медицина"
+  },
+  "map": {
+    "title": "Мапа",
+    "subtitle": "Відкривайте на мапі",
+    "searchPlaceholder": "Знайти на мапі",
+    "getDirections": "Прокласти маршрут"
+  },
+  "home": {
+    "title": "Огляд",
+    "subtitle": "Перевірені місця спільноти",
+    "allCategories": "Всі категорії",
+    "searchPlaceholder": "Знайти послуги, їжу або місця",
+    "recentSearches": "Останні пошуки",
+    "clearAll": "Очистити все",
+    "locationSeeNearby": "Поряд зі мною",
+    "locationAllLocations": "Всі локації",
+    "locationNearYou": "Поряд зі мною",
+    "locationPermissionTitle": "Використати геолокацію?",
+    "locationPermissionMessage": "Дозвольте доступ до геолокації, щоб знайти бізнеси поряд.",
+    "locationPermissionNotNow": "Не зараз",
+    "locationPermissionAllow": "Дозволити",
+    "errorNoInternet": "Немає інтернету",
+    "errorSomethingWrong": "Щось пішло не так",
+    "errorNoInternetDesc": "Перевірте з'єднання та спробуйте ще раз.",
+    "errorLoadFailedDesc": "Не вдалося завантажити бізнеси. Спробуйте ще раз.",
+    "errorTryAgain": "Спробувати ще раз",
+    "emptySearchTitle": "Бізнесів за запитом «{{query}}» не знайдено",
+    "emptyTitle": "Бізнесів не знайдено",
+    "emptySearchDesc": "Спробуйте іншу назву бізнесу.",
+    "emptyDesc": "Спробуйте змінити або скинути фільтри, щоб знайти більше місць.",
+    "clearSearch": "Очистити пошук",
+    "clearFilters": "Скинути фільтри"
+  },
+  "admin": {
+    "users": {
+      "title": "Користувачі",
+      "subtitle": "Управління акаунтами",
+      "addNew": "Додати користувача",
+      "searchPlaceholder": "Пошук за іменем, email або username...",
+      "filterAll": "Усі",
+      "filterPersonal": "Особисті",
+      "filterBusiness": "Бізнес",
+      "deleteTitle": "Видалити користувача",
+      "deleteConfirm": "Видалити {{email}}? Цю дію не можна скасувати.",
+      "deleteButton": "Видалити",
+      "deleteSuccess": "Користувача видалено",
+      "errorLoad": "Не вдалося завантажити користувачів",
+      "errorDelete": "Не вдалося видалити користувача",
+      "isAdminLabel": "адмін",
+      "isUnconfirmedLabel": "непідтверджений"
+    },
+    "userDetail": {
+      "sectionAccount": "Акаунт",
+      "sectionProfile": "Профіль",
+      "sectionBusiness": "Бізнес",
+      "labelEmail": "Email",
+      "labelPassword": "Новий пароль (залиште порожнім, щоб не змінювати)",
+      "labelAdmin": "Адмін",
+      "labelFirstName": "Ім'я",
+      "labelLastName": "Прізвище",
+      "labelUsername": "Username",
+      "labelPhone": "Телефон",
+      "labelBusinessName": "Назва бізнесу",
+      "labelOwnerName": "Ім'я власника",
+      "labelAddress": "Адреса",
+      "labelCity": "Місто",
+      "labelState": "Область",
+      "labelZip": "Поштовий індекс",
+      "labelCuisine": "Кухня",
+      "placeholderEmail": "Email",
+      "placeholderPassword": "Новий пароль",
+      "placeholderFirstName": "Ім'я",
+      "placeholderLastName": "Прізвище",
+      "placeholderUsername": "Username",
+      "placeholderPhone": "Номер телефону",
+      "placeholderBusinessName": "Назва бізнесу",
+      "placeholderOwnerName": "Повне ім'я власника",
+      "placeholderAddress": "Адреса",
+      "placeholderCity": "Місто",
+      "placeholderState": "Область",
+      "placeholderZip": "Поштовий індекс",
+      "placeholderCuisine": "Кухня",
+      "saveButton": "Зберегти зміни",
+      "savingButton": "Збереження...",
+      "saveSuccess": "Збережено",
+      "saveSuccessMessage": "Користувача успішно оновлено",
+      "errorLoad": "Не вдалося завантажити користувача",
+      "errorSave": "Не вдалося зберегти"
+    },
+    "createUser": {
+      "title": "Новий користувач",
+      "sectionAccount": "Акаунт",
+      "sectionProfile": "Профіль",
+      "sectionBusiness": "Бізнес",
+      "labelEmail": "Email *",
+      "labelPassword": "Пароль *",
+      "labelFirstName": "Ім'я",
+      "labelLastName": "Прізвище",
+      "labelUsername": "Username",
+      "labelPhone": "Телефон",
+      "labelBusinessName": "Назва бізнесу *",
+      "labelOwnerName": "Ім'я власника",
+      "labelAddress": "Адреса",
+      "labelCity": "Місто",
+      "labelState": "Область",
+      "labelZip": "Поштовий індекс",
+      "labelCuisine": "Кухня",
+      "placeholderEmail": "email@example.com",
+      "placeholderPassword": "Пароль",
+      "placeholderFirstName": "Ім'я",
+      "placeholderLastName": "Прізвище",
+      "placeholderUsername": "Username",
+      "placeholderPhone": "Номер телефону",
+      "placeholderBusinessName": "Назва бізнесу",
+      "placeholderOwnerName": "Повне ім'я власника",
+      "placeholderAddress": "Адреса",
+      "placeholderCity": "Місто",
+      "placeholderState": "Область",
+      "placeholderZip": "Поштовий індекс",
+      "placeholderCuisine": "Кухня",
+      "createButton": "Створити користувача",
+      "creatingButton": "Створення...",
+      "createSuccess": "Створено",
+      "createSuccessMessage": "Користувача успішно створено",
+      "validationTitle": "Перевірка",
+      "validationEmailPassword": "Email та пароль є обов'язковими",
+      "validationBusinessName": "Назва бізнесу є обов'язковою",
+      "errorCreate": "Не вдалося створити користувача"
+    }
+  },
+  "accountSwitcher": {
+    "title": "Змінити акаунт",
+    "personal": "Особистий акаунт",
+    "business": "Бізнес акаунт",
+    "notifications_one": "{{count}} нове сповіщення",
+    "notifications_other": "{{count}} нових сповіщень",
+    "addAccount": "Додати акаунт"
+  },
+  "business": {
+    "statusOpen": "Відчинено",
+    "statusClosed": "Зачинено",
+    "closesAt": "Зачиняється о {{time}}",
+    "opensAt": "Відчиняється о {{time}}",
+    "previewMode": "Режим перегляду",
+    "previewSubtitle": "Незбережені зміни бачите лише ви",
+    "notFound": "Бізнес не знайдено",
+    "errorLoadDetails": "Не вдалося завантажити дані бізнесу.",
+    "errorLoadReviews": "Не вдалося завантажити відгуки.",
+    "viewAll": "Переглянути всі",
+    "alertNotAvailableTitle": "Недоступно",
+    "alertNotAvailableDesc": "Бізнес-акаунти не можуть залишати відгуки.",
+    "tabOverview": "Огляд",
+    "tabServices": "Послуги",
+    "tabReviews": "Відгуки",
+    "tabPhotos": "Фото",
+    "tabAbout": "Про нас",
+    "topReviews": "Топ відгуки",
+    "yourBusiness": "Ваш бізнес",
+    "recommendedBy": "Рекомендують",
+    "recommends": "Рекомендує",
+    "hours": "Години роботи",
+    "amenities": "Зручності",
+    "languagesSpoken": "Мови обслуговування",
+    "socialLinks": "Соціальні мережі",
+    "recommendedByNames": "Рекомендують: {{names}}"
+  },
+  "edit": {
+    "title": "Редагувати бізнес",
+    "tabOverview": "Огляд",
+    "tabGallery": "Галерея",
+    "tabServices": "Послуги",
+    "tabAbout": "Про нас",
+    "preview": "Перегляд",
+    "unsavedTitle": "Незбережені зміни",
+    "unsavedMessage": "У вас є незбережені зміни. Ви впевнені, що хочете вийти?",
+    "unsavedStay": "Залишитись",
+    "unsavedLeave": "Вийти"
+  },
+  "businessBookings": {
+    "title": "Бронювання",
+    "subtitle": "Керуйте майбутніми та минулими бронюваннями вашого бізнесу.",
+    "tabUpcoming": "Майбутні",
+    "tabPast": "Минулі",
+    "tabCancelled": "Скасовані",
+    "errorBanner": "Не вдалося завантажити бронювання",
+    "errorDesc": "Не вдалося завантажити бронювання. Будь ласка, спробуйте ще раз.",
+    "fallbackClient": "Клієнт",
+    "fallbackService": "Послуга",
+    "fallbackSpecialist": "Будь-який спеціаліст",
+    "fallbackPrice": "Ціна за запитом",
+    "emptyUpcomingTitle": "Немає майбутніх бронювань",
+    "emptyUpcomingDesc": "Нові бронювання від клієнтів з'являться тут після реєстрації.",
+    "emptyPastTitle": "Ще немає минулих бронювань",
+    "emptyPastDesc": "Завершені бронювання з'являться тут.",
+    "emptyCancelledTitle": "Немає скасованих бронювань",
+    "emptyCancelledDesc": "Скасовані бронювання клієнтів з'являться тут."
+  },
+  "writeReview": {
+    "title": "Написати відгук",
+    "notFound": "Бізнес не знайдено",
+    "permissionTitle": "Потрібен дозвіл",
+    "permissionDesc": "Будь ласка, дозвольте доступ до фото для додавання зображень до відгуку.",
+    "alreadyReviewedTitle": "Відгук вже залишено",
+    "alreadyReviewedDesc": "Ви вже залишили відгук для цього бізнесу.",
+    "submitErrorTitle": "Не вдалося надіслати відгук",
+    "successTitle": "Відгук надіслано",
+    "successDesc": "Дякуємо!",
+    "done": "Готово",
+    "labelRating": "Ваша оцінка",
+    "labelReview": "Ваш відгук",
+    "reviewPlaceholder": "Поділіться своїм враженням",
+    "labelPhotos": "Додати фото",
+    "labelLiked": "Що вам сподобалось?",
+    "optional": "(необов'язково)",
+    "addPhoto": "Додати фото",
+    "submitButton": "Надіслати відгук",
+    "submittingButton": "Надсилання...",
+    "ratingExcellent": "Відмінно",
+    "ratingGreat": "Чудово",
+    "ratingGood": "Добре",
+    "ratingBetter": "Могло бути краще",
+    "ratingPoor": "Погано",
+    "ratingTap": "Натисніть для оцінки",
+    "tagGreatService": "Відмінний сервіс",
+    "tagClean": "Чисто та комфортно",
+    "tagProfessional": "Професійний персонал",
+    "tagValue": "Хороше співвідношення ціни та якості",
+    "tagEasyBooking": "Легке бронювання",
+    "tagRelaxing": "Розслаблена атмосфера"
+  },
+  "recommendedBy": {
+    "title": "Рекомендують",
+    "subtitle": "Бізнеси, які довіряють та рекомендують це місце",
+    "emptyTitle": "Ще немає рекомендацій",
+    "emptyDesc": "Бізнеси, що рекомендують це місце, з'являться тут."
+  },
+  "recommends": {
+    "title": "Рекомендує",
+    "subtitle": "Бізнеси, які рекомендує це місце",
+    "emptyTitle": "Ще немає рекомендацій",
+    "emptyDesc": "Рекомендовані цим місцем бізнеси з'являться тут."
+  },
+  "following": {
+    "title": "Новини та акції",
+    "subtitleOwner": "Додавайте та переглядайте новини й акції",
+    "subtitleFollower": "Оновлення від підписаних бізнесів",
+    "locationLabel": "Локація",
+    "allLocations": "Всі локації",
+    "seeNearby": "Поряд зі мною",
+    "nearYou": "Поруч",
+    "searchPlaceholder": "Пошук...",
+    "tabPromotions": "Акції",
+    "tabNews": "Новини",
+    "useLocationTitle": "Використати геолокацію?",
+    "useLocationDesc": "Дозвольте доступ до геолокації, щоб бачити підписані бізнеси поруч.",
+    "notNow": "Не зараз",
+    "allow": "Дозволити",
+    "guestEmptyTitle": "Зареєструйтесь, щоб бачити акції та новини",
+    "guestEmptyDesc": "Реєструйтесь та підписуйтесь на бізнеси, щоб бачити їх акції та новини.",
+    "guestButton": "Зареєструватись у BridgeUA",
+    "emptyNoFollowTitle": "Ви ще нікого не підписані",
+    "emptyNoFollowDesc": "Підписуйтесь на бізнеси, щоб бачити їх акції та новини тут.",
+    "emptyNoItemsTitle": "Немає {{type}}",
+    "emptyNoItemsDesc": "Спробуйте скоригувати або очистити фільтри.",
+    "emptyNoPromotions": "Наразі акцій немає. Перегляньте Новини!",
+    "emptyNoNews": "Наразі новин немає. Перегляньте Акції!",
+    "clearFilters": "Очистити фільтри",
+    "createPromotion": "Створити акцію",
+    "createNews": "Створити новину",
+    "unsavedTitle": "Незбережені зміни",
+    "unsavedMessage": "У вас є незбережені зміни. Що бажаєте зробити?",
+    "keepEditing": "Продовжити редагування",
+    "saveDraft": "Зберегти чернетку",
+    "discard": "Відхилити",
+    "deletePromotionTitle": "Видалити акцію",
+    "deleteNewsTitle": "Видалити новину",
+    "deleteCannotUndo": "Цю дію не можна скасувати.",
+    "cancel": "Скасувати",
+    "delete": "Видалити",
+    "errorTitle": "Помилка",
+    "errorSavePromotion": "Не вдалося зберегти акцію. Спробуйте ще раз.",
+    "errorPublishPromotion": "Не вдалося опублікувати акцію. Спробуйте ще раз.",
+    "errorDeletePromotion": "Не вдалося видалити акцію. Спробуйте ще раз.",
+    "errorSaveNews": "Не вдалося зберегти новину. Спробуйте ще раз.",
+    "errorPublishNews": "Не вдалося опублікувати новину. Спробуйте ще раз.",
+    "errorDeleteNews": "Не вдалося видалити новину. Спробуйте ще раз.",
+    "untitledPromotion": "Без назви (акція)",
+    "untitledNews": "Без назви (новина)",
+    "noDescription": "Опис ще не додано.",
+    "yourBusiness": "Ваш бізнес"
+  },
+  "dashboard": {
+    "bookings": "Бронювання",
+    "newClients": "Нові клієнти",
+    "followers": "Підписники"
+  },
+  "quickActions": {
+    "title": "Швидкі дії",
+    "edit": "Редагувати",
+    "editTitle": "Редагувати швидкі дії",
+    "cancel": "Скасувати",
+    "save": "Зберегти",
+    "addPromo": "Додати акцію",
+    "addNews": "Додати новину",
+    "editBusiness": "Редаг. бізнес",
+    "editServices": "Редаг. послуги",
+    "editGallery": "Редаг. галерею",
+    "viewBookings": "Бронювання",
+    "viewReviews": "Відгуки",
+    "shareBusiness": "Поділитись",
+    "publicProfile": "Публ. профіль",
+    "myTeam": "Моя команда",
+    "recommends": "Рекомендації",
+    "recommendedBy": "Рекомендують"
+  },
+  "reviewFilters": {
+    "mostRelevant": "Найбільш релевантні",
+    "newest": "Найновіші",
+    "highest": "Найвища оцінка",
+    "lowest": "Найнижча оцінка"
+  },
+  "businessServices": {
+    "emptyTitle": "Послуг ще немає",
+    "emptyDesc": "Цей бізнес ще не додав послуги."
+  },
+  "businessBooking": {
+    "title": "Записатися",
+    "selectServices": "Оберіть послуги",
+    "selectServicesSubtitle": "Оберіть одну або кілька послуг"
+  },
+  "businessReviews": {
+    "writeTitle": "Написати відгук",
+    "writeHint": "Поділіться досвідом та допоможіть спільноті.",
+    "reviewPhotos": "Фото відгуків",
+    "allReviews": "Всі відгуки",
+    "totalCount": "{{count}} всього",
+    "emptyTitle": "Відгуків ще немає",
+    "emptyDesc": "Будьте першим, хто поділиться враженнями."
+  },
+  "reviewCard": {
+    "edited": "Редаговано",
+    "editAction": "Редагувати відгук",
+    "deleteAction": "Видалити відгук",
+    "showLess": "Згорнути",
+    "readMore": "Читати більше",
+    "more": "Більше"
+  },
+  "follow": {
+    "following": "Підписано",
+    "follow": "Підписатися"
+  },
+  "recommend": {
+    "confirmTitle": "Рекомендувати {{businessName}}?",
+    "confirmBody": "Ваша рекомендація буде публічно видима та відображена на профілі цього бізнесу. Інші користувачі побачать, що ви підтримуєте це місце.",
+    "confirm": "Рекомендувати",
+    "fallbackName": "цей бізнес"
+  },
+  "promotion": {
+    "badge": "Акція",
+    "viewBusiness": "Переглянути {{businessName}}"
+  },
+  "filterOptions": {
+    "activeFilters": "АКТИВНІ ФІЛЬТРИ",
+    "filterByRating": "ФІЛЬТР ЗА РЕЙТИНГОМ",
+    "filterByDistance": "ФІЛЬТР ЗА ВІДСТАННЮ",
+    "sortRelevance": "Релевантність (за замовчуванням)",
+    "sortDistance": "Відстань",
+    "sortRating": "Рейтинг",
+    "sortPriceLow": "Ціна: від низької до високої",
+    "sortPriceHigh": "Ціна: від високої до низької",
+    "ratingAny": "Будь-який рейтинг",
+    "distanceNearby": "Поряд"
+  }
+}

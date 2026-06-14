@@ -1,5 +1,6 @@
 import { Feather } from "@expo/vector-icons";
 import { Image, Modal, Pressable, Text, View } from "react-native";
+import { useTranslation } from "react-i18next";
 
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import type { HomePromotion } from "@/src/features/promotions/types/promotion.types";
@@ -20,6 +21,7 @@ export default function HomePromotionModal({
 }: Props) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+  const { t } = useTranslation();
 
   if (!promotion) {
     return null;
@@ -50,7 +52,7 @@ export default function HomePromotionModal({
             onPress={() => onPressCta(promotion)}
           >
             <Text style={styles.ctaText}>
-              {promotion.ctaLabel ?? `View ${promotion.businessName}`}
+              {promotion.ctaLabel ?? t("promotion.viewBusiness", { businessName: promotion.businessName })}
             </Text>
           </Pressable>
         </View>
