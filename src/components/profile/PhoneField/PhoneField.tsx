@@ -11,12 +11,14 @@ type Props = {
   value: string;
   onChange: (value: string) => void;
   onValidationChange: (isValid: boolean) => void;
+  onFocus?: () => void;
 };
 
 export default function PhoneField({
   value,
   onChange,
   onValidationChange,
+  onFocus,
 }: Props) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
@@ -29,9 +31,7 @@ export default function PhoneField({
 
   const handleClear = () => {
     onChange("");
-
     onValidationChange(false);
-
     setInputKey((currentKey) => currentKey + 1);
   };
 
@@ -49,7 +49,9 @@ export default function PhoneField({
         flagTextStyle={styles.flag}
         textInputProps={{
           placeholder: "Add phone number",
+          placeholderTextColor: colors.textMuted,
           returnKeyType: "done",
+          onFocus,
         }}
       />
 

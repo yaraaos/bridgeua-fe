@@ -3,6 +3,7 @@ import ClearableInput from "@/src/components/ui/ClearableInput";
 import { useAppTheme } from "@/src/hooks/useAppTheme";
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker, {
+  DateTimePickerAndroid,
   DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
 import React, { useState } from "react";
@@ -15,6 +16,8 @@ type Props = {
   placeholder?: string;
 };
 
+const formatDate = (date: Date) => date.toISOString().split("T")[0];
+
 export default function DateField({
   value,
   onChange,
@@ -24,20 +27,43 @@ export default function DateField({
   const styles = createStyles(colors);
 
   const [isOpen, setIsOpen] = useState(false);
-
   const [draftDate, setDraftDate] = useState<Date>(
     value ? new Date(value) : new Date(),
   );
 
+  const handleAndroidChange = (
+    event: DateTimePickerEvent,
+    selectedDate?: Date,
+  ) => {
+    if (event.type !== "set" || !selectedDate) {
+      return;
+    }
+
+    onChange(formatDate(selectedDate));
+  };
+
   const handleOpen = () => {
     Keyboard.dismiss();
 
-    setDraftDate(value ? new Date(value) : new Date());
+    const nextDate = value ? new Date(value) : new Date();
+    setDraftDate(nextDate);
+
+    if (Platform.OS === "android") {
+      DateTimePickerAndroid.open({
+        value: nextDate,
+        mode: "date",
+        display: "spinner",
+        maximumDate: new Date(),
+        onChange: handleAndroidChange,
+      });
+
+      return;
+    }
 
     setIsOpen(true);
   };
 
-  const handleDateChange = (
+  const handleIosDateChange = (
     event: DateTimePickerEvent,
     selectedDate?: Date,
   ) => {
@@ -51,8 +77,7 @@ export default function DateField({
   };
 
   const handleConfirm = () => {
-    onChange(draftDate.toISOString().split("T")[0]);
-
+    onChange(formatDate(draftDate));
     setIsOpen(false);
   };
 
@@ -75,37 +100,39 @@ export default function DateField({
         />
       </Pressable>
 
-      <Modal
-        visible={isOpen}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setIsOpen(false)}
-      >
-        <View style={styles.overlay}>
-          <View style={styles.card}>
-            <View style={styles.header}>
-              <Pressable onPress={() => setIsOpen(false)}>
-                <AppText style={styles.cancel}>Cancel</AppText>
-              </Pressable>
+      {Platform.OS === "ios" ? (
+        <Modal
+          visible={isOpen}
+          transparent
+          animationType="fade"
+          onRequestClose={() => setIsOpen(false)}
+        >
+          <View style={styles.overlay}>
+            <View style={styles.card}>
+              <View style={styles.header}>
+                <Pressable onPress={() => setIsOpen(false)}>
+                  <AppText style={styles.cancel}>Cancel</AppText>
+                </Pressable>
 
-              <AppText style={styles.title}>Date of birth</AppText>
+                <AppText style={styles.title}>Date of birth</AppText>
 
-              <Pressable onPress={handleConfirm}>
-                <AppText style={styles.done}>Done</AppText>
-              </Pressable>
+                <Pressable onPress={handleConfirm}>
+                  <AppText style={styles.done}>Done</AppText>
+                </Pressable>
+              </View>
+
+              <DateTimePicker
+                value={draftDate}
+                mode="date"
+                display="spinner"
+                maximumDate={new Date()}
+                onChange={handleIosDateChange}
+                style={styles.picker}
+              />
             </View>
-
-            <DateTimePicker
-              value={draftDate}
-              mode="date"
-              display={Platform.OS === "ios" ? "spinner" : "spinner"}
-              maximumDate={new Date()}
-              onChange={handleDateChange}
-              style={styles.picker}
-            />
           </View>
-        </View>
-      </Modal>
+        </Modal>
+      ) : null}
     </>
   );
 }
