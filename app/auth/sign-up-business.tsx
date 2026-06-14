@@ -223,7 +223,7 @@ export default function SignUpBusinessScreen() {
     >
       <KeyboardAvoidingView
         style={{ flex: 1 }}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
         <ScrollView
           ref={scrollRef}
@@ -508,7 +508,9 @@ export default function SignUpBusinessScreen() {
                   value={latitude}
                   onChangeText={setLatitude}
                   onClear={() => setLatitude("")}
-                  keyboardType="decimal-pad"
+                  keyboardType={
+                    Platform.OS === "ios" ? "decimal-pad" : "default"
+                  }
                   disabled={isLoading}
                 />
 
@@ -523,7 +525,9 @@ export default function SignUpBusinessScreen() {
                   value={longitude}
                   onChangeText={setLongitude}
                   onClear={() => setLongitude("")}
-                  keyboardType="decimal-pad"
+                  keyboardType={
+                    Platform.OS === "ios" ? "decimal-pad" : "default"
+                  }
                   disabled={isLoading}
                 />
 
